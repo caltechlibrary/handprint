@@ -1,0 +1,69 @@
+# -*- mode: sh-mode; -*-
+
+# Compiled source
+# .............................................................................
+
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Compressed archives & package files
+# .............................................................................
+
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# OS-specific things to ignore:
+# .............................................................................
+
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Emacs-specific things to ignore:
+# .............................................................................
+
+*~
+.#*
+.git/COMMIT_EDITMSG
+auto
+*.synctex.gz
+TAGS
+
+# LaTeX-specific things to ignore:
+# .............................................................................
+
+*.aux
+*.log
+*.bbl
+*.blg
+*.out
+*.toc
+*.loc
+*.mp
+
+# Python-specific things to ignore:
+# .............................................................................
+
+*.pyc
+__pycache__
+
+
+# Project-specific things to ignore:
+# .............................................................................
+
+build
+dist

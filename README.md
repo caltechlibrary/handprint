@@ -1,29 +1,29 @@
-@@REPO_NAME@@
-=============
+Handprint<img width="100px" align="right" src=".graphics/noun_Hand_733265.svg">
+=========
 
-@@SHORT_DESCRIPTION@@
+An experiment with handwritten text optical recognition on Caltech Archives materials.
 
 *Authors*:      [Michael Hucka](http://github.com/mhucka)<br>
-*Repository*:   [https://github.com/caltechlibrary/urlup](https://github.com/caltechlibrary/@@REPO@@)<br>
+*Repository*:   [https://github.com/caltechlibrary/handprint](https://github.com/caltechlibrary/handprint)<br>
 *License*:      BSD/MIT derivative &ndash; see the [LICENSE](LICENSE) file for more information
 
 ☀ Introduction
 -----------------------------
 
-@@EXPLANATION@@
+Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the use of alternative optical character recognition (OCR) and handwritten text recognition (HTR) methods on documents from the [Caltech Archives](http://archives.caltech.edu).  Tests include the use of Google's OCR capabilities in their Google Cloud Vision API (https://cloud.google.com/vision/docs/ocr) and [Tesseract](https://en.wikipedia.org/wiki/Tesseract_(software)).
 
 ✺ Installation instructions
 ---------------------------
 
 The following is probably the simplest and most direct way to install this software on your computer:
 ```sh
-sudo pip3 install git+https://github.com/caltechlibrary/@@REPO@@.git
+sudo pip3 install git+https://github.com/caltechlibrary/handprint.git
 ```
 
 Alternatively, you can clone this GitHub repository and then run `setup.py`:
 ```sh
-git clone https://github.com/caltechlibrary/@@REPO@@.git
-cd @@REPO@@
+git clone https://github.com/caltechlibrary/handprint.git
+cd handprint
 sudo python3 -m pip install .
 ```
 
@@ -35,7 +35,13 @@ sudo python3 -m pip install .
 ⁇ Getting help and support
 --------------------------
 
-If you find an issue, please submit it in [the GitHub issue tracker](https://github.com/caltechlibrary/@@REPO@@/issues) for this repository.
+If you find an issue, please submit it in [the GitHub issue tracker](https://github.com/caltechlibrary/handprint/issues) for this repository.
+
+
+☺︎ Acknowledgments
+-----------------------
+
+The [vector artwork](https://thenounproject.com/search/?q=hand&i=733265) of a hand used as a logo for Handprint was created by [Kevin](https://thenounproject.com/kevn/) from the Noun Project.  It is licensed under the Creative Commons [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/) license.
 
 
 ☮︎ Copyright and license

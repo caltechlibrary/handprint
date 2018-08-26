@@ -10,7 +10,7 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 ☀ Introduction
 -----------------------------
 
-Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the use of alternative optical character recognition (OCR) and handwritten text recognition (HTR) methods on documents from the [Caltech Archives](http://archives.caltech.edu).  Tests include the use of Google's OCR capabilities in their Google Cloud Vision API (https://cloud.google.com/vision/docs/ocr) and [Tesseract](https://en.wikipedia.org/wiki/Tesseract_(software)).
+Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the use of alternative optical character recognition (OCR) and handwritten text recognition (HTR) methods on documents from the [Caltech Archives](http://archives.caltech.edu).  Tests include the use of Google's OCR/HTR capabilities in their [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr) and [Tesseract](https://en.wikipedia.org/wiki/Tesseract_(software)).
 
 ✺ Installation instructions
 ---------------------------
@@ -30,6 +30,13 @@ sudo python3 -m pip install .
 ▶︎ Basic operation
 ------------------
 
+Currently, Handprint is a command-line driven program.  There is a single command-line interface program unsprisingly called `handprint`.  Before `handprint` can be run, a `credentials.json` file has to be placed in the Handprint module directory.  Once it is there, `handprint` can be run with a directory or a list of image files as argument:
+
+```bash
+bin/handprint /path/to/directory/of/images
+```
+
+Each image should be a single page of a document in which handwritten text should be recognized.
 
 
 ⁇ Getting help and support

@@ -29,12 +29,13 @@ try:
     from termcolor import colored
 except:
     pass
+import time
 
 import handprint
 from handprint.messages import msg, color
 from handprint.network import network_available
 from handprint.files import files_in_directory, replace_extension, readable
-from handprint.google_ocr import GoogleHTR
+from handprint.htr.google import GoogleHTR
 
 
 # Global constants.
@@ -42,18 +43,23 @@ from handprint.google_ocr import GoogleHTR
 
 _IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.jp2', '.png', '.tif', '.tiff')
 
+_ENGINES = {'google': GoogleHTR()}
+
 
 # Main program.
 # ......................................................................
 
 @plac.annotations(
-    quiet    = ('do not print messages while working', 'flag',   'q'),
-    no_color = ('do not color-code terminal output',   'flag',   'C'),
-    version  = ('print version info and exit',         'flag',   'V'),
+    engine   = ('use HTR engine "E" (default: google)', 'option', 'e'),
+    list     = ('list known HTR engines',               'flag',   'l'),
+    quiet    = ('do not print messages while working',  'flag',   'q'),
+    no_color = ('do not color-code terminal output',    'flag',   'C'),
+    version  = ('print version info and exit',          'flag',   'V'),
     files    = 'directories and/or files to process',
 )
 
-def main(quiet = False, no_color = False, version = False, *files):
+def main(engine = 'E', list = False,
+         quiet = False, no_color = False, version = False, *files):
 
     # Our defaults are to do things like color the output, which means the
     # command line flags make more sense as negated values (e.g., "no-color").
@@ -64,10 +70,19 @@ def main(quiet = False, no_color = False, version = False, *files):
     if version:
         print_version()
         sys.exit()
+    if list:
+        msg('Known engines (use as values for option -e):', 'info', use_color)
+        for key in _ENGINES.keys():
+            msg('   {}'.format(key), 'info', use_color)
+        sys.exit()
     if not files:
         raise SystemExit(color('No directories or files given', 'error', use_color))
     if not network_available():
         raise SystemExit(color('No network', 'error', use_color))
+    if engine == 'E':
+        engine = 'google'
+    if not quiet:
+        from halo import Halo
 
     # Let's do this thing.
     todo = []
@@ -77,10 +92,30 @@ def main(quiet = False, no_color = False, version = False, *files):
         elif path.isdir(item):
             todo += files_in_directory(item, extensions = _IMAGE_EXTENSIONS)
         else:
-            raise ValueError(color('"{}" not a file or directory', 'warn', use_color))
-    google = GoogleHTR()
+            msg('"{}" not a file or directory'.format(item), 'warn', use_color)
+    if engine in _ENGINES:
+        htrengine = _ENGINES[engine]
+    else:
+        msg('"{}" is not known'.format(engine), 'error', use_color)
+        sys.exit()
+
+    if not quiet:
+        msg('Using HTR engine "{}".'.format(engine), 'info', use_color)
     for file in todo:
-        save_output(google.text(file), replace_extension(file, '.g_txt'))
+        full_path = path.realpath(path.join(os.getcwd(), file))
+        file_dir = path.dirname(full_path)
+        file_name = path.basename(full_path)
+        dest_dir = path.join(file_dir, engine)
+        if not path.exists(dest_dir):
+            os.makedirs(dest_dir)
+        dest_file = replace_extension(path.join(dest_dir, file_name), '.txt')
+        if use_color:
+            with Halo(spinner='bouncingBall', enabled = not quiet):
+                msg('"{}" -> "{}"'.format(file, dest_file), 'info', use_color)
+                save_output(htrengine.text_from(file), dest_file)
+        else:
+            msg('"{}" -> "{}"'.format(file, dest_file))
+            save_output(htrengine.text_from(file), dest_file)
 
     msg('Done.', 'info', use_color)
 
@@ -103,9 +138,20 @@ def print_version():
 
 
 def save_output(text, file):
-    import pdb; pdb.set_trace()
     with open(file, 'w') as f:
         f.write(text)
+
+# init_halo_hack() is mostly a guess at a way to keep the first part of the
+# spinner printed by Halo from overwriting part of the first message we
+# print.  It seems to work, but the problem that this tries to solve occurred
+# sporadically anyway, so maybe the issue still remains and I just haven't
+# seen it happen again.
+
+def init_halo_hack():
+    '''Write a blank to prevent occasional garbled first line printed by Halo.'''
+    sys.stdout.write('')
+    sys.stdout.flush()
+    time.sleep(0.1)
 
 
 # Main entry point.

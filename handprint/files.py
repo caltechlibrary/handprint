@@ -26,6 +26,15 @@ def module_path():
     return path.abspath(handprint.__path__[0])
 
 
+def handprint_path():
+    '''Returns the path to where Handprint is installed.'''
+    # The path returned by module.__path__ is to the directory containing the
+    # __init__.py file.  What we want here is the path to the installation of
+    # the Handprint binary.  I don't know how to get that in a os-independent
+    # way, so I'm punting here.
+    return path.abspath(path.join(module_path(), '..'))
+
+
 def files_in_directory(dir, extensions = None):
     if not path.isdir(dir):
         return []

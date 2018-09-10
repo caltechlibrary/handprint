@@ -1,0 +1,27 @@
+#!/usr/bin/env python3
+# =============================================================================
+# @file    handprint
+# @brief   Simple interface to run handprint, for testing and exploration
+# @author  Michael Hucka <mhucka@caltech.edu>
+# @license Please see the file named LICENSE in the project directory
+# @website https://github.com/caltechlibrary/handprint
+# =============================================================================
+
+# Allow this program to be executed directly from the 'bin' directory.
+import os
+import sys
+import plac
+
+# Allow this program to be executed directly from the 'bin' directory.
+try:
+    thisdir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.append(os.path.join(thisdir, '..'))
+except:
+    sys.path.append('..')
+
+# Hand over to the command line interface.
+import handprint
+from handprint.__main__ import main as main
+
+if __name__ == "__main__":
+    plac.call(main)

@@ -1,3 +1,6 @@
+'''
+google.py: interface to Google HTR network service
+'''
 
 import io
 import os
@@ -5,16 +8,20 @@ from os import path
 from google.cloud import vision_v1p3beta1 as vision
 
 import handprint
-from handprint.files import module_path
+from handprint.files import module_path, handprint_path
 
+from .base import HTR
 
-class GoogleHTR(object):
+# Main class.
+# -----------------------------------------------------------------------------
+
+class GoogleHTR(HTR):
     def __init__(self):
-        credentials_file = path.join(module_path(), 'credentials.json')
+        credentials_file = path.join(handprint_path(), 'credentials.json')
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_file
 
 
-    def text(self, path):
+    def text_from(self, path):
         with io.open(path, 'rb') as image_file:
             content = image_file.read()
 

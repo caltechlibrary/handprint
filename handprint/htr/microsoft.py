@@ -32,17 +32,26 @@ class MicrosoftHTR(HTR):
                    'Content-Type': 'application/octet-stream'}
         params  = {'mode': 'Handwritten'}
         image_data = open(path, 'rb').read()
-        response = requests.post(text_recognition_url, data = image_data,
-                                 params = params, headers = headers)
-        response.raise_for_status()
 
-        # Extracting handwritten text requires two API calls: One call to submit the
-        # image for processing, the other to retrieve the text found in the image.
+        # MS seems to reject files larger than 1 MB.  The result is an HTTP
+        # status code 400, "Bad Request for url".  So check it before trying.
+        if len(image_data) > 1024*1024:
+            msg('File "{}" too large for MS service'.format(path), 'warn')
+            return ''
 
-        # Holds the URI used to retrieve the recognized text.
-        operation_url = response.headers["Operation-Location"]
+        # Post it to the Microsoft cloud service.
+        response = requests.post(text_recognition_url, headers = headers,
+                                 params = params, data = image_data)
+        try:
+            response.raise_for_status()
+        except:
+            msg('MS rejected "{}"'.format(path), 'warn')
+            return ''
 
-        # The recognized text isn't immediately available, so poll to wait for completion.
+        # The Microsoft API for extracting handwritten text requires two API
+        # calls: one call to submit the image for processing, the other to
+        # retrieve the text found in the image.  We have to poll and wait
+        # until a result is available.
         analysis = {}
         poll = True
         while (poll):
@@ -51,12 +60,11 @@ class MicrosoftHTR(HTR):
             analysis = response_final.json()
             time.sleep(1)
             if ("recognitionResult" in analysis):
-                poll= False
-                if ("status" in analysis and analysis['status'] == 'Failed'):
-                    poll= False
+                poll = False
+            if ("status" in analysis and analysis['status'] == 'Failed'):
+                poll = False
 
         lines = sorted(analysis['recognitionResult']['lines'],
                        key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
 
-        import pdb; pdb.set_trace()
         return ' '.join(x['text'] for x in lines)

@@ -34,8 +34,10 @@ import time
 import handprint
 from handprint.messages import msg, color
 from handprint.network import network_available
-from handprint.files import files_in_directory, replace_extension, readable
+from handprint.files import files_in_directory, replace_extension, handprint_path
+from handprint.files import readable
 from handprint.htr.google import GoogleHTR
+from handprint.htr.microsoft import MicrosoftHTR
 
 
 # Global constants.
@@ -43,22 +45,26 @@ from handprint.htr.google import GoogleHTR
 
 _IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.jp2', '.png', '.tif', '.tiff')
 
-_ENGINES = {'google': GoogleHTR()}
+_METHODS = {
+    'google': GoogleHTR,
+    'microsoft': MicrosoftHTR,
+}
 
 
 # Main program.
 # ......................................................................
 
 @plac.annotations(
-    engine   = ('use HTR engine "E" (default: google)', 'option', 'e'),
-    list     = ('list known HTR engines',               'flag',   'l'),
-    quiet    = ('do not print messages while working',  'flag',   'q'),
-    no_color = ('do not color-code terminal output',    'flag',   'C'),
-    version  = ('print version info and exit',          'flag',   'V'),
+    credsdir = ('look for credentials files in directory "D"', 'option', 'c'),
+    list     = ('print list of known HTR methods',             'flag',   'l'),
+    method   = ('use HTR method "M" (default: "google")',      'option', 'm'),
+    quiet    = ('do not print messages while working',         'flag',   'q'),
+    no_color = ('do not color-code terminal output',           'flag',   'C'),
+    version  = ('print version info and exit',                 'flag',   'V'),
     files    = 'directories and/or files to process',
 )
 
-def main(engine = 'E', list = False,
+def main(credsdir = 'D', list = False, method = 'M',
          quiet = False, no_color = False, version = False, *files):
 
     # Our defaults are to do things like color the output, which means the
@@ -71,20 +77,29 @@ def main(engine = 'E', list = False,
         print_version()
         sys.exit()
     if list:
-        msg('Known engines (use as values for option -e):', 'info', use_color)
-        for key in _ENGINES.keys():
+        msg('Known methods (use as values for option -m):', 'info', use_color)
+        for key in _METHODS.keys():
             msg('   {}'.format(key), 'info', use_color)
         sys.exit()
     if not files:
         raise SystemExit(color('No directories or files given', 'error', use_color))
     if not network_available():
         raise SystemExit(color('No network', 'error', use_color))
-    if engine == 'E':
-        engine = 'google'
+    if credsdir == 'D':
+        credsdir = path.join(handprint_path(), 'creds')
+    elif not readable(credsdir):
+        raise SystemExit(color('"{}" not readable'.format(credsdir), 'error', use_color))
+    if method == 'M':
+        method = 'google'
+    if method.lower() in _METHODS:
+        tool = _METHODS[method.lower()]()
+    else:
+        msg('"{}" is not known'.format(method), 'error', use_color)
+        sys.exit()
     if not quiet:
         from halo import Halo
 
-    # Let's do this thing.
+    # Create a list of files to be processed.
     todo = []
     for item in files:
         if path.isfile(item) and path.splitext(item)[1] in _IMAGE_EXTENSIONS:
@@ -93,29 +108,26 @@ def main(engine = 'E', list = False,
             todo += files_in_directory(item, extensions = _IMAGE_EXTENSIONS)
         else:
             msg('"{}" not a file or directory'.format(item), 'warn', use_color)
-    if engine in _ENGINES:
-        htrengine = _ENGINES[engine]
-    else:
-        msg('"{}" is not known'.format(engine), 'error', use_color)
-        sys.exit()
 
+    # Let's do this thing.
     if not quiet:
-        msg('Using HTR engine "{}".'.format(engine), 'info', use_color)
+        msg('Using HTR method "{}".'.format(method), 'info', use_color)
+    tool.init_credentials(credsdir)
+    spinner = Halo(spinner='bouncingBall', enabled = (use_color and not quiet))
     for file in todo:
+        if use_color:
+            spinner.start()
         full_path = path.realpath(path.join(os.getcwd(), file))
-        file_dir = path.dirname(full_path)
         file_name = path.basename(full_path)
-        dest_dir = path.join(file_dir, engine)
+        dest_dir = path.join(path.dirname(full_path), method)
         if not path.exists(dest_dir):
             os.makedirs(dest_dir)
         dest_file = replace_extension(path.join(dest_dir, file_name), '.txt')
+        if not quiet:
+            msg('"{}" -> "{}"'.format(file, dest_file), 'info', use_color)
+        save_output(tool.text_from(file), dest_file)
         if use_color:
-            with Halo(spinner='bouncingBall', enabled = not quiet):
-                msg('"{}" -> "{}"'.format(file, dest_file), 'info', use_color)
-                save_output(htrengine.text_from(file), dest_file)
-        else:
-            msg('"{}" -> "{}"'.format(file, dest_file))
-            save_output(htrengine.text_from(file), dest_file)
+            spinner.stop()
 
     msg('Done.', 'info', use_color)
 
@@ -131,10 +143,10 @@ if sys.platform.startswith('win'):
 # ......................................................................
 
 def print_version():
-    print('{} version {}'.format(turf.__title__, turf.__version__))
-    print('Author: {}'.format(turf.__author__))
-    print('URL: {}'.format(turf.__url__))
-    print('License: {}'.format(turf.__license__))
+    print('{} version {}'.format(handprint.__title__, handprint.__version__))
+    print('Author: {}'.format(handprint.__author__))
+    print('URL: {}'.format(handprint.__url__))
+    print('License: {}'.format(handprint.__license__))
 
 
 def save_output(text, file):
@@ -156,7 +168,7 @@ def init_halo_hack():
 
 # Main entry point.
 # ......................................................................
-# The following allows users to invoke this using "python3 -m turf".
+# The following allows users to invoke this using "python3 -m handprint".
 
 if __name__ == '__main__':
     plac.call(main)

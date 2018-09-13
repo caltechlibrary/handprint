@@ -67,3 +67,6 @@ __pycache__
 
 build
 dist
+
+# This is the default location for credentials files.
+creds

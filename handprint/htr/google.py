@@ -8,17 +8,19 @@ from os import path
 from google.cloud import vision_v1p3beta1 as vision
 
 import handprint
-from handprint.files import module_path, handprint_path
+from handprint.credentials.google_auth import GoogleCredentials
 
 from .base import HTR
 
+
 # Main class.
 # -----------------------------------------------------------------------------
 
 class GoogleHTR(HTR):
-    def __init__(self):
-        credentials_file = path.join(handprint_path(), 'credentials.json')
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_file
+    def init_credentials(self, credentials_dir = None):
+        # Haven't been able to get this to work by reading the credentials
+        # self.credentials = GoogleCredentials(credentials_dir).creds()
+        GoogleCredentials(credentials_dir)
 
 
     def text_from(self, path):

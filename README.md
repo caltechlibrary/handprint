@@ -39,6 +39,40 @@ bin/handprint /path/to/directory/of/images
 Each image should be a single page of a document in which handwritten text should be recognized.
 
 
+Credentials
+-----------
+
+Credentials for different services need to be provided in the form of JSON files.  The specific contents and forms of the files differ depending on the particular service.
+
+### Google
+
+Credentials for using a Google service account are stored in a JSON file containing many fields.  The overall form looks like this:
+
+```
+{
+  "type": "service_account",
+  "project_id": "theid",
+  "private_key_id": "thekey",
+  "private_key": "-----BEGIN PRIVATE KEY-----anotherkey-----END PRIVATE KEY-----\n",
+  "client_email": "emailaddress",
+  "client_id": "id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "someurl"
+}
+```
+
+### Microsoft
+
+Microsoft's approach to credentials in Azure involves the use of [subscription keys](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/vision-api-how-to-topics/howtosubscribe).  The credentials file for Handprint just needs to contain a single field:
+
+```json
+{
+ "subscription_key": "thekey"
+}
+```
+
 ⁇ Getting help and support
 --------------------------
 

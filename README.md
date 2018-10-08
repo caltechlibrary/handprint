@@ -78,6 +78,8 @@ Microsoft's approach to credentials in Azure involves the use of [subscription k
 }
 ```
 
+The value of "thekey" will be a string such as "18de248475134eb49ae4a4e94b93461c".  When signing up for an Azure cloud service account, make sure to choose "Western US" as the region so that the service URL begins with "https://westus.api.cognitive.microsoft.com".
+
 ⁇ Getting help and support
 --------------------------
 

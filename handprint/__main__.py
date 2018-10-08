@@ -66,6 +66,19 @@ _METHODS = {
 
 def main(credsdir = 'D', list = False, method = 'M',
          quiet = False, no_color = False, version = False, *files):
+    '''Handprint (Handwritten Page Recognition Test) can run alternative
+optical character recognition (OCR) and handwritten text recognition (HTR)
+methods on documents.  It takes a directory of images and generates text
+files containing the results of applying methods from Google, Microsoft and
+others.
+
+If given the command-line flag -l (or /l on Windows), Handprint will print a
+list of the known methods.  The option -m (/m on Windows) can be used to
+select a specific method.  (The default method is "google".)
+
+If given the -V option (/V on Windows), this program will print version
+information and exit without doing anything else.
+'''
 
     # Our defaults are to do things like color the output, which means the
     # command line flags make more sense as negated values (e.g., "no-color").
@@ -77,7 +90,7 @@ def main(credsdir = 'D', list = False, method = 'M',
         print_version()
         sys.exit()
     if list:
-        msg('Known methods (use as values for option -m):', 'info', use_color)
+        msg('Known methods (for use as values for option -m):', 'info', use_color)
         for key in _METHODS.keys():
             msg('   {}'.format(key), 'info', use_color)
         sys.exit()
@@ -87,7 +100,7 @@ def main(credsdir = 'D', list = False, method = 'M',
         raise SystemExit(color('No network', 'error', use_color))
     if credsdir == 'D':
         credsdir = path.join(handprint_path(), 'creds')
-    elif not readable(credsdir):
+    if not readable(credsdir):
         raise SystemExit(color('"{}" not readable'.format(credsdir), 'error', use_color))
     if method == 'M':
         method = 'google'
@@ -160,7 +173,9 @@ def save_output(text, file):
 # seen it happen again.
 
 def init_halo_hack():
-    '''Write a blank to prevent occasional garbled first line printed by Halo.'''
+
+    '''Write a blank to prevent occasional garbled first line printed by
+    Halo.'''
     sys.stdout.write('')
     sys.stdout.flush()
     time.sleep(0.1)

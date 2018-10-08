@@ -1,5 +1,17 @@
 '''
 files.py: utilities for working with files.
+
+Authors
+-------
+
+Michael Hucka <mhucka@caltech.edu> -- Caltech Library
+
+Copyright
+---------
+
+Copyright (c) 2018 by the California Institute of Technology.  This code is
+open-source software released under a 3-clause BSD license.  Please see the
+file "LICENSE" for more information.
 '''
 
 import os
@@ -9,14 +21,26 @@ import subprocess
 import webbrowser
 
 import handprint
+from handprint.debug import log
+
+
+# Constants.
+# .............................................................................
+
+_HANDPRINT_REG_PATH = r'Software\Caltech Library\Handprint\Settings'
 
 
 # Main functions.
 # .............................................................................
 
-def readable(file):
-    '''Returns True if the given 'file' is accessible and readable.'''
-    return os.access(file, os.F_OK | os.R_OK)
+def readable(dest):
+    '''Returns True if the given 'dest' is accessible and readable.'''
+    return os.access(dest, os.F_OK | os.R_OK)
+
+
+def writable(dest):
+    '''Returns True if the destination is writable.'''
+    return os.access(dest, os.F_OK | os.W_OK)
 
 
 def module_path():
@@ -28,11 +52,31 @@ def module_path():
 
 def handprint_path():
     '''Returns the path to where Handprint is installed.'''
-    # The path returned by module.__path__ is to the directory containing the
-    # __init__.py file.  What we want here is the path to the installation of
-    # the Handprint binary.  I don't know how to get that in a os-independent
-    # way, so I'm punting here.
-    return path.abspath(path.join(module_path(), '..'))
+    # The path returned by module.__path__ is to the directory containing
+    # the __init__.py file.  What we want here is the path to the installation
+    # of the Handprint binary.
+    if sys.platform.startswith('win'):
+        from winreg import OpenKey, CloseKey, QueryValueEx, HKEY_LOCAL_MACHINE, KEY_READ
+        try:
+            if __debug__: log('Reading Windows registry entry')
+            key = OpenKey(HKEY_LOCAL_MACHINE, _HANDPRINT_REG_PATH)
+            value, regtype = QueryValueEx(key, 'Path')
+            CloseKey(key)
+            if __debug__: log('Path to windows installation: {}'.format(value))
+            return value
+        except WindowsError:
+            # Kind of a problem. Punt and return a default value.
+            return path.abspath('C:\Program Files\Handprint')
+    else:
+        return path.abspath(path.join(module_path(), '..'))
+
+
+def desktop_path():
+    '''Returns the path to the user's desktop directory.'''
+    if sys.platform.startswith('win'):
+        return path.join(path.join(os.environ['USERPROFILE']), 'Desktop')
+    else:
+        return path.join(path.join(path.expanduser('~')), 'Desktop')
 
 
 def files_in_directory(dir, extensions = None):
@@ -54,6 +98,8 @@ def replace_extension(filepath, ext):
 
 
 def rename_existing(file, notifier):
+    '''Renames 'file' to 'file.bak'.'''
+
     def rename(f):
         backup = f + '.bak'
         # If we fail, we just give up instead of throwing an exception.
@@ -61,10 +107,6 @@ def rename_existing(file, notifier):
             os.rename(f, backup)
         except:
             return
-        notifier.msg('Renamed existing file "{}" to "{}"'.format(f, backup),
-                     'To avoid overwriting the existing file "{}", '.format(f)
-                     + 'it has been renamed to "{}"'.format(backup),
-                     'info')
 
     if path.exists(file):
         rename(file)
@@ -87,4 +129,6 @@ def open_file(file):
 
 
 def open_url(url):
+    '''Open the given 'url' in a web browser using the current platform's
+    default approach.'''
     webbrowser.open(url)

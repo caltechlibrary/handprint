@@ -38,12 +38,13 @@ from handprint.files import files_in_directory, replace_extension, handprint_pat
 from handprint.files import readable
 from handprint.htr.google import GoogleHTR
 from handprint.htr.microsoft import MicrosoftHTR
+from handprint.debug import set_debug, log
 
 
 # Global constants.
 # .............................................................................
 
-_IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.jp2', '.png', '.tif', '.tiff')
+_IMAGE_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.gif', '.bmp')
 
 _METHODS = {
     'google': GoogleHTR,
@@ -60,21 +61,27 @@ _METHODS = {
     method   = ('use HTR method "M" (default: "google")',      'option', 'm'),
     quiet    = ('do not print messages while working',         'flag',   'q'),
     no_color = ('do not color-code terminal output',           'flag',   'C'),
+    debug    = ('turn on debugging (console only)',            'flag',   'D'),
     version  = ('print version info and exit',                 'flag',   'V'),
     files    = 'directories and/or files to process',
 )
 
-def main(credsdir = 'D', list = False, method = 'M',
-         quiet = False, no_color = False, version = False, *files):
-    '''Handprint (Handwritten Page Recognition Test) can run alternative
-optical character recognition (OCR) and handwritten text recognition (HTR)
-methods on documents.  It takes a directory of images and generates text
-files containing the results of applying methods from Google, Microsoft and
-others.
+def main(credsdir = 'D', list = False, method = 'M', quiet = False,
+         no_color = False, debug = False, version = False, *files):
+    '''Handprint (a loose acronym of "Handwritten Page Recognition Test") can
+run alternative optical character recognition (OCR) and handwritten text
+recognition (HTR) methods on documents.
+
+When invoked, the command-line arguments should end with either one or more
+directory names or one or more image files.  Handprint will send each image
+file found to OCR/HTR services from Google, Microsoft and others, and write the
+text returned by them to text files in the same directories as the images.
+The text files will be placed in new directories named after the service being
+used; e.g., "microsoft" for the results of using Microsoft's Azure API.
 
 If given the command-line flag -l (or /l on Windows), Handprint will print a
-list of the known methods.  The option -m (/m on Windows) can be used to
-select a specific method.  (The default method is "google".)
+list of the known methods and then exit.  The option -m (/m on Windows) can
+be used to select a specific method.  (The default method is "google".)
 
 If given the -V option (/V on Windows), this program will print version
 information and exit without doing anything else.
@@ -86,6 +93,8 @@ information and exit without doing anything else.
     use_color   = not no_color
 
     # Process arguments.
+    if debug:
+        set_debug(True)
     if version:
         print_version()
         sys.exit()

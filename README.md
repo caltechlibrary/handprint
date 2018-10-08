@@ -36,7 +36,12 @@ Currently, Handprint is a command-line driven program.  There is a single comman
 bin/handprint /path/to/directory/of/images
 ```
 
-Each image should be a single page of a document in which handwritten text should be recognized.
+Each image should be a single page of a document in which handwritten text should be recognized.  The images must the least common denominator among the formats accepted by the cloud services, which at this time, is JPEG, PNG, GIF, and BMP.
+
+<!--
+* Google: [JPEG, PNG8, PNG24, GIF, Animated GIF (first frame only), BMP, WEBP, RAW, ICO, PDF, TIFF](https://cloud.google.com/vision/docs/supported-files)
+* Microsoft: [JPEG, PNG, GIF, or BMP format](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home)
+-->
 
 
 Credentials

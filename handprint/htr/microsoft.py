@@ -8,14 +8,17 @@ https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quicks
 import os
 from   os import path
 import requests
+from requests.exceptions import HTTPError
 import sys
 import time
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
+from handprint.htr.base import HTR
+from handprint.messages import msg
+from handprint.exceptions import ServiceFailure
 
-from .base import HTR
-
+
 # Main class.
 # -----------------------------------------------------------------------------
 
@@ -25,7 +28,7 @@ class MicrosoftHTR(HTR):
 
 
     def text_from(self, path):
-        vision_base_url = "https://westcentralus.api.cognitive.microsoft.com/vision/v2.0/"
+        vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
         text_recognition_url = vision_base_url + "recognizeText"
 
         headers = {'Ocp-Apim-Subscription-Key': self.credentials,
@@ -33,18 +36,33 @@ class MicrosoftHTR(HTR):
         params  = {'mode': 'Handwritten'}
         image_data = open(path, 'rb').read()
 
-        # MS seems to reject files larger than 1 MB.  The result is an HTTP
-        # status code 400, "Bad Request for url".  So check it before trying.
-        if len(image_data) > 1024*1024:
-            msg('File "{}" too large for MS service'.format(path), 'warn')
-            return ''
+        # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home
+        # states "The file size of the image must be less than 4 megabytes (MB)"
+        if len(image_data) > 4*1024*1024:
+            text = 'File "{}" is too large for Microsoft service'.format(path)
+            msg(text, 'warn')
+            return text
 
         # Post it to the Microsoft cloud service.
         response = requests.post(text_recognition_url, headers = headers,
                                  params = params, data = image_data)
         try:
             response.raise_for_status()
-        except:
+        except HTTPError as err:
+            if response.status_code in [401, 402, 403, 407, 451, 511]:
+                text = 'Authentication failure for MS service -- {}'.format(err)
+                raise ServiceFailure(text)
+            elif code == 429:
+                text = 'Server blocking further requests due to rate limits'
+                raise ServiceFailure(text)
+            elif code == 503:
+                text = 'Server is unavailable -- try again later'
+                raise ServiceFailure(text)
+            else:
+                text = 'Encountered network communications problem -- {}'.format(err) 
+                raise ServiceFailure(text)
+        except Exception as err:
+            import pdb; pdb.set_trace()
             msg('MS rejected "{}"'.format(path), 'warn')
             return ''
 

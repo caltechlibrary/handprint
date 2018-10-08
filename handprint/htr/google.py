@@ -25,12 +25,22 @@ class GoogleHTR(HTR):
 
     def text_from(self, path):
         with io.open(path, 'rb') as image_file:
-            content = image_file.read()
+            image_data = image_file.read()
 
-        image    = vision.types.Image(content = content)
-        context  = vision.types.ImageContext(language_hints = ['en-t-i0-handwrit'])
-        client   = vision.ImageAnnotatorClient()
-        response = client.document_text_detection(image = image,
-                                                  image_context = context)
+        # Google Cloud Vision API docs state that images cannot exceed 20 MB:
+        # https://cloud.google.com/vision/docs/supported-files
+        if len(image_data) > 20*1024*1024:
+            text = 'Error: file "{}" is too large for Google service'.format(path)
+            msg(text, 'warn')
+            return text
 
-        return response.full_text_annotation.text
+        try:
+            image    = vision.types.Image(content = image_data)
+            context  = vision.types.ImageContext(language_hints = ['en-t-i0-handwrit'])
+            client   = vision.ImageAnnotatorClient()
+            response = client.document_text_detection(image = image,
+                                                      image_context = context)
+            return response.full_text_annotation.text
+        except Exception as err:
+            text = 'Error: failed to convert "{}": {}'.format(path, err)
+            return text

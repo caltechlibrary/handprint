@@ -70,6 +70,8 @@ Credentials for using a Google service account are stored in a JSON file contain
 }
 ```
 
+Some notes about creating these credentials can be found in the [project Wiki pages](https://github.com/caltechlibrary/handprint/wiki/Getting-Google-Cloud-credentials).
+
 
 ▶︎ Running Handprint
 ------------------

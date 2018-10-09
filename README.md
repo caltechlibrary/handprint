@@ -15,7 +15,7 @@ Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a sma
 ✺ Installation instructions
 ---------------------------
 
-Handprint is a program written in Python that works by invoking cloud-based services.  Installation requires both obtaining a copy of Handprint itself, and also signing up for access to the cloud service providers.
+Handprint is a program written in Python 3 that works by invoking cloud-based services.  Installation requires both obtaining a copy of Handprint itself, and also signing up for access to the cloud service providers.
 
 ### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
 
@@ -71,26 +71,42 @@ Credentials for using a Google service account are stored in a JSON file contain
 ```
 
 
-▶︎ Basic operation
+▶︎ Running Handprint
 ------------------
 
-Handprint is a command-line driven program.  There is a single command-line interface program called `handprint`.
-
-
-
-
-  Before `handprint` can be run, a `credentials.json` file has to be placed in the Handprint module directory.  Once it is there, `handprint` can be run with a directory or a list of image files as argument:
+Handprint is a command-line driven program.  There is a single command-line interface program called `handprint`.  You can run it by starting a terminal shell and `cd`'ing to the directory where you installed Handprint, and then running the program `bin/handprint` from there.  For example:
 
 ```bash
-bin/handprint /path/to/directory/of/images
+bin/handprint -h
 ```
 
-Each image should be a single page of a document in which handwritten text should be recognized.  The images must the least common denominator among the formats accepted by the cloud services, which at this time, is JPEG, PNG, GIF, and BMP.
+Alternatively, you should be able to run Handprint from anywhere using the normal approach to running Python modules:
+
+```bash
+python3 -m handprint -h
+```
+
+The `-h` option will make `handprint` display some help information and exit immediately.  To make Handprint do something more useful, you can supply arguments that are a set of file names, or one or more directories containing images.  Each image should be a single page of a document in which handwritten text should be recognized.  The images must the least common denominator among the formats accepted by the cloud services, which at this time, is JPEG, PNG, GIF, and BMP.
 
 <!--
 * Google: [JPEG, PNG8, PNG24, GIF, Animated GIF (first frame only), BMP, WEBP, RAW, ICO, PDF, TIFF](https://cloud.google.com/vision/docs/supported-files)
 * Microsoft: [JPEG, PNG, GIF, or BMP format](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home)
 -->
+
+Handprint can contact more than one cloud service for OCR and HTR.  You can use the `-l` option to make Handprint display a list of the methods currently implemented:
+
+```
+# bin/handprint -l
+Known methods (for use as values for option -m):
+   microsoft
+   google
+```
+
+To invoke a particular method, use the `-m` option followed by a method name:
+
+```bash
+bin/handprint -m microsoft /path/to/images
+```
 
 
 ⁇ Getting help and support

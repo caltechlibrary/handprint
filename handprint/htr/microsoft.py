@@ -17,6 +17,7 @@ from handprint.credentials.microsoft_auth import MicrosoftCredentials
 from handprint.htr.base import HTR
 from handprint.messages import msg
 from handprint.exceptions import ServiceFailure
+from handprint.debug import log
 
 
 # Main class.
@@ -44,11 +45,14 @@ class MicrosoftHTR(HTR):
             return text
 
         # Post it to the Microsoft cloud service.
+        if __debug__: log('Sending file to MS cloud service')
         response = requests.post(text_recognition_url, headers = headers,
                                  params = params, data = image_data)
         try:
             response.raise_for_status()
         except HTTPError as err:
+            # FIXME this might be a good place to suggest to the user that they
+            # visit https://blogs.msdn.microsoft.com/kwill/2017/05/17/http-401-access-denied-when-calling-azure-cognitive-services-apis/
             if response.status_code in [401, 402, 403, 407, 451, 511]:
                 text = 'Authentication failure for MS service -- {}'.format(err)
                 raise ServiceFailure(text)
@@ -72,6 +76,7 @@ class MicrosoftHTR(HTR):
         # until a result is available.
         analysis = {}
         poll = True
+        if __debug__: log('Polling MS for results ...')
         while (poll):
             response_final = requests.get(
                 response.headers["Operation-Location"], headers=headers)
@@ -82,6 +87,7 @@ class MicrosoftHTR(HTR):
             if ("status" in analysis and analysis['status'] == 'Failed'):
                 poll = False
 
+        if __debug__: log('Results received.')
         lines = sorted(analysis['recognitionResult']['lines'],
                        key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
 

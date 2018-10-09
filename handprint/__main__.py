@@ -111,6 +111,8 @@ information and exit without doing anything else.
         credsdir = path.join(handprint_path(), 'creds')
     if not readable(credsdir):
         raise SystemExit(color('"{}" not readable'.format(credsdir), 'error', use_color))
+    else:
+        if __debug__: log('Assuming credentials found in {}', credsdir)
     if method == 'M':
         method = 'google'
     if method.lower() in _METHODS:
@@ -143,6 +145,7 @@ information and exit without doing anything else.
         file_name = path.basename(full_path)
         dest_dir = path.join(path.dirname(full_path), method)
         if not path.exists(dest_dir):
+            if __debug__: log('Creating {}', dest_dir)
             os.makedirs(dest_dir)
         dest_file = replace_extension(path.join(dest_dir, file_name), '.txt')
         if not quiet:

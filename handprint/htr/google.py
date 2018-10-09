@@ -9,6 +9,7 @@ from google.cloud import vision_v1p3beta1 as vision
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
+from handprint.debug import log
 
 from .base import HTR
 
@@ -35,11 +36,14 @@ class GoogleHTR(HTR):
             return text
 
         try:
+            if __debug__: log('Building Google vision API object')
             image    = vision.types.Image(content = image_data)
             context  = vision.types.ImageContext(language_hints = ['en-t-i0-handwrit'])
             client   = vision.ImageAnnotatorClient()
+            if __debug__: log('Sending image to Google ...')
             response = client.document_text_detection(image = image,
                                                       image_context = context)
+            if __debug__: log('Received result.')
             return response.full_text_annotation.text
         except Exception as err:
             text = 'Error: failed to convert "{}": {}'.format(path, err)

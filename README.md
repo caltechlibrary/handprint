@@ -15,41 +15,43 @@ Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a sma
 ✺ Installation instructions
 ---------------------------
 
+Handprint is a program written in Python that works by invoking cloud-based services.  Installation requires both obtaining a copy of Handprint itself, and also signing up for access to the cloud service providers.
+
+### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
+
 The following is probably the simplest and most direct way to install this software on your computer:
 ```sh
 sudo pip3 install git+https://github.com/caltechlibrary/handprint.git
 ```
 
-Alternatively, you can clone this GitHub repository and then run `setup.py`:
+Alternatively, you can instead clone this GitHub repository and then run `setup.py` manually.  First, create a directory somewhere on your computer where you want to store the files, and cd to it from a terminal shell.  Next, execute the following commands:
 ```sh
 git clone https://github.com/caltechlibrary/handprint.git
 cd handprint
 sudo python3 -m pip install .
 ```
 
-▶︎ Basic operation
-------------------
+### ⓶&nbsp;&nbsp; _Obtain cloud service credentials_
 
-Currently, Handprint is a command-line driven program.  There is a single command-line interface program unsprisingly called `handprint`.  Before `handprint` can be run, a `credentials.json` file has to be placed in the Handprint module directory.  Once it is there, `handprint` can be run with a directory or a list of image files as argument:
+Credentials for different services need to be provided to Handprint in the form of JSON files.  Each service needs a separate JSON file named after the service (e.g., `microsoft.json`) and placed in a directory that Handprint searches.  By default, Handprint searches for the files in a subdirectory named `creds` where Handprint is installed, but an alternative diretory can be indicated at run-time using the `-c` command-line option.
 
-```bash
-bin/handprint /path/to/directory/of/images
+The specific contents and forms of the files differ depending on the particular service, as described below.
+
+### _Microsoft_
+
+Microsoft's approach to credentials in Azure involves the use of [subscription keys](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/vision-api-how-to-topics/howtosubscribe).  The credentials file for Handprint just needs to contain a single field:
+
+```json
+{
+ "subscription_key": "YOURKEYHERE"
+}
 ```
 
-Each image should be a single page of a document in which handwritten text should be recognized.  The images must the least common denominator among the formats accepted by the cloud services, which at this time, is JPEG, PNG, GIF, and BMP.
+The value of "YOURKEYHERE" will be a string such as `"18de248475134eb49ae4a4e94b93461c"`.  To sign up for Azure and obtain a key, visit [https://portal.azure.com](https://portal.azure.com) and sign in using your Caltech Access email address/login.  (Note: you will need to turn off browser security plugins such as Ad&nbsp;Block and uMatrix if you have them, or else the site will not work.)  It will redirect you to the regular Caltech Access login page and then (after you log in) back to the Dashboard [https://portal.azure.com](https://portal.azure.com), from where you can create credentials.  Some notes about this can be found in the [project Wiki pages](https://github.com/caltechlibrary/handprint/wiki/Getting-Microsoft-Azure-credentials).
 
-<!--
-* Google: [JPEG, PNG8, PNG24, GIF, Animated GIF (first frame only), BMP, WEBP, RAW, ICO, PDF, TIFF](https://cloud.google.com/vision/docs/supported-files)
-* Microsoft: [JPEG, PNG, GIF, or BMP format](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home)
--->
+When signing up for an Azure cloud service account, make sure to choose "Western US" as the region so that the service URL begins with "https://westus.api.cognitive.microsoft.com".
 
-
-Credentials
------------
-
-Credentials for different services need to be provided in the form of JSON files.  The specific contents and forms of the files differ depending on the particular service.
-
-### Google
+### _Google_
 
 Credentials for using a Google service account are stored in a JSON file containing many fields.  The overall form looks like this:
 
@@ -68,17 +70,28 @@ Credentials for using a Google service account are stored in a JSON file contain
 }
 ```
 
-### Microsoft
 
-Microsoft's approach to credentials in Azure involves the use of [subscription keys](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/vision-api-how-to-topics/howtosubscribe).  The credentials file for Handprint just needs to contain a single field:
+▶︎ Basic operation
+------------------
 
-```json
-{
- "subscription_key": "thekey"
-}
+Handprint is a command-line driven program.  There is a single command-line interface program called `handprint`.
+
+
+
+
+  Before `handprint` can be run, a `credentials.json` file has to be placed in the Handprint module directory.  Once it is there, `handprint` can be run with a directory or a list of image files as argument:
+
+```bash
+bin/handprint /path/to/directory/of/images
 ```
 
-The value of "thekey" will be a string such as "18de248475134eb49ae4a4e94b93461c".  When signing up for an Azure cloud service account, make sure to choose "Western US" as the region so that the service URL begins with "https://westus.api.cognitive.microsoft.com".
+Each image should be a single page of a document in which handwritten text should be recognized.  The images must the least common denominator among the formats accepted by the cloud services, which at this time, is JPEG, PNG, GIF, and BMP.
+
+<!--
+* Google: [JPEG, PNG8, PNG24, GIF, Animated GIF (first frame only), BMP, WEBP, RAW, ICO, PDF, TIFF](https://cloud.google.com/vision/docs/supported-files)
+* Microsoft: [JPEG, PNG, GIF, or BMP format](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home)
+-->
+
 
 ⁇ Getting help and support
 --------------------------

@@ -36,8 +36,8 @@ from handprint.messages import msg, color
 from handprint.network import network_available
 from handprint.files import files_in_directory, replace_extension, handprint_path
 from handprint.files import readable
-from handprint.htr.google import GoogleHTR
-from handprint.htr.microsoft import MicrosoftHTR
+from handprint.htr import GoogleHTR
+from handprint.htr import MicrosoftHTR
 from handprint.debug import set_debug, log
 
 

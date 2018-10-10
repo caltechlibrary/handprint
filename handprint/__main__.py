@@ -30,6 +30,7 @@ try:
 except:
     pass
 import time
+import traceback
 
 import handprint
 from handprint.messages import msg, color
@@ -38,6 +39,7 @@ from handprint.files import files_in_directory, replace_extension, handprint_pat
 from handprint.files import readable
 from handprint.htr import GoogleHTR
 from handprint.htr import MicrosoftHTR
+from handprint.exceptions import *
 from handprint.debug import set_debug, log
 
 
@@ -124,37 +126,56 @@ information and exit without doing anything else.
         from halo import Halo
 
     # Create a list of files to be processed.
-    todo = []
+    files_list = []
     for item in files:
         if path.isfile(item) and path.splitext(item)[1] in _IMAGE_EXTENSIONS:
-            todo.append(item)
+            files_list.append(item)
         elif path.isdir(item):
-            todo += files_in_directory(item, extensions = _IMAGE_EXTENSIONS)
+            files_list += files_in_directory(item, extensions = _IMAGE_EXTENSIONS)
         else:
             msg('"{}" not a file or directory'.format(item), 'warn', use_color)
 
     # Let's do this thing.
     if not quiet:
         msg('Using HTR method "{}".'.format(method), 'info', use_color)
-    tool.init_credentials(credsdir)
-    spinner = Halo(spinner='bouncingBall', enabled = (use_color and not quiet))
-    for file in todo:
-        if use_color:
-            spinner.start()
-        full_path = path.realpath(path.join(os.getcwd(), file))
-        file_name = path.basename(full_path)
-        dest_dir = path.join(path.dirname(full_path), method)
-        if not path.exists(dest_dir):
-            if __debug__: log('Creating {}', dest_dir)
-            os.makedirs(dest_dir)
-        dest_file = replace_extension(path.join(dest_dir, file_name), '.txt')
-        if not quiet:
-            msg('"{}" -> "{}"'.format(file, dest_file), 'info', use_color)
-        save_output(tool.text_from(file), dest_file)
-        if use_color:
+    spinner = None
+    try:
+        tool.init_credentials(credsdir)
+        for file in files_list:
+            if use_color and not quiet:
+                spinner = Halo(spinner='bouncingBall', text = color(file, 'info'))
+                spinner.start()
+            full_path = path.realpath(path.join(os.getcwd(), file))
+            file_name = path.basename(full_path)
+            dest_dir = path.join(path.dirname(full_path), method)
+            if not path.exists(dest_dir):
+                if __debug__: log('Creating {}', dest_dir)
+                os.makedirs(dest_dir)
+            dest_file = replace_extension(path.join(dest_dir, file_name), '.txt')
+            save_output(tool.text_from(file), dest_file)
+            if use_color and not quiet:
+                short_path = path.relpath(dest_file, os.getcwd())
+                spinner.succeed(color('{} -> {}'.format(file, short_path), 'info'))
+                spinner.stop()
+    except (KeyboardInterrupt, UserCancelled) as err:
+        if spinner:
             spinner.stop()
-
-    msg('Done.', 'info', use_color)
+        msg('Quitting.', 'info', use_color)
+        sys.exit()
+    except ServiceFailure as err:
+        if spinner:
+            spinner.fail(color('Stopping due to a problem', 'error', use_color))
+        msg(err, 'error', use_color)
+        sys.exit()
+    except Exception as err:
+        if spinner:
+            spinner.fail(color('Stopping due to a problem', 'error', use_color))
+        if debug:
+            import pdb; pdb.set_trace()
+        msg('{}\n{}'.format(str(err), traceback.format_exc()), 'error', use_color)
+        sys.exit()
+    else:
+        msg('Done.', 'info', use_color)
 
 
 # If this is windows, we want the command-line args to use slash intead

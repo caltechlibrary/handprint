@@ -6,6 +6,7 @@ google-auth>=1.5.1
 google-cloud-vision>=0.34.0
 google-cloud>=0.34.0
 googleapis-common-protos>=1.5.3
+grpcio>=1.15.0
 halo>=0.0.17
 matplotlib>=2.2.3
 numpy>=1.15.1

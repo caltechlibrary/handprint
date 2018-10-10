@@ -7,6 +7,24 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 *Repository*:   [https://github.com/caltechlibrary/handprint](https://github.com/caltechlibrary/handprint)<br>
 *License*:      BSD/MIT derivative &ndash; see the [LICENSE](LICENSE) file for more information
 
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
+[![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-0.0.1-b44e88.svg?style=flat-square)](http://shields.io)
+
+Table of Contents
+-----------------
+
+* [Introduction](#-introduction)
+* [Installation instructions](#-installation-instructions)
+   * [Install Handprint on your computer](#-install-handprint-on-your-computer)
+   * [Obtain cloud service credentials](#-obtain-cloud-service-credentials)
+      * [<em>Microsoft</em>](#microsoft)
+      * [<em>Google</em>](#google)
+* [Running Handprint](#︎-running-handprint)
+* [Getting help and support](#-getting-help-and-support)
+* [Acknowledgments](#︎-acknowledgments)
+* [Copyright and license](#︎-copyright-and-license)
+
 ☀ Introduction
 -----------------------------
 
@@ -110,6 +128,12 @@ To invoke a particular method, use the `-m` option followed by a method name:
 bin/handprint -m microsoft /path/to/images
 ```
 
+Handprint looks for credentials files in the directory where it is installed, but you can put credentials in another directory and then tell Handprint where to find it using the `-c` option:
+
+```bash
+bin/handprint -c ~/handprint-credentials /path/to/images
+```
+
 
 ⁇ Getting help and support
 --------------------------
@@ -122,6 +146,18 @@ If you find an issue, please submit it in [the GitHub issue tracker](https://git
 
 The [vector artwork](https://thenounproject.com/search/?q=hand&i=733265) of a hand used as a logo for Handprint was created by [Kevin](https://thenounproject.com/kevn/) from the Noun Project.  It is licensed under the Creative Commons [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/) license.
 
+Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Turf with the resources we had.  We want to acknowledge this debt.  In alphabetical order, the packages are:
+
+* [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
+* [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
+* [halo](https://github.com/ManrajGrover/halo) &ndash; busy-spinners for Python command-line programs
+* [httplib2](https://github.com/httplib2/httplib2) &ndash; a comprehensive HTTP client library
+* [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
+* [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library
+* [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
+* [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
+* [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
+* [termcolor](https://pypi.org/project/termcolor/) &ndash; ANSI color formatting for output in terminal
 
 ☮︎ Copyright and license
 ---------------------

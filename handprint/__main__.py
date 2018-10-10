@@ -1,11 +1,10 @@
 '''Handprint: HANDwritten Page RecognitIoN Test for Caltech Archives.
 
-This small project examines the use of alternative optical character
-recognition (OCR) and handwritten text recognition (HTR) methods on documents
-from the Caltech Archives (http://archives.caltech.edu).  Tests include the
-use of Google's OCR capabilities in their Google Cloud Vision API
-(https://cloud.google.com/vision/docs/ocr) and Tesseract
-(https://en.wikipedia.org/wiki/Tesseract_(software)).
+This project uses alternative optical character recognition (OCR) and
+handwritten text recognition (HTR) methods on documents from the Caltech
+Archives (http://archives.caltech.edu).  Tests include the use of Google's
+OCR capabilities in their Google Cloud Vision API
+(https://cloud.google.com/vision/docs/ocr), Microsoft's Azure, and others.
 
 Authors
 -------
@@ -70,7 +69,7 @@ _METHODS = {
 
 def main(credsdir = 'D', list = False, method = 'M', quiet = False,
          no_color = False, debug = False, version = False, *files):
-    '''Handprint (a loose acronym of "Handwritten Page Recognition Test") can
+    '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") can
 run alternative optical character recognition (OCR) and handwritten text
 recognition (HTR) methods on documents.
 

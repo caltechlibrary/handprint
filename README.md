@@ -9,7 +9,7 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-0.1.0-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-0.2.0-b44e88.svg?style=flat-square)](http://shields.io)
 
 Table of Contents
 -----------------
@@ -122,7 +122,7 @@ Known methods (for use as values for option -m):
    google
 ```
 
-To invoke a particular method, use the `-m` option followed by a method name:
+By default, Handprint will run each known method in turn.  To invoke a specific method, use the `-m` option followed by a method name:
 
 ```bash
 bin/handprint -m microsoft /path/to/images

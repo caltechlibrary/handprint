@@ -19,6 +19,7 @@ open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   halo import Halo
 import os
 from   os import path
 import plac
@@ -59,7 +60,7 @@ _METHODS = {
 @plac.annotations(
     credsdir = ('look for credentials files in directory "D"', 'option', 'c'),
     list     = ('print list of known HTR methods',             'flag',   'l'),
-    method   = ('use HTR method "M" (default: "google")',      'option', 'm'),
+    method   = ('use HTR method "M" (default: "all")',         'option', 'm'),
     quiet    = ('do not print messages while working',         'flag',   'q'),
     no_color = ('do not color-code terminal output',           'flag',   'C'),
     debug    = ('turn on debugging (console only)',            'flag',   'D'),
@@ -115,11 +116,9 @@ information and exit without doing anything else.
     else:
         if __debug__: log('Assuming credentials found in {}', credsdir)
     if method == 'M':
-        method = 'google'
-    if method.lower() in _METHODS:
-        tool = _METHODS[method.lower()]()
-    else:
-        msg('"{}" is not known'.format(method), 'error', use_color)
+        method = 'all'
+    if method != 'all' and method.lower() not in _METHODS:
+        msg('"{}" is not a known method'.format(method), 'error', use_color)
         sys.exit()
     if not quiet:
         from halo import Halo
@@ -135,10 +134,33 @@ information and exit without doing anything else.
             msg('"{}" not a file or directory'.format(item), 'warn', use_color)
 
     # Let's do this thing.
-    if not quiet:
-        msg('Using HTR method "{}".'.format(method), 'info', use_color)
+    methods = _METHODS.values() if method == 'all' else [_METHODS[method.lower()]]
+    if method == 'all':
+        msg('Applying all methods in succession.', 'info', use_color)
+    for method_object in methods:
+        if method == 'all':
+            msg('='*70, 'dark', use_color)
+        run(method_object, files_list, credsdir, use_color, quiet, debug)
+    if method == 'all':
+        msg('='*70, 'dark', use_color)
+    msg('Done.', 'info', use_color)
+
+
+# If this is windows, we want the command-line args to use slash intead
+# of hyphen.
+
+if sys.platform.startswith('win'):
+    main.prefix_chars = '/'
+
+
+# Helper functions.
+# ......................................................................
+
+def run(method_object, files_list, credsdir, use_color, quiet, debug):
     spinner = None
     try:
+        tool = method_object()
+        msg('Using method "{}".'.format(tool.name()), 'info', use_color)
         tool.init_credentials(credsdir)
         for file in files_list:
             if use_color and not quiet:
@@ -146,7 +168,7 @@ information and exit without doing anything else.
                 spinner.start()
             full_path = path.realpath(path.join(os.getcwd(), file))
             file_name = path.basename(full_path)
-            dest_dir = path.join(path.dirname(full_path), method)
+            dest_dir = path.join(path.dirname(full_path), tool.name())
             if not path.exists(dest_dir):
                 if __debug__: log('Creating {}', dest_dir)
                 os.makedirs(dest_dir)
@@ -173,19 +195,7 @@ information and exit without doing anything else.
             import pdb; pdb.set_trace()
         msg('{}\n{}'.format(str(err), traceback.format_exc()), 'error', use_color)
         sys.exit()
-    else:
-        msg('Done.', 'info', use_color)
 
-
-# If this is windows, we want the command-line args to use slash intead
-# of hyphen.
-
-if sys.platform.startswith('win'):
-    main.prefix_chars = '/'
-
-
-# Miscellaneous utilities.
-# ......................................................................
 
 def print_version():
     print('{} version {}'.format(handprint.__title__, handprint.__version__))

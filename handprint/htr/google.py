@@ -30,6 +30,10 @@ class GoogleHTR(HTR):
         GoogleCredentials(credentials_dir)
 
 
+    def name(self):
+        return "google"
+
+
     def text_from(self, path):
         with io.open(path, 'rb') as image_file:
             image_data = image_file.read()

@@ -11,3 +11,6 @@ class HTR(object):
 
     def text_from(self, path):
         pass
+
+    def name(self):
+        pass

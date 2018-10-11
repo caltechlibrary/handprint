@@ -28,6 +28,10 @@ class MicrosoftHTR(HTR):
         self.credentials = MicrosoftCredentials(credentials_dir).creds()
 
 
+    def name(self):
+        return "microsoft"
+
+
     def text_from(self, path):
         vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
         text_recognition_url = vision_base_url + "recognizeText"

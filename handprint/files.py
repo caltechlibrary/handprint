@@ -106,7 +106,7 @@ def replace_extension(filepath, ext):
     return path.splitext(filepath)[0] + ext
 
 
-def rename_existing(file, notifier):
+def rename_existing(file):
     '''Renames 'file' to 'file.bak'.'''
 
     def rename(f):

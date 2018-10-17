@@ -51,7 +51,7 @@ sudo python3 -m pip install .
 
 ### ⓶&nbsp;&nbsp; _Obtain cloud service credentials_
 
-Credentials for different services need to be provided to Handprint in the form of JSON files.  Each service needs a separate JSON file named after the service (e.g., `microsoft.json`) and placed in a directory that Handprint searches.  By default, Handprint searches for the files in a subdirectory named `creds` where Handprint is installed, but an alternative diretory can be indicated at run-time using the `-c` command-line option.
+Credentials for different services need to be provided to Handprint in the form of JSON files.  Each service needs a separate JSON file named after the service (e.g., `microsoft.json`) and placed in a directory that Handprint searches.  By default, Handprint searches for the files in a subdirectory named `creds` where Handprint is installed, but an alternative diretory can be indicated at run-time using the `-c` command-line option (or `/c` on Windows).
 
 The specific contents and forms of the files differ depending on the particular service, as described below.
 
@@ -106,14 +106,21 @@ Alternatively, you should be able to run Handprint from anywhere using the norma
 python3 -m handprint -h
 ```
 
-The `-h` option will make `handprint` display some help information and exit immediately.  To make Handprint do something more useful, you can supply arguments that are a set of file names, or one or more directories containing images.  Each image should be a single page of a document in which handwritten text should be recognized.  The images must the least common denominator among the formats accepted by the cloud services, which at this time, is JPEG, PNG, GIF, and BMP.
+The `-h` option (`/h` on Windows) will make `handprint` display some help information and exit immediately.  To make Handprint do more, you can supply other arguments that instruct Handprint to process image files (or alternatively, URLs pointing to image files at a network location) and run handwritten text recognition (HTR) or optical character recognition (OCR) algorithms on them, as explained below.
+
+
+### File formats recognized
+
+Whether the images are stored locally or accessible via URLs, each image should be a single page of a document in which text should be recognized.  The images must the least common denominator among the formats accepted by the cloud services, which at this time, are **JPEG**, **PNG**, **GIF**, and **BMP** only.
 
 <!--
 * Google: [JPEG, PNG8, PNG24, GIF, Animated GIF (first frame only), BMP, WEBP, RAW, ICO, PDF, TIFF](https://cloud.google.com/vision/docs/supported-files)
 * Microsoft: [JPEG, PNG, GIF, or BMP format](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home)
 -->
 
-Handprint can contact more than one cloud service for OCR and HTR.  You can use the `-l` option to make Handprint display a list of the methods currently implemented:
+### Supported HTR/OCR methods
+
+Handprint can contact more than one cloud service for OCR and HTR.  You can use the `-l` option (`/l` on Windows) to make Handprint display a list of the methods currently implemented:
 
 ```
 # bin/handprint -l
@@ -122,18 +129,61 @@ Known methods (for use as values for option -m):
    google
 ```
 
-By default, Handprint will run each known method in turn.  To invoke a specific method, use the `-m` option followed by a method name:
+By default, Handprint will run each known method in turn.  To invoke only one specific method, use the `-m` option (`/m` on Windows) followed by a method name:
 
 ```bash
 bin/handprint -m microsoft /path/to/images
 ```
 
-Handprint looks for credentials files in the directory where it is installed, but you can put credentials in another directory and then tell Handprint where to find it using the `-c` option:
+### Service account credentials
+
+Handprint looks for credentials files in the directory where it is installed, but you can put credentials in another directory and then tell Handprint where to find it using the `-c` option (`/c` on Windows).  Example of use:
 
 ```bash
 bin/handprint -c ~/handprint-credentials /path/to/images
 ```
 
+
+### Files versus URLs
+
+Handprint can work both with files and with URLs.  By default, arguments are interpreted as being files or directories of files, but if given the `-u` option (`/u` on Windows), the arguments are interpreted instead as URLs pointing to images.
+
+A challenge with using URLs is how to name the files that Handprint writes for the results.  Some CMS systems store content using opaque schemes that provide no clear names in the URLs, making it impossible for a software tool such as Handprint to guess what file name would make sense to use for local storage.  Worse, some systems create extremely long URLs, making it impractical to use the full URL itself as the file name.  For example, the following is a real URL pointing to an image in Caltech Archives today:
+
+```
+https://hale.archives.caltech.edu/adore-djatoka//resolver?rft_id=https%3A%2F%2Fhale.archives.caltech.edu%2Fislandora%2Fobject%2Fhale%253A85240%2Fdatastream%2FJP2%2Fview%3Ftoken%3D7997253eb6195d89b2615e8fa60708a97204a4cdefe527a5ab593395ac7d4327&url_ver=Z39.88-2004&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.level=4&svc.rotate=0
+```
+
+To deal with this situation, Handprint manufactures its own file names when the `-u` option is used.  The scheme is simple: every file has a base name of `url-N`, where `N` is an integer.  The integers start from `1` for every run of Handprint, and the integers count the URLs found either on the command line or in the file indicated by the `-f` option.  The image found at the URL is stored in a file named `url-N.E` where `E` is the format extension (e.g., `url-1.jpeg`, `url-1.png`, etc.), and the URL itself is stored in a file named `url-1.url`.  Thus, the files produced by Handprint will look like this when the `-u` option is used:
+
+```
+url-1.jpeg
+url-1.url
+url-1.google.txt
+url-1.microsoft.txt
+
+url-2.jpeg
+url-2.url
+url-2.google.txt
+url-2.microsoft.txt
+
+url-3.jpeg
+url-3.url
+url-3.google.txt
+url-3.microsoft.txt
+
+...
+```
+
+The use of the `-u` option also **requires the use of the `-o` option** (`/o` on Windows) to tell Handprint where to store the results.  This is a consequence of the fact that, without being provided with files or directories on the local disk, Handprint can't infer where to write its output.
+
+Example of use:
+
+```bash
+bin/handprint -u -f /tmp/urls-to-read.txt -o /tmp/results/
+```
+
+Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to list the URLs in a file in combination with the `-f` option (`/f` on Windows).
 
 ⁇ Getting help and support
 --------------------------

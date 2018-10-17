@@ -1,0 +1,30 @@
+'''
+constants: global constants for Handprint.
+
+Authors
+-------
+
+Michael Hucka <mhucka@caltech.edu> -- Caltech Library
+
+Copyright
+---------
+
+Copyright (c) 2018 by the California Institute of Technology.  This code is
+open-source software released under a 3-clause BSD license.  Please see the
+file "LICENSE" for more information.
+'''
+
+import sys
+
+import handprint
+from handprint.htr import GoogleHTR
+from handprint.htr import MicrosoftHTR
+
+ON_WINDOWS = sys.platform.startswith('win')
+
+IMAGE_FORMATS = ('jpg', 'jpeg', 'png', 'gif', 'bmp')
+
+KNOWN_METHODS = {
+    'google': GoogleHTR,
+    'microsoft': MicrosoftHTR,
+}

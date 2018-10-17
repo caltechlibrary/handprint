@@ -21,6 +21,7 @@ import subprocess
 import webbrowser
 
 import handprint
+from handprint.constants import ON_WINDOWS
 from handprint.debug import log
 
 
@@ -55,7 +56,7 @@ def handprint_path():
     # The path returned by module.__path__ is to the directory containing
     # the __init__.py file.  What we want here is the path to the installation
     # of the Handprint binary.
-    if sys.platform.startswith('win'):
+    if ON_WINDOWS:
         from winreg import OpenKey, CloseKey, QueryValueEx, HKEY_LOCAL_MACHINE, KEY_READ
         try:
             if __debug__: log('Reading Windows registry entry')
@@ -73,7 +74,7 @@ def handprint_path():
 
 def desktop_path():
     '''Returns the path to the user's desktop directory.'''
-    if sys.platform.startswith('win'):
+    if ON_WINDOWS:
         return path.join(path.join(os.environ['USERPROFILE']), 'Desktop')
     else:
         return path.join(path.join(path.expanduser('~')), 'Desktop')

@@ -1,5 +1,5 @@
 '''
-messages: message-printing utilities for Handprint.
+messages: message-printing utilities for Handprint
 
 Authors
 -------
@@ -14,6 +14,7 @@ open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+import queue
 import sys
 import wx
 import wx.lib.dialogs
@@ -27,54 +28,153 @@ except:
     pass
 
 import handprint
+from handprint.exceptions import *
 
 
-# Class definitions.
-# ......................................................................
+# Exported classes.
+# .............................................................................
+# The basic principle of writing the classes (like this one) that get used
+# elsewhere is that they should take the information they need.  This means,
+# for example, that 'use_color' is handed to the CLI version of this object,
+# not to the base class class, even though use_color is something that may be
+# relevant to more than one of the main classes.  This is a matter of
+# separation of concerns and information hiding.
 
-class MessageHandlerCLI():
-    colorize = True
-    on_windows = sys.platform.startswith('win')
+class MessageHandlerBase():
+    '''Base class for message-printing classes in Handprint!'''
 
-    def __init__(self, use_color = True):
-        self.colorize = use_color
-
-
-    def note(self, text):
-        msg(text, 'info', self.colorize)
-
-
-    def msg(self, text, details = '', severity = 'info'):
-        msg(text, severity, self.colorize)
-
-
-    def yes_no(self, question):
-        return input("{} (y/n) ".format(question)).startswith(('y', 'Y'))
-
-
-class MessageHandlerGUI():
     def __init__(self):
         pass
 
 
-    def note(self, text):
+class MessageHandlerCLI(MessageHandlerBase):
+    '''Class for printing console messages and asking the user questions.'''
+
+    def __init__(self, use_color):
+        super().__init__()
+        self._colorize = use_color
+
+
+    def use_color(self):
+        return self._colorize
+
+
+    def info_text(self, text, details = ''):
+        '''Prints an informational message.'''
+        return color(text, 'info', self._colorize)
+
+
+    def info(self, text, details = ''):
+        '''Prints an informational message.'''
+        msg(self.info_text(text, details))
+
+
+    def warn_text(self, text, details = ''):
+        '''Prints a nonfatal, noncritical warning message.'''
+        return color('Warning: ' + text, 'warn', self._colorize)
+
+
+    def warn(self, text, details = ''):
+        '''Prints a nonfatal, noncritical warning message.'''
+        msg(self.warn_text(text, details))
+
+
+    def error_text(self, text, details = ''):
+        '''Prints a message reporting a critical error.'''
+        return color('Error: ' + text, 'error', self._colorize)
+
+
+    def error(self, text, details = ''):
+        '''Prints a message reporting a critical error.'''
+        msg(self.error_text(text, details))
+
+
+    def fatal_text(self, text, details = ''):
+        '''Prints a message reporting a fatal error.  This method does not
+        exit the program; it leaves that to the caller in case the caller
+        needs to perform additional tasks before exiting.
+        '''
+        return color('FATAL: ' + text, ['error', 'bold'], self._colorize)
+
+
+    def fatal(self, text, details = ''):
+        '''Prints a message reporting a fatal error.  This method does not
+        exit the program; it leaves that to the caller in case the caller
+        needs to perform additional tasks before exiting.
+        '''
+        msg(self.fatal_text(text, details))
+
+
+    def yes_no(self, question):
+        '''Asks a yes/no question of the user, on the command line.'''
+        return input("{} (y/n) ".format(question)).startswith(('y', 'Y'))
+
+
+    def msg_text(self, text, flags = None):
+        return color(text, flags, self._colorize)
+
+
+    def msg(self, text, flags = None):
+        msg(self.msg_text(text, flags))
+
+
+class MessageHandlerGUI(MessageHandlerBase):
+    '''Class for GUI-based user messages and asking the user questions.'''
+
+    def __init__(self):
+        super().__init__()
+        self._queue = queue.Queue()
+        self._response = None
+
+
+    def info(self, text, details = ''):
+        '''Prints an informational message.'''
+        wx.CallAfter(self._note, text)
+        self._wait()
+
+
+    def warn(self, text, details = ''):
+        '''Prints a nonfatal, noncritical warning message.'''
+        wx.CallAfter(self._dialog, text, details, 'warn')
+        self._wait()
+
+
+    def error(self, text, details = ''):
+        '''Prints a message reporting a critical error.'''
+        wx.CallAfter(self._dialog, text, details, 'error')
+        self._wait()
+
+
+    def fatal(self, text, details = ''):
+        '''Prints a message reporting a fatal error.  This method does not
+        exit the program; it leaves that to the caller in case the caller
+        needs to perform additional tasks before exiting.
+        '''
+        wx.CallAfter(self._dialog, text, details, 'fatal')
+        self._wait()
+
+
+    def yes_no(self, question):
+        '''Asks the user a yes/no question using a GUI dialog.'''
+        wx.CallAfter(self._yes_no, question)
+        self._wait()
+        return self._response
+
+
+    def _note(self, text):
         '''Displays a simple notice with a single OK button.'''
-        app = wx.App()
-        frame = wx.Frame(None)
+        frame = wx.Frame(wx.GetApp().TopWindow)
         frame.Center()
         dlg = wx.GenericMessageDialog(frame, text, caption = "Handprint!",
                                       style = wx.OK | wx.ICON_INFORMATION)
         clicked = dlg.ShowModal()
         dlg.Destroy()
         frame.Destroy()
+        self._queue.put(True)
 
 
-    def msg(self, text, details = '', severity = 'error'):
-        # When running with a GUI, we only bring up error dialogs.
-        if 'info' in severity:
-            return
-        app = wx.App()
-        frame = wx.Frame(None)
+    def _dialog(self, text, details = '', severity = 'error'):
+        frame = wx.Frame(wx.GetApp().TopWindow)
         frame.Center()
         if 'fatal' in severity:
             short = text
@@ -83,12 +183,12 @@ class MessageHandlerGUI():
             short = text + '\n\nWould you like to try to continue?\n(Click "no" to quit now.)'
             style = wx.YES_NO | wx.YES_DEFAULT | wx.HELP | wx.ICON_EXCLAMATION
         dlg = wx.MessageDialog(frame, message = short, style = style,
-                               caption = "Handprint encountered a problem")
+                               caption = "Handprint has encountered a problem")
         clicked = dlg.ShowModal()
         if clicked == wx.ID_HELP:
-            body = ("Handprint has encountered an error:\n"
+            body = ("Handprint has encountered a problem:\n"
                     + "─"*30
-                    + "\n{}\n".format(details)
+                    + "\n{}\n".format(details or text)
                     + "─"*30
                     + "\nIf the problem is due to a network timeout or "
                     + "similar transient error, then please quit and try again "
@@ -100,28 +200,35 @@ class MessageHandlerGUI():
             info.ShowModal()
             info.Destroy()
             frame.Destroy()
+            self._queue.put(True)
         elif clicked in [wx.ID_NO, wx.ID_OK]:
             dlg.Destroy()
             frame.Destroy()
-            raise UserCancelled
+            self._queue.put(True)
         else:
             dlg.Destroy()
+            self._queue.put(True)
 
 
-    def yes_no(self, question):
-        app = wx.App()
-        frame = wx.Frame(None)
+    def _yes_no(self, question):
+        frame = wx.Frame(wx.GetApp().TopWindow)
         frame.Center()
         dlg = wx.GenericMessageDialog(frame, question, caption = "Handprint!",
                                       style = wx.YES_NO | wx.ICON_QUESTION)
         clicked = dlg.ShowModal()
         dlg.Destroy()
         frame.Destroy()
-        return clicked == wx.ID_YES
+        self._response = (clicked == wx.ID_YES)
+        self._queue.put(True)
+
+
+    def _wait(self):
+        self._queue.get()
+
 
 
-# Direct-access message utilities.
-# ......................................................................
+# Message utility funcions.
+# .............................................................................
 
 def msg(text, flags = None, colorize = True):
     '''Like the standard print(), but flushes the output immediately and
@@ -165,7 +272,7 @@ def color(text, flags = None, colorize = True):
 
 
 # Internal utilities.
-# ......................................................................
+# .............................................................................
 
 def _print_header(text, flags, quiet = False, colorize = True):
     if not quiet:

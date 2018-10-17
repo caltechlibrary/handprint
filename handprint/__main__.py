@@ -50,22 +50,23 @@ from handprint.debug import set_debug, log
 # ......................................................................
 
 @plac.annotations(
-    creds_dir  = ('look for credentials files in directory "D"',  'option', 'c'),
-    from_file  = ('read file names or URLs from file "F"',        'option', 'f'),
-    list       = ('print list of known methods',                  'flag',   'l'),
-    method     = ('use method "M" (default: "all")',              'option', 'm'),
-    given_urls = ('assume have URLs, not files (default: files)', 'flag',   'u'),
-    output     = ('write output to directory "O"',                'option', 'o'),
-    quiet      = ('do not print info messages while working',     'flag',   'q'),
-    no_color   = ('do not color-code terminal output',            'flag',   'C'),
-    debug      = ('turn on debugging (console only)',             'flag',   'D'),
-    version    = ('print version info and exit',                  'flag',   'V'),
+    creds_dir  = ('look for credentials files in directory "D"',     'option', 'c'),
+    from_file  = ('read file names or URLs from file "F"',           'option', 'f'),
+    list       = ('print list of known methods',                     'flag',   'l'),
+    method     = ('use method "M" (default: "all")',                 'option', 'm'),
+    output     = ('write output to directory "O"',                   'option', 'o'),
+    root_name  = ('name downloaded images using root file name "R"', 'option', 'r'),
+    given_urls = ('assume have URLs, not files (default: files)',    'flag',   'u'),
+    quiet      = ('do not print info messages while working',        'flag',   'q'),
+    no_color   = ('do not color-code terminal output',               'flag',   'C'),
+    debug      = ('turn on debugging (console only)',                'flag',   'D'),
+    version    = ('print version info and exit',                     'flag',   'V'),
     images     = 'if given -u, URLs, else directories and/or files',
 )
 
 def main(creds_dir = 'D', from_file = 'F', list = False, method = 'M',
-         output = 'O', given_urls = False, quiet = False, no_color = False,
-         debug = False, version = False, *images):
+         output = 'O', given_urls = False, root_name = 'R', quiet = False,
+         no_color = False, debug = False, version = False, *images):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") can
 run alternative optical character recognition (OCR) and handwritten text
 recognition (HTR) methods on images of document pages.
@@ -82,24 +83,29 @@ When invoked, the command-line arguments should contain one of the following:
  c) if given the -f option (/f on Windows), a file containing either image
     paths or (if combined with the -u option), image URLs
 
-Handprint will send each image file (or URL) to OCR/HTR services from Google,
-Microsoft and others.  It will write the results to new files placed either in
-the same directories as the original files or if given the -o option (/o on
-Windows), to the directory indicated by the argument to the -o option.  The
-results will be written in files named after the original files with the
-addition of a string that indicates the service used.  For example, a file
-named "someimage.jpg" will produce
+If given URLs (via the -u option), Handprint will first download the images
+found at the URLs to a local directory indicated by the option -o (/o on
+Windows).  Handprint will send each image file to OCR/HTR services from
+Google, Microsoft and others.  It will write the results to new files placed
+either in the same directories as the original files or if given the -o
+option (/o on Windows), to the directory indicated by the argument to the -o
+option.  The results will be written in files named after the original files
+with the addition of a string that indicates the service used.  For example,
+a file named "somefile.jpg" will produce
 
-  someimage.jpg
-  someimage.google.txt
-  someimage.microsoft.txt
-  someimage.amazon.txt
+  somefile.jpg
+  somefile.google.txt
+  somefile.microsoft.txt
+  somefile.amazon.txt
   ...
 
 and so on for each image and each service used.  Note that if -u (/u on
-Windows) is given, then an output directory must also be specified using the
+Windows) is given, then an output directory MUST also be specified using the
 option -o (/o on Windows) because it is not possible to write the results in
-the network locations represented by the URLs.
+the network locations represented by the URLs.  Also, when -u is used, the
+images and text results will be stored in files whose root names have the
+form "document-N", where "N" is an integer.  The root name can be changed
+using the -r option (/r on Windows).
 
 If given the command-line flag -l (or /l on Windows), Handprint will print a
 list of the known methods and then exit.  The option -m (/m on Windows) can
@@ -122,11 +128,13 @@ for warnings or errors.
 
 If given the -V option (/V on Windows), this program will print version
 information and exit without doing anything else.
-'''
+
+    '''
 
     # Prepare notification methods and hints.
     say = MessageHandlerCLI(not no_color, quiet)
-    hint = '(Hint: use /h for help.)' if ON_WINDOWS else '(Hint: use -h for help.)'
+    prefix = '/' if ON_WINDOWS else '-'
+    hint = '(Hint: use {}h for help.)'.format(prefix)
 
     # Process arguments.
     if debug:
@@ -183,6 +191,10 @@ information and exit without doing anything else.
             if __debug__: log('Created output directory "{}"', output)
     if given_urls and not output:
         exit(say.error_text('Must provide an output directory if using URLs.'))
+    if root_name != 'R' and not given_urls:
+        exit(say.error_text('Option {}r can only be used with URLs.'.format(prefix)))
+    if root_name == 'R':
+        root_name = 'document'
 
     # Create a list of files to be processed.
     targets = targets_from_arguments(images, from_file, given_urls, say)
@@ -196,12 +208,12 @@ information and exit without doing anything else.
             for m in KNOWN_METHODS.values():
                 if not say.be_quiet():
                     say.msg('='*70, 'dark')
-                run(m, targets, given_urls, output, creds_dir, say)
+                run(m, targets, given_urls, output, root_name, creds_dir, say)
             if not say.be_quiet():
                 say.msg('='*70, 'dark')
         else:
             m = KNOWN_METHODS[method]
-            run(m, targets, given_urls, output, creds_dir, say)
+            run(m, targets, given_urls, output, root_name, creds_dir, say)
     except (KeyboardInterrupt, UserCancelled) as err:
         exit(say.info_text('Quitting.'))
     except ServiceFailure as err:
@@ -223,7 +235,7 @@ if ON_WINDOWS:
 # Helper functions.
 # ......................................................................
 
-def run(method_class, targets, given_urls, output_dir, creds_dir, say):
+def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say):
     spinner = None
     try:
         tool = method_class()
@@ -250,7 +262,7 @@ def run(method_class, targets, given_urls, output_dir, creds_dir, say):
                     continue
                 # If we're given URLs, we have to invent file names to store
                 # the images and the OCR results.
-                base = 'url-{}'.format(index)
+                base = '{}-{}'.format(root_name, index)
                 url_file = path.realpath(path.join(output_dir, base + '.url'))
                 if __debug__: log('Writing URL to {}', url_file)
                 with open(url_file, 'w') as f:

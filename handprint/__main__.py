@@ -121,7 +121,7 @@ information and exit without doing anything else.
 '''
 
     # Prepare notification methods and hints.
-    notifier = MessageHandlerCLI(not no_color)
+    say = MessageHandlerCLI(not no_color)
     hint = '(Hint: use /h for help.)' if ON_WINDOWS else '(Hint: use -h for help.)'
 
     # Process arguments.
@@ -131,12 +131,12 @@ information and exit without doing anything else.
         print_version()
         exit()
     if list:
-        notifier.info('Known methods:')
+        say.info('Known methods:')
         for key in KNOWN_METHODS.keys():
-            notifier.info('   {}'.format(key))
+            say.info('   {}'.format(key))
         exit()
     if not network_available():
-        exit(notifier.fatal_text('No network.'))
+        exit(say.fatal_text('No network.'))
 
     if from_file == 'F':
         from_file = None
@@ -144,14 +144,14 @@ information and exit without doing anything else.
         if not path.isabs(from_file):
             from_file = path.realpath(path.join(os.getcwd(), from_file))
         if not path.exists(from_file):
-            exit(notifier.error_text('File not found: {}'.format(from_file)))
+            exit(say.error_text('File not found: {}'.format(from_file)))
         if not readable(from_file):
-            exit(notifier.error_text('File not readable: {}'.format(from_file)))
+            exit(say.error_text('File not readable: {}'.format(from_file)))
 
     if creds_dir == 'D':
         creds_dir = path.join(handprint_path(), 'creds')
     if not readable(creds_dir):
-        exit(notifier.error_text('Directory not readable: {}'.format(creds_dir)))
+        exit(say.error_text('Directory not readable: {}'.format(creds_dir)))
     else:
         if __debug__: log('Assuming credentials found in "{}".', creds_dir)
 
@@ -159,12 +159,12 @@ information and exit without doing anything else.
         method = 'all'
     method = method.lower()
     if method != 'all' and method not in KNOWN_METHODS:
-        exit(notifier.error_text('"{}" is not a known method. {}'.format(method, hint)))
+        exit(say.error_text('"{}" is not a known method. {}'.format(method, hint)))
 
     if not images and not from_file:
-        exit(notifier.error_text('Need provide directories, files or URLs. {}'.format(hint)))
+        exit(say.error_text('Need provide images or URLs. {}'.format(hint)))
     if any(item.startswith('-') for item in images):
-        exit(notifier.error_text('Unrecognized option in arguments. {}'.format(hint)))
+        exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
 
     if output == 'O':
         output = None
@@ -173,12 +173,12 @@ information and exit without doing anything else.
             output = path.realpath(path.join(os.getcwd(), output))
         if path.isdir(output):
             if not writable(output):
-                exit(notifier.error_text('Directory not writable: {}'.format(output)))
+                exit(say.error_text('Directory not writable: {}'.format(output)))
         else:
             os.mkdir(output)
             if __debug__: log('Created output directory "{}"', output)
     if given_urls and not output:
-        exit(notifier.error_text('Must provide an output directory if using URLs.'))
+        exit(say.error_text('Must provide an output directory if using URLs.'))
 
     # Create a list of files to be processed.
     targets = []
@@ -188,32 +188,32 @@ information and exit without doing anything else.
         targets = [line.rstrip('\n') for line in targets]
         if __debug__: log('Read {} lines from "{}".', len(targets), from_file)
         if not given_urls:
-            targets = filter_urls(targets, notifier)
+            targets = filter_urls(targets, say)
     elif given_urls:
         # We assume that the arguments are URLs and take them as-is.
         targets = images
     else:
         # We were given files and/or directories.  Look for image files.
-        for item in filter_urls(images, notifier):
+        for item in filter_urls(images, say):
             if path.isfile(item) and path.splitext(item)[1] in IMAGE_FORMATS:
                 targets.append(item)
             elif path.isdir(item):
                 targets += files_in_directory(item, extensions = IMAGE_FORMATS)
             else:
-                notifier.warn('"{}" not a file or directory'.format(item))
+                say.warn('"{}" not a file or directory'.format(item))
     if not targets:
-        exit(notifier.warn_text('No images to process; quitting.'))
+        exit(say.warn_text('No images to process; quitting.'))
 
     # Let's do this thing.
     if method == 'all':
-        notifier.info('Applying all methods in succession.')
+        say.info('Applying all methods in succession.')
         for m in KNOWN_METHODS.values():
-            notifier.msg('='*70, 'dark')
-            run(m, targets, given_urls, output, creds_dir, notifier, quiet, debug)
-        notifier.msg('='*70, 'dark')
+            say.msg('='*70, 'dark')
+            run(m, targets, given_urls, output, creds_dir, say, quiet, debug)
+        say.msg('='*70, 'dark')
     else:
-        run(KNOWN_METHODS[method], targets, given_urls, output, creds_dir, notifier, quiet, debug)
-    notifier.info('Done.')
+        run(KNOWN_METHODS[method], targets, given_urls, output, creds_dir, say, quiet, debug)
+    say.info('Done.')
 
 
 # If this is windows, we want the command-line args to use slash intead
@@ -226,30 +226,29 @@ if ON_WINDOWS:
 # Helper functions.
 # ......................................................................
 
-def run(method_class, targets, given_urls, output_dir, creds_dir,
-        notifier, quiet, debug):
+def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet, debug):
     spinner = None
     try:
         tool = method_class()
-        notifier.info('Using method "{}".'.format(tool.name()))
+        say.info('Using method "{}".'.format(tool.name()))
         tool.init_credentials(creds_dir)
         for index, item in enumerate(targets, 1):
             if not given_urls and (item.startswith('http') or item.startswith('ftp')):
-                notifier.warn('Skipping URL "{}"'.format(item))
+                say.warn('Skipping URL "{}"'.format(item))
                 continue
-            if notifier.use_color() and not quiet:
+            if say.use_color() and not quiet:
                 spinner = Halo(spinner='bouncingBall', text = color(item, 'info'))
                 spinner.start()
             if given_urls:
                 # Make sure the URLs point to images.
                 response = request.urlopen(item)
                 if response.headers.get_content_maintype() != 'image':
-                    spinner.fail(notifier.error_text(
+                    spinner.fail(say.error_text(
                         'Did not find an image at "{}"'.format(item)))
                     continue
                 format = response.headers.get_content_subtype()
                 if format not in IMAGE_FORMATS:
-                    spinner.fail(notifier.error_text(
+                    spinner.fail(say.error_text(
                         'Cannot use image format {} in "{}"'.format(format, item)))
                     continue
                 # If we're given URLs, we have to invent file names to store
@@ -275,36 +274,36 @@ def run(method_class, targets, given_urls, output_dir, creds_dir,
             else:
                 dest_dir = path.dirname(full_path)
                 if not writable(dest_dir):
-                    notifier.fatal('Cannot write output in "{}".'.format(dest_dir))
+                    say.fatal('Cannot write output in "{}".'.format(dest_dir))
                     return
             dest_file = replace_extension(path.join(dest_dir, file_name),
                                           '.' + tool.name() + '.txt')
             save_output(tool.text_from(file), dest_file)
-            if notifier.use_color() and not quiet:
+            if say.use_color() and not quiet:
                 short_path = path.relpath(dest_file, os.getcwd())
                 spinner.succeed(color('{} -> {}'.format(file, short_path), 'info'))
                 spinner.stop()
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
             spinner.stop()
-        exit(notifier.info_text('Quitting.'))
+        exit(say.info_text('Quitting.'))
     except ServiceFailure as err:
         if spinner:
-            spinner.fail(notifier.error_text('Stopping due to a problem'))
-        exit(notifier.error_text(err))
+            spinner.fail(say.error_text('Stopping due to a problem'))
+        exit(say.error_text(err))
     except Exception as err:
         if spinner:
-            spinner.fail(notifier.error_text('Stopping due to a problem'))
+            spinner.fail(say.error_text('Stopping due to a problem'))
         if debug:
             import pdb; pdb.set_trace()
-        exit(notifier.error_text('{}\n{}'.format(str(err), traceback.format_exc())))
+        exit(say.error_text('{}\n{}'.format(str(err), traceback.format_exc())))
 
 
-def filter_urls(item_list, notifier):
+def filter_urls(item_list, say):
     results = []
     for item in item_list:
         if item.startswith('http') or item.startswith('ftp'):
-            notifier.warn('Unexpected URL: "{}"'.format(item))
+            say.warn('Unexpected URL: "{}"'.format(item))
             continue
         else:
             results.append(item)

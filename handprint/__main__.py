@@ -33,12 +33,11 @@ except:
 import time
 import traceback
 from   urllib import request
-import wget
 
 import handprint
 from handprint.constants import ON_WINDOWS, IMAGE_FORMATS, KNOWN_METHODS
 from handprint.messages import msg, color, MessageHandlerCLI
-from handprint.network import network_available
+from handprint.network import network_available, download_url
 from handprint.files import files_in_directory, replace_extension, handprint_path
 from handprint.files import readable, writable, filename_extension
 from handprint.htr import GoogleHTR
@@ -267,23 +266,22 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                 if __debug__: log('Writing URL to {}', url_file)
                 with open(url_file, 'w') as f:
                     f.write(url_file_content(item))
-                if __debug__: log('Starting wget on {}', item)
-                downloaded = wget.download(item, bar = None, out = output_dir)
                 file = path.realpath(path.join(output_dir, base + '.' + format))
-                if __debug__: log('Renaming downloaded file to {}', file)
-                os.rename(downloaded, file)
-                full_path = file
+                if __debug__: log('Starting wget on {}', item)
+                (success, error) = download_url(item, file)
+                if not success:
+                    spinner.fail('Failed to download {}: {}'.format(item, error))
+                    continue
             else:
-                file = item
-                full_path = path.realpath(path.join(os.getcwd(), file))
-            file_name = path.basename(full_path)
+                file = path.realpath(path.join(os.getcwd(), item))
             if output_dir:
                 dest_dir = output_dir
             else:
-                dest_dir = path.dirname(full_path)
+                dest_dir = path.dirname(file)
                 if not writable(dest_dir):
                     say.fatal('Cannot write output in "{}".'.format(dest_dir))
                     return
+            file_name = path.basename(file)
             dest_file = replace_extension(path.join(dest_dir, file_name),
                                           '.' + tool.name() + '.txt')
             save_output(tool.text_from(file), dest_file)

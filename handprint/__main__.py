@@ -56,7 +56,7 @@ from handprint.debug import set_debug, log
     method     = ('use method "M" (default: "all")',              'option', 'm'),
     given_urls = ('assume have URLs, not files (default: files)', 'flag',   'u'),
     output     = ('write output to directory "O"',                'option', 'o'),
-    quiet      = ('do not print messages while working',          'flag',   'q'),
+    quiet      = ('do not print info messages while working',     'flag',   'q'),
     no_color   = ('do not color-code terminal output',            'flag',   'C'),
     debug      = ('turn on debugging (console only)',             'flag',   'D'),
     version    = ('print version info and exit',                  'flag',   'V'),
@@ -116,12 +116,16 @@ be indicated at run-time using the -c command-line option (/c on Windows).
 The specific format of each credentials file is different for each service;
 please consult the Handprint documentation for more details.
 
+If given the -q option (/q on Windows), Handprint will not print its usual
+informational messages while it is working.  It will only print messages
+for warnings or errors.
+
 If given the -V option (/V on Windows), this program will print version
 information and exit without doing anything else.
 '''
 
     # Prepare notification methods and hints.
-    say = MessageHandlerCLI(not no_color)
+    say = MessageHandlerCLI(not no_color, quiet)
     hint = '(Hint: use /h for help.)' if ON_WINDOWS else '(Hint: use -h for help.)'
 
     # Process arguments.
@@ -190,12 +194,14 @@ information and exit without doing anything else.
         if method == 'all':
             say.info('Applying all methods in succession.')
             for m in KNOWN_METHODS.values():
+                if not say.be_quiet():
+                    say.msg('='*70, 'dark')
+                run(m, targets, given_urls, output, creds_dir, say)
+            if not say.be_quiet():
                 say.msg('='*70, 'dark')
-                run(m, targets, given_urls, output, creds_dir, say, quiet)
-            say.msg('='*70, 'dark')
         else:
             m = KNOWN_METHODS[method]
-            run(m, targets, given_urls, output, creds_dir, say, quiet)
+            run(m, targets, given_urls, output, creds_dir, say)
     except (KeyboardInterrupt, UserCancelled) as err:
         exit(say.info_text('Quitting.'))
     except ServiceFailure as err:
@@ -217,7 +223,7 @@ if ON_WINDOWS:
 # Helper functions.
 # ......................................................................
 
-def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet):
+def run(method_class, targets, given_urls, output_dir, creds_dir, say):
     spinner = None
     try:
         tool = method_class()
@@ -227,7 +233,7 @@ def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet):
             if not given_urls and (item.startswith('http') or item.startswith('ftp')):
                 say.warn('Skipping URL "{}"'.format(item))
                 continue
-            if say.use_color() and not quiet:
+            if say.use_color() and not say.be_quiet():
                 spinner = Halo(spinner='bouncingBall', text = color(item, 'info'))
                 spinner.start()
             if given_urls:
@@ -269,7 +275,7 @@ def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet):
             dest_file = replace_extension(path.join(dest_dir, file_name),
                                           '.' + tool.name() + '.txt')
             save_output(tool.text_from(file), dest_file)
-            if say.use_color() and not quiet:
+            if say.use_color() and not say.be_quiet():
                 short_path = path.relpath(dest_file, os.getcwd())
                 spinner.succeed(color('{} -> {}'.format(file, short_path), 'info'))
                 spinner.stop()

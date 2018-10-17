@@ -205,14 +205,24 @@ information and exit without doing anything else.
         exit(say.warn_text('No images to process; quitting.'))
 
     # Let's do this thing.
-    if method == 'all':
-        say.info('Applying all methods in succession.')
-        for m in KNOWN_METHODS.values():
+    try:
+        if method == 'all':
+            say.info('Applying all methods in succession.')
+            for m in KNOWN_METHODS.values():
+                say.msg('='*70, 'dark')
+                run(m, targets, given_urls, output, creds_dir, say, quiet)
             say.msg('='*70, 'dark')
-            run(m, targets, given_urls, output, creds_dir, say, quiet, debug)
-        say.msg('='*70, 'dark')
-    else:
-        run(KNOWN_METHODS[method], targets, given_urls, output, creds_dir, say, quiet, debug)
+        else:
+            m = KNOWN_METHODS[method]
+            run(m, targets, given_urls, output, creds_dir, say, quiet)
+    except (KeyboardInterrupt, UserCancelled) as err:
+        exit(say.info_text('Quitting.'))
+    except ServiceFailure as err:
+        exit(say.error_text(err))
+    except Exception as err:
+        if debug:
+            import pdb; pdb.set_trace()
+        exit(say.error_text('{}\n{}'.format(str(err), traceback.format_exc())))
     say.info('Done.')
 
 
@@ -226,7 +236,7 @@ if ON_WINDOWS:
 # Helper functions.
 # ......................................................................
 
-def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet, debug):
+def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet):
     spinner = None
     try:
         tool = method_class()
@@ -259,7 +269,6 @@ def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet, de
                 with open(url_file, 'w') as f:
                     f.write(url_file_content(item))
                 if __debug__: log('Starting wget on {}', item)
-                import pdb; pdb.set_trace()
                 downloaded = wget.download(item, bar = None, out = output_dir)
                 file = path.realpath(path.join(output_dir, base + '.' + format))
                 if __debug__: log('Renaming downloaded file to {}', file)
@@ -286,17 +295,15 @@ def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet, de
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
             spinner.stop()
-        exit(say.info_text('Quitting.'))
+        raise
     except ServiceFailure as err:
         if spinner:
             spinner.fail(say.error_text('Stopping due to a problem'))
-        exit(say.error_text(err))
+        raise
     except Exception as err:
         if spinner:
             spinner.fail(say.error_text('Stopping due to a problem'))
-        if debug:
-            import pdb; pdb.set_trace()
-        exit(say.error_text('{}\n{}'.format(str(err), traceback.format_exc())))
+        raise
 
 
 def filter_urls(item_list, say):

@@ -40,7 +40,7 @@ from handprint.constants import ON_WINDOWS, IMAGE_FORMATS, KNOWN_METHODS
 from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.network import network_available
 from handprint.files import files_in_directory, replace_extension, handprint_path
-from handprint.files import readable, writable
+from handprint.files import readable, writable, filename_extension
 from handprint.htr import GoogleHTR
 from handprint.htr import MicrosoftHTR
 from handprint.exceptions import *
@@ -181,26 +181,7 @@ information and exit without doing anything else.
         exit(say.error_text('Must provide an output directory if using URLs.'))
 
     # Create a list of files to be processed.
-    targets = []
-    if from_file:
-        with open(from_file) as f:
-            targets = f.readlines()
-        targets = [line.rstrip('\n') for line in targets]
-        if __debug__: log('Read {} lines from "{}".', len(targets), from_file)
-        if not given_urls:
-            targets = filter_urls(targets, say)
-    elif given_urls:
-        # We assume that the arguments are URLs and take them as-is.
-        targets = images
-    else:
-        # We were given files and/or directories.  Look for image files.
-        for item in filter_urls(images, say):
-            if path.isfile(item) and path.splitext(item)[1] in IMAGE_FORMATS:
-                targets.append(item)
-            elif path.isdir(item):
-                targets += files_in_directory(item, extensions = IMAGE_FORMATS)
-            else:
-                say.warn('"{}" not a file or directory'.format(item))
+    targets = targets_from_arguments(images, from_file, given_urls, say)
     if not targets:
         exit(say.warn_text('No images to process; quitting.'))
 
@@ -304,6 +285,30 @@ def run(method_class, targets, given_urls, output_dir, creds_dir, say, quiet):
         if spinner:
             spinner.fail(say.error_text('Stopping due to a problem'))
         raise
+
+
+def targets_from_arguments(images, from_file, given_urls, say):
+    targets = []
+    if from_file:
+        with open(from_file) as f:
+            targets = f.readlines()
+        targets = [line.rstrip('\n') for line in targets]
+        if __debug__: log('Read {} lines from "{}".', len(targets), from_file)
+        if not given_urls:
+            targets = filter_urls(targets, say)
+    elif given_urls:
+        # We assume that the arguments are URLs and take them as-is.
+        targets = images
+    else:
+        # We were given files and/or directories.  Look for image files.
+        for item in filter_urls(images, say):
+            if path.isfile(item) and filename_extension(item) in IMAGE_FORMATS:
+                targets.append(item)
+            elif path.isdir(item):
+                targets += files_in_directory(item, extensions = IMAGE_FORMATS)
+            else:
+                say.warn('"{}" not a file or directory'.format(item))
+    return targets
 
 
 def filter_urls(item_list, say):

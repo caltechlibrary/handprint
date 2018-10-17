@@ -113,6 +113,7 @@ def rename_existing(file):
         backup = f + '.bak'
         # If we fail, we just give up instead of throwing an exception.
         try:
+            if __debug__: log('Renaming existing file {}', f)
             os.rename(f, backup)
         except:
             return

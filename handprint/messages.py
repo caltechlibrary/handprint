@@ -50,23 +50,30 @@ class MessageHandlerBase():
 class MessageHandlerCLI(MessageHandlerBase):
     '''Class for printing console messages and asking the user questions.'''
 
-    def __init__(self, use_color):
+    def __init__(self, use_color, quiet):
         super().__init__()
         self._colorize = use_color
+        self._quiet = quiet
 
 
     def use_color(self):
         return self._colorize
 
 
+    def be_quiet(self):
+        return self._quiet
+
+
     def info_text(self, text, details = ''):
         '''Prints an informational message.'''
-        return color(text, 'info', self._colorize)
+        if not self.be_quiet():
+            return color(text, 'info', self._colorize)
 
 
     def info(self, text, details = ''):
         '''Prints an informational message.'''
-        msg(self.info_text(text, details))
+        if not self.be_quiet():
+            msg(self.info_text(text, details))
 
 
     def warn_text(self, text, details = ''):

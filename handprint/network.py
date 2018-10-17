@@ -21,9 +21,6 @@ def network_available():
         return False
 
 
-# The following originally started out as the code here:
-# https://stackoverflow.com/a/16696317/743730
-
 def download_url(url, local_destination):
     '''Download the 'url' to the file 'local_destination' and return a tuple
     of (success, error) indicating whether the attempt succeeded and an error
@@ -54,6 +51,8 @@ def download_url(url, local_destination):
     elif 200 <= code < 400:
         if __debug__: log('Writing downloaded data to {}', local_destination)
         rename_existing(local_destination)
+        # The following originally started out as the code here:
+        # https://stackoverflow.com/a/16696317/743730
         with open(local_destination, 'wb') as f:
             for chunk in req.iter_content(chunk_size = 1024):
                 if chunk:

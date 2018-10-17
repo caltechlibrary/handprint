@@ -89,9 +89,17 @@ def files_in_directory(dir, extensions = None):
     for item in os.listdir(dir):
         full_path = path.join(dir, item)
         if path.isfile(full_path) and readable(full_path):
-            if extensions and path.splitext(item)[1] in extensions:
+            if extensions and filename_extension(item) in extensions:
                 files.append(full_path)
     return files
+
+
+def filename_extension(file):
+    parts = file.rpartition('.')
+    if len(parts) > 1:
+        return parts[-1]
+    else:
+        return ''
 
 
 def replace_extension(filepath, ext):

@@ -204,13 +204,15 @@ The following table summarizes all the command line options available. (Note: on
 | `-m`_M_  | `--method`_M_     | Use method _M_ | "all" |
 | `-o`_O_  | `--output`_O_     | Write outputs to directory _D_ | Same directories where images are found |  ⚑ |
 | `-u`     | `--given-urls`    | Inputs are URLs, not files or dirs | Assume files and/or directories of files |
-| `-r`_R_  | `--root-name`_R_  | Write outputs to files named _R_-n | Use the base names of the image files |
+| `-r`_R_  | `--root-name`_R_  | Write outputs to files named _R_-n | Use the base names of the image files | ✦ |
 | `-q`     | `--quiet`         | Don't print messages while working | Be chatty while working |
 | `-C`     | `--no-color`      | Don't color-code the output | Use colors in the terminal output |
 | `-D`     | `--debug`         | Debugging mode | Normal mode |
 | `-V`     | `--version`       | Print program version info and exit | Do other actions instead |
 
  ⚑ &nbsp; The `o` option (`/o` on Windows) **must be provided** if the `-u` option (`/u` on Windows) is used: the results must be written to the local disk somewhere, because it is not possible to write the results in the network locations represented by the URLs.
+
+✦ &nbsp; If `-u` is used (meaning, the inputs are URLs and not files or directories), then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpeg`, `document-1.google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.
 
 
 ⁇ Getting help and support

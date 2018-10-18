@@ -127,8 +127,7 @@ for warnings or errors.
 
 If given the -V option (/V on Windows), this program will print version
 information and exit without doing anything else.
-
-    '''
+'''
 
     # Prepare notification methods and hints.
     say = MessageHandlerCLI(not no_color, quiet)

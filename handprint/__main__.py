@@ -287,7 +287,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             save_output(tool.text_from(file), dest_file)
             if say.use_color() and not say.be_quiet():
                 short_path = path.relpath(dest_file, os.getcwd())
-                spinner.succeed(color('{} -> {}'.format(file, short_path), 'info'))
+                spinner.succeed(color('{} -> {}'.format(item, short_path), 'info'))
                 spinner.stop()
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:

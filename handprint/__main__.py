@@ -86,11 +86,11 @@ If given URLs (via the -u option), Handprint will first download the images
 found at the URLs to a local directory indicated by the option -o (/o on
 Windows).  Handprint will send each image file to OCR/HTR services from
 Google, Microsoft and others.  It will write the results to new files placed
-either in the same directories as the original files or if given the -o
-option (/o on Windows), to the directory indicated by the argument to the -o
-option.  The results will be written in files named after the original files
-with the addition of a string that indicates the service used.  For example,
-a file named "somefile.jpg" will produce
+either in the same directories as the original files, or (if given the -o
+option) to the directory indicated by the -o option value (/o on Windows).
+The results will be written in files named after the original files with the
+addition of a string that indicates the service used.  For example, a file
+named "somefile.jpg" will produce
 
   somefile.jpg
   somefile.google.txt

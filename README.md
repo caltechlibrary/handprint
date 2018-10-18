@@ -154,26 +154,28 @@ A challenge with using URLs is how to name the files that Handprint writes for t
 https://hale.archives.caltech.edu/adore-djatoka//resolver?rft_id=https%3A%2F%2Fhale.archives.caltech.edu%2Fislandora%2Fobject%2Fhale%253A85240%2Fdatastream%2FJP2%2Fview%3Ftoken%3D7997253eb6195d89b2615e8fa60708a97204a4cdefe527a5ab593395ac7d4327&url_ver=Z39.88-2004&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.level=4&svc.rotate=0
 ```
 
-To deal with this situation, Handprint manufactures its own file names when the `-u` option is used.  The scheme is simple: every file has a base name of `url-N`, where `N` is an integer.  The integers start from `1` for every run of Handprint, and the integers count the URLs found either on the command line or in the file indicated by the `-f` option.  The image found at the URL is stored in a file named `url-N.E` where `E` is the format extension (e.g., `url-1.jpeg`, `url-1.png`, etc.), and the URL itself is stored in a file named `url-1.url`.  Thus, the files produced by Handprint will look like this when the `-u` option is used:
+To deal with this situation, Handprint manufactures its own file names when the `-u` option is used.  The scheme is simple: by default, Handprint will use a base name of `document-N`, where `N` is an integer.  The integers start from `1` for every run of Handprint, and the integers count the URLs found either on the command line or in the file indicated by the `-f` option.  The image found at a given URL is stored in a file named `document-N.E` where `E` is the format extension (e.g., `document-1.jpeg`, `document-1.png`, etc.), and the URL itself is stored in a file named `document-1.url`.  Thus, the files produced by Handprint will look like this when the `-u` option is used:
 
 ```
-url-1.jpeg
-url-1.url
-url-1.google.txt
-url-1.microsoft.txt
+document-1.jpeg
+document-1.url
+document-1.google.txt
+document-1.microsoft.txt
 
-url-2.jpeg
-url-2.url
-url-2.google.txt
-url-2.microsoft.txt
+document-2.jpeg
+document-2.url
+document-2.google.txt
+document-2.microsoft.txt
 
-url-3.jpeg
-url-3.url
-url-3.google.txt
-url-3.microsoft.txt
+document-3.jpeg
+document-3.url
+document-3.google.txt
+document-3.microsoft.txt
 
 ...
 ```
+
+The base name `image` can be changed using the `-r` option (`/r` on Windows).  For example, running Handprint with the option `-r einstein` will cause the outputs to be named `einstein-1.jpeg`, `einstein-1.url`, etc. (assuming, for the sake of this example, that the image file format is `jpeg`).
 
 The use of the `-u` option also **requires the use of the `-o` option** (`/o` on Windows) to tell Handprint where to store the results.  This is a consequence of the fact that, without being provided with files or directories on the local disk, Handprint can't infer where to write its output.
 

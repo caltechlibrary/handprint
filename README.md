@@ -116,12 +116,8 @@ The `-h` option (`/h` on Windows) will make `handprint` display some help inform
 
 ### File formats recognized
 
-Whether the images are stored locally or accessible via URLs, each image should be a single page of a document in which text should be recognized.  The images must the least common denominator among the formats accepted by the cloud services, which at this time, are **JPEG**, **PNG**, **GIF**, and **BMP** only.
+Whether the images are stored locally or accessible via URLs, each image should be a single page of a document in which text should be recognized.  The accepted by the cloud services at this time are JPEG, PNG, GIF, and BMP only, but Handprint can convert a few others formats into JPEG if necessary.  Specifically, Handprint also handles JPEG 2000 and TIFF formats, which it converts to JPEG before sending to the different methods for text recognition.
 
-<!--
-* Google: [JPEG, PNG8, PNG24, GIF, Animated GIF (first frame only), BMP, WEBP, RAW, ICO, PDF, TIFF](https://cloud.google.com/vision/docs/supported-files)
-* Microsoft: [JPEG, PNG, GIF, or BMP format](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home)
--->
 
 ### Supported HTR/OCR methods
 

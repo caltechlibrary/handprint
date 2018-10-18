@@ -187,6 +187,27 @@ bin/handprint -u -f /tmp/urls-to-read.txt -o /tmp/results/
 
 Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to list the URLs in a file in combination with the `-f` option (`/f` on Windows).
 
+### Command line options
+
+The following table summarizes all the command line options available. (Note: on Windows computers, `/` must be usedas the prefix character instead of `-`):
+
+| Short    | Long&nbsp;form&nbsp;opt | Meaning | Default |  |
+|----------|-------------------|----------------------|---------|---|
+| `-c`_D_  | `--creds-dir`_D_  | Look for credentials in directory _D_ | `creds` |
+| `-f`_F_  | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs given on command line |
+| `-l`     | `--list`          | Disply list of known methods | |
+| `-m`_M_  | `--method`_M_     | Use method _M_ | "all" |
+| `-o`_O_  | `--output`_O_     | Write outputs to directory _D_ | Same directories where images are found |  ⚑ |
+| `-u`     | `--given-urls`    | Inputs are URLs, not files or dirs | Assume files and/or directories of files |
+| `-r`_R_  | `--root-name`_R_  | Write outputs to files named _R_-n | Use the base names of the image files |
+| `-q`     | `--quiet`         | Don't print messages while working | Be chatty while working |
+| `-C`     | `--no-color`      | Don't color-code the output | Use colors in the terminal output |
+| `-D`     | `--debug`         | Debugging mode | Normal mode |
+| `-V`     | `--version`       | Print program version info and exit | Do other actions instead |
+
+ ⚑ &nbsp; The `o` option (`/o` on Windows) **must be provided** if the `-u` option (`/u` on Windows) is used: the results must be written to the local disk somewhere, because it is not possible to write the results in the network locations represented by the URLs.
+
+
 ⁇ Getting help and support
 --------------------------
 

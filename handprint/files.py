@@ -16,6 +16,7 @@ file "LICENSE" for more information.
 
 import os
 from   os import path
+from   PIL import Image
 import sys
 import subprocess
 import webbrowser
@@ -94,6 +95,14 @@ def files_in_directory(dir, extensions = None):
     return files
 
 
+def filename_basename(file):
+    parts = file.rpartition('.')
+    if len(parts) > 1:
+        return ''.join(parts[:-1]).rstrip('.')
+    else:
+        return file
+
+
 def filename_extension(file):
     parts = file.rpartition('.')
     if len(parts) > 1:
@@ -142,3 +151,14 @@ def open_url(url):
     '''Open the given 'url' in a web browser using the current platform's
     default approach.'''
     webbrowser.open(url)
+
+
+def convert_image(file, from_format, to_format):
+    '''Returns a tuple of (success, error-message).'''
+    dest_file = filename_basename(file) + '.' + to_format
+    try:
+        im = Image.open(file)
+        im.save(dest_file, to_format)
+        return (True, '')
+    except Exception as err:
+        return (False, str(err))

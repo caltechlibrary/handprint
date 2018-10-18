@@ -22,7 +22,9 @@ from handprint.htr import MicrosoftHTR
 
 ON_WINDOWS = sys.platform.startswith('win')
 
-IMAGE_FORMATS = ('jpg', 'jpeg', 'png', 'gif', 'bmp')
+ACCEPTED_FORMATS = ('jpg', 'jpeg', 'jp2', 'png', 'gif', 'bmp', 'tif', 'tiff')
+
+FORMATS_MUST_CONVERT = ('jp2', 'tif', 'tiff')
 
 KNOWN_METHODS = {
     'google': GoogleHTR,

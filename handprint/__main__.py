@@ -293,10 +293,6 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
         if spinner:
             spinner.stop()
         raise
-    except ServiceFailure as err:
-        if spinner:
-            spinner.fail(say.error_text('Stopping due to a problem'))
-        raise
     except Exception as err:
         if spinner:
             spinner.fail(say.error_text('Stopping due to a problem'))

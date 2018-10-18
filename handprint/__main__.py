@@ -35,11 +35,13 @@ import traceback
 from   urllib import request
 
 import handprint
-from handprint.constants import ON_WINDOWS, IMAGE_FORMATS, KNOWN_METHODS
+from handprint.constants import ON_WINDOWS, ACCEPTED_FORMATS, KNOWN_METHODS
+from handprint.constants import FORMATS_MUST_CONVERT
 from handprint.messages import msg, color, MessageHandlerCLI
+from handprint.progress import ProgressIndicator
 from handprint.network import network_available, download_url
 from handprint.files import files_in_directory, replace_extension, handprint_path
-from handprint.files import readable, writable, filename_extension
+from handprint.files import readable, writable, filename_extension, convert_image
 from handprint.htr import GoogleHTR
 from handprint.htr import MicrosoftHTR
 from handprint.exceptions import *
@@ -215,7 +217,7 @@ information and exit without doing anything else.
     except (KeyboardInterrupt, UserCancelled) as err:
         exit(say.info_text('Quitting.'))
     except ServiceFailure as err:
-        exit(say.error_text(err))
+        exit(say.error_text(str(err)))
     except Exception as err:
         if debug:
             import pdb; pdb.set_trace()
@@ -234,7 +236,7 @@ if ON_WINDOWS:
 # ......................................................................
 
 def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say):
-    spinner = None
+    spinner = ProgressIndicator(say.use_color(), say.be_quiet())
     try:
         tool = method_class()
         say.info('Using method "{}".'.format(tool.name()))
@@ -244,19 +246,18 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                 say.warn('Skipping URL "{}"'.format(item))
                 continue
             if say.use_color() and not say.be_quiet():
-                spinner = Halo(spinner='bouncingBall', text = color(item, 'info'))
-                spinner.start()
+                action = 'Downloading' if given_urls else 'Reading'
+                spinner.start('{} {}'.format(action, item))
+            fmt = None
             if given_urls:
                 # Make sure the URLs point to images.
                 response = request.urlopen(item)
                 if response.headers.get_content_maintype() != 'image':
-                    spinner.fail(say.error_text(
-                        'Did not find an image at "{}"'.format(item)))
+                    spinner.fail('Did not find an image at "{}"'.format(item))
                     continue
-                format = response.headers.get_content_subtype()
-                if format not in IMAGE_FORMATS:
-                    spinner.fail(say.error_text(
-                        'Cannot use image format {} in "{}"'.format(format, item)))
+                fmt = response.headers.get_content_subtype()
+                if fmt not in ACCEPTED_FORMATS:
+                    spinner.fail('Cannot use image format {} in "{}"'.format(fmt, item))
                     continue
                 # If we're given URLs, we have to invent file names to store
                 # the images and the OCR results.
@@ -265,7 +266,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                 if __debug__: log('Writing URL to {}', url_file)
                 with open(url_file, 'w') as f:
                     f.write(url_file_content(item))
-                file = path.realpath(path.join(output_dir, base + '.' + format))
+                file = path.realpath(path.join(output_dir, base + '.' + fmt))
                 if __debug__: log('Starting wget on {}', item)
                 (success, error) = download_url(item, file)
                 if not success:
@@ -273,6 +274,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                     continue
             else:
                 file = path.realpath(path.join(os.getcwd(), item))
+                fmt = filename_extension(file)
             if output_dir:
                 dest_dir = output_dir
             else:
@@ -280,14 +282,18 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                 if not writable(dest_dir):
                     say.fatal('Cannot write output in "{}".'.format(dest_dir))
                     return
+            if fmt in FORMATS_MUST_CONVERT:
+                spinner.update('Converting file format to JPEG: "{}"'.format(file))
+                convert_image(file, fmt, 'jpeg')
             file_name = path.basename(file)
             dest_file = replace_extension(path.join(dest_dir, file_name),
                                           '.' + tool.name() + '.txt')
+            spinner.update('Sending to {} for text extraction'.format(tool.name()))
             save_output(tool.text_from(file), dest_file)
+            spinner.update('Extraction by {} finished'.format(tool.name()))
             if say.use_color() and not say.be_quiet():
                 short_path = path.relpath(dest_file, os.getcwd())
-                spinner.succeed(color('{} -> {}'.format(item, short_path), 'info'))
-                spinner.stop()
+                spinner.stop('{} -> {}'.format(item, short_path))
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
             spinner.stop()
@@ -313,10 +319,10 @@ def targets_from_arguments(images, from_file, given_urls, say):
     else:
         # We were given files and/or directories.  Look for image files.
         for item in filter_urls(images, say):
-            if path.isfile(item) and filename_extension(item) in IMAGE_FORMATS:
+            if path.isfile(item) and filename_extension(item) in ACCEPTED_FORMATS:
                 targets.append(item)
             elif path.isdir(item):
-                targets += files_in_directory(item, extensions = IMAGE_FORMATS)
+                targets += files_in_directory(item, extensions = ACCEPTED_FORMATS)
             else:
                 say.warn('"{}" not a file or directory'.format(item))
     return targets

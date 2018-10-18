@@ -60,10 +60,10 @@ class MicrosoftHTR(HTR):
             if response.status_code in [401, 402, 403, 407, 451, 511]:
                 text = 'Authentication failure for MS service -- {}'.format(err)
                 raise ServiceFailure(text)
-            elif code == 429:
+            elif response.status_code == 429:
                 text = 'Server blocking further requests due to rate limits'
                 raise ServiceFailure(text)
-            elif code == 503:
+            elif response.status_code == 503:
                 text = 'Server is unavailable -- try again later'
                 raise ServiceFailure(text)
             else:

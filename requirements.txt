@@ -10,6 +10,7 @@ grpcio>=1.15.0
 halo>=0.0.18
 matplotlib>=2.2.3
 numpy>=1.15.1
+Pillow>=5.2.0
 plac>=1.0.0
 requests>=2.19.1
 setuptools>=39.1.0

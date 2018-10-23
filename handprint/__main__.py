@@ -116,12 +116,12 @@ Note: the only image formats recognized are JPG, PNG, GIF, and BMP.
 
 Credentials for different services need to be provided to Handprint in the
 form of JSON files.  Each service needs a separate JSON file named after the
-service (e.g., "microsoft.json") and placed in a directory that Handprint
-searches.  By default, Handprint searches for the files in a subdirectory
-named "creds" where Handprint is installed, but an alternative directory can
-be indicated at run-time using the -c command-line option (/c on Windows).
-The specific format of each credentials file is different for each service;
-please consult the Handprint documentation for more details.
+service (e.g., "microsoft_credentials.json") and placed in a directory that
+Handprint searches.  By default, Handprint searches for the files in a
+subdirectory named "creds" where Handprint is installed, but an alternative
+directory can be indicated at run-time using the -c command-line option (/c
+on Windows).  The specific format of each credentials file is different for
+each service; please consult the Handprint documentation for more details.
 
 If given the -q option (/q on Windows), Handprint will not print its usual
 informational messages while it is working.  It will only print messages
@@ -284,7 +284,11 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                     return
             if fmt in FORMATS_MUST_CONVERT:
                 spinner.update('Converting file format to JPEG: "{}"'.format(file))
-                convert_image(file, fmt, 'jpeg')
+                (success, converted_file, msg) = convert_image(file, fmt, 'jpeg')
+                if not success:
+                    spinner.fail('Failed to convert "{}": {}'.format(file, msg))
+                # Note: 'file' now points to the converted file, not the original
+                file = converted_file
             file_name = path.basename(file)
             dest_file = replace_extension(path.join(dest_dir, file_name),
                                           '.' + tool.name() + '.txt')

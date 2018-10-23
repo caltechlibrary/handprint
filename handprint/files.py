@@ -154,11 +154,12 @@ def open_url(url):
 
 
 def convert_image(file, from_format, to_format):
-    '''Returns a tuple of (success, error-message).'''
+    '''Returns a tuple of (success, output file, error message).'''
     dest_file = filename_basename(file) + '.' + to_format
     try:
         im = Image.open(file)
         im.save(dest_file, to_format)
-        return (True, '')
+        if __debug__: log('Saved converted image to {}', dest_file)
+        return (True, dest_file, '')
     except Exception as err:
-        return (False, str(err))
+        return (False, None, str(err))

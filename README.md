@@ -9,7 +9,7 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-0.2.1-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-0.2.2-b44e88.svg?style=flat-square)](http://shields.io)
 
 Table of Contents
 -----------------
@@ -44,14 +44,14 @@ Handprint is a program written in Python 3 that works by invoking cloud-based se
 
 The following is probably the simplest and most direct way to install this software on your computer:
 ```sh
-sudo pip3 install git+https://github.com/caltechlibrary/handprint.git
+sudo pip3 install git+https://github.com/caltechlibrary/handprint.git --upgrade
 ```
 
 Alternatively, you can instead clone this GitHub repository and then run `setup.py` manually.  First, create a directory somewhere on your computer where you want to store the files, and cd to it from a terminal shell.  Next, execute the following commands:
 ```sh
 git clone https://github.com/caltechlibrary/handprint.git
 cd handprint
-sudo python3 -m pip install .
+sudo python3 -m pip install . --upgrade
 ```
 
 ### ⓶&nbsp;&nbsp; _Obtain cloud service credentials_

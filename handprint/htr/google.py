@@ -35,6 +35,7 @@ class GoogleHTR(HTR):
 
 
     def text_from(self, path):
+        if __debug__: log('Reading {}', path)
         with io.open(path, 'rb') as image_file:
             image_data = image_file.read()
 

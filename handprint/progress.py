@@ -53,7 +53,7 @@ class ProgressIndicator():
             self._spinner.start()
             self._current_message = message
         else:
-            msg(color(message, 'info'))
+            msg(message)
 
 
     def update(self, message = None):
@@ -64,7 +64,7 @@ class ProgressIndicator():
             self._spinner.stop()
             self.start(message)
         else:
-            msg(color(message, 'info'))
+            msg(message)
 
 
     def stop(self, message = None):
@@ -77,7 +77,7 @@ class ProgressIndicator():
             self._spinner.succeed(color(message, 'info', self._colorize))
             self._spinner.stop()
         else:
-            msg(color(message, 'info'))
+            msg(message)
 
 
     def fail(self, message = None):
@@ -88,4 +88,4 @@ class ProgressIndicator():
             self._spinner.fail(color(message, 'error', self._colorize))
             self._spinner.stop()
         else:
-            msg(color(message, 'error'))
+            msg('ERROR: ' + message)

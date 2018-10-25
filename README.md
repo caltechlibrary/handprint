@@ -9,7 +9,7 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-0.2.2-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-0.3.0-b44e88.svg?style=flat-square)](http://shields.io)
 
 Table of Contents
 -----------------
@@ -26,6 +26,7 @@ Table of Contents
    * [Service account credentials](#service-account-credentials)
    * [Files versus URLs](#files-versus-urls)
    * [Command line options](#command-line-options)
+* [Data returned](#︎-data-returned)
 * [Getting help and support](#-getting-help-and-support)
 * [Acknowledgments](#︎-acknowledgments)
 * [Copyright and license](#︎-copyright-and-license)
@@ -136,6 +137,7 @@ By default, Handprint will run each known method in turn.  To invoke only one sp
 bin/handprint -m microsoft /path/to/images
 ```
 
+
 ### Service account credentials
 
 Handprint looks for credentials files in the directory where it is installed, but you can put credentials in another directory and then tell Handprint where to find it using the `-c` option (`/c` on Windows).  Example of use:
@@ -155,23 +157,29 @@ A challenge with using URLs is how to name the files that Handprint writes for t
 https://hale.archives.caltech.edu/adore-djatoka//resolver?rft_id=https%3A%2F%2Fhale.archives.caltech.edu%2Fislandora%2Fobject%2Fhale%253A85240%2Fdatastream%2FJP2%2Fview%3Ftoken%3D7997253eb6195d89b2615e8fa60708a97204a4cdefe527a5ab593395ac7d4327&url_ver=Z39.88-2004&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.level=4&svc.rotate=0
 ```
 
-To deal with this situation, Handprint manufactures its own file names when the `-u` option is used.  The scheme is simple: by default, Handprint will use a base name of `document-N`, where `N` is an integer.  The integers start from `1` for every run of Handprint, and the integers count the URLs found either on the command line or in the file indicated by the `-f` option.  The image found at a given URL is stored in a file named `document-N.E` where `E` is the format extension (e.g., `document-1.jpeg`, `document-1.png`, etc.), and the URL itself is stored in a file named `document-1.url`.  Thus, the files produced by Handprint will look like this when the `-u` option is used:
+To deal with this situation, Handprint manufactures its own file names when the `-u` option is used.  The scheme is simple: by default, Handprint will use a base name of `document-N`, where `N` is an integer.  The integers start from `1` for every run of Handprint, and the integers count the URLs found either on the command line or in the file indicated by the `-f` option.  The image found at a given URL is stored in a file named `document-N.E` where `E` is the format extension (e.g., `document-1.jpeg`, `document-1.png`, etc.).  The URL itself is stored in another file named `document-1.url`.  Thus, the files produced by Handprint will look like this when the `-u` option is used:
 
 ```
 document-1.jpeg
 document-1.url
 document-1.google.txt
+document-1.google.json
 document-1.microsoft.txt
+document-1.microsoft.json
 
 document-2.jpeg
 document-2.url
 document-2.google.txt
+document-2.google.json
 document-2.microsoft.txt
+document-2.microsoft.json
 
 document-3.jpeg
 document-3.url
 document-3.google.txt
+document-3.google.json
 document-3.microsoft.txt
+document-3.microsoft.json
 
 ...
 ```
@@ -187,6 +195,7 @@ bin/handprint -u -f /tmp/urls-to-read.txt -o /tmp/results/
 ```
 
 Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to list the URLs in a file in combination with the `-f` option (`/f` on Windows).
+
 
 ### Command line options
 
@@ -209,6 +218,12 @@ The following table summarizes all the command line options available. (Note: on
  ⚑ &nbsp; The `o` option (`/o` on Windows) **must be provided** if the `-u` option (`/u` on Windows) is used: the results must be written to the local disk somewhere, because it is not possible to write the results in the network locations represented by the URLs.
 
 ✦ &nbsp; If `-u` is used (meaning, the inputs are URLs and not files or directories), then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpeg`, `document-1.google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.
+
+
+⚛︎ Data returned
+---------------
+
+Handprint tries to gather all the data that each service returns for text recognition, and outputs the results in two forms: a `.json` file containing all the results, and a `.txt` file containing just the document text.  The exact content of the `.json` file differs for each service.
 
 
 ⁇ Getting help and support

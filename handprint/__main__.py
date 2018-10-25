@@ -20,6 +20,7 @@ file "LICENSE" for more information.
 '''
 
 from   halo import Halo
+import json
 import os
 from   os import path
 import plac
@@ -72,6 +73,10 @@ def main(creds_dir = 'D', from_file = 'F', list = False, method = 'M',
 run alternative optical character recognition (OCR) and handwritten text
 recognition (HTR) methods on images of document pages.
 
+If given the command-line flag -l (or /l on Windows), Handprint will print a
+list of the known methods and then exit.  The option -m (/m on Windows) can
+be used to select a specific method.  (The default method is to run them all.)
+
 When invoked, the command-line arguments should contain one of the following:
 
  a) one or more directory paths or one or more image file paths, which will
@@ -96,23 +101,32 @@ named "somefile.jpg" will produce
 
   somefile.jpg
   somefile.google.txt
+  somefile.google.json
   somefile.microsoft.txt
+  somefile.microsoft.json
   somefile.amazon.txt
+  somefile.amazon.json
   ...
 
-and so on for each image and each service used.  Note that if -u (/u on
-Windows) is given, then an output directory MUST also be specified using the
-option -o (/o on Windows) because it is not possible to write the results in
-the network locations represented by the URLs.  Also, when -u is used, the
-images and text results will be stored in files whose root names have the
-form "document-N", where "N" is an integer.  The root name can be changed
-using the -r option (/r on Windows).
+and so on for each image and each service used.  The .txt files will contain
+the text extracted (if any).  The .json files will contain the complete
+response from the service, converted to JSON by Handprint.  In some cases,
+such as Google's API, the service may offer multiple operations and will
+return individual results for different API calls or options; in those cases,
+Handprint combines the results of multiple API calls into a single JSON
+object.
 
-If given the command-line flag -l (or /l on Windows), Handprint will print a
-list of the known methods and then exit.  The option -m (/m on Windows) can
-be used to select a specific method.  (The default method is "google".)
-
-Note: the only image formats recognized are JPG, PNG, GIF, and BMP.
+Note that if -u (/u on Windows) is given, then an output directory MUST also
+be specified using the option -o (/o on Windows) because it is not possible
+to write the results in the network locations represented by the URLs.  Also,
+when -u is used, the images and text results will be stored in files whose
+root names have the form "document-N", where "N" is an integer.  The root
+name can be changed using the -r option (/r on Windows).  The image will be
+converted to ordinary JPEG format for maximum compatibility with the
+different OCR services and written to "document-N.jpg", and the URL
+corresponding to each document will be written in a file named
+"document-N.url" so that it is possible to connect each "document-N.jpg" to
+the URL it came from.
 
 Credentials for different services need to be provided to Handprint in the
 form of JSON files.  Each service needs a separate JSON file named after the
@@ -129,7 +143,8 @@ for warnings or errors.
 
 If given the -V option (/V on Windows), this program will print version
 information and exit without doing anything else.
-'''
+
+    '''
 
     # Prepare notification methods and hints.
     say = MessageHandlerCLI(not no_color, quiet)
@@ -239,7 +254,8 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
     spinner = ProgressIndicator(say.use_color(), say.be_quiet())
     try:
         tool = method_class()
-        say.info('Using method "{}".'.format(tool.name()))
+        tool_name = tool.name()
+        say.info('Using method "{}".'.format(tool_name))
         tool.init_credentials(creds_dir)
         for index, item in enumerate(targets, 1):
             if not given_urls and (item.startswith('http') or item.startswith('ftp')):
@@ -290,13 +306,16 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                 # Note: 'file' now points to the converted file, not the original
                 file = converted_file
             file_name = path.basename(file)
-            dest_file = replace_extension(path.join(dest_dir, file_name),
-                                          '.' + tool.name() + '.txt')
-            spinner.update('Sending to {} for text extraction'.format(tool.name()))
-            save_output(tool.text_from(file), dest_file)
-            spinner.update('Extraction by {} finished'.format(tool.name()))
+            base_path = path.join(dest_dir, file_name)
+            txt_file  = replace_extension(base_path, '.' + tool_name + '.txt')
+            json_file = replace_extension(base_path, '.' + tool_name + '.json')
+            spinner.update('Sending to {} for text extraction'.format(tool_name))
+            save_output(tool.document_text(file), txt_file)
+            spinner.update('Text from {} saved in {}'.format(tool_name, txt_file))
+            spinner.update('All data from {} saved in {}'.format(tool_name, json_file))
+            save_output(json.dumps(tool.all_results(file)), json_file)
             if say.use_color() and not say.be_quiet():
-                short_path = path.relpath(dest_file, os.getcwd())
+                short_path = path.relpath(txt_file, os.getcwd())
                 spinner.stop('{} -> {}'.format(item, short_path))
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:

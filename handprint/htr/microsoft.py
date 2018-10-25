@@ -24,15 +24,36 @@ from handprint.debug import log
 # -----------------------------------------------------------------------------
 
 class MicrosoftHTR(HTR):
+    def __init__(self):
+        '''Initializes the credentials to use for accessing this service.'''
+        self._results = {}
+
+
     def init_credentials(self, credentials_dir = None):
+        '''Initializes the credentials to use for accessing this service.'''
+        if __debug__: log('Getting credentials from {}', credentials_dir)
         self.credentials = MicrosoftCredentials(credentials_dir).creds()
 
 
     def name(self):
+        '''Returns the canonical internal name for this service.'''
         return "microsoft"
 
 
-    def text_from(self, path):
+    def document_text(self, path):
+        if path not in self._results:
+            self.all_results(path)      # Sets self._results as side-effect.
+        lines = self._results[path]['recognitionResult']['lines']
+        sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
+        return ' '.join(x['text'] for x in sorted_lines)
+
+
+    def all_results(self, path):
+        '''Returns all the results from the service as a Python dict.'''
+        # Check if we already processed it.
+        if path in self._results:
+            return self._results[path]
+
         vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
         text_recognition_url = vision_base_url + "recognizeText"
 
@@ -90,9 +111,6 @@ class MicrosoftHTR(HTR):
                 poll = False
             if ("status" in analysis and analysis['status'] == 'Failed'):
                 poll = False
-
         if __debug__: log('Results received.')
-        lines = sorted(analysis['recognitionResult']['lines'],
-                       key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
-
-        return ' '.join(x['text'] for x in lines)
+        self._results[path] = analysis
+        return analysis

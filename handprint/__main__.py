@@ -314,9 +314,8 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             spinner.update('Text from {} saved in {}'.format(tool_name, txt_file))
             spinner.update('All data from {} saved in {}'.format(tool_name, json_file))
             save_output(json.dumps(tool.all_results(file)), json_file)
-            if say.use_color() and not say.be_quiet():
-                short_path = path.relpath(txt_file, os.getcwd())
-                spinner.stop('{} -> {}'.format(item, short_path))
+            short_path = path.relpath(txt_file, os.getcwd())
+            spinner.stop('{} -> {}'.format(item, short_path))
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
             spinner.stop()

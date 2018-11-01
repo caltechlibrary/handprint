@@ -158,6 +158,11 @@ def open_url(url):
     webbrowser.open(url)
 
 
+def image_size(file):
+    '''Returns the size of the image in 'file'.'''
+    return path.getsize(file)
+
+
 def convert_image(file, from_format, to_format):
     '''Returns a tuple of (success, output file, error message).'''
     dest_file = filename_basename(file) + '.' + to_format

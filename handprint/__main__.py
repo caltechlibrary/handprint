@@ -43,6 +43,7 @@ from handprint.progress import ProgressIndicator
 from handprint.network import network_available, download_url
 from handprint.files import files_in_directory, replace_extension, handprint_path
 from handprint.files import readable, writable, filename_extension, convert_image
+from handprint.files import relative_path
 from handprint.htr import GoogleHTR
 from handprint.htr import MicrosoftHTR
 from handprint.exceptions import *
@@ -315,12 +316,11 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                 spinner.fail('Error from {}: {}'.format(tool_name, result.error))
                 continue
             else:
+                spinner.update('Text -> {}'.format(relative_path(txt_file)))
                 save_output(result.text, txt_file)
-                spinner.update('Text from {} saved in {}'.format(tool_name, txt_file))
+                spinner.update('All data -> {}'.format(relative_path(json_file)))
                 save_output(json.dumps(result.data), json_file)
-                spinner.update('All data from {} saved in {}'.format(tool_name, json_file))
-            short_path = path.relpath(txt_file, os.getcwd())
-            spinner.stop('{} -> {}'.format(item, short_path))
+            spinner.stop('Done with {}'.format(item))
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
             spinner.warn('Interrupted')

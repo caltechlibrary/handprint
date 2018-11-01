@@ -17,8 +17,8 @@ file "LICENSE" for more information.
 import sys
 
 import handprint
-from handprint.htr import GoogleHTR
-from handprint.htr import MicrosoftHTR
+from handprint.methods import GoogleTR
+from handprint.methods import MicrosoftTR
 
 ON_WINDOWS = sys.platform.startswith('win')
 
@@ -27,6 +27,6 @@ ACCEPTED_FORMATS = ('jpg', 'jpeg', 'jp2', 'png', 'gif', 'bmp', 'tif', 'tiff')
 FORMATS_MUST_CONVERT = ('jp2', 'tif', 'tiff')
 
 KNOWN_METHODS = {
-    'google': GoogleHTR,
-    'microsoft': MicrosoftHTR,
+    'google': GoogleTR,
+    'microsoft': MicrosoftTR,
 }

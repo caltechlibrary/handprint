@@ -112,6 +112,10 @@ def filename_extension(file):
         return ''
 
 
+def relative_path(file):
+    return path.relpath(file, os.getcwd())
+
+
 def replace_extension(filepath, ext):
     return path.splitext(filepath)[0] + ext
 

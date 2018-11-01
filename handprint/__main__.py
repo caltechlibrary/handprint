@@ -295,6 +295,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             else:
                 dest_dir = path.dirname(file)
                 if not writable(dest_dir):
+                    spinner.stop()
                     say.fatal('Cannot write output in "{}".'.format(dest_dir))
                     return
             if fmt in FORMATS_MUST_CONVERT:
@@ -309,10 +310,15 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             txt_file  = replace_extension(base_path, '.' + tool_name + '.txt')
             json_file = replace_extension(base_path, '.' + tool_name + '.json')
             spinner.update('Sending to {} for text extraction'.format(tool_name))
-            save_output(tool.document_text(file), txt_file)
-            spinner.update('Text from {} saved in {}'.format(tool_name, txt_file))
-            spinner.update('All data from {} saved in {}'.format(tool_name, json_file))
-            save_output(json.dumps(tool.all_results(file)), json_file)
+            result = tool.result(file)
+            if result.error:
+                spinner.fail('Error from {}: {}'.format(tool_name, result.error))
+                continue
+            else:
+                save_output(result.text, txt_file)
+                spinner.update('Text from {} saved in {}'.format(tool_name, txt_file))
+                save_output(json.dumps(result.data), json_file)
+                spinner.update('All data from {} saved in {}'.format(tool_name, json_file))
             short_path = path.relpath(txt_file, os.getcwd())
             spinner.stop('{} -> {}'.format(item, short_path))
     except (KeyboardInterrupt, UserCancelled) as err:

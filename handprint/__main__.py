@@ -1,9 +1,8 @@
 '''Handprint: HANDwritten Page RecognitIoN Test for Caltech Archives.
 
-This project uses alternative optical character recognition (OCR) and
-handwritten text recognition (HTR) methods on documents from the Caltech
-Archives (http://archives.caltech.edu).  Tests include the use of Google's
-OCR capabilities in their Google Cloud Vision API
+This project uses alternative text recognition methods on documents from the
+Caltech Archives (http://archives.caltech.edu).  Tests include the use of
+Google's OCR capabilities in their Google Cloud Vision API
 (https://cloud.google.com/vision/docs/ocr), Microsoft's Azure, and others.
 
 Authors
@@ -44,8 +43,8 @@ from handprint.network import network_available, download_url
 from handprint.files import files_in_directory, replace_extension, handprint_path
 from handprint.files import readable, writable, filename_extension, convert_image
 from handprint.files import relative_path
-from handprint.htr import GoogleHTR
-from handprint.htr import MicrosoftHTR
+from handprint.htr import GoogleTR
+from handprint.htr import MicrosoftTR
 from handprint.exceptions import *
 from handprint.debug import set_debug, log
 
@@ -71,8 +70,7 @@ def main(creds_dir = 'D', from_file = 'F', list = False, method = 'M',
          output = 'O', given_urls = False, root_name = 'R', quiet = False,
          no_color = False, debug = False, version = False, *images):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") can
-run alternative optical character recognition (OCR) and handwritten text
-recognition (HTR) methods on images of document pages.
+run alternative text recognition methods on images of document pages.
 
 If given the command-line flag -l (or /l on Windows), Handprint will print a
 list of the known methods and then exit.  The option -m (/m on Windows) can
@@ -144,8 +142,7 @@ for warnings or errors.
 
 If given the -V option (/V on Windows), this program will print version
 information and exit without doing anything else.
-
-    '''
+'''
 
     # Prepare notification methods and hints.
     say = MessageHandlerCLI(not no_color, quiet)

@@ -1,5 +1,5 @@
 '''
-google.py: interface to Google HTR network service
+google.py: interface to Google text recognition network service
 '''
 
 import io
@@ -15,7 +15,7 @@ import json
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
-from handprint.htr.base import HTR, HTRResult
+from handprint.htr.base import TextRecognition, TRResult
 from handprint.exceptions import ServiceFailure
 from handprint.debug import log
 
@@ -36,7 +36,7 @@ _FILE_SIZE_LIMIT = 10*1024*1024
 # a given file.  This is to avoid using API calls to get the different
 # subelements of the results.
 
-class GoogleHTR(HTR):
+class GoogleTR(TextRecognition):
     # The following is based on the table of Google Cloud Vision features at
     # https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1p3beta1#type_1
     # as of 2018-10-25.
@@ -47,7 +47,7 @@ class GoogleHTR(HTR):
 
     def __init__(self):
         '''Initializes the credentials to use for accessing this service.'''
-        # Dictionary where the keys are the paths and values are an HTRResult.
+        # Dictionary where the keys are the paths and values are an TRResult.
         self._results = {}
 
 
@@ -66,7 +66,7 @@ class GoogleHTR(HTR):
 
     def result(self, path):
         '''Returns the results from calling the service on the 'path'.  The
-        results are returned as an HTRResult named tuple.
+        results are returned as an TRResult named tuple.
         '''
         # Check if we already processed it.
         if path in self._results:
@@ -78,7 +78,7 @@ class GoogleHTR(HTR):
 
         if len(image_data) > _FILE_SIZE_LIMIT:
             text = 'Error: file "{}" is too large for Google service'.format(path)
-            return HTRResult(path = path, data = {}, text = '', error = text)
+            return TRResult(path = path, data = {}, text = '', error = text)
         try:
             if __debug__: log('Building Google vision API object')
             client  = gv.ImageAnnotatorClient()
@@ -95,8 +95,8 @@ class GoogleHTR(HTR):
             full_text = ''
             if 'fullTextAnnotation' in result['document_text_detection']:
                 full_text = result['document_text_detection']['fullTextAnnotation']['text']
-            self._results[path] = HTRResult(path = path, data = result,
-                                            text = full_text, error = None)
+            self._results[path] = TRResult(path = path, data = result,
+                                           text = full_text, error = None)
             return self._results[path]
         except google.api_core.exceptions.PermissionDenied as err:
             text = 'Authentication failure for Google service -- {}'.format(err)
@@ -111,4 +111,4 @@ class GoogleHTR(HTR):
                 raise KeyboardInterrupt
             else:
                 text = 'Error: failed to convert "{}": {}'.format(path, err)
-                return HTRResult(path = path, data = {}, text = '', error = text)
+                return TRResult(path = path, data = {}, text = '', error = text)

@@ -1,2 +1,2 @@
-from .google import GoogleHTR
-from .microsoft import MicrosoftHTR
+from .google import GoogleTR
+from .microsoft import MicrosoftTR

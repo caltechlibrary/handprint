@@ -1,5 +1,5 @@
 '''
-microsoft.py: interface to Microsoft HTR network service
+microsoft.py: interface to Microsoft text recognition network service
 
 This code was originally based on the sample provided by Microsoft at
 https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts/python-hand-text
@@ -14,7 +14,7 @@ import time
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
-from handprint.htr.base import HTR, HTRResult
+from handprint.htr.base import TextRecognition, TRResult
 from handprint.messages import msg
 from handprint.exceptions import ServiceFailure
 from handprint.debug import log
@@ -31,7 +31,7 @@ _FILE_SIZE_LIMIT = 4*1024*1024
 # Main class.
 # -----------------------------------------------------------------------------
 
-class MicrosoftHTR(HTR):
+class MicrosoftTR(TextRecognition):
     def __init__(self):
         '''Initializes the credentials to use for accessing this service.'''
         self._results = {}
@@ -64,7 +64,7 @@ class MicrosoftHTR(HTR):
 
         if len(image_data) > _FILE_SIZE_LIMIT:
             text = 'Error: file "{}" is too large for Microsoft service'.format(path)
-            return HTRResult(path = path, data = {}, text = '', error = text)
+            return TRResult(path = path, data = {}, text = '', error = text)
 
         # Post it to the Microsoft cloud service.
         if __debug__: log('Sending file to MS cloud service')
@@ -89,7 +89,7 @@ class MicrosoftHTR(HTR):
                 raise ServiceFailure(text)
         except Exception as err:
             text = 'MS rejected "{}"'.format(path)
-            return HTRResult(path = path, data = {}, text = '', error = text)
+            return TRResult(path = path, data = {}, text = '', error = text)
 
         # The Microsoft API for extracting handwritten text requires two API
         # calls: one call to submit the image for processing, the other to
@@ -117,6 +117,6 @@ class MicrosoftHTR(HTR):
             full_text = ' '.join(x['text'] for x in sorted_lines)
 
         # Put it all together.
-        self._results[path] = HTRResult(path = path, data = analysis,
-                                        text = full_text, error = None)
+        self._results[path] = TRResult(path = path, data = analysis,
+                                       text = full_text, error = None)
         return self._results[path]

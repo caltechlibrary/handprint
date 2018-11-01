@@ -1,5 +1,5 @@
 '''
-htr/base.py: base class definition for text recognition systems.
+tr/base.py: base class definition for text recognition systems.
 '''
 
 from collections import namedtuple
@@ -8,8 +8,8 @@ from collections import namedtuple
 # Named tuple definitions.
 # .............................................................................
 
-HTRResult = namedtuple('HTRResult', 'path data text error')
-HTRResult.__doc__ = '''Results of invoking a text recognition service.
+TRResult = namedtuple('TRResult', 'path data text error')
+TRResult.__doc__ = '''Results of invoking a text recognition service.
   'path' is the file path or URL of the item in question
   'data' is the full data result as a Python dict (or {} in case of error)
   'text' is the extracted text as a string (or '' in case of error)
@@ -20,7 +20,7 @@ HTRResult.__doc__ = '''Results of invoking a text recognition service.
 # Class definitions.
 # .............................................................................
 
-class HTR(object):
+class TR(object):
     def __init__(self):
         pass
 
@@ -36,5 +36,5 @@ class HTR(object):
 
 
     def result(self, path):
-        '''Returns the output from the service as an HTRResult named tuple.'''
+        '''Returns the output from the service as an TRResult named tuple.'''
         pass

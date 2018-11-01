@@ -20,7 +20,7 @@ TRResult.__doc__ = '''Results of invoking a text recognition service.
 # Class definitions.
 # .............................................................................
 
-class TR(object):
+class TextRecognition(object):
     def __init__(self):
         pass
 

@@ -14,7 +14,7 @@ import time
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
-from handprint.htr.base import TextRecognition, TRResult
+from handprint.methods.base import TextRecognition, TRResult
 from handprint.messages import msg
 from handprint.exceptions import ServiceFailure
 from handprint.debug import log

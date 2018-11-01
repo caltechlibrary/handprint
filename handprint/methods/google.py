@@ -15,7 +15,7 @@ import json
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
-from handprint.htr.base import TextRecognition, TRResult
+from handprint.methods.base import TextRecognition, TRResult
 from handprint.exceptions import ServiceFailure
 from handprint.debug import log
 

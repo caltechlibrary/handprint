@@ -15,11 +15,20 @@ import json
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
-from handprint.messages import msg
 from handprint.exceptions import ServiceFailure
 from handprint.debug import log
 
-from .base import HTR
+from .base import HTR, HTRResult
+
+
+# Main class.
+# -----------------------------------------------------------------------------
+
+# Google Cloud Vision API docs state that images cannot exceed 20 MB according
+# to https://cloud.google.com/vision/docs/supported-files but if you try to
+# send more than 10 MB, you'll get an error back.
+
+_FILE_SIZE_LIMIT = 10*1024*1024
 
 
 # Main class.
@@ -39,6 +48,7 @@ class GoogleHTR(HTR):
 
     def __init__(self):
         '''Initializes the credentials to use for accessing this service.'''
+        # Dictionary where the keys are the paths and values are an HTRResult.
         self._results = {}
 
 
@@ -55,15 +65,10 @@ class GoogleHTR(HTR):
         return "google"
 
 
-    def document_text(self, path):
-        '''Returns the pure text extracted from the image by this service.'''
-        if path not in self._results:
-            self.all_results(path)      # Sets self._results as side-effect.
-        return self._results[path]['document_text_detection']['fullTextAnnotation']['text']
-
-
-    def all_results(self, path):
-        '''Returns all the results from the service as a Python dict.'''
+    def result(self, path):
+        '''Returns the results from calling the service on the 'path'.  The
+        results are returned as an HTRResult named tuple.
+        '''
         # Check if we already processed it.
         if path in self._results:
             return self._results[path]
@@ -72,12 +77,9 @@ class GoogleHTR(HTR):
         with io.open(path, 'rb') as image_file:
             image_data = image_file.read()
 
-        # Google Cloud Vision API docs state that images cannot exceed 20 MB:
-        # https://cloud.google.com/vision/docs/supported-files
-        if len(image_data) > 20*1024*1024:
+        if len(image_data) > _FILE_SIZE_LIMIT:
             text = 'Error: file "{}" is too large for Google service'.format(path)
-            msg(text, 'warn')
-            return text
+            return HTRResult(path = path, data = {}, text = '', error = text)
         try:
             if __debug__: log('Building Google vision API object')
             client  = gv.ImageAnnotatorClient()
@@ -85,17 +87,28 @@ class GoogleHTR(HTR):
             context = gv.types.ImageContext(language_hints = ['en-t-i0-handwrit'])
 
             # Iterate over the known API calls and store each result.
-            results = {}
+            result = dict.fromkeys(self._known_features)
             for feature in self._known_features:
                 if __debug__: log('Sending image to Google for {} ...', feature)
                 response = getattr(client, feature)(image = image, image_context = context)
                 if __debug__: log('Received result.')
-                results[feature] = MessageToDict(response)
-            self._results[path] = results
-            return results
+                result[feature] = MessageToDict(response)
+            if 'fullTextAnnotation' in result['document_text_detection']:
+                full_text = result['document_text_detection']['fullTextAnnotation']['text']
+            self._results[path] = HTRResult(path = path, data = result,
+                                            text = full_text, error = None)
+            return self._results[path]
         except google.api_core.exceptions.PermissionDenied as err:
             text = 'Authentication failure for Google service -- {}'.format(err)
             raise ServiceFailure(text)
+        except KeyboardInterrupt:
+            raise
         except Exception as err:
-            text = 'Error: failed to convert "{}": {}'.format(path, err)
-            return text
+            if isinstance(err, KeyError):
+                # Can happen if you control-C in the middle of the Google call.
+                # Result is "Exception ignored in: 'grpc._cython.cygrpc._next'"
+                # printed to the terminal and we end up here.
+                raise KeyboardInterrupt
+            else:
+                text = 'Error: failed to convert "{}": {}'.format(path, err)
+                return HTRResult(path = path, data = {}, text = '', error = text)

@@ -67,6 +67,16 @@ class ProgressIndicator():
             msg(message)
 
 
+    def warn(self, message = None):
+        if self._quiet:
+            return
+        if self._colorize:
+            self._spinner.warn(color(message, 'warn', self._colorize))
+            self.start(message)
+        else:
+            msg(message)
+
+
     def stop(self, message = None):
         if self._quiet:
             return

@@ -35,6 +35,21 @@ class TextRecognition(object):
         pass
 
 
+    def accepted_formats(self):
+        '''Returns a list of supported image file formats.'''
+        pass
+
+
+    def max_size(self):
+        '''Returns the maximum size of an acceptable image, in bytes.'''
+        pass
+
+
+    def max_dimensions(self):
+        '''Maximum image size as a tuple of pixel numbers: (width, height).'''
+        pass
+
+
     def result(self, path):
         '''Returns the output from the service as an TRResult named tuple.'''
         pass

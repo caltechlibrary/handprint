@@ -93,6 +93,7 @@ class GoogleHTR(HTR):
                 response = getattr(client, feature)(image = image, image_context = context)
                 if __debug__: log('Received result.')
                 result[feature] = MessageToDict(response)
+            full_text = ''
             if 'fullTextAnnotation' in result['document_text_detection']:
                 full_text = result['document_text_detection']['fullTextAnnotation']['text']
             self._results[path] = HTRResult(path = path, data = result,

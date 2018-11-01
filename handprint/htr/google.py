@@ -21,7 +21,7 @@ from handprint.debug import log
 from .base import HTR, HTRResult
 
 
-# Main class.
+# Constants.
 # -----------------------------------------------------------------------------
 
 # Google Cloud Vision API docs state that images cannot exceed 20 MB according

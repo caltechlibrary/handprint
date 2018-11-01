@@ -127,6 +127,21 @@ corresponding to each document will be written in a file named
 "document-N.url" so that it is possible to connect each "document-N.jpg" to
 the URL it came from.
 
+If images are too large for a method/service, then Handprint will resize them
+prior to sending them.  It will write the reduced image to a file named
+"FILENAME-reduced.EXT", where "FILENAME" is the original file name and "EXT"
+is the file extension.  This means that if an image needs to be resized, the
+results of applying the text recognition methods will be, e.g.,
+
+  somefile-reduced.jpg
+  somefile-reduced.google.txt
+  somefile-reduced.google.json
+  somefile-reduced.microsoft.txt
+  somefile-reduced.microsoft.json
+  somefile-reduced.amazon.txt
+  somefile-reduced.amazon.json
+  ...
+
 Credentials for different services need to be provided to Handprint in the
 form of JSON files.  Each service needs a separate JSON file named after the
 service (e.g., "microsoft_credentials.json") and placed in a directory that

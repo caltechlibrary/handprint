@@ -42,9 +42,9 @@ from handprint.progress import ProgressIndicator
 from handprint.network import network_available, download_url
 from handprint.files import files_in_directory, replace_extension, handprint_path
 from handprint.files import readable, writable, filename_extension, convert_image
-from handprint.files import relative_path
-from handprint.htr import GoogleTR
-from handprint.htr import MicrosoftTR
+from handprint.files import relative_path, image_dimensions, resize_image
+from handprint.methods import GoogleTR
+from handprint.methods import MicrosoftTR
 from handprint.exceptions import *
 from handprint.debug import set_debug, log
 
@@ -269,22 +269,17 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                     spinner.fail('Did not find an image at "{}"'.format(item))
                     continue
                 fmt = response.headers.get_content_subtype()
-                if fmt not in ACCEPTED_FORMATS:
-                    spinner.fail('Cannot use image format {} in "{}"'.format(fmt, item))
-                    continue
-                # If we're given URLs, we have to invent file names to store
-                # the images and the OCR results.
                 base = '{}-{}'.format(root_name, index)
-                url_file = path.realpath(path.join(output_dir, base + '.url'))
-                if __debug__: log('Writing URL to {}', url_file)
-                with open(url_file, 'w') as f:
-                    f.write(url_file_content(item))
                 file = path.realpath(path.join(output_dir, base + '.' + fmt))
-                if __debug__: log('Starting wget on {}', item)
+                if __debug__: log('Downloading {}', item)
                 (success, error) = download_url(item, file)
                 if not success:
                     spinner.fail('Failed to download {}: {}'.format(item, error))
                     continue
+                url_file = path.realpath(path.join(output_dir, base + '.url'))
+                if __debug__: log('Saving URL in {}', url_file)
+                with open(url_file, 'w') as f:
+                    f.write(url_file_content(item))
             else:
                 file = path.realpath(path.join(os.getcwd(), item))
                 fmt = filename_extension(file)
@@ -296,13 +291,25 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                     spinner.stop()
                     say.fatal('Cannot write output in "{}".'.format(dest_dir))
                     return
-            if fmt in FORMATS_MUST_CONVERT:
-                spinner.update('Converting file format to JPEG: "{}"'.format(file))
-                (success, converted_file, msg) = convert_image(file, fmt, 'jpeg')
+            # If we must resize the image, resize using original format first.
+            need_convert = fmt not in tool.accepted_formats()
+            # Test dimensions, not bytes, because compression of jp2 != jpeg.
+            if image_dimensions(file) > tool.max_dimensions():
+                spinner.update('Original image too large; reducing size')
+                (success, resized, msg) = resize_image(file, tool.max_dimensions())
+                if not success:
+                    spinner.fail('Failed to resize "{}": {}'.format(file, msg))
+                    continue
+                # Note: 'file' now points to the resized file, not the original.
+                file = resized
+            if need_convert:
+                spinner.update('Converting to JPEG format: "{}"'.format(file))
+                (success, converted, msg) = convert_image(file, fmt, 'jpeg')
                 if not success:
                     spinner.fail('Failed to convert "{}": {}'.format(file, msg))
+                    continue
                 # Note: 'file' now points to the converted file, not the original
-                file = converted_file
+                file = converted
             file_name = path.basename(file)
             base_path = path.join(dest_dir, file_name)
             txt_file  = replace_extension(base_path, '.' + tool_name + '.txt')

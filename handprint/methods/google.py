@@ -3,6 +3,7 @@ google.py: interface to Google text recognition network service
 '''
 
 import io
+import math
 import os
 from os import path
 import google
@@ -18,16 +19,6 @@ from handprint.credentials.google_auth import GoogleCredentials
 from handprint.methods.base import TextRecognition, TRResult
 from handprint.exceptions import ServiceFailure
 from handprint.debug import log
-
-
-# Constants.
-# -----------------------------------------------------------------------------
-
-# Google Cloud Vision API docs state that images cannot exceed 20 MB according
-# to https://cloud.google.com/vision/docs/supported-files but if you try to
-# send more than 10 MB, you'll get an error back.
-
-_FILE_SIZE_LIMIT = 10*1024*1024
 
 
 # Main class.
@@ -64,6 +55,32 @@ class GoogleTR(TextRecognition):
         return "google"
 
 
+    def accepted_formats(self):
+        '''Returns a list of supported image file formats.'''
+        return ['jpeg', 'jpg', 'png', 'gif', 'bmp', 'raw', 'tif', 'tiff', 'pdf']
+
+
+    def max_size(self):
+        '''Returns the maximum size of an acceptable image, in bytes.'''
+        # https://cloud.google.com/vision/docs/supported-files
+        # Google Cloud Vision API docs state that images can't exceed 20 MB
+        # but the JSON request size limit is 10 MB.  We hit the 10 MB limit
+        # even though we're using the Google API library, which I guess must
+        # be transferring JSON under the hood.
+        return 10*1024*1024
+
+
+    def max_dimensions(self):
+        '''Maximum image size as a tuple of pixel numbers: (width, height).'''
+        # No max dimensions are given in the Google docs, so this returns
+        # dimensions based on a square image of the max size.  This is not a
+        # great approach because (a) an image that doesn't have a square
+        # aspect ratio could legitimately have larger dimensions and (b) this
+        # assumes 8-bit color, but for now let's take this easy way out.
+        side = math.floor(math.sqrt(self.max_size()))
+        return (side, side)
+
+
     def result(self, path):
         '''Returns the results from calling the service on the 'path'.  The
         results are returned as an TRResult named tuple.
@@ -76,7 +93,7 @@ class GoogleTR(TextRecognition):
         with io.open(path, 'rb') as image_file:
             image_data = image_file.read()
 
-        if len(image_data) > _FILE_SIZE_LIMIT:
+        if len(image_data) > self.max_size():
             text = 'Error: file "{}" is too large for Google service'.format(path)
             return TRResult(path = path, data = {}, text = '', error = text)
         try:

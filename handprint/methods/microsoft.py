@@ -20,14 +20,6 @@ from handprint.exceptions import ServiceFailure
 from handprint.debug import log
 
 
-# Constants.
-# -----------------------------------------------------------------------------
-# https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home
-# states "The file size of the image must be less than 4 megabytes (MB)"
-
-_FILE_SIZE_LIMIT = 4*1024*1024
-
-
 # Main class.
 # -----------------------------------------------------------------------------
 
@@ -48,6 +40,28 @@ class MicrosoftTR(TextRecognition):
         return "microsoft"
 
 
+    def accepted_formats(self):
+        '''Returns a list of supported image file formats.'''
+        return ['jpeg', 'jpg', 'png', 'gif', 'bmp']
+
+
+    def max_size(self):
+        '''Returns the maximum size of an acceptable image, in bytes.'''
+        # https://cloud.google.com/vision/docs/supported-files
+        # Google Cloud Vision API docs state that images can't exceed 20 MB
+        # but the JSON request size limit is 10 MB.  We hit the 10 MB limit
+        # even though we're using the Google API library, which I guess must
+        # be transferring JSON under the hood.
+        return 4*1024*1024
+
+
+    def max_dimensions(self):
+        '''Maximum image size as a tuple of pixel numbers: (width, height).'''
+        # For OCR, max image dimensions are 4200 x 4200.
+        # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home
+        return (4200, 4200)
+
+
     def result(self, path):
         '''Returns all the results from the service as a Python dict.'''
         # Check if we already processed it.
@@ -62,7 +76,7 @@ class MicrosoftTR(TextRecognition):
         params  = {'mode': 'Handwritten'}
         image_data = open(path, 'rb').read()
 
-        if len(image_data) > _FILE_SIZE_LIMIT:
+        if len(image_data) > self.max_size():
             text = 'Error: file "{}" is too large for Microsoft service'.format(path)
             return TRResult(path = path, data = {}, text = '', error = text)
 

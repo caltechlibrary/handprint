@@ -14,6 +14,7 @@ open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+import io
 import os
 from   os import path
 from   PIL import Image
@@ -107,7 +108,7 @@ def filename_basename(file):
 def filename_extension(file):
     parts = file.rpartition('.')
     if len(parts) > 1:
-        return parts[-1]
+        return parts[-1].lower()
     else:
         return ''
 

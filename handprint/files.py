@@ -164,6 +164,14 @@ def image_size(file):
     return path.getsize(file)
 
 
+def image_dimensions(file):
+    with warnings.catch_warnings():
+        # Catch warnings from image conversion, like DecompressionBombWarning
+        warnings.simplefilter('ignore')
+        im = Image.open(file)
+        return im.size
+
+
 def convert_image(file, from_format, to_format):
     '''Returns a tuple of (success, output file, error message).'''
     dest_file = filename_basename(file) + '.' + to_format
@@ -173,6 +181,29 @@ def convert_image(file, from_format, to_format):
         try:
             im = Image.open(file)
             im.save(dest_file, to_format)
+            if __debug__: log('Saved converted image to {}', dest_file)
+            return (True, dest_file, '')
+        except Exception as err:
+            return (False, None, str(err))
+
+
+def resize_image(file, max_dimensions):
+    '''Resizes the image and writes a new file named "ORIGINAL-reduced.EXT".'''
+    extension = filename_extension(file)
+    dest_file = filename_basename(file) + '-reduced.' + extension
+    with warnings.catch_warnings():
+        # Catch warnings from image conversion, like DecompressionBombWarning
+        warnings.simplefilter('ignore')
+        try:
+            im = Image.open(file)
+            dims = im.size
+            width_ratio = max_dimensions[0]/dims[0]
+            length_ratio = max_dimensions[1]/dims[1]
+            ratio = min(width_ratio, length_ratio)
+            new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
+            if __debug__: log('Resizing image to {}', new_dims)
+            resized = im.resize(new_dims, Image.HAMMING)
+            resized.save(dest_file)
             if __debug__: log('Saved converted image to {}', dest_file)
             return (True, dest_file, '')
         except Exception as err:

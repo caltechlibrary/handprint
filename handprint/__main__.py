@@ -261,9 +261,8 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             if not given_urls and (item.startswith('http') or item.startswith('ftp')):
                 say.warn('Skipping URL "{}"'.format(item))
                 continue
-            if say.use_color() and not say.be_quiet():
-                action = 'Downloading' if given_urls else 'Reading'
-                spinner.start('{} {}'.format(action, item))
+            action = 'Downloading' if given_urls else 'Reading'
+            spinner.start('{} {}'.format(action, item))
             fmt = None
             if given_urls:
                 # Make sure the URLs point to images.
@@ -318,7 +317,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             spinner.stop('{} -> {}'.format(item, short_path))
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
-            spinner.stop()
+            spinner.warn('Interrupted')
         raise
     except Exception as err:
         if spinner:

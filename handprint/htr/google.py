@@ -15,10 +15,9 @@ import json
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
+from handprint.htr.base import HTR, HTRResult
 from handprint.exceptions import ServiceFailure
 from handprint.debug import log
-
-from .base import HTR, HTRResult
 
 
 # Constants.

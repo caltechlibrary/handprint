@@ -14,10 +14,18 @@ import time
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
-from handprint.htr.base import HTR
+from handprint.htr.base import HTR, HTRResult
 from handprint.messages import msg
 from handprint.exceptions import ServiceFailure
 from handprint.debug import log
+
+
+# Constants.
+# -----------------------------------------------------------------------------
+# https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home
+# states "The file size of the image must be less than 4 megabytes (MB)"
+
+_FILE_SIZE_LIMIT = 4*1024*1024
 
 
 # Main class.
@@ -40,15 +48,7 @@ class MicrosoftHTR(HTR):
         return "microsoft"
 
 
-    def document_text(self, path):
-        if path not in self._results:
-            self.all_results(path)      # Sets self._results as side-effect.
-        lines = self._results[path]['recognitionResult']['lines']
-        sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
-        return ' '.join(x['text'] for x in sorted_lines)
-
-
-    def all_results(self, path):
+    def result(self, path):
         '''Returns all the results from the service as a Python dict.'''
         # Check if we already processed it.
         if path in self._results:
@@ -62,12 +62,9 @@ class MicrosoftHTR(HTR):
         params  = {'mode': 'Handwritten'}
         image_data = open(path, 'rb').read()
 
-        # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home
-        # states "The file size of the image must be less than 4 megabytes (MB)"
-        if len(image_data) > 4*1024*1024:
-            text = 'File "{}" is too large for Microsoft service'.format(path)
-            msg(text, 'warn')
-            return text
+        if len(image_data) > _FILE_SIZE_LIMIT:
+            text = 'Error: file "{}" is too large for Microsoft service'.format(path)
+            return HTRResult(path = path, data = {}, text = '', error = text)
 
         # Post it to the Microsoft cloud service.
         if __debug__: log('Sending file to MS cloud service')
@@ -91,9 +88,8 @@ class MicrosoftHTR(HTR):
                 text = 'Encountered network communications problem -- {}'.format(err) 
                 raise ServiceFailure(text)
         except Exception as err:
-            import pdb; pdb.set_trace()
-            msg('MS rejected "{}"'.format(path), 'warn')
-            return ''
+            text = 'MS rejected "{}"'.format(path)
+            return HTRResult(path = path, data = {}, text = '', error = text)
 
         # The Microsoft API for extracting handwritten text requires two API
         # calls: one call to submit the image for processing, the other to
@@ -112,5 +108,15 @@ class MicrosoftHTR(HTR):
             if ("status" in analysis and analysis['status'] == 'Failed'):
                 poll = False
         if __debug__: log('Results received.')
-        self._results[path] = analysis
-        return analysis
+
+        # Have to extract the text into a single string.
+        full_text = ''
+        if 'recognitionResult' in analysis:
+            lines = analysis['recognitionResult']['lines']
+            sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
+            full_text = ' '.join(x['text'] for x in sorted_lines)
+
+        # Put it all together.
+        self._results[path] = HTRResult(path = path, data = analysis,
+                                        text = full_text, error = None)
+        return self._results[path]

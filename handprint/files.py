@@ -160,13 +160,15 @@ def open_url(url):
 
 
 def image_size(file):
-    '''Returns the size of the image in 'file'.'''
+    '''Returns the size of the image in 'file', in units of bytes.'''
     return path.getsize(file)
 
 
 def image_dimensions(file):
+    '''Returns the pixel dimensions of the image as a tuple of (width, height).'''
+    # When converting images, PIL may issue a DecompressionBombWarning but
+    # it's not a concern in our application.  Ignore it.
     with warnings.catch_warnings():
-        # Catch warnings from image conversion, like DecompressionBombWarning
         warnings.simplefilter('ignore')
         im = Image.open(file)
         return im.size
@@ -175,8 +177,9 @@ def image_dimensions(file):
 def convert_image(file, from_format, to_format):
     '''Returns a tuple of (success, output file, error message).'''
     dest_file = filename_basename(file) + '.' + to_format
+    # When converting images, PIL may issue a DecompressionBombWarning but
+    # it's not a concern in our application.  Ignore it.
     with warnings.catch_warnings():
-        # Catch warnings from image conversion, like DecompressionBombWarning
         warnings.simplefilter('ignore')
         try:
             im = Image.open(file)

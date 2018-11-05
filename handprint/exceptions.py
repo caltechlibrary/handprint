@@ -22,6 +22,10 @@ class ServiceFailure(Exception):
     '''Unrecoverable problem involving network services.'''
     pass
 
+class RateLimitExceeded(Exception):
+    '''The service flagged reports that its rate limits have been exceeded.'''
+    pass
+
 class InternalError(Exception):
     '''Unrecoverable problem involving Handprint itself.'''
     pass

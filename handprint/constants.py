@@ -22,6 +22,8 @@ from handprint.methods import MicrosoftTR
 
 ON_WINDOWS = sys.platform.startswith('win')
 
+ACCEPTED_FORMATS = ('jpg', 'jpeg', 'jp2', 'png', 'gif', 'bmp', 'tif', 'tiff')
+
 KNOWN_METHODS = {
     'google': GoogleTR,
     'microsoft': MicrosoftTR,

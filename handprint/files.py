@@ -175,7 +175,11 @@ def image_dimensions(file):
 
 
 def convert_image(file, from_format, to_format):
-    '''Returns a tuple of (success, output file, error message).'''
+    '''Returns a tuple of (success, output file, error message).
+    Returns a tuple of (new_file, error).  The value of 'error' will be None
+    if no error occurred; otherwise, the value will be a string summarizing the
+    error that occurred and 'new_file' will be set to None.
+    '''
     dest_file = filename_basename(file) + '.' + to_format
     # When converting images, PIL may issue a DecompressionBombWarning but
     # it's not a concern in our application.  Ignore it.
@@ -185,13 +189,17 @@ def convert_image(file, from_format, to_format):
             im = Image.open(file)
             im.save(dest_file, to_format)
             if __debug__: log('Saved converted image to {}', dest_file)
-            return (True, dest_file, '')
+            return (dest_file, None)
         except Exception as err:
-            return (False, None, str(err))
+            return (None, str(err))
 
 
 def resize_image(file, max_dimensions):
-    '''Resizes the image and writes a new file named "ORIGINAL-reduced.EXT".'''
+    '''Resizes the image and writes a new file named "ORIGINAL-reduced.EXT".
+    Returns a tuple of (new_file, error).  The value of 'error' will be None
+    if no error occurred; otherwise, the value will be a string summarizing the
+    error that occurred and 'new_file' will be set to None.
+    '''
     extension = filename_extension(file)
     dest_file = filename_basename(file) + '-reduced.' + extension
     with warnings.catch_warnings():
@@ -208,6 +216,6 @@ def resize_image(file, max_dimensions):
             resized = im.resize(new_dims, Image.HAMMING)
             resized.save(dest_file)
             if __debug__: log('Saved converted image to {}', dest_file)
-            return (True, dest_file, '')
+            return (dest_file, None)
         except Exception as err:
-            return (False, None, str(err))
+            return (None, str(err))

@@ -311,17 +311,17 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             # Test dimensions, not bytes, because compression of jp2 != jpeg.
             if image_dimensions(file) > tool.max_dimensions():
                 spinner.update('Original image too large; reducing size')
-                (success, resized, msg) = resize_image(file, tool.max_dimensions())
-                if not success:
-                    spinner.fail('Failed to resize "{}": {}'.format(file, msg))
+                (resized, error) = resize_image(file, tool.max_dimensions())
+                if not resized:
+                    spinner.fail('Failed to resize "{}": {}'.format(file, error))
                     continue
                 # Note: 'file' now points to the resized file, not the original.
                 file = resized
             if need_convert:
                 spinner.update('Converting to JPEG format: "{}"'.format(file))
-                (success, converted, msg) = convert_image(file, fmt, 'jpeg')
-                if not success:
-                    spinner.fail('Failed to convert "{}": {}'.format(file, msg))
+                (converted, error) = convert_image(file, fmt, 'jpeg')
+                if not converted:
+                    spinner.fail('Failed to convert "{}": {}'.format(file, error))
                     continue
                 # Note: 'file' now points to the converted file, not the original
                 file = converted

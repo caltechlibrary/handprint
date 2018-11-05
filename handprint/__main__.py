@@ -31,6 +31,7 @@ try:
 except:
     pass
 import time
+from   timeit import default_timer as timer
 import traceback
 from   urllib import request
 
@@ -268,9 +269,11 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
     try:
         tool = method_class()
         tool_name = tool.name()
+        limit_rate = False
         say.info('Using method "{}".'.format(tool_name))
         tool.init_credentials(creds_dir)
         for index, item in enumerate(targets, 1):
+            last_time = timer()
             if not given_urls and (item.startswith('http') or item.startswith('ftp')):
                 say.warn('Skipping URL "{}"'.format(item))
                 continue
@@ -339,7 +342,12 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             base_path = path.join(dest_dir, file_name)
             txt_file  = replace_extension(base_path, '.' + tool_name + '.txt')
             json_file = replace_extension(base_path, '.' + tool_name + '.json')
-            spinner.update('Sending to {} for text extraction'.format(tool_name))
+            if limit_rate:
+                time_passed = timer() - last_time
+                if time_passed < 1/tool.max_rate():
+                    spinner.warn('Pausing due to rate limits')
+                    time.sleep(1/tool.max_rate() - time_passed)
+            spinner.update('Sending to {} and waiting for response'.format(tool_name))
             result = tool.result(file)
             if result.error:
                 spinner.fail('Error from {}: {}'.format(tool_name, result.error))
@@ -353,7 +361,6 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
             spinner.warn('Interrupted')
-        raise
     except Exception as err:
         if spinner:
             spinner.fail(say.error_text('Stopping due to a problem'))

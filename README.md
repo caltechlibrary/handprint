@@ -9,7 +9,7 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-0.4.0-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-0.5.0-b44e88.svg?style=flat-square)](http://shields.io)
 
 Table of Contents
 -----------------

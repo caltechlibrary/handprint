@@ -16,7 +16,7 @@ import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
 from handprint.methods.base import TextRecognition, TRResult
 from handprint.messages import msg
-from handprint.exceptions import ServiceFailure
+from handprint.exceptions import ServiceFailure, RateLimitExceeded
 from handprint.debug import log
 
 
@@ -43,6 +43,12 @@ class MicrosoftTR(TextRecognition):
     def accepted_formats(self):
         '''Returns a list of supported image file formats.'''
         return ['jpeg', 'jpg', 'png', 'gif', 'bmp']
+
+
+    def max_rate(self):
+        '''Returns the number of calls allowed per second.'''
+        # https://azure.microsoft.com/en-us/pricing/details/cognitive-services/computer-vision/
+        return 0.333
 
 
     def max_size(self):
@@ -94,7 +100,7 @@ class MicrosoftTR(TextRecognition):
                 raise ServiceFailure(text)
             elif response.status_code == 429:
                 text = 'Server blocking further requests due to rate limits'
-                raise ServiceFailure(text)
+                raise RateLimitExceeded(text)
             elif response.status_code == 503:
                 text = 'Server is unavailable -- try again later'
                 raise ServiceFailure(text)

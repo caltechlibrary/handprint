@@ -60,6 +60,12 @@ class GoogleTR(TextRecognition):
         return ['jpeg', 'jpg', 'png', 'gif', 'bmp', 'raw', 'tif', 'tiff', 'pdf']
 
 
+    def max_rate(self):
+        '''Returns the number of calls allowed per second.'''
+        # https://cloud.google.com/vision/quotas
+        return 30
+
+
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
         # https://cloud.google.com/vision/docs/supported-files

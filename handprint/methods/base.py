@@ -40,6 +40,11 @@ class TextRecognition(object):
         pass
 
 
+    def max_rate(self):
+        '''Returns the number of calls allowed per second.'''
+        pass
+
+
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
         pass

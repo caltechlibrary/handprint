@@ -36,13 +36,13 @@ from   urllib import request
 
 import handprint
 from handprint.constants import ON_WINDOWS, ACCEPTED_FORMATS, KNOWN_METHODS
-from handprint.constants import FORMATS_MUST_CONVERT
 from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.progress import ProgressIndicator
 from handprint.network import network_available, download_url
 from handprint.files import files_in_directory, replace_extension, handprint_path
-from handprint.files import readable, writable, filename_extension, convert_image
-from handprint.files import relative_path, image_dimensions, resize_image
+from handprint.files import readable, writable
+from handprint.files import filename_basename, filename_extension, relative_path
+from handprint.files import convert_image, resize_image, image_dimensions
 from handprint.methods import GoogleTR
 from handprint.methods import MicrosoftTR
 from handprint.exceptions import *
@@ -306,25 +306,35 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                     spinner.stop()
                     say.fatal('Cannot write output in "{}".'.format(dest_dir))
                     return
-            # If we must resize the image, resize using original format first.
             need_convert = fmt not in tool.accepted_formats()
+            # If we must resize the image, first resize using original format.
             # Test dimensions, not bytes, because compression of jp2 != jpeg.
             if image_dimensions(file) > tool.max_dimensions():
-                spinner.update('Original image too large; reducing size')
-                (resized, error) = resize_image(file, tool.max_dimensions())
-                if not resized:
-                    spinner.fail('Failed to resize "{}": {}'.format(file, error))
-                    continue
-                # Note: 'file' now points to the resized file, not the original.
-                file = resized
+                spinner.update('Original image too large')
+                new_file = filename_basename(file) + '-reduced.' + fmt
+                if path.exists(new_file):
+                    spinner.update('Using reduced image found in "{}"'.format(new_file))
+                    file = new_file
+                else:
+                    spinner.update('Original image too large; reducing size')
+                    (resized, error) = resize_image(file, tool.max_dimensions())
+                    if not resized:
+                        spinner.fail('Failed to resize "{}": {}'.format(file, error))
+                        continue
+                    file = resized
             if need_convert:
-                spinner.update('Converting to JPEG format: "{}"'.format(file))
-                (converted, error) = convert_image(file, fmt, 'jpeg')
-                if not converted:
-                    spinner.fail('Failed to convert "{}": {}'.format(file, error))
-                    continue
-                # Note: 'file' now points to the converted file, not the original
-                file = converted
+                spinner.update('Method {} does not accept {} format natively'.format(tool_name, fmt))
+                new_file = filename_basename(file) + '.jpeg'
+                if path.exists(new_file):
+                    spinner.update('Using converted image found in "{}"'.format(new_file))
+                    file = new_file
+                else:
+                    spinner.update('Converting to JPEG format: "{}"'.format(file))
+                    (converted, error) = convert_image(file, fmt, 'jpeg')
+                    if not converted:
+                        spinner.fail('Failed to convert "{}": {}'.format(file, error))
+                        continue
+                    file = converted
             file_name = path.basename(file)
             base_path = path.join(dest_dir, file_name)
             txt_file  = replace_extension(base_path, '.' + tool_name + '.txt')

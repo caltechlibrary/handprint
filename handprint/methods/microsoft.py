@@ -11,6 +11,7 @@ import requests
 from requests.exceptions import HTTPError
 import sys
 import time
+from   timeit import default_timer as timer
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
@@ -74,57 +75,52 @@ class MicrosoftTR(TextRecognition):
         if path in self._results:
             return self._results[path]
 
-        vision_base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
-        text_recognition_url = vision_base_url + "recognizeText"
-
-        headers = {'Ocp-Apim-Subscription-Key': self.credentials,
-                   'Content-Type': 'application/octet-stream'}
-        params  = {'mode': 'Handwritten'}
-        image_data = open(path, 'rb').read()
-
-        if len(image_data) > self.max_size():
+        image = open(path, 'rb').read()
+        if len(image) > self.max_size():
             text = 'Error: file "{}" is too large for Microsoft service'.format(path)
             return TRResult(path = path, data = {}, text = '', error = text)
 
-        # Post it to the Microsoft cloud service.
-        if __debug__: log('Sending file to MS cloud service')
-        response = requests.post(text_recognition_url, headers = headers,
-                                 params = params, data = image_data)
-        try:
-            response.raise_for_status()
-        except HTTPError as err:
-            # FIXME this might be a good place to suggest to the user that they
-            # visit https://blogs.msdn.microsoft.com/kwill/2017/05/17/http-401-access-denied-when-calling-azure-cognitive-services-apis/
-            if response.status_code in [401, 402, 403, 407, 451, 511]:
-                text = 'Authentication failure for MS service -- {}'.format(err)
-                raise ServiceFailure(text)
-            elif response.status_code == 429:
-                text = 'Server blocking further requests due to rate limits'
-                raise RateLimitExceeded(text)
-            elif response.status_code == 503:
-                text = 'Server is unavailable -- try again later'
-                raise ServiceFailure(text)
-            else:
-                text = 'Encountered network communications problem -- {}'.format(err) 
-                raise ServiceFailure(text)
-        except Exception as err:
-            text = 'MS rejected "{}"'.format(path)
-            return TRResult(path = path, data = {}, text = '', error = text)
+        base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
+        url = base_url + "recognizeText"
+        params  = {'mode': 'Handwritten'}
+        headers = {'Ocp-Apim-Subscription-Key': self.credentials,
+                   'Content-Type': 'application/octet-stream'}
+        start_time = timer()
 
-        # The Microsoft API for extracting handwritten text requires two API
-        # calls: one call to submit the image for processing, the other to
-        # retrieve the text found in the image.  We have to poll and wait
-        # until a result is available.
+        # The Microsoft API for extracting text requires two phases: one call
+        # to submit the image for processing, then polling to wait until the
+        # text is ready to be retrieved.
+
+        if __debug__: log('Sending file to MS cloud service')
+        response = requests.post(url, headers = headers, params = params, data = image)
+        (rate_limit, error) = self._status_check(response)
+        if rate_limit:
+            # Pause for a full minute to let the server reset its timers.
+            if __debug__: log('Hit rate limit; sleeping for 60 s')
+            time.sleep(60)
+        elif error:
+            if __debug__: log('MS call produced an error: {}', error)
+            return TRResult(path = path, data = {}, text = '', error = error)
+
         analysis = {}
         poll = True
         while poll:
             if __debug__: log('Polling MS for results ...')
-            # I never have see results returned in 1 sec, and meanwhile the
+            # I never have seen results returned in 1 sec, and meanwhile the
             # repeated polling counts against your rate limit.  So, wait for
             # 2 sec to reduce the number of calls.
             time.sleep(2)
             response_final = requests.get(
                 response.headers["Operation-Location"], headers=headers)
+            (rate_limit, error) = self._status_check(response)
+            if rate_limit:
+                # Pause for a full minute to let the server reset its timers.
+                if __debug__: log('Hit rate limit; sleeping for 60 s')
+                time.sleep(60)
+            elif error:
+                if __debug__: log('MS call produced an error: {}', error)
+                return TRResult(path = path, data = {}, text = '', error = error)
+
             analysis = response_final.json()
             if "recognitionResult" in analysis:
                 poll = False
@@ -143,3 +139,23 @@ class MicrosoftTR(TextRecognition):
         self._results[path] = TRResult(path = path, data = analysis,
                                        text = full_text, error = None)
         return self._results[path]
+
+
+    def _status_check(self, response):
+        hit_rate_limit = False
+        error = None
+        if response.status_code in [401, 402, 403, 407, 451, 511]:
+            # FIXME this might be a good place to suggest to the user that they
+            # visit https://blogs.msdn.microsoft.com/kwill/2017/05/17/http-401-access-denied-when-calling-azure-cognitive-services-apis/
+            error = 'Authentication failure for MS service -- {}'.format(err)
+        elif response.status_code == 429:
+            hit_rate_limit = True
+        elif response.status_code == 503:
+            error = 'Service is unavailable -- try again later'
+        elif response.status_code in [500, 501, 502, 503, 506, 507, 508]:
+            error = "Internal server error {}".format(response.status_code)
+        elif response.status_code > 400:
+            error = 'Problem contacting Microsoft service: {}'.format(err)
+        elif response.status_code > 500:
+            error = 'Problem reported by Microsoft Azure: {}'.format(err)
+        return (hit_rate_limit, error)

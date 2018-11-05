@@ -117,15 +117,18 @@ class MicrosoftTR(TextRecognition):
         # until a result is available.
         analysis = {}
         poll = True
-        if __debug__: log('Polling MS for results ...')
-        while (poll):
+        while poll:
+            if __debug__: log('Polling MS for results ...')
+            # I never have see results returned in 1 sec, and meanwhile the
+            # repeated polling counts against your rate limit.  So, wait for
+            # 2 sec to reduce the number of calls.
+            time.sleep(2)
             response_final = requests.get(
                 response.headers["Operation-Location"], headers=headers)
             analysis = response_final.json()
-            time.sleep(1)
-            if ("recognitionResult" in analysis):
+            if "recognitionResult" in analysis:
                 poll = False
-            if ("status" in analysis and analysis['status'] == 'Failed'):
+            if "status" in analysis and analysis['status'] == 'Failed':
                 poll = False
         if __debug__: log('Results received.')
 

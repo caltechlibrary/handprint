@@ -352,6 +352,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
 def targets_from_arguments(images, from_file, given_urls, say):
     targets = []
     if from_file:
+        if __debug__: log('Opening {}', from_file)
         with open(from_file) as f:
             targets = f.readlines()
         targets = [line.rstrip('\n') for line in targets]
@@ -427,20 +428,6 @@ def print_version():
 def save_output(text, file):
     with open(file, 'w') as f:
         f.write(text)
-
-# init_halo_hack() is mostly a guess at a way to keep the first part of the
-# spinner printed by Halo from overwriting part of the first message we
-# print.  It seems to work, but the problem that this tries to solve occurred
-# sporadically anyway, so maybe the issue still remains and I just haven't
-# seen it happen again.
-
-def init_halo_hack():
-
-    '''Write a blank to prevent occasional garbled first line printed by
-    Halo.'''
-    sys.stdout.write('')
-    sys.stdout.flush()
-    time.sleep(0.1)
 
 
 # Main entry point.

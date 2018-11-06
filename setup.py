@@ -45,7 +45,7 @@ setup(
     author_email     = version['__email__'],
     license          = version['__license__'],
     keywords         = "archives OCR HTR library",
-    packages         = ['handprint', 'handprint/htr', 'handprint/credentials'],
+    packages         = ['handprint', 'handprint/methods', 'handprint/credentials'],
     scripts          = ['bin/handprint'],
     install_requires = reqs,
     platforms        = 'any',

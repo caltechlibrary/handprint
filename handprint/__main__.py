@@ -310,34 +310,16 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                     say.fatal('Cannot write output in "{}".'.format(dest_dir))
                     return
             need_convert = fmt not in tool.accepted_formats()
-            # If we must resize the image, first resize using original format.
-            # Test dimensions, not bytes, because compression of jp2 != jpeg.
+            # If we must resize the image, do it before format conversion.
+            # Test the dimensions, not bytes, because compression of jp2 != jpeg.
             if image_dimensions(file) > tool.max_dimensions():
                 spinner.update('Original image too large')
-                new_file = filename_basename(file) + '-reduced.' + fmt
-                if path.exists(new_file):
-                    spinner.update('Using reduced image found in "{}"'.format(new_file))
-                    file = new_file
-                else:
-                    spinner.update('Original image too large; reducing size')
-                    (resized, error) = resize_image(file, tool.max_dimensions())
-                    if not resized:
-                        spinner.fail('Failed to resize "{}": {}'.format(file, error))
-                        continue
-                    file = resized
-            if need_convert:
-                spinner.update('Method {} does not accept {} format natively'.format(tool_name, fmt))
-                new_file = filename_basename(file) + '.jpeg'
-                if path.exists(new_file):
-                    spinner.update('Using converted image found in "{}"'.format(new_file))
-                    file = new_file
-                else:
-                    spinner.update('Converting to JPEG format: "{}"'.format(file))
-                    (converted, error) = convert_image(file, fmt, 'jpeg')
-                    if not converted:
-                        spinner.fail('Failed to convert "{}": {}'.format(file, error))
-                        continue
-                    file = converted
+                file = file_after_resizing(file, tool, spinner)
+            if file and need_convert:
+                spinner.update('{} does not accept {} format natively'.format(tool_name, fmt))
+                file = file_after_conversion(file, 'jpeg', tool, spinner)
+            if not file:
+                continue
             file_name = path.basename(file)
             base_path = path.join(dest_dir, file_name)
             txt_file  = replace_extension(base_path, '.' + tool_name + '.txt')
@@ -404,6 +386,35 @@ def filter_urls(item_list, say):
 
 def url_file_content(url):
     return '[InternetShortcut]\nURL={}\n'.format(url)
+
+
+def file_after_resizing(file, tool, spinner):
+    file_ext = filename_extension(file)
+    new_file = filename_basename(file) + '-reduced.' + file_ext
+    if path.exists(new_file):
+        spinner.update('Using reduced image found in "{}"'.format(new_file))
+        return new_file
+    else:
+        spinner.update('Original image too large; reducing size')
+        (resized, error) = resize_image(file, tool.max_dimensions())
+        if not resized:
+            spinner.fail('Failed to resize "{}": {}'.format(file, error))
+            return None
+        return resized
+
+
+def file_after_conversion(file, to_format, tool, spinner):
+    new_file = filename_basename(file) + '.' + to_format
+    if path.exists(new_file):
+        spinner.update('Using converted image found in "{}"'.format(new_file))
+        return new_file
+    else:
+        spinner.update('Converting to {} format: "{}"'.format(to_format, file))
+        (converted, error) = convert_image(file, to_format)
+        if not converted:
+            spinner.fail('Failed to convert "{}": {}'.format(file, error))
+            return None
+        return converted
 
 
 def print_version():

@@ -42,7 +42,7 @@ from handprint.progress import ProgressIndicator
 from handprint.network import network_available, download
 from handprint.files import files_in_directory, replace_extension, handprint_path
 from handprint.files import readable, writable
-from handprint.files import filename_basename, filename_extension, relative_path
+from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import convert_image, resize_image, image_dimensions
 from handprint.methods import GoogleTR
 from handprint.methods import MicrosoftTR
@@ -194,7 +194,7 @@ information and exit without doing anything else.
     if not readable(creds_dir):
         exit(say.error_text('Directory not readable: {}'.format(creds_dir)))
     else:
-        if __debug__: log('Assuming credentials found in "{}".', creds_dir)
+        if __debug__: log('Assuming credentials found in {}.', creds_dir)
 
     if method == 'M':
         method = 'all'
@@ -217,7 +217,7 @@ information and exit without doing anything else.
                 exit(say.error_text('Directory not writable: {}'.format(output)))
         else:
             os.mkdir(output)
-            if __debug__: log('Created output directory "{}"', output)
+            if __debug__: log('Created output directory {}', output)
     if given_urls and not output:
         exit(say.error_text('Must provide an output directory if using URLs.'))
     if root_name != 'R' and not given_urls:
@@ -276,28 +276,30 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             spinner.start('{} {}'.format(action, item))
             if given_urls:
                 # Make sure the URLs point to images.
-                if __debug__: log('Testing if URL contains an image: "{}"', item)
+                if __debug__: log('Testing if URL contains an image: {}', item)
                 try:
                     response = request.urlopen(item)
                 except Exception as err:
                     if __debug__: log('Network access resulted in error: {}', str(err))
-                    spinner.fail('Skipping URL due to error: "{}"'.format(err))
+                    spinner.fail('Skipping URL due to error: {}'.format(err))
                     continue
                 if response.headers.get_content_maintype() != 'image':
-                    spinner.fail('Did not find an image at "{}"'.format(item))
+                    spinner.fail('Did not find an image at {}'.format(item))
                     continue
                 fmt = response.headers.get_content_subtype()
                 base = '{}-{}'.format(root_name, index)
                 file = path.realpath(path.join(output_dir, base + '.' + fmt))
                 if __debug__: log('Downloading {}', item)
                 error = download(item, file)
-                if error:
+                if not error:
+                    spinner.update('Wrote contents to {}'.format(relative(file)))
+                else:
                     spinner.fail('Failed to download {}: {}'.format(item, error))
                     continue
                 url_file = path.realpath(path.join(output_dir, base + '.url'))
-                if __debug__: log('Saving URL in {}', url_file)
                 with open(url_file, 'w') as f:
                     f.write(url_file_content(item))
+                    spinner.update('Wrote URL to {}'.format(relative(url_file)))
             else:
                 file = path.realpath(path.join(os.getcwd(), item))
                 fmt = filename_extension(file)
@@ -305,7 +307,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             dest_dir = output_dir if output_dir else path.dirname(file)
             if not writable(dest_dir):
                 spinner.stop()
-                say.fatal('Cannot write output in "{}".'.format(dest_dir))
+                say.fatal('Cannot write output in {}.'.format(dest_dir))
                 continue
 
             # If need to convert format, best do it after resizing original fmt.
@@ -334,9 +336,9 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             base_path = path.join(dest_dir, file_name)
             txt_file  = replace_extension(base_path, '.' + str(method) + '.txt')
             json_file = replace_extension(base_path, '.' + str(method) + '.json')
-            spinner.update('Text -> {}'.format(relative_path(txt_file)))
+            spinner.update('Text -> {}'.format(relative(txt_file)))
             save_output(result.text, txt_file)
-            spinner.update('All data -> {}'.format(relative_path(json_file)))
+            spinner.update('All data -> {}'.format(relative(json_file)))
             save_output(json.dumps(result.data), json_file)
             spinner.stop('Done with {}'.format(item))
     except (KeyboardInterrupt, UserCancelled) as err:
@@ -358,7 +360,7 @@ def targets_from_arguments(images, from_file, given_urls, say):
         with open(from_file) as f:
             targets = f.readlines()
         targets = [line.rstrip('\n') for line in targets]
-        if __debug__: log('Read {} lines from "{}".', len(targets), from_file)
+        if __debug__: log('Read {} lines from {}.', len(targets), from_file)
         if not given_urls:
             targets = filter_urls(targets, say)
     elif given_urls:
@@ -380,7 +382,7 @@ def filter_urls(item_list, say):
     results = []
     for item in item_list:
         if item.startswith('http') or item.startswith('ftp'):
-            say.warn('Unexpected URL skipped: "{}"'.format(item))
+            say.warn('Unexpected URL skipped: {}'.format(item))
             continue
         else:
             results.append(item)
@@ -395,13 +397,13 @@ def file_after_resizing(file, tool, spinner):
     file_ext = filename_extension(file)
     new_file = filename_basename(file) + '-reduced.' + file_ext
     if path.exists(new_file):
-        spinner.update('Using reduced image found in "{}"'.format(new_file))
+        spinner.update('Using reduced image found in {}'.format(relative(new_file)))
         return new_file
     else:
         spinner.update('Original image too large; reducing size')
         (resized, error) = resize_image(file, tool.max_dimensions())
         if not resized:
-            spinner.fail('Failed to resize "{}": {}'.format(file, error))
+            spinner.fail('Failed to resize {}: {}'.format(relative(file, error)))
             return None
         return resized
 
@@ -409,13 +411,13 @@ def file_after_resizing(file, tool, spinner):
 def file_after_converting(file, to_format, tool, spinner):
     new_file = filename_basename(file) + '.' + to_format
     if path.exists(new_file):
-        spinner.update('Using converted image found in "{}"'.format(new_file))
+        spinner.update('Using converted image found in {}'.format(relative(new_file)))
         return new_file
     else:
-        spinner.update('Converting to {} format: "{}"'.format(to_format, file))
+        spinner.update('Converting to {} format: {}'.format(to_format, relative(file)))
         (converted, error) = convert_image(file, to_format)
         if not converted:
-            spinner.fail('Failed to convert "{}": {}'.format(file, error))
+            spinner.fail('Failed to convert {}: {}'.format(relative(file), error))
             return None
         return converted
 

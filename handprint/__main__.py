@@ -235,7 +235,8 @@ information and exit without doing anything else.
         num_items = len(targets)
         print_separators = num_items > 1 and not say.be_quiet()
         if method == 'all':
-            methods = KNOWN_METHODS.values()
+            # Order doesn't really matter; just make it consistent run-to-run.
+            methods = sorted(KNOWN_METHODS.values(), key = lambda x: str(x))
             say.info('Will apply all known methods to {} images.'.format(num_items))
         else:
             methods = [KNOWN_METHODS[method]]

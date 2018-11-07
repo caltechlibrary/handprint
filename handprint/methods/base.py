@@ -19,10 +19,56 @@ TRResult.__doc__ = '''Results of invoking a text recognition service.
 
 # Class definitions.
 # .............................................................................
+# Basics for the __eq__ etc. methods came from
+# https://stackoverflow.com/questions/1061283/lt-instead-of-cmp
 
 class TextRecognition(object):
     def __init__(self):
         pass
+
+
+    def __str__(self):
+        return self.name()
+
+
+    def __repr__(self):
+        return self.name()
+
+
+    def __eq__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        else:
+            return not self.name() < other.name() and not other.name() < self.name()
+
+
+    def __ne__(self, other):
+        return not __eq__(self, other)
+
+
+    def __lt__(self, other):
+        return self.name() < other.name()
+
+
+    def __gt__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        else:
+            return other.name() < self.name()
+
+
+    def __le__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        else:
+            return not other.name() < self.name()
+
+
+    def __ge__(self, other):
+        if not isinstance(other, type(self)):
+            return NotImplemented
+        else:
+            return not self.name() < other.name()
 
 
     def init_credentials(self):

@@ -7,6 +7,7 @@ from   http.client import responses as http_responses
 import requests
 from   time import sleep
 import urllib
+from   urllib import request
 
 import handprint
 from   handprint.files import rename_existing
@@ -18,7 +19,7 @@ def network_available():
     '''Return True if it appears we have a network connection, False if not.'''
     r = None
     try:
-        r = urllib.request.urlopen("https://www.google.com")
+        r = urllib.request.urlopen("http://www.google.com")
         return True
     except Exception:
         if __debug__: log('Could not connect to https://www.google.com')

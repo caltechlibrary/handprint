@@ -232,17 +232,20 @@ information and exit without doing anything else.
 
     # Let's do this thing.
     try:
+        num_items = len(targets)
+        print_separators = num_items > 1 and not say.be_quiet()
         if method == 'all':
-            say.info('Applying all methods in succession.')
-            for m in KNOWN_METHODS.values():
-                if not say.be_quiet():
-                    say.msg('='*70, 'dark')
-                run(m, targets, given_urls, output, root_name, creds_dir, say)
-            if not say.be_quiet():
-                say.msg('='*70, 'dark')
+            methods = KNOWN_METHODS.values()
+            say.info('Will apply all known methods to {} images.'.format(num_items))
         else:
-            m = KNOWN_METHODS[method]
-            run(m, targets, given_urls, output, root_name, creds_dir, say)
+            methods = [KNOWN_METHODS[method]]
+            say.info('Will apply method "{}" to {} images.'.format(method, num_items))
+        for index, item in enumerate(targets):
+            if print_separators:
+                say.msg('='*70, 'dark')
+            run(methods, item, index, output, given_urls, root_name, creds_dir, say)
+        if print_separators:
+            say.msg('='*70, 'dark')
     except (KeyboardInterrupt, UserCancelled) as err:
         exit(say.info_text('Quitting.'))
     except ServiceFailure as err:
@@ -264,51 +267,52 @@ if ON_WINDOWS:
 # Helper functions.
 # ......................................................................
 
-def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say):
+def run(classes, item, index, output_dir, given_urls, root_name, creds_dir, say):
     spinner = ProgressIndicator(say.use_color(), say.be_quiet())
     try:
-        method = method_class()
-        say.info('Using method "{}".'.format(method))
-        method.init_credentials(creds_dir)
-        for index, item in enumerate(targets, 1):
-            last_time = timer()
-            action = 'Downloading' if given_urls else 'Reading'
-            spinner.start('{} {}'.format(action, relative(item)))
-            if given_urls:
-                # Make sure the URLs point to images.
-                if __debug__: log('Testing if URL contains an image: {}', item)
-                try:
-                    response = request.urlopen(item)
-                except Exception as err:
-                    if __debug__: log('Network access resulted in error: {}', str(err))
-                    spinner.fail('Skipping URL due to error: {}'.format(err))
-                    continue
-                if response.headers.get_content_maintype() != 'image':
-                    spinner.fail('Did not find an image at {}'.format(item))
-                    continue
-                fmt = response.headers.get_content_subtype()
-                base = '{}-{}'.format(root_name, index)
-                file = path.realpath(path.join(output_dir, base + '.' + fmt))
-                if __debug__: log('Downloading {}', item)
-                error = download(item, file)
-                if not error:
-                    spinner.update('Wrote contents to {}'.format(relative(file)))
-                else:
-                    spinner.fail('Failed to download {}: {}'.format(item, error))
-                    continue
-                url_file = path.realpath(path.join(output_dir, base + '.url'))
-                with open(url_file, 'w') as f:
-                    f.write(url_file_content(item))
-                    spinner.update('Wrote URL to {}'.format(relative(url_file)))
-            else:
-                file = path.realpath(path.join(os.getcwd(), item))
-                fmt = filename_extension(file)
+        action = 'Downloading' if given_urls else 'Reading'
+        spinner.start('{} {}'.format(action, relative(item)))
 
-            dest_dir = output_dir if output_dir else path.dirname(file)
-            if not writable(dest_dir):
-                spinner.stop()
-                say.fatal('Cannot write output in {}.'.format(dest_dir))
-                continue
+        # Download the file if necessary.
+        if given_urls:
+            # Make sure the URLs point to images.
+            if __debug__: log('Testing if URL contains an image: {}', item)
+            try:
+                response = request.urlopen(item)
+            except Exception as err:
+                if __debug__: log('Network access resulted in error: {}', str(err))
+                spinner.fail('Skipping URL due to error: {}'.format(err))
+                return
+            if response.headers.get_content_maintype() != 'image':
+                spinner.fail('Did not find an image at {}'.format(item))
+                return
+            fmt = response.headers.get_content_subtype()
+            base = '{}-{}'.format(root_name, index)
+            file = path.realpath(path.join(output_dir, base + '.' + fmt))
+            error = download(item, file)
+            if not error:
+                spinner.update('Wrote contents to {}'.format(relative(file)))
+            else:
+                spinner.fail('Failed to download {}: {}'.format(item, error))
+                return
+            url_file = path.realpath(path.join(output_dir, base + '.url'))
+            with open(url_file, 'w') as f:
+                f.write(url_file_content(item))
+                spinner.update('Wrote URL to {}'.format(relative(url_file)))
+        else:
+            file = path.realpath(path.join(os.getcwd(), item))
+            fmt = filename_extension(file)
+
+        dest_dir = output_dir if output_dir else path.dirname(file)
+        if not writable(dest_dir):
+            say.fatal('Cannot write output in {}.'.format(dest_dir))
+            return
+
+        # Iterate over the methods.
+        for method_class in classes:
+            method = method_class()
+            method.init_credentials(creds_dir)
+            last_time = timer()
 
             # If need to convert format, best do it after resizing original fmt.
             need_convert = fmt not in method.accepted_formats()
@@ -318,9 +322,12 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             if file and need_convert:
                 file = file_after_converting(file, 'jpeg', method, spinner)
             if not file:
-                continue
+                return
 
-            spinner.update('Sending to {} and waiting for response'.format(method))
+            spinner.update('Sending to {} {}'.format(
+                color(method, 'white', say.use_color()),
+                # Need explicit color research or colorization goes wrong.
+                color('and waiting for response', 'info', say.use_color())))
             try:
                 result = method.result(file)
             except RateLimitExceeded as err:
@@ -330,7 +337,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                     time.sleep(1/method.max_rate() - time_passed)
             if result.error:
                 spinner.fail(result.error)
-                continue
+                return
 
             file_name = path.basename(file)
             base_path = path.join(dest_dir, file_name)
@@ -340,16 +347,15 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             save_output(result.text, txt_file)
             spinner.update('All data -> {}'.format(relative(json_file)))
             save_output(json.dumps(result.data), json_file)
-            spinner.stop('Done with {}'.format(relative(item)))
+        spinner.stop('Done with {}'.format(relative(item)))
     except (KeyboardInterrupt, UserCancelled) as err:
-        if spinner:
-            spinner.warn('Interrupted')
+        spinner.warn('Interrupted')
+        raise
     except AuthenticationFailure as err:
         spinner.fail('Unable to continue using {}: {}'.format(method, err))
         return
     except Exception as err:
-        if spinner:
-            spinner.fail(say.error_text('Stopping due to a problem'))
+        spinner.fail(say.error_text('Stopping due to a problem'))
         raise
 
 

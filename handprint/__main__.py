@@ -321,7 +321,7 @@ def run(classes, item, index, output_dir, given_urls, root_name, creds_dir, say)
             if image_dimensions(file) > method.max_dimensions():
                 file = file_after_resizing(file, method, spinner)
             if file and need_convert:
-                file = file_after_converting(file, 'jpeg', method, spinner)
+                file = file_after_converting(file, 'jpg', method, spinner)
             if not file:
                 return
 

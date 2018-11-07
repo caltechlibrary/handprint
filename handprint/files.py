@@ -24,7 +24,6 @@ import warnings
 import webbrowser
 
 import handprint
-from handprint.constants import ON_WINDOWS
 from handprint.debug import log
 
 
@@ -59,7 +58,7 @@ def handprint_path():
     # The path returned by module.__path__ is to the directory containing
     # the __init__.py file.  What we want here is the path to the installation
     # of the Handprint binary.
-    if ON_WINDOWS:
+    if sys.platform.startswith('win'):
         from winreg import OpenKey, CloseKey, QueryValueEx, HKEY_LOCAL_MACHINE, KEY_READ
         try:
             if __debug__: log('Reading Windows registry entry')
@@ -174,7 +173,7 @@ def image_dimensions(file):
         return im.size
 
 
-def convert_image(file, from_format, to_format):
+def convert_image(file, to_format):
     '''Returns a tuple of (success, output file, error message).
     Returns a tuple of (new_file, error).  The value of 'error' will be None
     if no error occurred; otherwise, the value will be a string summarizing the

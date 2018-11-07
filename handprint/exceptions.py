@@ -18,12 +18,16 @@ class UserCancelled(Exception):
     '''The user elected to cancel/quit the program.'''
     pass
 
-class ServiceFailure(Exception):
-    '''Unrecoverable problem involving network services.'''
+class NetworkFailure(Exception):
+    '''Unrecoverable problem involving network operations.'''
     pass
 
 class AuthenticationFailure(Exception):
     '''Problem obtaining or using authentication credentials.'''
+    pass
+
+class ServiceFailure(Exception):
+    '''Unrecoverable problem involving a remote service.'''
     pass
 
 class RateLimitExceeded(Exception):

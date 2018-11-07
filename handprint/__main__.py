@@ -39,7 +39,7 @@ import handprint
 from handprint.constants import ON_WINDOWS, ACCEPTED_FORMATS, KNOWN_METHODS
 from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.progress import ProgressIndicator
-from handprint.network import network_available, download_url
+from handprint.network import network_available, download
 from handprint.files import files_in_directory, replace_extension, handprint_path
 from handprint.files import readable, writable
 from handprint.files import filename_basename, filename_extension, relative_path
@@ -267,22 +267,23 @@ if ON_WINDOWS:
 def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say):
     spinner = ProgressIndicator(say.use_color(), say.be_quiet())
     try:
-        tool = method_class()
-        tool_name = tool.name()
-        limit_rate = False
-        say.info('Using method "{}".'.format(tool_name))
-        tool.init_credentials(creds_dir)
+        method = method_class()
+        say.info('Using method "{}".'.format(method))
+        method.init_credentials(creds_dir)
         for index, item in enumerate(targets, 1):
             last_time = timer()
-            if not given_urls and (item.startswith('http') or item.startswith('ftp')):
-                say.warn('Skipping URL "{}"'.format(item))
-                continue
             action = 'Downloading' if given_urls else 'Reading'
             spinner.start('{} {}'.format(action, item))
             fmt = None
             if given_urls:
                 # Make sure the URLs point to images.
-                response = request.urlopen(item)
+                if __debug__: log('Testing if URL contains an image: "{}"', item)
+                try:
+                    response = request.urlopen(item)
+                except Exception as err:
+                    if __debug__: log('Network access resulted in error: {}', str(err))
+                    spinner.fail('Skipping URL due to error: "{}"'.format(item))
+                    continue
                 if response.headers.get_content_maintype() != 'image':
                     spinner.fail('Did not find an image at "{}"'.format(item))
                     continue
@@ -290,8 +291,8 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                 base = '{}-{}'.format(root_name, index)
                 file = path.realpath(path.join(output_dir, base + '.' + fmt))
                 if __debug__: log('Downloading {}', item)
-                (success, error) = download_url(item, file)
-                if not success:
+                error = download(item, file)
+                if error:
                     spinner.fail('Failed to download {}: {}'.format(item, error))
                     continue
                 url_file = path.realpath(path.join(output_dir, base + '.url'))
@@ -301,48 +302,52 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             else:
                 file = path.realpath(path.join(os.getcwd(), item))
                 fmt = filename_extension(file)
-            if output_dir:
-                dest_dir = output_dir
-            else:
-                dest_dir = path.dirname(file)
-                if not writable(dest_dir):
-                    spinner.stop()
-                    say.fatal('Cannot write output in "{}".'.format(dest_dir))
-                    return
-            need_convert = fmt not in tool.accepted_formats()
+
+            dest_dir = output_dir if output_dir else path.dirname(file)
+            if not writable(dest_dir):
+                spinner.stop()
+                say.fatal('Cannot write output in "{}".'.format(dest_dir))
+                continue
+
+            need_convert = fmt not in method.accepted_formats()
             # If we must resize the image, do it before format conversion.
-            # Test the dimensions, not bytes, because compression of jp2 != jpeg.
-            if image_dimensions(file) > tool.max_dimensions():
-                spinner.update('Original image too large')
-                file = file_after_resizing(file, tool, spinner)
+            # Test the dimensions, not bytes, because of compression.
+            if image_dimensions(file) > method.max_dimensions():
+                spinner.update('Original image too large -- will reduce it')
+                file = file_after_resizing(file, method, spinner)
             if file and need_convert:
-                spinner.update('{} does not accept {} format natively'.format(tool_name, fmt))
-                file = file_after_conversion(file, 'jpeg', tool, spinner)
+                spinner.update("Method {} doesn't accept {} -- will convert".format(method, fmt))
+                file = file_after_converting(file, 'jpeg', method, spinner)
             if not file:
                 continue
+
+            spinner.update('Sending to {} and waiting for response'.format(method))
+            try:
+                result = method.result(file)
+            except RateLimitExceeded as err:
+                time_passed = timer() - last_time
+                if time_passed < 1/method.max_rate():
+                    spinner.warn('Pausing due to rate limits')
+                    time.sleep(1/method.max_rate() - time_passed)
+            if result.error:
+                spinner.fail(result.error)
+                continue
+
             file_name = path.basename(file)
             base_path = path.join(dest_dir, file_name)
-            txt_file  = replace_extension(base_path, '.' + tool_name + '.txt')
-            json_file = replace_extension(base_path, '.' + tool_name + '.json')
-            if limit_rate:
-                time_passed = timer() - last_time
-                if time_passed < 1/tool.max_rate():
-                    spinner.warn('Pausing due to rate limits')
-                    time.sleep(1/tool.max_rate() - time_passed)
-            spinner.update('Sending to {} and waiting for response'.format(tool_name))
-            result = tool.result(file)
-            if result.error:
-                spinner.fail('Error from {}: {}'.format(tool_name, result.error))
-                continue
-            else:
-                spinner.update('Text -> {}'.format(relative_path(txt_file)))
-                save_output(result.text, txt_file)
-                spinner.update('All data -> {}'.format(relative_path(json_file)))
-                save_output(json.dumps(result.data), json_file)
+            txt_file  = replace_extension(base_path, '.' + str(method) + '.txt')
+            json_file = replace_extension(base_path, '.' + str(method) + '.json')
+            spinner.update('Text -> {}'.format(relative_path(txt_file)))
+            save_output(result.text, txt_file)
+            spinner.update('All data -> {}'.format(relative_path(json_file)))
+            save_output(json.dumps(result.data), json_file)
             spinner.stop('Done with {}'.format(item))
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
             spinner.warn('Interrupted')
+    except AuthenticationFailure as err:
+        spinner.fail('Unable to continue using {}: {}'.format(method, err))
+        return
     except Exception as err:
         if spinner:
             spinner.fail(say.error_text('Stopping due to a problem'))
@@ -378,7 +383,7 @@ def filter_urls(item_list, say):
     results = []
     for item in item_list:
         if item.startswith('http') or item.startswith('ftp'):
-            say.warn('Unexpected URL: "{}"'.format(item))
+            say.warn('Unexpected URL skipped: "{}"'.format(item))
             continue
         else:
             results.append(item)
@@ -404,7 +409,7 @@ def file_after_resizing(file, tool, spinner):
         return resized
 
 
-def file_after_conversion(file, to_format, tool, spinner):
+def file_after_converting(file, to_format, tool, spinner):
     new_file = filename_basename(file) + '.' + to_format
     if path.exists(new_file):
         spinner.update('Using converted image found in "{}"'.format(new_file))

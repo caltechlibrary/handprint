@@ -6,6 +6,7 @@ import http.client
 from   http.client import responses as http_responses
 import requests
 from   time import sleep
+import urllib
 
 import handprint
 from   handprint.files import rename_existing
@@ -15,12 +16,15 @@ from   handprint.exceptions import *
 
 def network_available():
     '''Return True if it appears we have a network connection, False if not.'''
+    r = None
     try:
-        r = requests.get("https://www.google.com")
+        r = urllib.request.urlopen("https://www.google.com")
         return True
-    except requests.ConnectionError:
+    except Exception:
         if __debug__: log('Could not connect to https://www.google.com')
         return False
+    if r:
+        r.close()
 
 
 def download(url, local_destination):

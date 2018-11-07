@@ -274,7 +274,6 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             last_time = timer()
             action = 'Downloading' if given_urls else 'Reading'
             spinner.start('{} {}'.format(action, item))
-            fmt = None
             if given_urls:
                 # Make sure the URLs point to images.
                 if __debug__: log('Testing if URL contains an image: "{}"', item)
@@ -282,7 +281,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                     response = request.urlopen(item)
                 except Exception as err:
                     if __debug__: log('Network access resulted in error: {}', str(err))
-                    spinner.fail('Skipping URL due to error: "{}"'.format(item))
+                    spinner.fail('Skipping URL due to error: "{}"'.format(err))
                     continue
                 if response.headers.get_content_maintype() != 'image':
                     spinner.fail('Did not find an image at "{}"'.format(item))
@@ -309,14 +308,12 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
                 say.fatal('Cannot write output in "{}".'.format(dest_dir))
                 continue
 
+            # If need to convert format, best do it after resizing original fmt.
             need_convert = fmt not in method.accepted_formats()
-            # If we must resize the image, do it before format conversion.
             # Test the dimensions, not bytes, because of compression.
             if image_dimensions(file) > method.max_dimensions():
-                spinner.update('Original image too large -- will reduce it')
                 file = file_after_resizing(file, method, spinner)
             if file and need_convert:
-                spinner.update("Method {} doesn't accept {} -- will convert".format(method, fmt))
                 file = file_after_converting(file, 'jpeg', method, spinner)
             if not file:
                 continue

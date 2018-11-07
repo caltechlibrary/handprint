@@ -6,6 +6,7 @@ import http.client
 from   http.client import responses as http_responses
 import requests
 from   time import sleep
+import ssl
 import urllib
 from   urllib import request
 
@@ -125,3 +126,17 @@ def net(get_or_post, url, polling = False, **kwargs):
         raise ServiceFailure("Internal server error")
     else:
         raise NetworkFailure("Unable to resolve URL")
+
+
+# Next code originally from https://stackoverflow.com/a/39779918/743730
+
+def disable_ssl_cert_check():
+    requests.packages.urllib3.disable_warnings()
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        # Legacy Python that doesn't verify HTTPS certificates by default
+        pass
+    else:
+        # Handle target environment that doesn't support HTTPS verification
+        ssl._create_default_https_context = _create_unverified_https_context

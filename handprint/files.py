@@ -197,7 +197,7 @@ def convert_image(file, to_format):
         warnings.simplefilter('ignore')
         try:
             im = Image.open(file)
-            im.save(dest_file, to_format)
+            im.save(dest_file, canonical_format_name(to_format))
             if __debug__: log('Saved converted image to {}', dest_file)
             return (dest_file, None)
         except Exception as err:
@@ -229,3 +229,13 @@ def resize_image(file, max_dimensions):
             return (dest_file, None)
         except Exception as err:
             return (None, str(err))
+
+
+def canonical_format_name(format):
+    format = format.lower()
+    if format in ['jpg', 'jpeg']:
+        return 'jpeg'
+    elif format in ['tiff', 'tif']:
+        return 'tiff'
+    else:
+        return format

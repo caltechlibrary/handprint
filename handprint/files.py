@@ -112,7 +112,7 @@ def filename_extension(file):
         return ''
 
 
-def relative_path(file):
+def relative(file):
     '''Returns a path that is relative to the current directory.  If the
     relative path would require more than one parent step (i.e., ../../*
     instead of ../*) then it will return an absolute path instead.'''

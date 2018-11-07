@@ -15,7 +15,6 @@ file "LICENSE" for more information.
 '''
 
 from   halo import Halo
-from   pubsub import pub
 import sys
 import time
 

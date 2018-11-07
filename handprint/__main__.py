@@ -189,6 +189,11 @@ information and exit without doing anything else.
         if not readable(from_file):
             exit(say.error_text('File not readable: {}'.format(from_file)))
 
+    if not images and not from_file:
+        exit(say.error_text('Need provide images or URLs. {}'.format(hint)))
+    if any(item.startswith('-') for item in images):
+        exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
+
     if creds_dir == 'D':
         creds_dir = path.join(handprint_path(), 'creds')
     if not readable(creds_dir):
@@ -201,11 +206,6 @@ information and exit without doing anything else.
     method = method.lower()
     if method != 'all' and method not in KNOWN_METHODS:
         exit(say.error_text('"{}" is not a known method. {}'.format(method, hint)))
-
-    if not images and not from_file:
-        exit(say.error_text('Need provide images or URLs. {}'.format(hint)))
-    if any(item.startswith('-') for item in images):
-        exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
 
     if output == 'O':
         output = None

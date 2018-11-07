@@ -273,7 +273,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
         for index, item in enumerate(targets, 1):
             last_time = timer()
             action = 'Downloading' if given_urls else 'Reading'
-            spinner.start('{} {}'.format(action, item))
+            spinner.start('{} {}'.format(action, relative(item)))
             if given_urls:
                 # Make sure the URLs point to images.
                 if __debug__: log('Testing if URL contains an image: {}', item)
@@ -340,7 +340,7 @@ def run(method_class, targets, given_urls, output_dir, root_name, creds_dir, say
             save_output(result.text, txt_file)
             spinner.update('All data -> {}'.format(relative(json_file)))
             save_output(json.dumps(result.data), json_file)
-            spinner.stop('Done with {}'.format(item))
+            spinner.stop('Done with {}'.format(relative(item)))
     except (KeyboardInterrupt, UserCancelled) as err:
         if spinner:
             spinner.warn('Interrupted')

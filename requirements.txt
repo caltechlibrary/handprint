@@ -16,4 +16,4 @@ requests>=2.19.1
 setuptools>=39.1.0
 termcolor>=1.1.0
 wget>=3.2
-wxPython>=4.0.3
+

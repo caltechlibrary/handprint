@@ -39,7 +39,7 @@ import handprint
 from handprint.constants import ON_WINDOWS, ACCEPTED_FORMATS, KNOWN_METHODS
 from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.progress import ProgressIndicator
-from handprint.network import network_available, download
+from handprint.network import network_available, download, disable_ssl_cert_check
 from handprint.files import files_in_directory, replace_extension, handprint_path
 from handprint.files import readable, writable
 from handprint.files import filename_basename, filename_extension, relative
@@ -49,6 +49,10 @@ from handprint.methods import MicrosoftTR
 from handprint.exceptions import *
 from handprint.debug import set_debug, log
 
+# Disable certificate verification.  FIXME: probably shouldn't do this.
+disable_ssl_cert_check()
+
+
 # Main program.
 # ......................................................................
 

@@ -16,10 +16,10 @@ from   handprint.exceptions import *
 def network_available():
     '''Return True if it appears we have a network connection, False if not.'''
     try:
-        r = requests.get("https://www.caltech.edu")
+        r = requests.get("https://www.google.com")
         return True
     except requests.ConnectionError:
-        if __debug__: log('Could not connect to https://www.caltech.edu')
+        if __debug__: log('Could not connect to https://www.google.com')
         return False
 
 

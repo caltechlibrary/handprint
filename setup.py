@@ -12,9 +12,6 @@ from   os import path
 from   setuptools import setup
 import sys
 
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
 here = path.abspath(path.dirname(__file__))
 
 with open(path.join(here, 'requirements.txt')) as f:

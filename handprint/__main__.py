@@ -241,7 +241,7 @@ information and exit without doing anything else.
         else:
             methods = [KNOWN_METHODS[method]]
             say.info('Will apply method "{}" to {} images.'.format(method, num_items))
-        for index, item in enumerate(targets):
+        for index, item in enumerate(targets, start = 1):
             if print_separators:
                 say.msg('='*70, 'dark')
             run(methods, item, index, output, given_urls, root_name, creds_dir, say)

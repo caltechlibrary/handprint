@@ -7,18 +7,17 @@ https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quicks
 
 import os
 from   os import path
-import requests
-from requests.exceptions import HTTPError
 import sys
-import time
+from   time import sleep
 from   timeit import default_timer as timer
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
 from handprint.methods.base import TextRecognition, TRResult
 from handprint.messages import msg
-from handprint.exceptions import ServiceFailure, RateLimitExceeded
+from handprint.exceptions import *
 from handprint.debug import log
+from handprint.network import net
 
 
 # Main class.
@@ -33,7 +32,10 @@ class MicrosoftTR(TextRecognition):
     def init_credentials(self, credentials_dir = None):
         '''Initializes the credentials to use for accessing this service.'''
         if __debug__: log('Getting credentials from {}', credentials_dir)
-        self.credentials = MicrosoftCredentials(credentials_dir).creds()
+        try:
+            self._credentials = MicrosoftCredentials(credentials_dir).creds()
+        except Exception as err:
+            raise AuthenticationFailure(str(err))
 
 
     def name(self):
@@ -69,21 +71,39 @@ class MicrosoftTR(TextRecognition):
         return (4200, 4200)
 
 
+    # General scheme of things:
+    #
+    # * Return errors (via TRResult) if a result could not be obtained
+    #   because of an error specific to a particular path/item.  The guiding
+    #   principle here is: if the calling loop is processing multiple items,
+    #   can it be expected to be able to go on to the next item if this error
+    #   occurred?
+    #
+    # * Raises exceptions if a problem occurs that should stop the calling
+    #   code from continuing with this service.  This includes things like
+    #   authentication failures, because authentication failures tend to
+    #   involve all uses of a service and not just a specific item.
+    #
+    # * Otherwise, returns a TRResult if successful.
+
     def result(self, path):
-        '''Returns all the results from the service as a Python dict.'''
+        '''Returns all the results from calling the service on the 'path'. The
+        results are returned as an TRResult named tuple.
+        '''
         # Check if we already processed it.
         if path in self._results:
             return self._results[path]
 
+        if __debug__: log('Reading {}', path)
         image = open(path, 'rb').read()
         if len(image) > self.max_size():
-            text = 'Error: file "{}" is too large for Microsoft service'.format(path)
+            text = 'File exceeds {} byte limit for Microsoft service'.format(self.max_size())
             return TRResult(path = path, data = {}, text = '', error = text)
 
-        base_url = "https://westus.api.cognitive.microsoft.com/vision/v2.0/"
-        url = base_url + "recognizeText"
+        base_url = 'https://westus.api.cognitive.microsoft.com/vision/v2.0/'
+        url = base_url + 'recognizeText'
         params  = {'mode': 'Handwritten'}
-        headers = {'Ocp-Apim-Subscription-Key': self.credentials,
+        headers = {'Ocp-Apim-Subscription-Key': self._credentials,
                    'Content-Type': 'application/octet-stream'}
         start_time = timer()
 
@@ -92,40 +112,55 @@ class MicrosoftTR(TextRecognition):
         # text is ready to be retrieved.
 
         if __debug__: log('Sending file to MS cloud service')
-        response = requests.post(url, headers = headers, params = params, data = image)
-        (rate_limit, error) = self._status_check(response)
-        if rate_limit:
-            # Pause for a full minute to let the server reset its timers.
-            if __debug__: log('Hit rate limit; sleeping for 60 s')
-            time.sleep(60)
-        elif error:
-            if __debug__: log('MS call produced an error: {}', error)
-            return TRResult(path = path, data = {}, text = '', error = error)
+        try:
+            response = net('post', url, headers = headers, params = params, data = image)
+        except NetworkFailure as err:
+            if __debug__: log('Network exception: {}', str(err))
+            return TRResult(path = path, data = {}, text = '', error = str(err))
+        except RateLimitExceeded:
+            if __debug__: log('Hit rate limit; sleeping for 30 s and retrying')
+            sleep(30)
+            return self.result(path)
+        except KeyboardInterrupt:
+            raise
+
+        if 'Operation-Location' in response.headers:
+            polling_url = response.headers['Operation-Location']
+        else:
+            if __debug__: log('No operation-location in response headers')
+            raise ServiceFailure('Unexpected response from Microsoft server')
 
         analysis = {}
         poll = True
         while poll:
             if __debug__: log('Polling MS for results ...')
-            # I never have seen results returned in 1 sec, and meanwhile the
-            # repeated polling counts against your rate limit.  So, wait for
-            # 2 sec to reduce the number of calls.
-            time.sleep(2)
-            response_final = requests.get(
-                response.headers["Operation-Location"], headers=headers)
-            (rate_limit, error) = self._status_check(response)
-            if rate_limit:
-                # Pause for a full minute to let the server reset its timers.
-                if __debug__: log('Hit rate limit; sleeping for 60 s')
-                time.sleep(60)
-            elif error:
-                if __debug__: log('MS call produced an error: {}', error)
-                return TRResult(path = path, data = {}, text = '', error = error)
+            # I never have seen results returned in 1 second, and meanwhile
+            # the repeated polling counts against your rate limit.  So, wait
+            # for 2 s to reduce the number of calls.
+            sleep(2)
+            try:
+                response = net('get', polling_url, polling = True, headers = headers)
+            except NetworkFailure as err:
+                if __debug__: log('Network exception: {}', str(err))
+                return TRResult(path = path, data = {}, text = '', error = str(err))
+            except RateLimitExceeded:
+                # Pause to let the server reset its timers.
+                if __debug__: log('Hit rate limit; sleeping for 30 s')
+                sleep(30)
+            except KeyboardInterrupt:
+                raise
 
-            analysis = response_final.json()
-            if "recognitionResult" in analysis:
-                poll = False
-            if "status" in analysis and analysis['status'] == 'Failed':
-                poll = False
+            # Sometimes the response comes back without content.  I don't know
+            # if that's a bug in the Azure system or not.  It's not clear what
+            # else should be done except keep going.
+            if response.text:
+                analysis = response.json()
+                if 'recognitionResult' in analysis:
+                    poll = False
+                if 'status' in analysis and analysis['status'] == 'Failed':
+                    poll = False
+            else:
+                if __debug__: log('Received empty result from Microsoft.')
         if __debug__: log('Results received.')
 
         # Have to extract the text into a single string.
@@ -139,23 +174,3 @@ class MicrosoftTR(TextRecognition):
         self._results[path] = TRResult(path = path, data = analysis,
                                        text = full_text, error = None)
         return self._results[path]
-
-
-    def _status_check(self, response):
-        hit_rate_limit = False
-        error = None
-        if response.status_code in [401, 402, 403, 407, 451, 511]:
-            # FIXME this might be a good place to suggest to the user that they
-            # visit https://blogs.msdn.microsoft.com/kwill/2017/05/17/http-401-access-denied-when-calling-azure-cognitive-services-apis/
-            error = 'Authentication failure for MS service -- {}'.format(err)
-        elif response.status_code == 429:
-            hit_rate_limit = True
-        elif response.status_code == 503:
-            error = 'Service is unavailable -- try again later'
-        elif response.status_code in [500, 501, 502, 503, 506, 507, 508]:
-            error = "Internal server error {}".format(response.status_code)
-        elif response.status_code > 400:
-            error = 'Problem contacting Microsoft service: {}'.format(err)
-        elif response.status_code > 500:
-            error = 'Problem reported by Microsoft Azure: {}'.format(err)
-        return (hit_rate_limit, error)

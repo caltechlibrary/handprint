@@ -17,7 +17,7 @@ import json
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
 from handprint.methods.base import TextRecognition, TRResult
-from handprint.exceptions import ServiceFailure
+from handprint.exceptions import *
 from handprint.debug import log
 
 
@@ -47,7 +47,10 @@ class GoogleTR(TextRecognition):
         # Haven't been able to get this to work by reading the credentials:
         # self.credentials = GoogleCredentials(credentials_dir).creds()
         if __debug__: log('Getting credentials from {}', credentials_dir)
-        GoogleCredentials(credentials_dir)
+        try:
+            GoogleCredentials(credentials_dir)
+        except Exception as err:
+            raise AuthenticationFailure(str(err))
 
 
     def name(self):
@@ -96,16 +99,15 @@ class GoogleTR(TextRecognition):
             return self._results[path]
 
         if __debug__: log('Reading {}', path)
-        with io.open(path, 'rb') as image_file:
-            image_data = image_file.read()
-
-        if len(image_data) > self.max_size():
-            text = 'Error: file "{}" is too large for Google service'.format(path)
+        image = open(path, 'rb').read()
+        if len(image) > self.max_size():
+            text = 'File exceeds {} byte limit for Google service'.format(self.max_size())
             return TRResult(path = path, data = {}, text = '', error = text)
+
         try:
             if __debug__: log('Building Google vision API object')
             client  = gv.ImageAnnotatorClient()
-            image   = gv.types.Image(content = image_data)
+            image   = gv.types.Image(content = image)
             context = gv.types.ImageContext(language_hints = ['en-t-i0-handwrit'])
 
             # Iterate over the known API calls and store each result.
@@ -123,7 +125,7 @@ class GoogleTR(TextRecognition):
             return self._results[path]
         except google.api_core.exceptions.PermissionDenied as err:
             text = 'Authentication failure for Google service -- {}'.format(err)
-            raise ServiceFailure(text)
+            raise AuthenticationFailure(text)
         except KeyboardInterrupt:
             raise
         except Exception as err:

@@ -33,7 +33,7 @@ def download(url, local_destination):
     returns False to indicate no error occurred.
     '''
     try:
-        if __debug__: log('Requesting {}', url)
+        if __debug__: log('Attempting to get {}', url)
         req = requests.get(url, stream = True)
     except requests.exceptions.ConnectionError as err:
         if err.args and isinstance(err.args[0], urllib3.exceptions.MaxRetryError):
@@ -53,7 +53,7 @@ def download(url, local_destination):
         sleep(1)                        # Sleep a short time and try again.
         return download_url(url, local_destination)
     elif 200 <= code < 400:
-        if __debug__: log('Writing downloaded data to {}', local_destination)
+        if __debug__: log('Downloading data to {}', local_destination)
         rename_existing(local_destination)
         # The following originally started out as the code here:
         # https://stackoverflow.com/a/16696317/743730

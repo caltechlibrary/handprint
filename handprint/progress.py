@@ -18,8 +18,6 @@ from   halo import Halo
 from   pubsub import pub
 import sys
 import time
-import wx
-import wx.lib.dialogs
 
 try:
     from termcolor import colored

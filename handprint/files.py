@@ -18,6 +18,7 @@ import io
 import os
 from   os import path
 from   PIL import Image
+import re
 import sys
 import subprocess
 import warnings
@@ -115,7 +116,10 @@ def filename_extension(file):
 def relative(file):
     '''Returns a path that is relative to the current directory.  If the
     relative path would require more than one parent step (i.e., ../../*
-    instead of ../*) then it will return an absolute path instead.'''
+    instead of ../*) then it will return an absolute path instead.  If the
+    argument is actuall a file path, it will return it unchanged.'''
+    if re.match(r'^[a-zA-Z]:/', file):
+        return file
     candidate = path.relpath(file, os.getcwd())
     if not candidate.startswith('../..'):
         return candidate
@@ -128,7 +132,6 @@ def replace_extension(filepath, ext):
 
 
 def rename_existing(file):
-
     '''Renames 'file' to 'file.bak'.'''
 
     def rename(f):

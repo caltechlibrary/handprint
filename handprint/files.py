@@ -113,7 +113,14 @@ def filename_extension(file):
 
 
 def relative_path(file):
-    return path.relpath(file, os.getcwd())
+    '''Returns a path that is relative to the current directory.  If the
+    relative path would require more than one parent step (i.e., ../../*
+    instead of ../*) then it will return an absolute path instead.'''
+    candidate = path.relpath(file, os.getcwd())
+    if not candidate.startswith('../..'):
+        return candidate
+    else:
+        return path.realpath(candidate)
 
 
 def replace_extension(filepath, ext):
@@ -121,6 +128,7 @@ def replace_extension(filepath, ext):
 
 
 def rename_existing(file):
+
     '''Renames 'file' to 'file.bak'.'''
 
     def rename(f):

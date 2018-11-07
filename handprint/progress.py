@@ -84,10 +84,10 @@ class ProgressIndicator():
             if self._current_message:
                 self._spinner.succeed(color(self._current_message, 'info', self._colorize))
             self._spinner.stop()
-            if message:
-                self.start(message)
-                self._spinner.succeed(color(message, 'info', self._colorize))
-                self._spinner.stop()
+            self.start(message)
+            self._spinner.succeed(color(message, 'info', self._colorize))
+            self._spinner.stop()
+            self._current_message = ''
         else:
             if message:
                 msg(message)

@@ -6,7 +6,7 @@
 # @website https://github.com/caltechlibrary/handprint
 # =============================================================================
 
-__version__     = '0.7.3'
+__version__     = '0.7.4'
 __title__       = 'handprint'
 __description__ = 'Handprint: HANDwritten Page RecognitIoN Test for Caltech Archives'
 __url__         = 'https://github.com/caltechlibrary/handprint'

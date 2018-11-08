@@ -174,7 +174,7 @@ class MicrosoftTR(TextRecognition):
         if 'recognitionResult' in analysis:
             lines = analysis['recognitionResult']['lines']
             sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
-            full_text = ' '.join(x['text'] for x in sorted_lines)
+            full_text = '\n'.join(x['text'] for x in sorted_lines)
 
         # Put it all together.
         self._results[path] = TRResult(path = path, data = analysis,

@@ -117,19 +117,25 @@ Getting one of these files is unfortunately a complicated process.  It's summari
 ▶︎ Running Handprint
 ------------------
 
-Handprint is a command-line driven program.  There is a single command-line interface program called `handprint`.  You can run it by starting a terminal shell and `cd`'ing to the directory where you installed Handprint, and then running the program `bin/handprint` from there.  For example:
+Handprint comes with a single command-line interface program called `handprint`.  If the installation steps described above proceed successfully, it should end up installed in a location where software is normally installed on your computer.   Running Handprint from a terminal shell should be as simple as type this in a shell:
+
+```bash
+handprint -h
+```
+
+If that fails for some reason, you can try instead to `cd` to the directory where you installed Handprint and then run `bin/handprint` from there.  For example:
 
 ```bash
 bin/handprint -h
 ```
 
-Alternatively, you should be able to run Handprint from anywhere using the normal approach to running Python modules:
+Finally, as a third alternative, you should be able to run Handprint from anywhere using the normal approach to running Python modules:
 
 ```bash
 python3 -m handprint -h
 ```
 
-The `-h` option (`/h` on Windows) will make `handprint` display some help information and exit immediately.  To make Handprint do more, you can supply other arguments that instruct Handprint to process image files (or alternatively, URLs pointing to image files at a network location) and run handwritten text recognition (HTR) or optical character recognition (OCR) algorithms on them, as explained below.
+The `-h` option (`/h` on Windows) will make `handprint` display some help information and exit immediately.  To make Handprint do more, you can supply other arguments that instruct Handprint to process image files (or alternatively, URLs pointing to image files at a network location) and run text recognition algorithms on them, as explained below.
 
 
 ### File formats recognized
@@ -142,7 +148,7 @@ Whether the images are stored locally or accessible via URLs, each image should 
 Handprint can contact more than one cloud service for OCR and HTR.  You can use the `-l` option (`/l` on Windows) to make Handprint display a list of the methods currently implemented:
 
 ```
-# bin/handprint -l
+# handprint -l
 Known methods (for use as values for option -m):
    microsoft
    google
@@ -151,7 +157,7 @@ Known methods (for use as values for option -m):
 By default, Handprint will run each known method in turn.  To invoke only one specific method, use the `-m` option (`/m` on Windows) followed by a method name:
 
 ```bash
-bin/handprint -m microsoft /path/to/images
+handprint -m microsoft /path/to/images
 ```
 
 
@@ -160,7 +166,7 @@ bin/handprint -m microsoft /path/to/images
 Handprint looks for credentials files in the directory where it is installed, but you can put credentials in another directory and then tell Handprint where to find it using the `-c` option (`/c` on Windows).  Example of use:
 
 ```bash
-bin/handprint -c ~/handprint-credentials /path/to/images
+handprint -c ~/handprint-credentials /path/to/images
 ```
 
 
@@ -208,7 +214,7 @@ The use of the `-u` option also **requires the use of the `-o` option** (`/o` on
 Example of use:
 
 ```bash
-bin/handprint -u -f /tmp/urls-to-read.txt -o /tmp/results/
+handprint -u -f /tmp/urls-to-read.txt -o /tmp/results/
 ```
 
 Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to list the URLs in a file in combination with the `-f` option (`/f` on Windows).

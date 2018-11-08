@@ -112,17 +112,23 @@ class MicrosoftTR(TextRecognition):
         # text is ready to be retrieved.
 
         if __debug__: log('Sending file to MS cloud service')
-        try:
-            response = net('post', url, headers = headers, params = params, data = image)
-        except NetworkFailure as err:
-            if __debug__: log('Network exception: {}', str(err))
-            return TRResult(path = path, data = {}, text = '', error = str(err))
-        except RateLimitExceeded:
-            if __debug__: log('Hit rate limit; sleeping for 30 s and retrying')
-            sleep(30)
-            return self.result(path)
-        except KeyboardInterrupt:
-            raise
+        response, error = net('post', url, headers = headers, params = params, data = image)
+        if isinstance(error, NetworkFailure):
+            if __debug__: log('Network exception: {}', str(error))
+            return TRResult(path = path, data = {}, text = '', error = str(error))
+        elif isinstance(error, RateLimitExceeded):
+            # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits
+            # The headers will have a Retry-After number in seconds.
+            if 'Retry-After' in response.headers:
+                sleep_time = int(response.headers['Retry-After'])
+                if __debug__: log('Sleeping for {} s and retrying', sleep_time)
+                sleep(sleep_time)
+            else:
+                if __debug__: log('Sleeping for 30 s and retrying')
+                sleep(30)
+            return self.result(path)    # Recursive invocation
+        elif error:
+            raise error
 
         if 'Operation-Location' in response.headers:
             polling_url = response.headers['Operation-Location']
@@ -138,17 +144,23 @@ class MicrosoftTR(TextRecognition):
             # the repeated polling counts against your rate limit.  So, wait
             # for 2 s to reduce the number of calls.
             sleep(2)
-            try:
-                response = net('get', polling_url, polling = True, headers = headers)
-            except NetworkFailure as err:
-                if __debug__: log('Network exception: {}', str(err))
-                return TRResult(path = path, data = {}, text = '', error = str(err))
-            except RateLimitExceeded:
-                # Pause to let the server reset its timers.
-                if __debug__: log('Hit rate limit; sleeping for 30 s')
-                sleep(30)
-            except KeyboardInterrupt:
-                raise
+            response, error = net('get', polling_url, polling = True, headers = headers)
+            if isinstance(error, NetworkFailure):
+                if __debug__: log('Network exception: {}', str(error))
+                return TRResult(path = path, data = {}, text = '', error = str(error))
+            elif isinstance(error, RateLimitExceeded):
+                # Pause to let the server reset its timers.  It seems that MS
+                # doesn't send back a Retry-After header when rated limited
+                # during polling, but I'm going to check it anyway, in case.
+                if 'Retry-After' in response.headers:
+                    sleep_time = int(response.headers['Retry-After'])
+                    if __debug__: log('Sleeping for {} s and retrying', sleep_time)
+                    sleep(sleep_time)
+                else:
+                    if __debug__: log('Sleeping for 30 s and retrying')
+                    sleep(30)
+            elif error:
+                raise error
 
             # Sometimes the response comes back without content.  I don't know
             # if that's a bug in the Azure system or not.  It's not clear what

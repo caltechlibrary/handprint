@@ -9,7 +9,6 @@ import os
 from   os import path
 import sys
 from   time import sleep
-from   timeit import default_timer as timer
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
@@ -105,7 +104,6 @@ class MicrosoftTR(TextRecognition):
         params  = {'mode': 'Handwritten'}
         headers = {'Ocp-Apim-Subscription-Key': self._credentials,
                    'Content-Type': 'application/octet-stream'}
-        start_time = timer()
 
         # The Microsoft API for extracting text requires two phases: one call
         # to submit the image for processing, then polling to wait until the
@@ -118,14 +116,12 @@ class MicrosoftTR(TextRecognition):
             return TRResult(path = path, data = {}, text = '', error = str(error))
         elif isinstance(error, RateLimitExceeded):
             # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits
-            # The headers will have a Retry-After number in seconds.
+            # The headers should have a Retry-After number in seconds.
+            sleep_time = 30
             if 'Retry-After' in response.headers:
                 sleep_time = int(response.headers['Retry-After'])
-                if __debug__: log('Sleeping for {} s and retrying', sleep_time)
-                sleep(sleep_time)
-            else:
-                if __debug__: log('Sleeping for 30 s and retrying')
-                sleep(30)
+            if __debug__: log('Sleeping for {} s and retrying', sleep_time)
+            sleep(sleep_time)
             return self.result(path)    # Recursive invocation
         elif error:
             raise error
@@ -136,10 +132,10 @@ class MicrosoftTR(TextRecognition):
             if __debug__: log('No operation-location in response headers')
             raise ServiceFailure('Unexpected response from Microsoft server')
 
+        if __debug__: log('Polling MS for results ...')
         analysis = {}
         poll = True
         while poll:
-            if __debug__: log('Polling MS for results ...')
             # I never have seen results returned in 1 second, and meanwhile
             # the repeated polling counts against your rate limit.  So, wait
             # for 2 s to reduce the number of calls.
@@ -152,13 +148,11 @@ class MicrosoftTR(TextRecognition):
                 # Pause to let the server reset its timers.  It seems that MS
                 # doesn't send back a Retry-After header when rated limited
                 # during polling, but I'm going to check it anyway, in case.
+                sleep_time = 30
                 if 'Retry-After' in response.headers:
                     sleep_time = int(response.headers['Retry-After'])
-                    if __debug__: log('Sleeping for {} s and retrying', sleep_time)
-                    sleep(sleep_time)
-                else:
-                    if __debug__: log('Sleeping for 30 s and retrying')
-                    sleep(30)
+                if __debug__: log('Sleeping for {} s and retrying', sleep_time)
+                sleep(sleep_time)
             elif error:
                 raise error
 

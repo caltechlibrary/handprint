@@ -60,7 +60,7 @@ Handprint is a program written in Python 3 that works by invoking cloud-based se
 
 The following is probably the simplest and most direct way to install this software on your computer:
 ```sh
-sudo pip3 install git+https://github.com/caltechlibrary/handprint.git --upgrade
+sudo python3 -m pip install git+https://github.com/caltechlibrary/handprint.git --upgrade
 ```
 
 Alternatively, you can instead clone this GitHub repository and then run `setup.py` manually.  First, create a directory somewhere on your computer where you want to store the files, and cd to it from a terminal shell.  Next, execute the following commands:

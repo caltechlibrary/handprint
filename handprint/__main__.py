@@ -43,7 +43,7 @@ from handprint.network import network_available, download, disable_ssl_cert_chec
 from handprint.files import files_in_directory, alt_extension, handprint_path
 from handprint.files import readable, writable
 from handprint.files import filename_basename, filename_extension, relative
-from handprint.files import convert_image, resize_image, image_dimensions
+from handprint.files import converted_image, reduced_image, image_dimensions
 from handprint.methods import GoogleTR
 from handprint.methods import MicrosoftTR
 from handprint.exceptions import *
@@ -412,7 +412,7 @@ def file_after_resizing(file, tool, spinner):
         return new_file
     else:
         spinner.update('Original image too large; reducing size')
-        (resized, error) = resize_image(file, tool.max_dimensions())
+        (resized, error) = reduced_image(file, tool.max_dimensions())
         if not resized:
             spinner.fail('Failed to resize {}: {}'.format(relative(file, error)))
             return None
@@ -426,7 +426,7 @@ def file_after_converting(file, to_format, tool, spinner):
         return new_file
     else:
         spinner.update('Converting to {} format: {}'.format(to_format, relative(file)))
-        (converted, error) = convert_image(file, to_format)
+        (converted, error) = converted_image(file, to_format)
         if not converted:
             spinner.fail('Failed to convert {}: {}'.format(relative(file), error))
             return None

@@ -187,7 +187,7 @@ def image_dimensions(file):
         return im.size
 
 
-def convert_image(file, to_format):
+def converted_image(file, to_format):
     '''Returns a tuple of (success, output file, error message).
     Returns a tuple of (new_file, error).  The value of 'error' will be None
     if no error occurred; otherwise, the value will be a string summarizing the
@@ -207,7 +207,7 @@ def convert_image(file, to_format):
             return (None, str(err))
 
 
-def resize_image(file, max_dimensions):
+def reduced_image(file, max_dimensions):
     '''Resizes the image and writes a new file named "ORIGINAL-reduced.EXT".
     Returns a tuple of (new_file, error).  The value of 'error' will be None
     if no error occurred; otherwise, the value will be a string summarizing the

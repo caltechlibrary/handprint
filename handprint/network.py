@@ -85,48 +85,49 @@ def download(url, local_destination):
 
 def net(get_or_post, url, polling = False, **kwargs):
     '''Gets or posts the 'url' with optional keyword arguments provided.
-    Raises exceptions if problems occur.  Returns the response from the get.
+    Returns a tuple of (response, exception), where the first element is
+    the response from the get or post http call, and the second element is
+    an exception object if an exception occurred.  If no exception occurred,
+    the second element will be None.  This allows the caller to inspect the
+    response even in cases where exceptions are raised.
+
     If keyword 'polling' is True, certain statuses like 404 are ignored and
     the response is returned; otherwise, they are considered errors.
     '''
     try:
         if __debug__: log('HTTP {} {}', get_or_post, url)
-        method = requests.get if get_or_post == 'get' else requests.post
-        req = method(url, **kwargs)
-    except requests.exceptions.ConnectionError as err:
-        if err.args and isinstance(err.args[0], urllib3.exceptions.MaxRetryError):
-            raise NetworkFailure('Unable to resolve destination host')
+        http_method = requests.get if get_or_post == 'get' else requests.post
+        req = http_method(url, **kwargs)
+    except requests.exceptions.ConnectionError as ex:
+        if ex.args and isinstance(ex.args[0], urllib3.exceptions.MaxRetryError):
+            return (req, NetworkFailure('Unable to resolve destination host'))
         else:
-            raise NetworkFailure(str(err))
-    except requests.exceptions.InvalidSchema as err:
-        raise NetworkFailure('Unsupported network protocol')
-    except Exception as err:
-        raise err
+            return (req, NetworkFailure(str(ex)))
+    except requests.exceptions.InvalidSchema as ex:
+        return (req, NetworkFailure('Unsupported network protocol'))
+    except Exception as ex:
+        return (req, ex)
 
     # Interpret the response.
     code = req.status_code
-    if 200 <= code < 400:
-        return req
+    error = None
+    if code in [404, 410] and not polling:
+        error = NetworkFailure("No content found at this location")
     elif code in [401, 402, 403, 407, 451, 511]:
-        raise AuthenticationFailure("Access is forbidden or requires authentication")
-    elif code in [404, 410]:
-        if polling:
-            return req
-        else:
-            raise NetworkFailure("No content found at this location")
+        error = AuthenticationFailure("Access is forbidden or requires authentication")
     elif code in [405, 406, 409, 411, 412, 414, 417, 428, 431, 505, 510]:
-        raise ServiceFailure("Server returned code {} -- please report this".format(code))
+        error = ServiceFailure("Server sent {} -- please report this".format(code))
     elif code in [415, 416]:
-        raise ServiceFailure("Server rejected the request")
+        error = ServiceFailure("Server rejected the request")
     elif code == 429:
-        raise RateLimitExceeded("Server blocking further requests due to rate limits")
+        error = RateLimitExceeded("Server blocking further requests due to rate limits") 
     elif code == 503:
-        raise ServiceFailure("Server is unavailable -- try again later")
+        error = ServiceFailure("Server is unavailable -- try again later")
     elif code in [500, 501, 502, 506, 507, 508]:
-        raise ServiceFailure("Internal server error")
-    else:
-        raise NetworkFailure("Unable to resolve URL")
-
+        error = ServiceFailure("Internal server error")
+    elif not (200 <= code < 400):
+        error = NetworkFailure("Unable to resolve URL")
+    return (req, error)
 
 # Next code originally from https://stackoverflow.com/a/39779918/743730
 

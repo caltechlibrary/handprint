@@ -40,7 +40,7 @@ from handprint.constants import ON_WINDOWS, ACCEPTED_FORMATS, KNOWN_METHODS
 from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.progress import ProgressIndicator
 from handprint.network import network_available, download, disable_ssl_cert_check
-from handprint.files import files_in_directory, replace_extension, handprint_path
+from handprint.files import files_in_directory, alt_extension, handprint_path
 from handprint.files import readable, writable
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import convert_image, resize_image, image_dimensions
@@ -346,8 +346,8 @@ def run(classes, item, index, output_dir, given_urls, root_name, creds_dir, say)
 
             file_name = path.basename(file)
             base_path = path.join(dest_dir, file_name)
-            txt_file  = replace_extension(base_path, '.' + str(method) + '.txt')
-            json_file = replace_extension(base_path, '.' + str(method) + '.json')
+            txt_file  = alt_extension(base_path, str(method) + '.txt')
+            json_file = alt_extension(base_path, str(method) + '.json')
             spinner.update('Text -> {}'.format(relative(txt_file)))
             save_output(result.text, txt_file)
             spinner.update('All data -> {}'.format(relative(json_file)))

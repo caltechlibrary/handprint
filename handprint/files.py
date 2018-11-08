@@ -113,6 +113,13 @@ def filename_extension(file):
         return ''
 
 
+def alt_extension(filepath, ext):
+    '''Returns the 'filepath' with the extension replaced by 'ext'.  The
+    extension given in 'ext' should NOT have a leading period: that is, it
+    should be "foo", not ".foo".'''
+    return path.splitext(filepath)[0] + '.' + ext
+
+
 def relative(file):
     '''Returns a path that is relative to the current directory.  If the
     relative path would require more than one parent step (i.e., ../../*
@@ -125,10 +132,6 @@ def relative(file):
         return candidate
     else:
         return path.realpath(candidate)
-
-
-def replace_extension(filepath, ext):
-    return path.splitext(filepath)[0] + ext
 
 
 def rename_existing(file):

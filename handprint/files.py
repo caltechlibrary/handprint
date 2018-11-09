@@ -120,12 +120,17 @@ def alt_extension(filepath, ext):
     return path.splitext(filepath)[0] + '.' + ext
 
 
+def is_url(string):
+    '''Return True if the 'string' looks like a URL, False otherwise.'''
+    return re.match(r'^[a-zA-Z]:/', string)
+
+
 def relative(file):
     '''Returns a path that is relative to the current directory.  If the
     relative path would require more than one parent step (i.e., ../../*
     instead of ../*) then it will return an absolute path instead.  If the
     argument is actuall a file path, it will return it unchanged.'''
-    if re.match(r'^[a-zA-Z]:/', file):
+    if is_url(file):
         return file
     candidate = path.relpath(file, os.getcwd())
     if not candidate.startswith('../..'):

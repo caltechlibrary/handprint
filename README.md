@@ -246,7 +246,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-b`_B_  | `--base-name`_B_  | Write outputs to files named _B_-n | Use the base names of the image files | ✦ |
 | `-c`_C_  | `--creds-dir`_C_  | Look for credentials in directory _C_ | `creds` |
 | `-f`_F_  | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs given on command line |
-| `-l`     | `--list`          | Disply list of known methods | |
+| `-l`     | `--list`          | Display list of known methods | |
 | `-m`_M_  | `--method`_M_     | Use method _M_ | "all" |
 | `-o`_O_  | `--output`_O_     | Write outputs to directory _D_ | Same directories where images are found |  ⚑ |
 | `-u`     | `--given-urls`    | Inputs are URLs, not files or dirs | Assume files and/or directories of files |

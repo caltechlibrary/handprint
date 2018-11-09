@@ -8,12 +8,18 @@ from collections import namedtuple
 # Named tuple definitions.
 # .............................................................................
 
-TRResult = namedtuple('TRResult', 'path data text error')
+TRResult = namedtuple('TRResult', 'path data text boxes error')
 TRResult.__doc__ = '''Results of invoking a text recognition service.
   'path' is the file path or URL of the item in question
   'data' is the full data result as a Python dict (or {} in case of error)
   'text' is the extracted text as a string (or '' in case of error)
   'error' is None if no error occurred, or the text of any error messages
+'''
+
+TextBox = namedtuple('TextBox', 'text boundingBox')
+TextBox.__doc__ = '''Representation of a single bounding box and text therein.
+  'box' is the bounding box, as XY coordinates of corners starting with u.l.
+  'text' is the text
 '''
 
 
@@ -102,5 +108,15 @@ class TextRecognition(object):
 
 
     def result(self, path):
-        '''Returns the output from the service as an TRResult named tuple.'''
+        '''Returns the text recognition results from the service as an
+        TRResult named tuple.
+        '''
         pass
+
+
+    def boxes(self, result):
+        '''Returns a list of TextBox tuples representing bounding boxes of
+        recognized text in the TRResult named tuple provided in parameter
+        'result'.
+        '''
+        import pdb; pdb.set_trace()

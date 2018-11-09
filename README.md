@@ -9,7 +9,7 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-0.7.5-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-0.8.0-b44e88.svg?style=flat-square)](http://shields.io)
 
 🏁 Log of recent changes
 -----------------------
@@ -50,6 +50,12 @@ Here is a screen cast to demonstrate. Click on the following image:
 
 <p align="center">
   <a href="https://asciinema.org/a/hDWutEH69LrbzcSAxfLwQWFhI"><img src=".graphics/handprint-asciinema.png" alt="Screencast of simple Handprint demo"></a>
+</p>
+
+Handprint can generate versions of the input images with recognized text overlaid over them, for easier visualization of the results.  The following is an example:
+
+<p align="center">
+    <img width="700px" src=".graphics/sample-annotated-image.png">
 </p>
 
 
@@ -186,22 +192,28 @@ To deal with this situation, Handprint manufactures its own file names when the 
 document-1.jpeg
 document-1.url
 document-1.google.txt
+document-1.google.jpg
 document-1.google.json
 document-1.microsoft.txt
+document-1.microsoft.jpg
 document-1.microsoft.json
 
 document-2.jpeg
 document-2.url
 document-2.google.txt
+document-2.google.jpg
 document-2.google.json
 document-2.microsoft.txt
+document-2.microsoft.jpg
 document-2.microsoft.json
 
 document-3.jpeg
 document-3.url
 document-3.google.txt
+document-3.google.jpg
 document-3.google.json
 document-3.microsoft.txt
+document-3.microsoft.jpg
 document-3.microsoft.json
 
 ...
@@ -220,20 +232,26 @@ handprint -u -f /tmp/urls-to-read.txt -o /tmp/results/
 Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to list the URLs in a file in combination with the `-f` option (`/f` on Windows).
 
 
+### Annotated images
+
+By default, Handprint will create copies of the images in files named with the method extension (e.g., `document-1.microsoft.jpg`) and write overlays of the text and bounding boxes extracted by the methods.  This makes it possible to see the text extracted directly over the source image.  Generating these annotated images takes a little bit of time and if they are not necessary for your purposes, you can turn off annotation with the `-A` option (`/A` on Windows).
+
+
 ### Command line options
 
 The following table summarizes all the command line options available. (Note: on Windows computers, `/` must be usedas the prefix character instead of `-`):
 
 | Short    | Long&nbsp;form&nbsp;opt | Meaning | Default |  |
 |----------|-------------------|----------------------|---------|---|
-| `-c`_D_  | `--creds-dir`_D_  | Look for credentials in directory _D_ | `creds` |
+| `-b`_B_  | `--base-name`_B_  | Write outputs to files named _B_-n | Use the base names of the image files | ✦ |
+| `-c`_C_  | `--creds-dir`_C_  | Look for credentials in directory _C_ | `creds` |
 | `-f`_F_  | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs given on command line |
 | `-l`     | `--list`          | Disply list of known methods | |
 | `-m`_M_  | `--method`_M_     | Use method _M_ | "all" |
 | `-o`_O_  | `--output`_O_     | Write outputs to directory _D_ | Same directories where images are found |  ⚑ |
 | `-u`     | `--given-urls`    | Inputs are URLs, not files or dirs | Assume files and/or directories of files |
-| `-r`_R_  | `--root-name`_R_  | Write outputs to files named _R_-n | Use the base names of the image files | ✦ |
 | `-q`     | `--quiet`         | Don't print messages while working | Be chatty while working |
+| `-A`     | `--no-annot`      | Don't produce annotated image files | Produce annotated images |
 | `-C`     | `--no-color`      | Don't color-code the output | Use colors in the terminal output |
 | `-D`     | `--debug`         | Debugging mode | Normal mode |
 | `-V`     | `--version`       | Print program version info and exit | Do other actions instead |

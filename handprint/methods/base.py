@@ -112,11 +112,3 @@ class TextRecognition(object):
         TRResult named tuple.
         '''
         pass
-
-
-    def boxes(self, result):
-        '''Returns a list of TextBox tuples representing bounding boxes of
-        recognized text in the TRResult named tuple provided in parameter
-        'result'.
-        '''
-        import pdb; pdb.set_trace()

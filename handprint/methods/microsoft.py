@@ -12,7 +12,7 @@ from   time import sleep
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
-from handprint.methods.base import TextRecognition, TRResult
+from handprint.methods.base import TextRecognition, TRResult, TextBox
 from handprint.messages import msg
 from handprint.exceptions import *
 from handprint.debug import log
@@ -176,7 +176,16 @@ class MicrosoftTR(TextRecognition):
             sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
             full_text = '\n'.join(x['text'] for x in sorted_lines)
 
+        # Create our particular box structure for annotations.  The Microsoft
+        # structure is like this: data['recognitionResult']['lines'] contains
+        # a list of dict with keys 'words', 'boundingBox', and 'text'.
+
+        boxes = []
+        for chunk in lines:
+            boxes.append(TextBox(boundingBox = chunk['boundingBox'], text = chunk['text']))
+
         # Put it all together.
         self._results[path] = TRResult(path = path, data = analysis,
-                                       text = full_text, error = None)
+                                       text = full_text, boxes = boxes,
+                                       error = None)
         return self._results[path]

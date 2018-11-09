@@ -16,7 +16,7 @@ import json
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
-from handprint.methods.base import TextRecognition, TRResult
+from handprint.methods.base import TextRecognition, TRResult, TextBox
 from handprint.exceptions import *
 from handprint.debug import log
 
@@ -31,7 +31,7 @@ class GoogleTR(TextRecognition):
     # The following is based on the table of Google Cloud Vision features at
     # https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1p3beta1#type_1
     # as of 2018-10-25.
-    _known_features = ['face_detection', 'landmark_detection', 'crop_hints',
+    _known_features = ['face_detection', 'landmark_detection',
                        'label_detection', 'text_detection',
                        'document_text_detection', 'image_properties']
 
@@ -118,10 +118,39 @@ class GoogleTR(TextRecognition):
                 if __debug__: log('Received result.')
                 result[feature] = MessageToDict(response)
             full_text = ''
+
+            # Extract text and bounding boxes into our format.
+            # Their structure looks like this:
+            #
+            # result['document_text_detection']['fullTextAnnotation']['pages'][0]['blocks'][0].keys()
+            #   --> dict_keys(['boundingBox', 'confidence', 'paragraphs', 'blockType'])
+            #
+            # result['document_text_detection']['fullTextAnnotation']['pages'][0]['blocks'][0]['paragraphs'][0].keys()
+            #   --> dict_keys(['boundingBox', 'words', 'confidence'])
+            #
+            # https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#Block
+
+            full_text = ''
+            boxes = []
             if 'fullTextAnnotation' in result['document_text_detection']:
-                full_text = result['document_text_detection']['fullTextAnnotation']['text']
+                fta = result['document_text_detection']['fullTextAnnotation']
+                full_text = fta['text']
+                for block in fta['pages'][0]['blocks']:
+                    for para in block['paragraphs']:
+                        for word in para['words']:
+                            text = ''
+                            for symbol in word['symbols']:
+                                text += symbol['text']
+                            bb = word['boundingBox']['vertices']
+                            corners = [bb[0]['x'], bb[0]['y'],
+                                       bb[1]['x'], bb[1]['y'],
+                                       bb[2]['x'], bb[2]['y'],
+                                       bb[3]['x'], bb[3]['y']]
+                            boxes.append(TextBox(boundingBox = corners, text = text))
+
             self._results[path] = TRResult(path = path, data = result,
-                                           text = full_text, error = None)
+                                           boxes = boxes, text = full_text,
+                                           error = None)
             return self._results[path]
         except google.api_core.exceptions.PermissionDenied as err:
             text = 'Authentication failure for Google service -- {}'.format(err)

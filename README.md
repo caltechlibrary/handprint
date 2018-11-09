@@ -14,11 +14,11 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 🏁 Log of recent changes
 -----------------------
 
+_Version 0.8.0_: Handprint now generates annotated images by default; they display the extracted text overlaid on the input images.
+
 _Version 0.7.5_: Separate chunks of text in Microsoft output using newlines, rather than spaces, to make the results more comparable to what Google produces.
 
 _Version 0.7.4_: This version improves efficiency by iterating over files/URLs first and then over methods, so that files do not get repeatedly downloaded each time a different method is used.  It also works around some network compatibility problems in different environments, and finally, adds a number of fixes.
-
-_Version 0.6.0_: This version should improve the handling of rate limits by cloud services, and catch more error conditions gracefully.
 
 
 Table of Contents

@@ -36,7 +36,8 @@ def annotated_image(file, text_boxes):
         for polygon in polygons:
             vertices = [(polygon[0][i], polygon[0][i+1]) for i in range(0, len(polygon[0]), 2)]
             text = polygon[1]
-            plt.text(vertices[0][0], vertices[0][1], text, fontsize = 8, va = "top", bbox = props)
+            plt.text(vertices[0][0], vertices[0][1], text, color = 'r',
+                     fontsize = 8, va = "top", bbox = props)
     buf = io.BytesIO()
     plt.savefig(buf, format = 'jpg', dpi = 300, bbox_inches = 'tight', pad_inches = 0)
     buf.seek(0)

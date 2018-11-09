@@ -19,11 +19,13 @@ file "LICENSE" for more information.
 '''
 
 from   halo import Halo
+import io
 import json
 import os
 from   os import path
 import plac
 import requests
+import shutil
 import sys
 from   sys import exit as exit
 try:
@@ -41,13 +43,14 @@ from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.progress import ProgressIndicator
 from handprint.network import network_available, download, disable_ssl_cert_check
 from handprint.files import files_in_directory, alt_extension, handprint_path
-from handprint.files import readable, writable
+from handprint.files import readable, writable, is_url, image_dimensions
 from handprint.files import filename_basename, filename_extension, relative
-from handprint.files import converted_image, reduced_image, image_dimensions
+from handprint.files import converted_image, reduced_image
 from handprint.methods import GoogleTR
 from handprint.methods import MicrosoftTR
 from handprint.exceptions import *
 from handprint.debug import set_debug, log
+from handprint.annotate import annotated_image
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
 disable_ssl_cert_check()
@@ -57,23 +60,25 @@ disable_ssl_cert_check()
 # ......................................................................
 
 @plac.annotations(
-    creds_dir  = ('look for credentials files in directory "D"',     'option', 'c'),
+    base_name  = ('use base name "B" to name downloaded images',     'option', 'b'),
+    creds_dir  = ('look for credentials files in directory "C"',     'option', 'c'),
     from_file  = ('read file names or URLs from file "F"',           'option', 'f'),
     list       = ('print list of known methods',                     'flag',   'l'),
     method     = ('use method "M" (default: "all")',                 'option', 'm'),
     output     = ('write output to directory "O"',                   'option', 'o'),
-    root_name  = ('name downloaded images using root file name "R"', 'option', 'r'),
     given_urls = ('assume have URLs, not files (default: files)',    'flag',   'u'),
     quiet      = ('do not print info messages while working',        'flag',   'q'),
-    no_color   = ('do not color-code terminal output',               'flag',   'C'),
-    debug      = ('turn on debugging (console only)',                'flag',   'D'),
+    no_annot   = ('do not produce annotated images (default: do)',   'flag',   'A'),
+    no_color   = ('do not color-code terminal output (default: do)', 'flag',   'C'),
+    debug      = ('turn on debugging',                               'flag',   'D'),
     version    = ('print version info and exit',                     'flag',   'V'),
     images     = 'if given -u, URLs, else directories and/or files',
 )
 
-def main(creds_dir = 'D', from_file = 'F', list = False, method = 'M',
-         output = 'O', given_urls = False, root_name = 'R', quiet = False,
-         no_color = False, debug = False, version = False, *images):
+def main(base_name = 'B', creds_dir = 'C', from_file = 'F', list = False,
+         method = 'M', output = 'O', given_urls = False, quiet = False,
+         no_annot = False, no_color = False, debug = False, version = False,
+         *images):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") can
 run alternative text recognition methods on images of document pages.
 
@@ -100,7 +105,7 @@ Google, Microsoft and others.  It will write the results to new files placed
 either in the same directories as the original files, or (if given the -o
 option) to the directory indicated by the -o option value (/o on Windows).
 The results will be written in files named after the original files with the
-addition of a string that indicates the service used.  For example, a file
+addition of a string that indicates the method used.  For example, a file
 named "somefile.jpg" will produce
 
   somefile.jpg
@@ -119,6 +124,19 @@ such as Google's API, the service may offer multiple operations and will
 return individual results for different API calls or options; in those cases,
 Handprint combines the results of multiple API calls into a single JSON
 object.
+
+Unless given the do-not-annotate option, -A (/A on Windows), Handprint will
+also generate a copy of the image with superimposed bounding boxes and text
+to show the recognition results.  The annotated images will include the name
+of the service; in other words, the list of files produced by Handprint will
+include
+
+  somefile.google.jpg
+  somefile.microsoft.jpg
+  ...
+
+and so on.  (They are distinguished from the original unannotated image, which
+will be left in somefile.jpg.)
 
 Note that if -u (/u on Windows) is given, then an output directory MUST also
 be specified using the option -o (/o on Windows) because it is not possible
@@ -140,10 +158,13 @@ results of applying the text recognition methods will be, e.g.,
 
   somefile-reduced.jpg
   somefile-reduced.google.txt
+  somefile-reduced.google.jpg
   somefile-reduced.google.json
   somefile-reduced.microsoft.txt
+  somefile-reduced.microsoft.jpg
   somefile-reduced.microsoft.json
   somefile-reduced.amazon.txt
+  somefile-reduced.amazon.jpg
   somefile-reduced.amazon.json
   ...
 
@@ -163,6 +184,9 @@ for warnings or errors.
 If given the -V option (/V on Windows), this program will print version
 information and exit without doing anything else.
 '''
+
+    # Reverse some flags for easier code readability
+    annotate = not no_annot
 
     # Prepare notification methods and hints.
     say = MessageHandlerCLI(not no_color, quiet)
@@ -198,7 +222,7 @@ information and exit without doing anything else.
     if any(item.startswith('-') for item in images):
         exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
 
-    if creds_dir == 'D':
+    if creds_dir == 'C':
         creds_dir = path.join(handprint_path(), 'creds')
     if not readable(creds_dir):
         exit(say.error_text('Directory not readable: {}'.format(creds_dir)))
@@ -224,10 +248,10 @@ information and exit without doing anything else.
             if __debug__: log('Created output directory {}', output)
     if given_urls and not output:
         exit(say.error_text('Must provide an output directory if using URLs.'))
-    if root_name != 'R' and not given_urls:
+    if base_name != 'B' and not given_urls:
         exit(say.error_text('Option {}r can only be used with URLs.'.format(prefix)))
-    if root_name == 'R':
-        root_name = 'document'
+    if base_name == 'B':
+        base_name = 'document'
 
     # Create a list of files to be processed.
     targets = targets_from_arguments(images, from_file, given_urls, say)
@@ -248,7 +272,7 @@ information and exit without doing anything else.
         for index, item in enumerate(targets, start = 1):
             if print_separators:
                 say.msg('='*70, 'dark')
-            run(methods, item, index, output, given_urls, root_name, creds_dir, say)
+            run(methods, item, index, base_name, output, creds_dir, annotate, say)
         if print_separators:
             say.msg('='*70, 'dark')
     except (KeyboardInterrupt, UserCancelled) as err:
@@ -272,14 +296,11 @@ if ON_WINDOWS:
 # Helper functions.
 # ......................................................................
 
-def run(classes, item, index, output_dir, given_urls, root_name, creds_dir, say):
+def run(classes, item, index, base_name, output_dir, creds_dir, annotate, say):
     spinner = ProgressIndicator(say.use_color(), say.be_quiet())
     try:
-        action = 'Downloading' if given_urls else 'Reading'
-        spinner.start('{} {}'.format(action, relative(item)))
-
-        # Download the file if necessary.
-        if given_urls:
+        spinner.start('Starting on {}'.format(relative(item)))
+        if is_url(item):
             # Make sure the URLs point to images.
             if __debug__: log('Testing if URL contains an image: {}', item)
             try:
@@ -292,7 +313,7 @@ def run(classes, item, index, output_dir, given_urls, root_name, creds_dir, say)
                 spinner.fail('Did not find an image at {}'.format(item))
                 return
             fmt = response.headers.get_content_subtype()
-            base = '{}-{}'.format(root_name, index)
+            base = '{}-{}'.format(base_name, index)
             file = path.realpath(path.join(output_dir, base + '.' + fmt))
             error = download(item, file)
             if not error:
@@ -344,14 +365,18 @@ def run(classes, item, index, output_dir, given_urls, root_name, creds_dir, say)
                 spinner.fail(result.error)
                 return
 
-            file_name = path.basename(file)
-            base_path = path.join(dest_dir, file_name)
-            txt_file  = alt_extension(base_path, str(method) + '.txt')
-            json_file = alt_extension(base_path, str(method) + '.json')
+            file_name  = path.basename(file)
+            base_path  = path.join(dest_dir, file_name)
+            txt_file   = alt_extension(base_path, str(method) + '.txt')
+            json_file  = alt_extension(base_path, str(method) + '.json')
+            annot_file = alt_extension(base_path, str(method) + '.jpg')
             spinner.update('Text -> {}'.format(relative(txt_file)))
             save_output(result.text, txt_file)
             spinner.update('All data -> {}'.format(relative(json_file)))
             save_output(json.dumps(result.data), json_file)
+            if annotate:
+                spinner.update('Annotated image -> {}'.format(relative(annot_file)))
+                save_output(annotated_image(file, result.boxes), annot_file)
         spinner.stop('Done with {}'.format(relative(item)))
     except (KeyboardInterrupt, UserCancelled) as err:
         spinner.warn('Interrupted')
@@ -440,9 +465,13 @@ def print_version():
     print('License: {}'.format(handprint.__license__))
 
 
-def save_output(text, file):
-    with open(file, 'w') as f:
-        f.write(text)
+def save_output(data, file):
+    if isinstance(data, str):
+        with open(file, 'w') as f:
+            f.write(data)
+    elif isinstance(data, io.BytesIO):
+        with open(file, 'wb') as f:
+            shutil.copyfileobj(data, f)
 
 
 # Main entry point.

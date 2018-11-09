@@ -122,7 +122,7 @@ def alt_extension(filepath, ext):
 
 def is_url(string):
     '''Return True if the 'string' looks like a URL, False otherwise.'''
-    return re.match(r'^[a-zA-Z]:/', string)
+    return re.match(r'^[a-zA-Z]+:/', string)
 
 
 def relative(file):

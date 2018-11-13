@@ -142,11 +142,14 @@ class GoogleTR(TextRecognition):
                             for symbol in word['symbols']:
                                 text += symbol['text']
                             bb = word['boundingBox']['vertices']
-                            corners = [bb[0]['x'], bb[0]['y'],
-                                       bb[1]['x'], bb[1]['y'],
-                                       bb[2]['x'], bb[2]['y'],
-                                       bb[3]['x'], bb[3]['y']]
-                            boxes.append(TextBox(boundingBox = corners, text = text))
+                            corners = corner_list(bb)
+                            if corners:
+                                boxes.append(TextBox(boundingBox = corners,
+                                                     text = text))
+                            else:
+                                # Something is wrong with the vertex list.
+                                # Skip it and continue.
+                                if __debug__: log('Bad bb for {}: {}', text, bb)
 
             self._results[path] = TRResult(path = path, data = result,
                                            boxes = boxes, text = full_text,
@@ -155,7 +158,7 @@ class GoogleTR(TextRecognition):
         except google.api_core.exceptions.PermissionDenied as err:
             text = 'Authentication failure for Google service -- {}'.format(err)
             raise AuthenticationFailure(text)
-        except KeyboardInterrupt:
+        except KeyboardInterrupt as err:
             raise
         except Exception as err:
             if isinstance(err, KeyError):
@@ -165,4 +168,27 @@ class GoogleTR(TextRecognition):
                 raise KeyboardInterrupt
             else:
                 text = 'Error: failed to convert "{}": {}'.format(path, err)
-                return TRResult(path = path, data = {}, text = '', error = text)
+                return TRResult(path = path, data = {}, boxes = [],
+                                text = '', error = text)
+
+
+# Miscellaenous utilities
+# .............................................................................
+
+# Grrrr.  The Google API can return incomplete vertices for a bounding box.
+# In one of our sample images ("pbm-2421-PBM_3_1_1_0016"), I get this result:
+# [{'x': 2493}, {'x': 2538, 'y': 1}, {'x': 2535, 'y': 154}, {'x': 2490, 'y': 153}]
+# So, we have to test to make sure both 'x' and 'y' keys are in every vertex.
+
+def corner_list(bb_json):
+    '''Takes a boundingBox value from Google vision's JSON output and returns
+    a condensed version, in the form [x y x y x y x y], with the first x, y
+    pair representing the upper left corner.'''
+    corners = []
+    for index in [0, 1, 2, 3]:
+        if 'x' in bb_json[index] and 'y' in bb_json[index]:
+            corners.append(bb_json[index]['x'])
+            corners.append(bb_json[index]['y'])
+        else:
+            return []
+    return corners

@@ -94,7 +94,7 @@ def files_in_directory(dir, extensions = None):
         if path.isfile(full_path) and readable(full_path):
             if extensions and filename_extension(item) in extensions:
                 files.append(full_path)
-    return files
+    return sorted(files)
 
 
 def filename_basename(file):

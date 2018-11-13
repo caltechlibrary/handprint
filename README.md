@@ -46,15 +46,9 @@ Table of Contents
 ☀ Introduction
 -----------------------------
 
-Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the use of alternative optical character recognition (OCR) and handwritten text recognition (HTR) methods on documents from the [Caltech Archives](http://archives.caltech.edu).  Tests include the use of Google's OCR/HTR capabilities in their [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr) and [Tesseract](https://en.wikipedia.org/wiki/Tesseract_(software)).
+Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the use of alternative optical character recognition (OCR) and handwritten text recognition (HTR) methods on documents from the [Caltech Archives](http://archives.caltech.edu).  Tests include the use of Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), and others.
 
-Here is a screen cast to demonstrate. Click on the following image:
-
-<p align="center">
-  <a href="https://asciinema.org/a/hDWutEH69LrbzcSAxfLwQWFhI"><img src=".graphics/handprint-asciinema.png" alt="Screencast of simple Handprint demo"></a>
-</p>
-
-Handprint can generate versions of the input images with recognized text overlaid over them, for easier visualization of the results.  The following is an example:
+Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, for easier visualization of the results.  The following is an example:
 
 <p align="center">
     <img width="700px" src=".graphics/sample-annotated-image.png">
@@ -125,7 +119,13 @@ Getting one of these files is unfortunately a complicated process.  It's summari
 ▶︎ Running Handprint
 ------------------
 
-Handprint comes with a single command-line interface program called `handprint`.  If the installation steps described above proceed successfully, it should end up installed in a location where software is normally installed on your computer.   Running Handprint from a terminal shell should be as simple as type this in a shell:
+Handprint comes with a single command-line interface program called `handprint`.  Here is a screen cast to give a sense for what it's like to run Handprint. Click on the following image:
+
+<p align="center">
+  <a href="https://asciinema.org/a/hDWutEH69LrbzcSAxfLwQWFhI"><img src=".graphics/handprint-asciinema.png" alt="Screencast of simple Handprint demo"></a>
+</p>
+
+The `handprint` command-line program should end up installed in a location where software is normally installed on your computer, if the installation steps described in the previous section proceed successfully.  Running Handprint from a terminal shell then should be as simple as running any other shell command on your system:
 
 ```bash
 handprint -h
@@ -137,7 +137,7 @@ If that fails for some reason, you can try instead to `cd` to the directory wher
 bin/handprint -h
 ```
 
-Finally, as a third alternative, you should be able to run Handprint from anywhere using the normal approach to running Python modules:
+Finally, as a third alternative, you should be able to run Handprint from anywhere using the normal approach for running Python modules:
 
 ```bash
 python3 -m handprint -h
@@ -148,7 +148,7 @@ The `-h` option (`/h` on Windows) will make `handprint` display some help inform
 
 ### File formats recognized
 
-Whether the images are stored locally or accessible via URLs, each image should be a single page of a document in which text should be recognized.  The accepted by the cloud services at this time are JPEG, PNG, GIF, and BMP only, but Handprint can convert a few others formats into JPEG if necessary.  Specifically, Handprint also handles JPEG 2000 and TIFF formats, which it converts to JPEG before sending to the different methods for text recognition.
+Whether the images are stored locally or accessible via URLs, each image should be a single page of a document in which text should be recognized.  Handprint will read a number of different formats, and if the files are not already in the most common formats accepted by the cloud services (which at this time are JPEG, PNG, GIF, and BMP), Handprint will convert them automatically to JPEG before proceeding.
 
 
 ### Supported HTR/OCR methods
@@ -180,7 +180,7 @@ handprint -c ~/handprint-credentials /path/to/images
 
 ### Files versus URLs
 
-Handprint can work both with files and with URLs.  By default, arguments are interpreted as being files or directories of files, but if given the `-u` option (`/u` on Windows), the arguments are interpreted instead as URLs pointing to images.
+Handprint can work both with files and with URLs.  By default, arguments are interpreted as being files or directories of files, but if given the `-u` option (`/u` on Windows), the arguments are interpreted instead as URLs pointing to images located on a network server.
 
 A challenge with using URLs is how to name the files that Handprint writes for the results.  Some CMS systems store content using opaque schemes that provide no clear names in the URLs, making it impossible for a software tool such as Handprint to guess what file name would make sense to use for local storage.  Worse, some systems create extremely long URLs, making it impractical to use the full URL itself as the file name.  For example, the following is a real URL pointing to an image in Caltech Archives today:
 
@@ -250,7 +250,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-f`_F_  | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs given on command line |
 | `-l`     | `--list`          | Display list of known methods | |
 | `-m`_M_  | `--method`_M_     | Use method _M_ | "all" |
-| `-o`_O_  | `--output`_O_     | Write outputs to directory _D_ | Same directories where images are found |  ⚑ |
+| `-o`_O_  | `--output`_O_     | Write outputs to directory _O_ | Same directories where images are found |  ⚑ |
 | `-u`     | `--given-urls`    | Inputs are URLs, not files or dirs | Assume files and/or directories of files |
 | `-q`     | `--quiet`         | Don't print messages while working | Be chatty while working |
 | `-A`     | `--no-annot`      | Don't produce annotated image files | Produce annotated images |
@@ -275,6 +275,12 @@ Handprint tries to gather all the data that each service returns for text recogn
 If you find an issue, please submit it in [the GitHub issue tracker](https://github.com/caltechlibrary/handprint/issues) for this repository.
 
 
+★ Do you like it?
+------------------
+
+If you like this software, don't forget to give this repo a star on GitHub to show your support!
+
+
 ☺︎ Acknowledgments
 -----------------------
 
@@ -287,7 +293,9 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [halo](https://github.com/ManrajGrover/halo) &ndash; busy-spinners for Python command-line programs
 * [httplib2](https://github.com/httplib2/httplib2) &ndash; a comprehensive HTTP client library
 * [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
+* [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
 * [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library
+* [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
 * [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`

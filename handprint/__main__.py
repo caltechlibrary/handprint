@@ -404,11 +404,18 @@ def targets_from_arguments(images, from_file, given_urls, say):
         targets = images
     else:
         # We were given files and/or directories.  Look for image files.
-        for item in filter_urls(images, say):
+        # Ignore files that appear to be the previous output of Handprint.
+        # These are files that end in, e.g., ".google.jpg"
+        handprint_endings = ['.' + x + '.jpg' for x in KNOWN_METHODS.keys()]
+        non_urls = filter_urls(images, say)
+        non_urls = filter_endings(non_urls, handprint_endings)
+        for item in non_urls:
             if path.isfile(item) and filename_extension(item) in ACCEPTED_FORMATS:
                 targets.append(item)
             elif path.isdir(item):
-                targets += files_in_directory(item, extensions = ACCEPTED_FORMATS)
+                files = files_in_directory(item, extensions = ACCEPTED_FORMATS)
+                files = filter_endings(files, handprint_endings)
+                targets += files
             else:
                 say.warn('"{}" not a file or directory'.format(item))
     return targets
@@ -422,6 +429,17 @@ def filter_urls(item_list, say):
             continue
         else:
             results.append(item)
+    return results
+
+
+def filter_endings(item_list, endings):
+    if not endings:
+        return item_list
+    if not item_list:
+        return []
+    results = item_list
+    for ending in endings:
+        results = list(filter(lambda name: ending not in name.lower(), results))
     return results
 
 

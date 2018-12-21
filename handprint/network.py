@@ -5,10 +5,13 @@ network.py: miscellaneous network utilities for Handprint.
 import http.client
 from   http.client import responses as http_responses
 import requests
+from   requests.packages.urllib3.exceptions import InsecureRequestWarning
 from   time import sleep
 import ssl
 import urllib
 from   urllib import request
+import urllib3
+import warnings
 
 import handprint
 from   handprint.files import rename_existing
@@ -32,34 +35,75 @@ def network_available():
         r.close()
 
 
-def download(url, local_destination):
-    '''Download the 'url' to the file 'local_destination'.  If an error
-    occurs, returns a string describing the reason for failure; otherwise,
-    returns False to indicate no error occurred.
-    '''
+def timed_request(get_or_post, url, **kwargs):
+    # Wrap requests.get() with a timeout.
+    # 'verify' means whether to perform HTTPS certificate verification.
+    http_method = requests.get if get_or_post == 'get' else requests.post
+    with warnings.catch_warnings():
+        # When verify = True, the underlying urllib3 library used by the
+        # Python requests module will issue a warning about unverified HTTPS
+        # requests.  If we don't care, then the warnings are a constant
+        # annoyance.  See also this for a discussion:
+        # https://github.com/kennethreitz/requests/issues/2214
+        warnings.simplefilter("ignore", InsecureRequestWarning)
+        return http_method(url, timeout = 10, verify = False, **kwargs)
+
+
+def download_file(url, output_file, user = None, pswd = None, spinner = None):
+    if spinner:
+        spinner.update('Downloading {}'.format(url))
     try:
-        if __debug__: log('Attempting to get {}', url)
-        req = requests.get(url, stream = True)
+        download(url, user, pswd, output_file)
+        return True
+    except (NoContent, ServiceFailure, AuthenticationFailure) as ex:
+        if spinner:
+            spinner.fail('Failed to download {}: {}'.format(url, str(ex)))
+    return False
+
+
+def download(url, user, password, local_destination, recursing = 0):
+    '''Download the 'url' to the file 'local_destination'.'''
+    def addurl(text):
+        return (text + ' for {}').format(url)
+
+    try:
+        req = timed_request('get', url, stream = True, auth = (user, password))
     except requests.exceptions.ConnectionError as ex:
-        if ex.args and isinstance(ex.args[0], urllib3.exceptions.MaxRetryError):
-            return 'Unable to resolve destination host'
+        if recursing >= _MAX_RECURSIVE_CALLS:
+            raise NetworkFailure(addurl('Too many connection errors'))
+        arg0 = ex.args[0]
+        if isinstance(arg0, urllib3.exceptions.MaxRetryError):
+            if network_available():
+                raise NetworkFailure(addurl('Unable to resolve host'))
+            else:
+                raise NetworkFailure(addurl('Lost network connection with server'))
+        elif (isinstance(arg0, urllib3.exceptions.ProtocolError)
+              and arg0.args and isinstance(args0.args[1], ConnectionResetError)):
+            if __debug__: log('download() got ConnectionResetError; will recurse')
+            sleep(1)                    # Sleep a short time and try again.
+            recursing += 1
+            download(url, user, password, local_destination, recursing)
         else:
-            return str(ex)
+            raise NetworkFailure(str(ex))
+    except requests.exceptions.ReadTimeout as ex:
+        if network_available():
+            raise ServiceFailure(addurl('Timed out reading data from server'))
+        else:
+            raise NetworkFailure(addurl('Timed out reading data over network'))
     except requests.exceptions.InvalidSchema as ex:
-        return 'Unsupported network protocol'
+        raise NetworkFailure(addurl('Unsupported network protocol'))
     except Exception as ex:
-        return str(ex)
+        raise
 
     # Interpret the response.
     code = req.status_code
     if code == 202:
         # Code 202 = Accepted, "received but not yet acted upon."
-        if __debug__: log('Pausing & retrying')
         sleep(1)                        # Sleep a short time and try again.
-        return download(url, local_destination)
+        recursing += 1
+        if __debug__: log('Calling download() recursively for http code 202')
+        download(url, user, password, local_destination, recursing)
     elif 200 <= code < 400:
-        if __debug__: log('Downloading data to {}', local_destination)
-        rename_existing(local_destination)
         # The following originally started out as the code here:
         # https://stackoverflow.com/a/16696317/743730
         with open(local_destination, 'wb') as f:
@@ -67,26 +111,25 @@ def download(url, local_destination):
                 if chunk:
                     f.write(chunk)
         req.close()
-        return False                    # No error.
     elif code in [401, 402, 403, 407, 451, 511]:
-        return "Access is forbidden or requires authentication"
+        raise AuthenticationFailure(addurl('Access is forbidden'))
     elif code in [404, 410]:
-        return "No content found at this location"
+        raise NoContent(addurl('No content found'))
     elif code in [405, 406, 409, 411, 412, 414, 417, 428, 431, 505, 510]:
-        return "Server returned code {} -- please report this".format(code)
+        raise InternalError(addurl('Server returned code {}'.format(code)))
     elif code in [415, 416]:
-        return "Server rejected the request"
+        raise ServiceFailure(addurl('Server rejected the request'))
     elif code == 429:
-        return "Server blocking further requests due to rate limits"
+        raise RateLimitExceeded('Server blocking further requests due to rate limits')
     elif code == 503:
-        return "Server is unavailable -- try again later"
+        raise ServiceFailure('Server is unavailable -- try again later')
     elif code in [500, 501, 502, 506, 507, 508]:
-        return "Internal server error"
+        raise ServiceFailure(addurl('Internal server error (HTTP code {})'.format(code)))
     else:
-        return "Unable to resolve URL"
+        raise NetworkFailure('Unable to resolve {}'.format(url))
 
 
-def net(get_or_post, url, polling = False, **kwargs):
+def net(get_or_post, url, polling = False, recursing = 0, **kwargs):
     '''Gets or posts the 'url' with optional keyword arguments provided.
     Returns a tuple of (response, exception), where the first element is
     the response from the get or post http call, and the second element is
@@ -97,17 +140,34 @@ def net(get_or_post, url, polling = False, **kwargs):
     If keyword 'polling' is True, certain statuses like 404 are ignored and
     the response is returned; otherwise, they are considered errors.
     '''
+    def addurl(text):
+        return (text + ' for {}').format(url)
+
+    req = None
     try:
         if __debug__: log('HTTP {} {}', get_or_post, url)
-        http_method = requests.get if get_or_post == 'get' else requests.post
-        req = http_method(url, **kwargs)
+        req = timed_request(get_or_post, url, **kwargs)
     except requests.exceptions.ConnectionError as ex:
-        if ex.args and isinstance(ex.args[0], urllib3.exceptions.MaxRetryError):
-            return (req, NetworkFailure('Unable to resolve destination host'))
+        if recursing >= _MAX_RECURSIVE_CALLS:
+            return (req, NetworkFailure(addurl('Too many connection errors')))
+        arg0 = ex.args[0]
+        if isinstance(arg0, urllib3.exceptions.MaxRetryError):
+            return (req, NetworkFailure(addurl('Unable to resolve host')))
+        elif (isinstance(arg0, urllib3.exceptions.ProtocolError)
+              and arg0.args and isinstance(args0.args[1], ConnectionResetError)):
+            if __debug__: log('net() got ConnectionResetError; will recurse')
+            sleep(1)                    # Sleep a short time and try again.
+            recursing += 1
+            return net(get_or_post, url, polling, recursing, **kwargs)
         else:
             return (req, NetworkFailure(str(ex)))
+    except requests.exceptions.ReadTimeout as ex:
+        if network_available():
+            return (req, ServiceFailure(addurl('Timed out reading data from server')))
+        else:
+            return (req, NetworkFailure(addurl('Timed out reading data over network')))
     except requests.exceptions.InvalidSchema as ex:
-        return (req, NetworkFailure('Unsupported network protocol'))
+        return (req, NetworkFailure(addurl('Unsupported network protocol')))
     except Exception as ex:
         return (req, ex)
 
@@ -115,25 +175,25 @@ def net(get_or_post, url, polling = False, **kwargs):
     code = req.status_code
     error = None
     if code in [404, 410] and not polling:
-        error = NetworkFailure("No content found at this location")
+        error = NoContent(addurl("No content found"))
     elif code in [401, 402, 403, 407, 451, 511]:
-        error = AuthenticationFailure("Access is forbidden or requires authentication")
+        error = AuthenticationFailure(addurl('Access is forbidden'))
     elif code in [405, 406, 409, 411, 412, 414, 417, 428, 431, 505, 510]:
-        error = ServiceFailure("Server sent {} -- please report this".format(code))
+        error = InternalError(addurl('Server returned code {}'.format(code)))
     elif code in [415, 416]:
-        error = ServiceFailure("Server rejected the request")
+        error = ServiceFailure(addurl('Server rejected the request'))
     elif code == 429:
-        error = RateLimitExceeded("Server blocking further requests due to rate limits") 
+        error = RateLimitExceeded('Server blocking further requests due to rate limits')
     elif code == 503:
-        error = ServiceFailure("Server is unavailable -- try again later")
+        error = ServiceFailure('Server is unavailable -- try again later')
     elif code in [500, 501, 502, 506, 507, 508]:
-        error = ServiceFailure("Internal server error")
+        error = ServiceFailure('Internal server error (HTTP code {})'.format(code))
     elif not (200 <= code < 400):
-        error = NetworkFailure("Unable to resolve URL")
+        error = NetworkFailure("Unable to resolve {}".format(url))
     return (req, error)
 
-# Next code originally from https://stackoverflow.com/a/39779918/743730
 
+# Next code originally from https://stackoverflow.com/a/39779918/743730
 def disable_ssl_cert_check():
     requests.packages.urllib3.disable_warnings()
     try:

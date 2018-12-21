@@ -14,7 +14,9 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 🏁 Log of recent changes
 -----------------------
 
-_Version 0.8.2_: This version fixes some internal bugs, does a little code refactoring, and introdcues the use of a separate [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) file.
+_Version 0.8.3_: Internal code refactoring to improve error detection when downloading files.
+
+_Version 0.8.2_: This version fixes some internal bugs, does a little code refactoring, and adds a separate [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) file.
 
 The file [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) contains a more complete change log that includes information about previous releases.
 

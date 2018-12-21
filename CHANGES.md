@@ -4,6 +4,12 @@ Change log for eprints2bags
 Version 0.8.2
 -------------
 
+* Refactoring of some internal network file download code.
+
+
+Version 0.8.2
+-------------
+
 * Fix internal bug in file download code.
 * Start separate file [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) for the change log.
 

@@ -208,8 +208,8 @@ def converted_image(file, to_format):
             im.save(dest_file, canonical_format_name(to_format))
             if __debug__: log('Saved converted image to {}', dest_file)
             return (dest_file, None)
-        except Exception as err:
-            return (None, str(err))
+        except Exception as ex:
+            return (None, str(ex))
 
 
 def reduced_image(file, max_dimensions):
@@ -235,8 +235,8 @@ def reduced_image(file, max_dimensions):
             resized.save(dest_file)
             if __debug__: log('Saved converted image to {}', dest_file)
             return (dest_file, None)
-        except Exception as err:
-            return (None, str(err))
+        except Exception as ex:
+            return (None, str(ex))
 
 
 def canonical_format_name(format):

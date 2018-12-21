@@ -275,14 +275,14 @@ information and exit without doing anything else.
             run(methods, item, index, base_name, output, creds_dir, annotate, say)
         if print_separators:
             say.msg('='*70, 'dark')
-    except (KeyboardInterrupt, UserCancelled) as err:
+    except (KeyboardInterrupt, UserCancelled) as ex:
         exit(say.info_text('Quitting.'))
-    except ServiceFailure as err:
-        exit(say.error_text(str(err)))
-    except Exception as err:
+    except ServiceFailure as ex:
+        exit(say.error_text(str(ex)))
+    except Exception as ex:
         if debug:
             import pdb; pdb.set_trace()
-        exit(say.error_text('{}\n{}'.format(str(err), traceback.format_exc())))
+        exit(say.error_text('{}\n{}'.format(str(ex), traceback.format_exc())))
     say.info('Done.')
 
 
@@ -305,9 +305,9 @@ def run(classes, item, index, base_name, output_dir, creds_dir, annotate, say):
             if __debug__: log('Testing if URL contains an image: {}', item)
             try:
                 response = request.urlopen(item)
-            except Exception as err:
-                if __debug__: log('Network access resulted in error: {}', str(err))
-                spinner.fail('Skipping URL due to error: {}'.format(err))
+            except Exception as ex:
+                if __debug__: log('Network access resulted in error: {}', str(ex))
+                spinner.fail('Skipping URL due to error: {}'.format(ex))
                 return
             if response.headers.get_content_maintype() != 'image':
                 spinner.fail('Did not find an image at {}'.format(item))
@@ -356,7 +356,7 @@ def run(classes, item, index, base_name, output_dir, creds_dir, annotate, say):
                 color('and waiting for response', 'info', say.use_color())))
             try:
                 result = method.result(file)
-            except RateLimitExceeded as err:
+            except RateLimitExceeded as ex:
                 time_passed = timer() - last_time
                 if time_passed < 1/method.max_rate():
                     spinner.warn('Pausing due to rate limits')
@@ -378,13 +378,13 @@ def run(classes, item, index, base_name, output_dir, creds_dir, annotate, say):
                 spinner.update('Annotated image -> {}'.format(relative(annot_file)))
                 save_output(annotated_image(file, result.boxes), annot_file)
         spinner.stop('Done with {}'.format(relative(item)))
-    except (KeyboardInterrupt, UserCancelled) as err:
+    except (KeyboardInterrupt, UserCancelled) as ex:
         spinner.warn('Interrupted')
         raise
-    except AuthenticationFailure as err:
-        spinner.fail('Unable to continue using {}: {}'.format(method, err))
+    except AuthenticationFailure as ex:
+        spinner.fail('Unable to continue using {}: {}'.format(method, ex))
         return
-    except Exception as err:
+    except Exception as ex:
         spinner.fail(say.error_text('Stopping due to a problem'))
         raise
 

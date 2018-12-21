@@ -40,15 +40,15 @@ def download(url, local_destination):
     try:
         if __debug__: log('Attempting to get {}', url)
         req = requests.get(url, stream = True)
-    except requests.exceptions.ConnectionError as err:
-        if err.args and isinstance(err.args[0], urllib3.exceptions.MaxRetryError):
+    except requests.exceptions.ConnectionError as ex:
+        if ex.args and isinstance(ex.args[0], urllib3.exceptions.MaxRetryError):
             return 'Unable to resolve destination host'
         else:
-            return str(err)
-    except requests.exceptions.InvalidSchema as err:
+            return str(ex)
+    except requests.exceptions.InvalidSchema as ex:
         return 'Unsupported network protocol'
-    except Exception as err:
-        return str(err)
+    except Exception as ex:
+        return str(ex)
 
     # Interpret the response.
     code = req.status_code

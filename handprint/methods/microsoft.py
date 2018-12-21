@@ -33,8 +33,8 @@ class MicrosoftTR(TextRecognition):
         if __debug__: log('Getting credentials from {}', credentials_dir)
         try:
             self._credentials = MicrosoftCredentials(credentials_dir).creds()
-        except Exception as err:
-            raise AuthenticationFailure(str(err))
+        except Exception as ex:
+            raise AuthenticationFailure(str(ex))
 
 
     def name(self):

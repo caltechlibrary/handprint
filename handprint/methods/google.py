@@ -49,8 +49,8 @@ class GoogleTR(TextRecognition):
         if __debug__: log('Getting credentials from {}', credentials_dir)
         try:
             GoogleCredentials(credentials_dir)
-        except Exception as err:
-            raise AuthenticationFailure(str(err))
+        except Exception as ex:
+            raise AuthenticationFailure(str(ex))
 
 
     def name(self):
@@ -155,19 +155,19 @@ class GoogleTR(TextRecognition):
                                            boxes = boxes, text = full_text,
                                            error = None)
             return self._results[path]
-        except google.api_core.exceptions.PermissionDenied as err:
-            text = 'Authentication failure for Google service -- {}'.format(err)
+        except google.api_core.exceptions.PermissionDenied as ex:
+            text = 'Authentication failure for Google service -- {}'.format(ex)
             raise AuthenticationFailure(text)
-        except KeyboardInterrupt as err:
+        except KeyboardInterrupt as ex:
             raise
-        except Exception as err:
-            if isinstance(err, KeyError):
+        except Exception as ex:
+            if isinstance(ex, KeyError):
                 # Can happen if you control-C in the middle of the Google call.
                 # Result is "Exception ignored in: 'grpc._cython.cygrpc._next'"
                 # printed to the terminal and we end up here.
                 raise KeyboardInterrupt
             else:
-                text = 'Error: failed to convert "{}": {}'.format(path, err)
+                text = 'Error: failed to convert "{}": {}'.format(path, ex)
                 return TRResult(path = path, data = {}, boxes = [],
                                 text = '', error = text)
 

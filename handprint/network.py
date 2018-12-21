@@ -1,5 +1,5 @@
 '''
-network.py: miscellaneous network utilities for Holdit.
+network.py: miscellaneous network utilities for Handprint.
 '''
 
 import http.client
@@ -15,6 +15,9 @@ from   handprint.files import rename_existing
 from   handprint.debug import log
 from   handprint.exceptions import *
 
+
+# Main functions.
+# .............................................................................
 
 def network_available():
     '''Return True if it appears we have a network connection, False if not.'''
@@ -53,7 +56,7 @@ def download(url, local_destination):
         # Code 202 = Accepted, "received but not yet acted upon."
         if __debug__: log('Pausing & retrying')
         sleep(1)                        # Sleep a short time and try again.
-        return download_url(url, local_destination)
+        return download(url, local_destination)
     elif 200 <= code < 400:
         if __debug__: log('Downloading data to {}', local_destination)
         rename_existing(local_destination)

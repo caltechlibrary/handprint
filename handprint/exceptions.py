@@ -22,6 +22,18 @@ class NetworkFailure(Exception):
     '''Unrecoverable problem involving network operations.'''
     pass
 
+class BadURL(Exception):
+    '''Incorrect or malformed URL.'''
+    pass
+
+class NoContent(Exception):
+    '''No content found at the given location.'''
+    pass
+
+class CorruptedContent(Exception):
+    '''Content corruption has been detected.'''
+    pass
+
 class AuthenticationFailure(Exception):
     '''Problem obtaining or using authentication credentials.'''
     pass
@@ -35,5 +47,5 @@ class RateLimitExceeded(Exception):
     pass
 
 class InternalError(Exception):
-    '''Unrecoverable problem involving Handprint itself.'''
+    '''Unrecoverable problem involving eprints2bags itself.'''
     pass

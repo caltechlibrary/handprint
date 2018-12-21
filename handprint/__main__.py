@@ -41,7 +41,7 @@ import handprint
 from handprint.constants import ON_WINDOWS, ACCEPTED_FORMATS, KNOWN_METHODS
 from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.progress import ProgressIndicator
-from handprint.network import network_available, download, disable_ssl_cert_check
+from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.files import files_in_directory, alt_extension, handprint_path
 from handprint.files import readable, writable, is_url, image_dimensions
 from handprint.files import filename_basename, filename_extension, relative
@@ -315,11 +315,7 @@ def run(classes, item, index, base_name, output_dir, creds_dir, annotate, say):
             fmt = response.headers.get_content_subtype()
             base = '{}-{}'.format(base_name, index)
             file = path.realpath(path.join(output_dir, base + '.' + fmt))
-            error = download(item, file)
-            if not error:
-                spinner.update('Wrote contents to {}'.format(relative(file)))
-            else:
-                spinner.fail('Failed to download {}: {}'.format(item, error))
+            if not download_file(item, file, spinner = spinner):
                 return
             url_file = path.realpath(path.join(output_dir, base + '.url'))
             with open(url_file, 'w') as f:

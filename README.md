@@ -31,7 +31,7 @@ Table of Contents
       * [<em>Google</em>](#google)
 * [Running Handprint](#︎-running-handprint)
    * [File formats recognized](#file-formats-recognized)
-   * [Supported HTR/OCR methods](#supported-htrocr-methods)
+   * [Supported HTR/OCR services](#supported-htrocr-services)
    * [Service account credentials](#service-account-credentials)
    * [Files versus URLs](#files-versus-urls)
    * [Command line options](#command-line-options)
@@ -43,7 +43,7 @@ Table of Contents
 ☀ Introduction
 -----------------------------
 
-Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the use of alternative optical character recognition (OCR) and handwritten text recognition (HTR) methods on documents from the [Caltech Archives](http://archives.caltech.edu).  Tests include the use of Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), and others.
+Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the use of alternative optical character recognition (OCR) and handwritten text recognition (HTR) services on documents from the [Caltech Archives](http://archives.caltech.edu).  Tests include the use of Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), and others.
 
 Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, for easier visualization of the results.  The following is an example:
 
@@ -148,18 +148,18 @@ The `-h` option (`/h` on Windows) will make `handprint` display some help inform
 Whether the images are stored locally or accessible via URLs, each image should be a single page of a document in which text should be recognized.  Handprint will read a number of different formats, and if the files are not already in the most common formats accepted by the cloud services (which at this time are JPEG, PNG, GIF, and BMP), Handprint will convert them automatically to JPEG before proceeding.
 
 
-### Supported HTR/OCR methods
+### Supported HTR/OCR services
 
-Handprint can contact more than one cloud service for OCR and HTR.  You can use the `-l` option (`/l` on Windows) to make Handprint display a list of the methods currently implemented:
+Handprint can contact more than one cloud service for OCR and HTR.  You can use the `-l` option (`/l` on Windows) to make Handprint display a list of the services currently implemented:
 
 ```
 # handprint -l
-Known methods (for use as values for option -m):
+Known services (for use as values for option -m):
    microsoft
    google
 ```
 
-By default, Handprint will run each known method in turn.  To invoke only one specific method, use the `-m` option (`/m` on Windows) followed by a method name:
+By default, Handprint will run each known service in turn.  To invoke only one specific service, use the `-m` option (`/m` on Windows) followed by a service name:
 
 ```bash
 handprint -m microsoft /path/to/images
@@ -233,7 +233,7 @@ Finally, note that providing URLs on the command line can be problematic due to 
 
 ### Annotated images
 
-By default, Handprint will create copies of the images in files named with the method extension (e.g., `document-1.microsoft.jpg`) and write overlays of the text and bounding boxes extracted by the methods.  This makes it possible to see the text extracted directly over the source image.  Generating these annotated images takes a little bit of time and if they are not necessary for your purposes, you can turn off annotation with the `-A` option (`/A` on Windows).
+By default, Handprint will create copies of the images in files named with the service extension (e.g., `document-1.microsoft.jpg`) and write overlays of the text and bounding boxes extracted by the services.  This makes it possible to see the text extracted directly over the source image.  Generating these annotated images takes a little bit of time and if they are not necessary for your purposes, you can turn off annotation with the `-A` option (`/A` on Windows).
 
 
 ### Command line options
@@ -245,9 +245,9 @@ The following table summarizes all the command line options available. (Note: on
 | `-b`_B_  | `--base-name`_B_  | Write outputs to files named _B_-n | Use the base names of the image files | ✦ |
 | `-c`_C_  | `--creds-dir`_C_  | Look for credentials in directory _C_ | `creds` |
 | `-f`_F_  | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs given on command line |
-| `-l`     | `--list`          | Display list of known methods | |
-| `-m`_M_  | `--method`_M_     | Use method _M_ | "all" |
+| `-l`     | `--list`          | Display list of known services | |
 | `-o`_O_  | `--output`_O_     | Write outputs to directory _O_ | Same directories where images are found |  ⚑ |
+| `-s`_S_  | `--service`_S_    | Use recognition service _S_ | "all" |
 | `-u`     | `--given-urls`    | Inputs are URLs, not files or dirs | Assume files and/or directories of files |
 | `-q`     | `--quiet`         | Don't print messages while working | Be chatty while working |
 | `-A`     | `--no-annot`      | Don't produce annotated image files | Produce annotated images |

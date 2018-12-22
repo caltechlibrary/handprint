@@ -218,7 +218,7 @@ document-3.microsoft.json
 ...
 ```
 
-The base name `image` can be changed using the `-r` option (`/r` on Windows).  For example, running Handprint with the option `-r einstein` will cause the outputs to be named `einstein-1.jpeg`, `einstein-1.url`, etc. (assuming, for the sake of this example, that the image file format is `jpeg`).
+The base name `document` can be changed using the `-b` option (`/b` on Windows).  For example, running Handprint with the option `-b einstein` will cause the outputs to be named `einstein-1.jpeg`, `einstein-1.url`, etc. (assuming, for the sake of this example, that the image file format is `jpeg`).
 
 The use of the `-u` option also **requires the use of the `-o` option** (`/o` on Windows) to tell Handprint where to store the results.  This is a consequence of the fact that, without being provided with files or directories on the local disk, Handprint can't infer where to write its output.
 

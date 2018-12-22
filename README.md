@@ -17,8 +17,6 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 _Version 0.9.0_: The user interface has been changed.  The command-line option `-m` is now `-s`, and "methods" are now known as "services", to avoid conflicting interpretation of what a "method" is in the context of software.  There has been some internal code refactoring as well.
 A number of additional images for testing are now available in the [tests](tests) subdirectory.
 
-_Version 0.8.2_: This version fixes some internal bugs, does a little code refactoring, and adds a separate [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) file.
-
 The file [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) contains a more complete change log that includes information about previous releases.
 
 

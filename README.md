@@ -9,12 +9,13 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-0.8.3-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-0.9.0-b44e88.svg?style=flat-square)](http://shields.io)
 
 🏁 Log of recent changes
 -----------------------
 
-_Version 0.8.3_: Internal code refactoring to improve error detection when downloading files.
+_Version 0.9.0_: The user interface has been changed.  The command-line option `-m` is now `-s`, and "methods" are now known as "services", to avoid conflicting interpretation of what a "method" is in the context of software.  There has been some internal code refactoring as well.
+A number of additional images for testing are now available in the [tests](tests) subdirectory.
 
 _Version 0.8.2_: This version fixes some internal bugs, does a little code refactoring, and adds a separate [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) file.
 

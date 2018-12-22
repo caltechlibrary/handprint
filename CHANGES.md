@@ -1,10 +1,12 @@
-Change log for eprints2bags
-===========================
+Change log for Handprint
+========================
 
-Version 0.8.2
+Version 0.9.0
 -------------
 
-* Refactoring of some internal network file download code.
+* **Backward-incompatible change**: command-line option `-m` is now `-s` and "methods" are now known as "services", to avoid conflicting interpretation of what a "method" is in the context of software.  Internal object classes have likewise been changed.
+* Refactor some internal network code.
+* Add a number of additional images for testing.
 
 
 Version 0.8.2

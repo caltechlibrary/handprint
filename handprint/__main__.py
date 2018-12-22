@@ -1,6 +1,6 @@
 '''Handprint: HANDwritten Page RecognitIoN Test for Caltech Archives.
 
-This project uses alternative text recognition methods on documents from the
+This project uses alternative text recognition services on documents from the
 Caltech Archives (http://archives.caltech.edu).  Tests include the use of
 Google's OCR capabilities in their Google Cloud Vision API
 (https://cloud.google.com/vision/docs/ocr), Microsoft's Azure, and others.
@@ -38,7 +38,7 @@ import traceback
 from   urllib import request
 
 import handprint
-from handprint.constants import ON_WINDOWS, ACCEPTED_FORMATS, KNOWN_METHODS
+from handprint.constants import ON_WINDOWS, ACCEPTED_FORMATS, KNOWN_SERVICES
 from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.progress import ProgressIndicator
 from handprint.network import network_available, download_file, disable_ssl_cert_check
@@ -46,8 +46,8 @@ from handprint.files import files_in_directory, alt_extension, handprint_path
 from handprint.files import readable, writable, is_url, image_dimensions
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import converted_image, reduced_image
-from handprint.methods import GoogleTR
-from handprint.methods import MicrosoftTR
+from handprint.services import GoogleTR
+from handprint.services import MicrosoftTR
 from handprint.exceptions import *
 from handprint.debug import set_debug, log
 from handprint.annotate import annotated_image
@@ -60,31 +60,31 @@ disable_ssl_cert_check()
 # ......................................................................
 
 @plac.annotations(
-    base_name  = ('use base name "B" to name downloaded images',     'option', 'b'),
-    creds_dir  = ('look for credentials files in directory "C"',     'option', 'c'),
-    from_file  = ('read file names or URLs from file "F"',           'option', 'f'),
-    list       = ('print list of known methods',                     'flag',   'l'),
-    method     = ('use method "M" (default: "all")',                 'option', 'm'),
-    output     = ('write output to directory "O"',                   'option', 'o'),
-    given_urls = ('assume have URLs, not files (default: files)',    'flag',   'u'),
-    quiet      = ('do not print info messages while working',        'flag',   'q'),
-    no_annot   = ('do not produce annotated images (default: do)',   'flag',   'A'),
-    no_color   = ('do not color-code terminal output (default: do)', 'flag',   'C'),
-    debug      = ('turn on debugging',                               'flag',   'D'),
-    version    = ('print version info and exit',                     'flag',   'V'),
+    base_name  = ('use base name "B" to name downloaded images',  'option', 'b'),
+    creds_dir  = ('look for credentials files in directory "C"',  'option', 'c'),
+    from_file  = ('read file names or URLs from file "F"',        'option', 'f'),
+    list       = ('print list of known services',                 'flag',   'l'),
+    output     = ('write output to directory "O"',                'option', 'o'),
+    service    = ('use service "S" (default: "all")',             'option', 's'),
+    given_urls = ('assume have URLs, not files (default: files)', 'flag',   'u'),
+    quiet      = ('do not print info messages while working',     'flag',   'q'),
+    no_annot   = ('do not produce annotated images',              'flag',   'A'),
+    no_color   = ('do not color-code terminal output',            'flag',   'C'),
+    version    = ('print version info and exit',                  'flag',   'V'),
+    debug      = ('turn on debugging',                            'flag',   'Z'),
     images     = 'if given -u, URLs, else directories and/or files',
 )
 
 def main(base_name = 'B', creds_dir = 'C', from_file = 'F', list = False,
-         method = 'M', output = 'O', given_urls = False, quiet = False,
-         no_annot = False, no_color = False, debug = False, version = False,
+         output = 'O', service = 'S', given_urls = False, quiet = False,
+         no_annot = False, no_color = False, version = False, debug = False,
          *images):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") can
-run alternative text recognition methods on images of document pages.
+run alternative text recognition services on images of document pages.
 
 If given the command-line flag -l (or /l on Windows), Handprint will print a
-list of the known methods and then exit.  The option -m (/m on Windows) can
-be used to select a specific method.  (The default method is to run them all.)
+list of the known services and then exit.  The option -s (/s on Windows) can
+be used to select a specific service.  (The default action is to run them all.)
 
 When invoked, the command-line arguments should contain one of the following:
 
@@ -105,7 +105,7 @@ Google, Microsoft and others.  It will write the results to new files placed
 either in the same directories as the original files, or (if given the -o
 option) to the directory indicated by the -o option value (/o on Windows).
 The results will be written in files named after the original files with the
-addition of a string that indicates the method used.  For example, a file
+addition of a string that indicates the service used.  For example, a file
 named "somefile.jpg" will produce
 
   somefile.jpg
@@ -150,11 +150,11 @@ corresponding to each document will be written in a file named
 "document-N.url" so that it is possible to connect each "document-N.jpg" to
 the URL it came from.
 
-If images are too large for a method/service, then Handprint will resize them
-prior to sending them.  It will write the reduced image to a file named
+If images are too large for a service, then Handprint will resize them prior
+to sending them.  It will write the reduced image to a file named
 "FILENAME-reduced.EXT", where "FILENAME" is the original file name and "EXT"
 is the file extension.  This means that if an image needs to be resized, the
-results of applying the text recognition methods will be, e.g.,
+results of applying the text recognition services will be, e.g.,
 
   somefile-reduced.jpg
   somefile-reduced.google.txt
@@ -200,8 +200,8 @@ information and exit without doing anything else.
         print_version()
         exit()
     if list:
-        say.info('Known methods:')
-        for key in KNOWN_METHODS.keys():
+        say.info('Known services:')
+        for key in KNOWN_SERVICES.keys():
             say.info('   {}'.format(key))
         exit()
     if not network_available():
@@ -229,11 +229,11 @@ information and exit without doing anything else.
     else:
         if __debug__: log('Assuming credentials found in {}.', creds_dir)
 
-    if method == 'M':
-        method = 'all'
-    method = method.lower()
-    if method != 'all' and method not in KNOWN_METHODS:
-        exit(say.error_text('"{}" is not a known method. {}'.format(method, hint)))
+    if service == 'S':
+        service = 'all'
+    service = service.lower()
+    if service != 'all' and service not in KNOWN_SERVICES:
+        exit(say.error_text('"{}" is not a known service. {}'.format(service, hint)))
 
     if output == 'O':
         output = None
@@ -260,19 +260,19 @@ information and exit without doing anything else.
 
     # Let's do this thing.
     try:
-        num_items = len(targets)
-        print_separators = num_items > 1 and not say.be_quiet()
-        if method == 'all':
+        num = len(targets)
+        print_separators = num > 1 and not say.be_quiet()
+        if service == 'all':
             # Order doesn't really matter; just make it consistent run-to-run.
-            methods = sorted(KNOWN_METHODS.values(), key = lambda x: str(x))
-            say.info('Will apply all known methods to {} images.'.format(num_items))
+            services = sorted(KNOWN_SERVICES.values(), key = lambda x: str(x))
+            say.info('Will apply all known services to {} images.'.format(num))
         else:
-            methods = [KNOWN_METHODS[method]]
-            say.info('Will apply method "{}" to {} images.'.format(method, num_items))
+            services = [KNOWN_SERVICES[service]]
+            say.info('Will apply service "{}" to {} images.'.format(service, num))
         for index, item in enumerate(targets, start = 1):
             if print_separators:
                 say.msg('='*70, 'dark')
-            run(methods, item, index, base_name, output, creds_dir, annotate, say)
+            run(services, item, index, base_name, output, creds_dir, annotate, say)
         if print_separators:
             say.msg('='*70, 'dark')
     except (KeyboardInterrupt, UserCancelled) as ex:
@@ -330,42 +330,42 @@ def run(classes, item, index, base_name, output_dir, creds_dir, annotate, say):
             say.fatal('Cannot write output in {}.'.format(dest_dir))
             return
 
-        # Iterate over the methods.
-        for method_class in classes:
-            method = method_class()
-            method.init_credentials(creds_dir)
+        # Iterate over the services.
+        for service_class in classes:
+            service = service_class()
+            service.init_credentials(creds_dir)
             last_time = timer()
 
             # If need to convert format, best do it after resizing original fmt.
-            need_convert = fmt not in method.accepted_formats()
+            need_convert = fmt not in service.accepted_formats()
             # Test the dimensions, not bytes, because of compression.
-            if image_dimensions(file) > method.max_dimensions():
-                file = file_after_resizing(file, method, spinner)
+            if image_dimensions(file) > service.max_dimensions():
+                file = file_after_resizing(file, service, spinner)
             if file and need_convert:
-                file = file_after_converting(file, 'jpg', method, spinner)
+                file = file_after_converting(file, 'jpg', service, spinner)
             if not file:
                 return
 
             spinner.update('Sending to {} {}'.format(
-                color(method, 'white', say.use_color()),
+                color(service, 'white', say.use_color()),
                 # Need explicit color research or colorization goes wrong.
                 color('and waiting for response', 'info', say.use_color())))
             try:
-                result = method.result(file)
+                result = service.result(file)
             except RateLimitExceeded as ex:
                 time_passed = timer() - last_time
-                if time_passed < 1/method.max_rate():
+                if time_passed < 1/service.max_rate():
                     spinner.warn('Pausing due to rate limits')
-                    time.sleep(1/method.max_rate() - time_passed)
+                    time.sleep(1/service.max_rate() - time_passed)
             if result.error:
                 spinner.fail(result.error)
                 return
 
             file_name  = path.basename(file)
             base_path  = path.join(dest_dir, file_name)
-            txt_file   = alt_extension(base_path, str(method) + '.txt')
-            json_file  = alt_extension(base_path, str(method) + '.json')
-            annot_file = alt_extension(base_path, str(method) + '.jpg')
+            txt_file   = alt_extension(base_path, str(service) + '.txt')
+            json_file  = alt_extension(base_path, str(service) + '.json')
+            annot_file = alt_extension(base_path, str(service) + '.jpg')
             spinner.update('Text -> {}'.format(relative(txt_file)))
             save_output(result.text, txt_file)
             spinner.update('All data -> {}'.format(relative(json_file)))
@@ -378,7 +378,7 @@ def run(classes, item, index, base_name, output_dir, creds_dir, annotate, say):
         spinner.warn('Interrupted')
         raise
     except AuthenticationFailure as ex:
-        spinner.fail('Unable to continue using {}: {}'.format(method, ex))
+        spinner.fail('Unable to continue using {}: {}'.format(service, ex))
         return
     except Exception as ex:
         spinner.fail(say.error_text('Stopping due to a problem'))
@@ -402,7 +402,7 @@ def targets_from_arguments(images, from_file, given_urls, say):
         # We were given files and/or directories.  Look for image files.
         # Ignore files that appear to be the previous output of Handprint.
         # These are files that end in, e.g., ".google.jpg"
-        handprint_endings = ['.' + x + '.jpg' for x in KNOWN_METHODS.keys()]
+        handprint_endings = ['.' + x + '.jpg' for x in KNOWN_SERVICES.keys()]
         non_urls = filter_urls(images, say)
         non_urls = filter_endings(non_urls, handprint_endings)
         for item in non_urls:

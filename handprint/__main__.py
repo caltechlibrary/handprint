@@ -13,8 +13,8 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018 by the California Institute of Technology.  This code is
-open-source software released under a 3-clause BSD license.  Please see the
+Copyright (c) 2018-2019 by the California Institute of Technology.  This code
+is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
@@ -429,10 +429,10 @@ def filter_urls(item_list, say):
 
 
 def filter_endings(item_list, endings):
-    if not endings:
-        return item_list
     if not item_list:
         return []
+    if not endings:
+        return item_list
     results = item_list
     for ending in endings:
         results = list(filter(lambda name: ending not in name.lower(), results))

@@ -1,11 +1,7 @@
 Handprint<img width="100px" align="right" src=".graphics/noun_Hand_733265.svg">
 =========
 
-An experiment with handwritten text optical recognition on Caltech Archives materials.
-
-*Authors*:      [Michael Hucka](http://github.com/mhucka)<br>
-*Repository*:   [https://github.com/caltechlibrary/handprint](https://github.com/caltechlibrary/handprint)<br>
-*License*:      BSD/MIT derivative &ndash; see the [LICENSE](LICENSE) file for more information
+Apply different handwritten text recognition services and algorithms to handwritten documents.
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
@@ -14,8 +10,7 @@ An experiment with handwritten text optical recognition on Caltech Archives mate
 🏁 Log of recent changes
 -----------------------
 
-_Version 0.9.0_: The user interface has been changed.  The command-line option `-m` is now `-s`, and "methods" are now known as "services", to avoid conflicting interpretation of what a "method" is in the context of software.  There has been some internal code refactoring as well.
-A number of additional images for testing are now available in the [tests](tests) subdirectory.
+_Version 0.10.0_: Addition of support for Amazon's handwriting recognition service, plus refactoring various things.
 
 The file [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) contains a more complete change log that includes information about previous releases.
 
@@ -24,24 +19,26 @@ Table of Contents
 -----------------
 
 * [Introduction](#-introduction)
-* [Installation instructions](#-installation-instructions)
+* [Installation](#-installation)
    * [Install Handprint on your computer](#-install-handprint-on-your-computer)
    * [Obtain cloud service credentials](#-obtain-cloud-service-credentials)
-      * [<em>Microsoft</em>](#microsoft)
-      * [<em>Google</em>](#google)
-* [Running Handprint](#︎-running-handprint)
+* [Usage](#︎-usage)
    * [File formats recognized](#file-formats-recognized)
+   * [Data returned](#data-returned)
    * [Supported HTR/OCR services](#supported-htrocr-services)
    * [Service account credentials](#service-account-credentials)
    * [Files versus URLs](#files-versus-urls)
    * [Command line options](#command-line-options)
-* [Data returned](#︎-data-returned)
-* [Getting help and support](#-getting-help-and-support)
+* [Known issues and limitations](#known-issues-and-limitations)
+* [Getting help](#-getting-help)
+* [Contributing](#-contributing)
+* [License](#-license)
+* [Authors and history](#-authors-and-history)
 * [Acknowledgments](#︎-acknowledgments)
-* [Copyright and license](#︎-copyright-and-license)
+
 
 ☀ Introduction
------------------------------
+-------------
 
 Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the use of alternative optical character recognition (OCR) and handwritten text recognition (HTR) services on documents from the [Caltech Archives](http://archives.caltech.edu).  Tests include the use of Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), and others.
 
@@ -52,8 +49,8 @@ Among other features, Handprint can generate versions of the input images with r
 </p>
 
 
-✺ Installation instructions
----------------------------
+✺ Installation
+-------------
 
 Handprint is a program written in Python 3 that works by invoking cloud-based services.  Installation requires both obtaining a copy of Handprint itself, and also signing up for access to the cloud service providers.
 
@@ -77,7 +74,7 @@ Credentials for different services need to be provided to Handprint in the form 
 
 The specific contents and forms of the files differ depending on the particular service, as described below.
 
-### _Microsoft_
+#### Microsoft
 
 Microsoft's approach to credentials in Azure involves the use of [subscription keys](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/vision-api-how-to-topics/howtosubscribe).  The credentials file for Handprint just needs to contain a single field:
 
@@ -91,7 +88,7 @@ The value of "YOURKEYHERE" will be a string such as `"18de248475134eb49ae4a4e94b
 
 When signing up for an Azure cloud service account, make sure to choose "Western US" as the region so that the service URL begins with "https://westus.api.cognitive.microsoft.com".
 
-### _Google_
+#### Google
 
 Credentials for using a Google service account are stored in a JSON file containing many fields.  The overall form looks like this:
 
@@ -113,8 +110,8 @@ Credentials for using a Google service account are stored in a JSON file contain
 Getting one of these files is unfortunately a complicated process.  It's summarized in the Google Cloud documentation for [Creating a service account](https://cloud.google.com/docs/authentication/), but some more explicit instructions can be found in our Handprint [project Wiki pages](https://github.com/caltechlibrary/handprint/wiki/Getting-Google-Cloud-credentials).
 
 
-▶︎ Running Handprint
-------------------
+▶︎ Usage
+-------
 
 Handprint comes with a single command-line interface program called `handprint`.  Here is a screen cast to give a sense for what it's like to run Handprint. Click on the following image:
 
@@ -143,12 +140,17 @@ python3 -m handprint -h
 The `-h` option (`/h` on Windows) will make `handprint` display some help information and exit immediately.  To make Handprint do more, you can supply other arguments that instruct Handprint to process image files (or alternatively, URLs pointing to image files at a network location) and run text recognition algorithms on them, as explained below.
 
 
-### File formats recognized
+### _File formats recognized_
 
-Whether the images are stored locally or accessible via URLs, each image should be a single page of a document in which text should be recognized.  Handprint will read a number of different formats, and if the files are not already in the most common formats accepted by the cloud services (which at this time are JPEG, PNG, GIF, and BMP), Handprint will convert them automatically to JPEG before proceeding.
+Whether the images are stored locally or accessed via URLs, each image should be a single page of a document in which text should be recognized.  Handprint will read a number of different formats, and if the files are not already in the most common formats accepted by the cloud services (which at this time are JPEG, PNG, GIF, and BMP), Handprint will convert them automatically to JPEG before proceeding.
 
 
-### Supported HTR/OCR services
+### _Data returned_
+
+Handprint tries to gather all the data that each service returns for text recognition, and outputs the results in two forms: a `.json` file containing all the results, and a `.txt` file containing just the document text.  The exact content of the `.json` file differs for each service.
+
+
+### _Supported HTR/OCR services_
 
 Handprint can contact more than one cloud service for OCR and HTR.  You can use the `-l` option (`/l` on Windows) to make Handprint display a list of the services currently implemented:
 
@@ -166,7 +168,7 @@ handprint -m microsoft /path/to/images
 ```
 
 
-### Service account credentials
+### _Service account credentials_
 
 Handprint looks for credentials files in the directory where it is installed, but you can put credentials in another directory and then tell Handprint where to find it using the `-c` option (`/c` on Windows).  Example of use:
 
@@ -175,7 +177,7 @@ handprint -c ~/handprint-credentials /path/to/images
 ```
 
 
-### Files versus URLs
+### _Files versus URLs_
 
 Handprint can work both with files and with URLs.  By default, arguments are interpreted as being files or directories of files, but if given the `-u` option (`/u` on Windows), the arguments are interpreted instead as URLs pointing to images located on a network server.
 
@@ -231,12 +233,12 @@ handprint -u -f /tmp/urls-to-read.txt -o /tmp/results/
 Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to list the URLs in a file in combination with the `-f` option (`/f` on Windows).
 
 
-### Annotated images
+### _Annotated images_
 
 By default, Handprint will create copies of the images in files named with the service extension (e.g., `document-1.microsoft.jpg`) and write overlays of the text and bounding boxes extracted by the services.  This makes it possible to see the text extracted directly over the source image.  Generating these annotated images takes a little bit of time and if they are not necessary for your purposes, you can turn off annotation with the `-A` option (`/A` on Windows).
 
 
-### Command line options
+### _Command line options_
 
 The following table summarizes all the command line options available. (Note: on Windows computers, `/` must be usedas the prefix character instead of `-`):
 
@@ -260,22 +262,33 @@ The following table summarizes all the command line options available. (Note: on
 ✦ &nbsp; If `-u` is used (meaning, the inputs are URLs and not files or directories), then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpeg`, `document-1.google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.
 
 
-⚛︎ Data returned
----------------
-
-Handprint tries to gather all the data that each service returns for text recognition, and outputs the results in two forms: a `.json` file containing all the results, and a `.txt` file containing just the document text.  The exact content of the `.json` file differs for each service.
+⚑ Known issues and limitations
+-------------------------------
 
 
-⁇ Getting help and support
---------------------------
+
+⁇ Getting help
+-------------
 
 If you find an issue, please submit it in [the GitHub issue tracker](https://github.com/caltechlibrary/handprint/issues) for this repository.
 
 
-★ Do you like it?
-------------------
+♬ Contributing
+-------------
 
-If you like this software, don't forget to give this repo a star on GitHub to show your support!
+I would be happy to receive your help and participation with enhancing Handprint!  Please visit the [guidelines for contributing](CONTRIBUTING.md) for some tips on getting started.
+
+
+☮︎ License
+---------
+
+Copyright (C) 2019, Caltech.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
+
+
+❡ Authors and history
+--------------------
+
+[Mike Hucka](https://github.com/mhucka) designed and implemented Handprint beginning in mid-2018.
 
 
 ☺︎ Acknowledgments
@@ -285,7 +298,7 @@ The [vector artwork](https://thenounproject.com/search/?q=hand&i=733265) of a ha
 
 Handprint benefitted from feedback from several people, notably from Tommy Keswick, Mariella Soprano, Peter Collopy and Stephen Davison.
 
-Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Turf with the resources we had.  We want to acknowledge this debt.  In alphabetical order, the packages are:
+Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Turf with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
 * [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
@@ -300,10 +313,7 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
 * [termcolor](https://pypi.org/project/termcolor/) &ndash; ANSI color formatting for output in terminal
 
-☮︎ Copyright and license
----------------------
-
-Copyright (C) 2018, Caltech.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
+Finally, I am grateful for computing &amp; institutional resources made available by the California Institute of Technology.
     
 <div align="center">
   <a href="https://www.caltech.edu">

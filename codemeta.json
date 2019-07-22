@@ -1,0 +1,29 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "description": "Apply different handwritten text recognition services and algorithms to handwritten documents.",
+  "name": "Handprint",
+  "codeRepository": "https://github.com/caltechlibrary/handprint",
+  "issueTracker": "https://github.com/caltechlibrary/handprint/issues",
+  "license": "https://github.com/caltechlibrary/handprint/blob/master/LICENSE",
+  "version": "0.10.0",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Michael",
+      "familyName": "Hucka",
+      "affiliation": "Caltech Library",
+      "email": "mhucka@caltech.edu",
+      "@id": "https://orcid.org/0000-0001-9105-5960"
+    }],
+  "developmentStatus": "active",
+  "downloadUrl": "https://github.com/caltechlibrary/handprint/archive/0.10.0.zip",
+  "keywords": [
+    "handwritten text recognition",
+    "HTR",
+    "OCR",
+    "machine learning"
+  ],
+  "maintainer": "https://orcid.org/0000-0001-9105-5960",
+  "programmingLanguage": "Python"
+}

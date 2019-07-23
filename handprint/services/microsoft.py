@@ -97,7 +97,7 @@ class MicrosoftTR(TextRecognition):
         image = open(path, 'rb').read()
         if len(image) > self.max_size():
             text = 'File exceeds {} byte limit for Microsoft service'.format(self.max_size())
-            return TRResult(path = path, data = {}, text = '', error = text)
+            return TRResult(path = path, data = {}, text = '', error = text, boxes = [])
 
         base_url = 'https://westus.api.cognitive.microsoft.com/vision/v2.0/'
         url = base_url + 'recognizeText'

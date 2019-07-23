@@ -102,7 +102,7 @@ class GoogleTR(TextRecognition):
         image = open(path, 'rb').read()
         if len(image) > self.max_size():
             text = 'File exceeds {} byte limit for Google service'.format(self.max_size())
-            return TRResult(path = path, data = {}, text = '', error = text)
+            return TRResult(path = path, data = {}, text = '', error = text, boxes = [])
 
         try:
             if __debug__: log('Building Google vision API object')

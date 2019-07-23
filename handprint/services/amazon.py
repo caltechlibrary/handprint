@@ -77,8 +77,8 @@ class AmazonTR(TextRecognition):
         if __debug__: log('Image size is width = {}, height = {}', width, height)
         max_width, max_height = self.max_dimensions()
         if width > max_width or height > max_height:
-            text = 'File exceeds dimensions limits for Amazon service'
-            return TRResult(path = path, data = {}, text = '', error = text)
+            text = 'Image dimensions exceed limits for Amazon service'
+            return TRResult(path = path, data = {}, text = '', error = text, boxes = [])
 
         try:
             if __debug__: log('Sending file to Amazon service')

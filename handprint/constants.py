@@ -17,6 +17,7 @@ file "LICENSE" for more information.
 import sys
 
 import handprint
+from handprint.services import AmazonTR
 from handprint.services import GoogleTR
 from handprint.services import MicrosoftTR
 
@@ -25,6 +26,7 @@ ON_WINDOWS = sys.platform.startswith('win')
 ACCEPTED_FORMATS = ('jpg', 'jpeg', 'jp2', 'png', 'gif', 'bmp', 'tif', 'tiff')
 
 KNOWN_SERVICES = {
+    'amazon': AmazonTR,
     'google': GoogleTR,
     'microsoft': MicrosoftTR,
 }

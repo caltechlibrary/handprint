@@ -10,7 +10,7 @@ import sys
 from   time import sleep
 
 import handprint
-from handprint.credentials.microsoft_auth import MicrosoftCredentials
+from handprint.credentials.amazon_auth import AmazonCredentials
 from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.messages import msg
 from handprint.exceptions import *
@@ -28,7 +28,12 @@ class AmazonTR(TextRecognition):
 
 
     def init_credentials(self, credentials_dir = None):
-        pass
+        '''Initializes the credentials to use for accessing this service.'''
+        if __debug__: log('Getting credentials from {}', credentials_dir)
+        try:
+            self._credentials = AmazonCredentials(credentials_dir).creds()
+        except Exception as ex:
+            raise AuthenticationFailure(str(ex))
 
 
     def name(self):
@@ -82,7 +87,10 @@ class AmazonTR(TextRecognition):
 
         try:
             if __debug__: log('Sending file to Amazon service')
-            client = boto3.client('textract', region_name = 'us-west-2')
+            creds = self._credentials
+            client = boto3.client('textract', region_name = creds['region_name'],
+                                  aws_access_key_id = creds['aws_access_key_id'],
+                                  aws_secret_access_key = creds['aws_secret_access_key'])
             response = client.detect_document_text(Document = {'Bytes': image})
             if __debug__: log('Received {} blocks', len(response['Blocks']))
 

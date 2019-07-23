@@ -1,10 +1,20 @@
 Change log for Handprint
 ========================
 
+Version 0.10.0
+-------------
+
+* Add support for Amazon's Textract service
+* Use [READMINE](https://github.com/mhucka/readmine) structure for [README](README.md) file.
+* Update some internal code such as [network.py](handprint/network.py) to versions developed for other projects such as [Microarchiver](https://github/caltechlibrary/microarchiver).
+* Fix some small defects.
+* Refactor some internal code.
+
+
 Version 0.9.0
 -------------
 
-* **Backward-incompatible change**: command-line option `-m` is now `-s` and "methods" are now known as "services", to avoid conflicting interpretation of what a "method" is in the context of software.  Internal object classes have likewise been changed.
+* **Backward-incompatible change**: command-line option `-m` is now `-s` and "methods" are now known as "services", to avoid conflicting interpretations of what a "method" is in the context of software.  Internal object classes have likewise been changed.
 * Refactor some internal network code.
 * Add a number of additional images for testing.
 

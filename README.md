@@ -5,14 +5,14 @@ Apply different handwritten text recognition services and algorithms to handwrit
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-0.9.0-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-0.10.0-b44e88.svg?style=flat-square)](http://shields.io)
 
 🏁 Log of recent changes
 -----------------------
 
-_Version 0.10.0_: Addition of support for Amazon's handwriting recognition service, plus refactoring various things.
+_Version 0.10.0_: Addition of support for Amazon's handwriting recognition service, updates to internal code and some small bug fixes, and addition of code of conduct and contributor guidelines.
 
-The file [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) contains a more complete change log that includes information about previous releases.
+The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
 
 
 Table of Contents
@@ -108,6 +108,21 @@ Credentials for using a Google service account are stored in a JSON file contain
 ```
 
 Getting one of these files is unfortunately a complicated process.  It's summarized in the Google Cloud documentation for [Creating a service account](https://cloud.google.com/docs/authentication/), but some more explicit instructions can be found in our Handprint [project Wiki pages](https://github.com/caltechlibrary/handprint/wiki/Getting-Google-Cloud-credentials).
+
+
+#### Amazon
+
+Amazon credentials for AWS take the form of two alphanumeric strings: a _key id_ string and a _secret access key_ string.  In addition, the service needs to be invoked with a region identifier.  For the purposes of Handprint, these should be stored in a JSON file with the following format:
+
+```json
+{
+    "aws_access_key_id": "YOUR_KEY_ID_HERE",
+    "aws_secret_access_key": "YOUR_ACCESS_KEY_HERE",
+    "region_name": "YOUR_REGION_NAME_HERE"
+}
+```
+
+Getting this information is a simple process for Amazon's services. Instructions can be found in our Handprint [project Wiki pages](https://github.com/caltechlibrary/handprint/wiki/Creating-credentials-for-use-with-Amazon-Textract).
 
 
 ▶︎ Usage
@@ -265,6 +280,9 @@ The following table summarizes all the command line options available. (Note: on
 ⚑ Known issues and limitations
 -------------------------------
 
+Here are some known limitations in the current version of Handprint:
+
+* Some services have different file size restrictions depending on the format of the file, but Handprint always uses the same limit for all files for a given service.  For example, Amazon's Textract [accepts larger PDF files than JPEG and PNG files](https://docs.aws.amazon.com/textract/latest/dg/limits.html), but Handprint always uses the (lower) size limit for JPEG and PNG even if the input file is a PDF.  This is a code simplification.
 
 
 ⁇ Getting help

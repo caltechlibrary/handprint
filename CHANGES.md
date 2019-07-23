@@ -4,7 +4,7 @@ Change log for Handprint
 Version 0.10.0
 --------------
 
-* Add support for Amazon's Textract service.
+* Add support for Amazon's Rekognition and Textract services.
 * Use [READMINE](https://github.com/mhucka/readmine) structure for [README](README.md) file.
 * Update some internal code such as [network.py](handprint/network.py) to versions developed for other projects such as [Microarchiver](https://github/caltechlibrary/microarchiver).
 * Fix some small defects.

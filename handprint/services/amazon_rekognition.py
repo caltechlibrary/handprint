@@ -1,5 +1,5 @@
 '''
-amazon.py: interface to Amazon Textextract network service
+amazon.py: interface to Amazon Rekognition network service
 '''
 
 import boto3
@@ -21,7 +21,7 @@ from handprint.network import net
 # Main class.
 # -----------------------------------------------------------------------------
 
-class AmazonTR(TextRecognition):
+class AmazonRekognitionTR(TextRecognition):
     def __init__(self):
         '''Initializes the credentials to use for accessing this service.'''
         self._results = {}
@@ -38,29 +38,29 @@ class AmazonTR(TextRecognition):
 
     def name(self):
         '''Returns the canonical internal name for this service.'''
-        return "amazon"
+        return "amazon-rekognition"
 
 
     def accepted_formats(self):
         '''Returns a list of supported image file formats.'''
-        return ['jpeg', 'jpg', 'png', 'pdf']
+        return ['jpeg', 'jpg', 'png']
 
 
     def max_rate(self):
         '''Returns the number of calls allowed per second.'''
-        # https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html#limits_textract
+        # https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html
         return 0.25
 
 
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
-        # https://docs.aws.amazon.com/textract/latest/dg/limits.html
+        # https://docs.aws.amazon.com/rekognition/latest/dg/limits.html
         return 5*1024*1024
 
 
     def max_dimensions(self):
         '''Maximum image size as a tuple of pixel numbers: (width, height).'''
-        # https://docs.aws.amazon.com/textract/latest/dg/limits.html
+        # https://docs.aws.amazon.com/rekognition/latest/dg/limits.html
         return (2880, 2880)
 
 
@@ -88,17 +88,17 @@ class AmazonTR(TextRecognition):
         try:
             if __debug__: log('Sending file to Amazon service')
             creds = self._credentials
-            client = boto3.client('textract', region_name = creds['region_name'],
+            client = boto3.client('rekognition', region_name = creds['region_name'],
                                   aws_access_key_id = creds['aws_access_key_id'],
                                   aws_secret_access_key = creds['aws_secret_access_key'])
-            response = client.detect_document_text(Document = {'Bytes': image})
-            if __debug__: log('Received {} blocks', len(response['Blocks']))
+            response = client.detect_text(Image = {'Bytes': image})
+            if __debug__: log('Received {} blocks', len(response['TextDetections']))
 
             full_text = ''
             boxes = []
-            for block in response['Blocks']:
-                if block['BlockType'] == "WORD":
-                    text = block['Text']
+            for block in response['TextDetections']:
+                if 'Type' in block and block['Type'] == "WORD":
+                    text = block['DetectedText']
                     full_text += (text + ' ')
 
                     corners = corner_list(block['Geometry']['Polygon'], width, height)

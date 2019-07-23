@@ -10,7 +10,7 @@ Apply different handwritten text recognition services and algorithms to handwrit
 🏁 Log of recent changes
 -----------------------
 
-_Version 0.10.0_: Addition of support for Amazon's handwriting recognition service, updates to internal code and some small bug fixes, and addition of code of conduct and contributor guidelines.
+_Version 0.10.0_: Addition of support for Amazon's Rekognition and Textract services, updates to internal code and some small bug fixes, and addition of code of conduct and contributor guidelines.
 
 The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
 
@@ -122,7 +122,7 @@ Amazon credentials for AWS take the form of two alphanumeric strings: a _key id_
 }
 ```
 
-Getting this information is a simple process for Amazon's services. Instructions can be found in our Handprint [project Wiki pages](https://github.com/caltechlibrary/handprint/wiki/Creating-credentials-for-use-with-Amazon-Textract).
+Getting this information is a simple process for Amazon's services. Instructions can be found in our Handprint [project Wiki pages](https://github.com/caltechlibrary/handprint/wiki/Creating-credentials-for-use-with-Amazon-Rekognition).
 
 
 ▶︎ Usage
@@ -172,8 +172,9 @@ Handprint can contact more than one cloud service for OCR and HTR.  You can use 
 ```
 # handprint -l
 Known services (for use as values for option -m):
+   amazon-rekognition
+   amazon-textract
    microsoft
-   amazon
    google
 ```
 
@@ -283,7 +284,8 @@ The following table summarizes all the command line options available. (Note: on
 
 Here are some known limitations in the current version of Handprint:
 
-* Some services have different file size restrictions depending on the format of the file, but Handprint always uses the same limit for all files for a given service.  For example, Amazon's Textract [accepts larger PDF files than JPEG and PNG files](https://docs.aws.amazon.com/textract/latest/dg/limits.html), but Handprint always uses the (lower) size limit for JPEG and PNG even if the input file is a PDF.  This is a code simplification.
+* The Amazon Rekognition and Textract APIs will return [at most 50 words in an image](https://docs.aws.amazon.com/rekognition/latest/dg/limits.html).
+* Some services have different file size restrictions depending on the format of the file, but Handprint always uses the same limit for all files for a given service.  This is a code simplification.
 
 
 ⁇ Getting help

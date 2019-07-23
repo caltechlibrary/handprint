@@ -173,6 +173,7 @@ Handprint can contact more than one cloud service for OCR and HTR.  You can use 
 # handprint -l
 Known services (for use as values for option -m):
    microsoft
+   amazon
    google
 ```
 
@@ -318,10 +319,12 @@ Handprint benefitted from feedback from several people, notably from Tommy Keswi
 
 Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Turf with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
+* [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
 * [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
 * [halo](https://github.com/ManrajGrover/halo) &ndash; busy-spinners for Python command-line programs
 * [httplib2](https://github.com/httplib2/httplib2) &ndash; a comprehensive HTTP client library
+* [imagesize](https://github.com/shibukawa/imagesize_py) &ndash; determine the dimensions of an image
 * [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
 * [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
 * [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library

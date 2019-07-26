@@ -21,7 +21,7 @@ from handprint.network import net
 # Main class.
 # -----------------------------------------------------------------------------
 
-class AmazonTextractTR(TextRecognition):
+class AmazonTR(TextRecognition):
     def __init__(self):
         '''Initializes the credentials to use for accessing this service.'''
         self._results = {}
@@ -34,16 +34,6 @@ class AmazonTextractTR(TextRecognition):
             self._credentials = AmazonCredentials(credentials_dir).creds()
         except Exception as ex:
             raise AuthenticationFailure(str(ex))
-
-
-    def name(self):
-        '''Returns the canonical internal name for this service.'''
-        return "amazon-textract"
-
-
-    def accepted_formats(self):
-        '''Returns a list of supported image file formats.'''
-        return ['jpeg', 'jpg', 'png', 'pdf']
 
 
     def max_rate(self):
@@ -64,41 +54,44 @@ class AmazonTextractTR(TextRecognition):
         return (2880, 2880)
 
 
-    def result(self, path):
-        '''Returns the results from calling the service on the 'path'.  The
-        results are returned as an TRResult named tuple.
+    def amazon_result(self, file_path, variant, method_name, keyword_arg,
+                      response_key, value_key, block_key):
+        '''Returns the results from calling the service on the 'file_path'.
+        The results are returned as an TRResult named tuple.
         '''
         # Check if we already processed it.
-        if path in self._results:
-            return self._results[path]
+        if file_path in self._results:
+            return self._results[file_path]
 
-        if __debug__: log('Reading {}', path)
-        image = open(path, 'rb').read()
+        if __debug__: log('Reading {}', file_path)
+        image = open(file_path, 'rb').read()
         if len(image) > self.max_size():
             text = 'File exceeds {} byte limit for Amazon service'.format(self.max_size())
-            return TRResult(path = path, data = {}, text = '', error = text)
+            return TRResult(path = file_path, data = {}, text = '', error = text, boxes = [])
 
-        width, height = imagesize.get(path)
+        width, height = imagesize.get(file_path)
         if __debug__: log('Image size is width = {}, height = {}', width, height)
         max_width, max_height = self.max_dimensions()
         if width > max_width or height > max_height:
             text = 'Image dimensions exceed limits for Amazon service'
-            return TRResult(path = path, data = {}, text = '', error = text, boxes = [])
+            return TRResult(path = file_path, data = {}, text = '', error = text, boxes = [])
 
         try:
             if __debug__: log('Sending file to Amazon service')
             creds = self._credentials
-            client = boto3.client('textract', region_name = creds['region_name'],
+            client = boto3.client(variant, region_name = creds['region_name'],
                                   aws_access_key_id = creds['aws_access_key_id'],
                                   aws_secret_access_key = creds['aws_secret_access_key'])
-            response = client.detect_document_text(Document = {'Bytes': image})
-            if __debug__: log('Received {} blocks', len(response['Blocks']))
+            if hasattr(client, method_name):
+                amazon_api = getattr(client, method_name)
+            response = amazon_api( **{ keyword_arg : {'Bytes': image} })
+            if __debug__: log('Received {} blocks', len(response[response_key]))
 
             full_text = ''
             boxes = []
-            for block in response['Blocks']:
-                if block['BlockType'] == "WORD":
-                    text = block['Text']
+            for block in response[response_key]:
+                if value_key in block and block[value_key] == "WORD":
+                    text = block[block_key]
                     full_text += (text + ' ')
 
                     corners = corner_list(block['Geometry']['Polygon'], width, height)
@@ -109,13 +102,63 @@ class AmazonTextractTR(TextRecognition):
                         # Skip it and continue.
                         if __debug__: log('Bad bb for {}: {}', text, bb)
 
-            self._results[path] = TRResult(path = path, data = response,
+            self._results[file_path] = TRResult(path = file_path, data = response,
                                            boxes = boxes, text = full_text,
                                            error = None)
-            return self._results[path]
+            return self._results[file_path]
         except Exception as ex:
             import pdb; pdb.set_trace()
 
+
+
+class AmazonTextractTR(AmazonTR):
+    '''Subclass of AmazonTR for the Textract service.'''
+
+    def name(self):
+        '''Returns the canonical internal name for this service.'''
+        return "amazon-textract"
+
+
+    def accepted_formats(self):
+        '''Returns a list of supported image file formats.'''
+        return ['jpeg', 'jpg', 'png', 'pdf']
+
+
+    def result(self, file_path):
+        '''Returns the results from calling the service on the 'file_path'.
+        The results are returned as an TRResult named tuple.
+        '''
+        return self.amazon_result(file_path, 'textract',
+                                  'detect_document_text',
+                                  'Document',
+                                  'Blocks',     # response_key
+                                  'BlockType',  # value_key
+                                  'Text')       # block_key
+
+
+class AmazonRekognitionTR(AmazonTR):
+    '''Subclass of AmazonTR for the Rekognition service.'''
+
+    def name(self):
+        '''Returns the canonical internal name for this service.'''
+        return "amazon-rekognition"
+
+
+    def accepted_formats(self):
+        '''Returns a list of supported image file formats.'''
+        return ['jpeg', 'jpg', 'png']
+
+
+    def result(self, file_path):
+        '''Returns the results from calling the service on the 'file_path'.
+        The results are returned as an TRResult named tuple.
+        '''
+        return self.amazon_result(file_path, 'rekognition',
+                                  'detect_text',
+                                  'Image',
+                                  'TextDetections', # response_key
+                                  'Type',           # value_key
+                                  'DetectedText')   # block_key
 
 
 def corner_list(polygon, width, height):

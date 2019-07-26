@@ -1,5 +1,5 @@
 '''
-amazon.py: interface to Amazon Textextract network service
+amazon.py: interface to Amazon network services Rekognition and Textract
 '''
 
 import boto3
@@ -11,6 +11,7 @@ from   time import sleep
 
 import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials
+from handprint.files import readable
 from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.messages import msg
 from handprint.exceptions import *
@@ -22,6 +23,8 @@ from handprint.network import net
 # -----------------------------------------------------------------------------
 
 class AmazonTR(TextRecognition):
+    '''Base class for Amazon text recognition services.'''
+
     def __init__(self):
         '''Initializes the credentials to use for accessing this service.'''
         self._results = {}
@@ -54,61 +57,70 @@ class AmazonTR(TextRecognition):
         return (2880, 2880)
 
 
-    def amazon_result(self, file_path, variant, method_name, keyword_arg,
+    # General scheme of things:
+    #
+    # * Return errors (via TRResult) if a result could not be obtained
+    #   because of an error specific to a particular path/item.  The guiding
+    #   principle here is: if the calling loop is processing multiple items,
+    #   can it be expected to be able to go on to the next item if this error
+    #   occurred?
+    #
+    # * Raises exceptions if a problem occurs that should stop the calling
+    #   code from continuing with this service.  This includes things like
+    #   authentication failures, because authentication failures tend to
+    #   involve all uses of a service and not just a specific item.
+    #
+    # * Otherwise, returns a TRResult if successful.
+
+    def amazon_result(self, file_path, variant, api_method, image_keyword,
                       response_key, value_key, block_key):
         '''Returns the results from calling the service on the 'file_path'.
         The results are returned as an TRResult named tuple.
         '''
         # Check if we already processed it.
         if file_path in self._results:
+            if __debug__: log('Returning already-known result for {}', file_path)
             return self._results[file_path]
 
-        if __debug__: log('Reading {}', file_path)
-        image = open(file_path, 'rb').read()
-        if len(image) > self.max_size():
-            text = 'File exceeds {} byte limit for Amazon service'.format(self.max_size())
-            return TRResult(path = file_path, data = {}, text = '', error = text, boxes = [])
+        # Read the image and proceed with contacting the service.
+        # If any exceptions occur, let them be passed to caller.
+        (image, error) = self._image_from_file(file_path)
+        if error:
+            return error
 
-        width, height = imagesize.get(file_path)
-        if __debug__: log('Image size is width = {}, height = {}', width, height)
-        max_width, max_height = self.max_dimensions()
-        if width > max_width or height > max_height:
-            text = 'Image dimensions exceed limits for Amazon service'
-            return TRResult(path = file_path, data = {}, text = '', error = text, boxes = [])
-
+        if __debug__: log('Setting up Amazon client function "{}"', variant)
+        creds = self._credentials
         try:
-            if __debug__: log('Sending file to Amazon service')
-            creds = self._credentials
             client = boto3.client(variant, region_name = creds['region_name'],
                                   aws_access_key_id = creds['aws_access_key_id'],
                                   aws_secret_access_key = creds['aws_secret_access_key'])
-            if hasattr(client, method_name):
-                amazon_api = getattr(client, method_name)
-            response = amazon_api( **{ keyword_arg : {'Bytes': image} })
+            if __debug__: log('Calling Amazon API function')
+            response = getattr(client, api_method)( **{ image_keyword : {'Bytes': image} })
             if __debug__: log('Received {} blocks', len(response[response_key]))
-
             full_text = ''
             boxes = []
+            width, height = imagesize.get(file_path)
             for block in response[response_key]:
                 if value_key in block and block[value_key] == "WORD":
                     text = block[block_key]
                     full_text += (text + ' ')
-
                     corners = corner_list(block['Geometry']['Polygon'], width, height)
                     if corners:
                         boxes.append(TextBox(boundingBox = corners, text = text))
                     else:
-                        # Something is wrong with the vertex list.
-                        # Skip it and continue.
+                        # Something's wrong with the vertex list. Skip & continue.
                         if __debug__: log('Bad bb for {}: {}', text, bb)
 
-            self._results[file_path] = TRResult(path = file_path, data = response,
-                                           boxes = boxes, text = full_text,
-                                           error = None)
-            return self._results[file_path]
+            result = TRResult(path = file_path, data = response, boxes = boxes,
+                              text = full_text, error = None)
+            self._results[file_path] = result
+            return result
+        except KeyboardInterrupt as ex:
+            raise
         except Exception as ex:
-            import pdb; pdb.set_trace()
-
+            text = 'Error: {} -- "{}"'.format(str(ex), file_path)
+            return TRResult(path = file_path, data = {}, boxes = [],
+                            text = '', error = text)
 
 
 class AmazonTextractTR(AmazonTR):
@@ -160,6 +172,9 @@ class AmazonRekognitionTR(AmazonTR):
                                   'Type',           # value_key
                                   'DetectedText')   # block_key
 
+
+# Miscellaneous utilities.
+# -----------------------------------------------------------------------------
 
 def corner_list(polygon, width, height):
     '''Takes a boundingBox value from Google vision's JSON output and returns
@@ -168,6 +183,7 @@ def corner_list(polygon, width, height):
     corners = []
     for index in [0, 1, 2, 3]:
         if 'X' in polygon[index] and 'Y' in polygon[index]:
+            # Results  are in percentages of the image.  Convert to pixels.
             corners.append(int(round(polygon[index]['X'] * width)))
             corners.append(int(round(polygon[index]['Y'] * height)))
         else:

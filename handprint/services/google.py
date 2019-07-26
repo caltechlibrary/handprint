@@ -90,19 +90,34 @@ class GoogleTR(TextRecognition):
         return (side, side)
 
 
+    # General scheme of things:
+    #
+    # * Return errors (via TRResult) if a result could not be obtained
+    #   because of an error specific to a particular path/item.  The guiding
+    #   principle here is: if the calling loop is processing multiple items,
+    #   can it be expected to be able to go on to the next item if this error
+    #   occurred?
+    #
+    # * Raises exceptions if a problem occurs that should stop the calling
+    #   code from continuing with this service.  This includes things like
+    #   authentication failures, because authentication failures tend to
+    #   involve all uses of a service and not just a specific item.
+    #
+    # * Otherwise, returns a TRResult if successful.
+
     def result(self, path):
         '''Returns the results from calling the service on the 'path'.  The
         results are returned as an TRResult named tuple.
         '''
         # Check if we already processed it.
         if path in self._results:
+            if __debug__: log('Returning already-known result for {}', path)
             return self._results[path]
 
-        if __debug__: log('Reading {}', path)
-        image = open(path, 'rb').read()
-        if len(image) > self.max_size():
-            text = 'File exceeds {} byte limit for Google service'.format(self.max_size())
-            return TRResult(path = path, data = {}, text = '', error = text, boxes = [])
+        # Read the image and proceed with contacting the service.
+        (image, error) = self._image_from_file(path)
+        if error:
+            return error
 
         try:
             if __debug__: log('Building Google vision API object')

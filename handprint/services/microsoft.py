@@ -91,13 +91,13 @@ class MicrosoftTR(TextRecognition):
         '''
         # Check if we already processed it.
         if path in self._results:
+            if __debug__: log('Returning already-known result for {}', path)
             return self._results[path]
 
-        if __debug__: log('Reading {}', path)
-        image = open(path, 'rb').read()
-        if len(image) > self.max_size():
-            text = 'File exceeds {} byte limit for Microsoft service'.format(self.max_size())
-            return TRResult(path = path, data = {}, text = '', error = text, boxes = [])
+        # Read the image and proceed with contacting the service.
+        (image, error) = self._image_from_file(path)
+        if error:
+            return error
 
         base_url = 'https://westus.api.cognitive.microsoft.com/vision/v2.0/'
         url = base_url + 'recognizeText'

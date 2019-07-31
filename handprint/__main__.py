@@ -47,6 +47,7 @@ from handprint.files import readable, writable
 from handprint.manager import Manager
 from handprint.messages import msg, color, MessageHandlerCLI
 from handprint.network import network_available, disable_ssl_cert_check
+from handprint.processes import available_cpus
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
 disable_ssl_cert_check()
@@ -65,6 +66,7 @@ disable_ssl_cert_check()
     output_dir = ('write output to directory "O"',                     'option', 'o'),
     quiet      = ('do not print info messages while working',          'flag',   'q'),
     service    = ('process images using service "S" (default: "all")', 'option', 's'),
+    threads    = ('num. threads to use (default: #cores/2)',           'option', 't'),
     version    = ('print version info and exit',                       'flag',   'V'),
     debug      = ('turn on debugging',                                 'flag',   'Z'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
@@ -72,7 +74,7 @@ disable_ssl_cert_check()
 
 def main(add_creds = 'A', base_name = 'B', no_color = False, extended = False,
          from_file = 'F', list = False, output_dir = 'O', quiet = False,
-         service = 'S', version = False, debug = False, *files):
+         service = 'S', threads = 'T', version = False, debug = False, *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -183,9 +185,18 @@ corresponding to each document will be written in a file named
 "document-N.url" so that it is possible to connect each "document-N.jpg" to
 the URL it came from.
 
+Handprint will send files to the different services in parallel, using a
+number of process threads equal to 1/2 of the number of cores on the computer
+it is running on.  (E.g., if your computer has 4 cores, it will by default use
+at most 2 threads.)  The option -t (/t on Windows) can be used to change this
+number.
+
 If given the -q option (/q on Windows), Handprint will not print its usual
 informational messages while it is working.  It will only print messages
-for warnings or errors.
+for warnings or errors.  By default messages printed by Handprint are also
+color-coded.  If given the option -C (/C on Windows), Handprint will not color
+the text of messages it prints.  (This latter option is useful when running
+Handprint within subshells inside other environments such as Emacs.)
 
 If given the -V option (/V on Windows), this program will print the version
 and other information, and exit without doing anything else.
@@ -236,9 +247,7 @@ and other information, and exit without doing anything else.
     if any(item.startswith('-') for item in files):
         exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
 
-    if service == 'S':
-        service = 'all'
-    service = service.lower()
+    service = service.lower() if service != 'S' else 'all'
     if service != 'all' and service not in KNOWN_SERVICES:
         exit(say.error_text('"{}" is not a known service. {}'.format(service, hint)))
 
@@ -257,7 +266,6 @@ and other information, and exit without doing anything else.
 
     # Do the real work --------------------------------------------------------
 
-    # Create a list of files to be processed.
     targets = targets_from_arguments(files, from_file, say)
     if not targets:
         exit(say.warn_text('No images to process; quitting.'))
@@ -265,6 +273,7 @@ and other information, and exit without doing anything else.
     try:
         num = len(targets)
         print_separators = num > 1 and not say.be_quiet()
+        procs = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
 
         if service == 'all':
             # Order doesn't really matter; just make it consistent run-to-run.
@@ -275,11 +284,11 @@ and other information, and exit without doing anything else.
             services = [KNOWN_SERVICES[service]]
             say.info('Will apply service "{}" to {} images.'.format(service, num))
 
-        manager = Manager(services, output_dir, say)
+        manager = Manager(services, procs, output_dir, extended, say)
         for index, item in enumerate(targets, start = 1):
             if print_separators:
                 say.msg('='*70, 'dark')
-            manager.process(item, index, base_name, extended)
+            manager.process(item, index, base_name)
         if print_separators:
             say.msg('='*70, 'dark')
     except (KeyboardInterrupt, UserCancelled) as ex:

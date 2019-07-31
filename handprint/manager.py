@@ -14,12 +14,21 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-import Handprint
+import io
+import json
+import os
+from   os import path
+import shutil
+import time
+from   timeit import default_timer as timer
+
+import handprint
 from handprint.annotate import annotated_image
 from handprint.files import converted_image, reduced_image
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
 from handprint.files import readable, writable, is_url, image_dimensions
+from handprint.messages import color
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.progress import ProgressIndicator
 
@@ -35,8 +44,9 @@ class Manager:
         self._spinner = ProgressIndicator(say.use_color(), say.be_quiet())
 
 
-    def run(self, item, index, base_name, all_results):
+    def process(self, item, index, base_name, all_results):
         # Shortcuts to make the code more readable.
+        output_dir = self._output_dir
         spinner = self._spinner
         say = self._say
 
@@ -73,8 +83,9 @@ class Manager:
                 return
 
             # Iterate over the services.
-            for service_class in classes:
+            for service_class in self._classes:
                 service = service_class()
+                service.init_credentials()
                 last_time = timer()
 
                 # If need to convert format, best do it after resizing original fmt.
@@ -165,3 +176,7 @@ def save_output(data, file):
     elif isinstance(data, io.BytesIO):
         with open(file, 'wb') as f:
             shutil.copyfileobj(data, f)
+
+
+def url_file_content(url):
+    return '[InternetShortcut]\nURL={}\n'.format(url)

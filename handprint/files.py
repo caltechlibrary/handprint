@@ -19,6 +19,7 @@ import os
 from   os import path
 from   PIL import Image
 import re
+import shutil
 import sys
 import subprocess
 import warnings
@@ -139,6 +140,17 @@ def relative(file):
         return path.realpath(candidate)
 
 
+def make_dir(dir_path):
+    '''Creates directory 'dir_path' (including intermediate directories).'''
+    if path.isdir(dir_path):
+        if __debug__: log('Reusing existing directory {}', dir_path)
+        return
+    else:
+        if __debug__: log('Creating directory {}', dir_path)
+        # If this gets an exception, let it bubble up to caller.
+        os.makedirs(dir_path)
+
+
 def rename_existing(file):
     '''Renames 'file' to 'file.bak'.'''
 
@@ -163,6 +175,12 @@ def rename_existing(file):
     if path.exists(full_path):
         rename(full_path)
         return
+
+
+def copy_file(src, dst):
+    '''Copy a file from "src" to "dst".'''
+    if __debug__: log('copying file {} to {}', src, dst)
+    shutil.copy2(src, dst, follow_symlinks = True)
 
 
 def open_file(file):

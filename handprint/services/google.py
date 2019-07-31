@@ -42,13 +42,11 @@ class GoogleTR(TextRecognition):
         self._results = {}
 
 
-    def init_credentials(self, credentials_dir = None):
+    def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
-        # Haven't been able to get this to work by reading the credentials:
-        # self.credentials = GoogleCredentials(credentials_dir).creds()
-        if __debug__: log('Getting credentials from {}', credentials_dir)
         try:
-            GoogleCredentials(credentials_dir)
+            if __debug__: log('Initializing credentials')
+            GoogleCredentials()
         except Exception as ex:
             raise AuthenticationFailure(str(ex))
 

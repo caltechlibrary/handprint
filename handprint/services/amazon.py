@@ -30,11 +30,11 @@ class AmazonTR(TextRecognition):
         self._results = {}
 
 
-    def init_credentials(self, credentials_dir = None):
+    def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
-        if __debug__: log('Getting credentials from {}', credentials_dir)
         try:
-            self._credentials = AmazonCredentials(credentials_dir).creds()
+            if __debug__: log('Initializing credentials')
+            self._credentials = AmazonCredentials().creds()
         except Exception as ex:
             raise AuthenticationFailure(str(ex))
 

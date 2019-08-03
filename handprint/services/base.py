@@ -141,9 +141,10 @@ class TextRecognition(object):
             return error_result(text)
         width, height = imagesize.get(file_path)
         if __debug__: log('Image size is width = {}, height = {}', width, height)
-        max_width, max_height = self.max_dimensions()
-        if width > max_width or height > max_height:
-            text = 'Image dimensions {}x{} exceed Amazon limits: {}'.format(
-                width, height, file_path)
-            return error_result(text)
+        if self.max_dimensions():
+            max_width, max_height = self.max_dimensions()
+            if width > max_width or height > max_height:
+                text = 'Image dimensions {}x{} exceed Amazon limits: {}'.format(
+                    width, height, file_path)
+                return error_result(text)
         return (image, None)

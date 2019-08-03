@@ -302,11 +302,3 @@ if sys.platform.startswith('win'):
 # The following allows users to invoke this using "python3 -m handprint".
 if __name__ == '__main__':
     plac.call(main)
-
-
-# For Emacs users
-# .............................................................................
-# Local Variables:
-# mode: python
-# python-indent-offset: 4
-# End:

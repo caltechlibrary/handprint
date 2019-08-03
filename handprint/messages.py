@@ -323,11 +323,3 @@ def _color_codes(flags):
     if 'dark' in flags:
         attrib.append('dark')
     return (prefix, color_name, attrib)
-
-
-# Please leave the following for Emacs users.
-# ......................................................................
-# Local Variables:
-# mode: python
-# python-indent-offset: 4
-# End:

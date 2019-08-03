@@ -123,5 +123,5 @@ class MainBody(object):
                     files = filter_by_extensions(files, handprint_endings)
                     targets += files
                 else:
-                    say.warn('"{}" not a file or directory'.format(item))
+                    self._say.warn('"{}" not a file or directory'.format(item))
         return targets

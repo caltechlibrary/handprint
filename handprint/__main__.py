@@ -215,6 +215,10 @@ Handprint within subshells inside other environments such as Emacs.)
 If given the -V option (/V on Windows), this program will print the version
 and other information, and exit without doing anything else.
 
+If given the -@ option (/@ on Windows), this program will print additional
+diagnostic output as it runs; in addition, it will start the Python debugger
+(pdb) when an exception occurs, instead of simply exiting.
+
 Command-line arguments summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 '''
@@ -268,6 +272,7 @@ Command-line arguments summary
         body = MainBody(base_name, extended, from_file, output_dir, threads, say)
         body.run(services, files)
     except (KeyboardInterrupt, UserCancelled) as ex:
+        if __debug__: log('received {}', ex.__name__)
         exit(say.info_text('Quitting.'))
     except Exception as ex:
         if debug:

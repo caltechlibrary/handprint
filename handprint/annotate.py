@@ -27,7 +27,6 @@ from matplotlib.patches import Polygon
 def annotated_image(file, text_boxes):
     plt.figure(figsize = (20, 20))
     img = mpimg.imread(file)
-    plt.ion()
     ax = plt.imshow(img)
     props = dict(facecolor = 'white', alpha = 0.6)
     if text_boxes:

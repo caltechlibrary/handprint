@@ -14,10 +14,7 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-import queue
 import sys
-# import wx
-# import wx.lib.dialogs
 
 try:
     from termcolor import colored
@@ -245,9 +242,11 @@ def msg(text, flags = None, colorize = True):
     happening in real time.
     '''
     if colorize and 'termcolor' in sys.modules:
-        print(color(text, flags), flush = True)
+        sys.stdout.write(color(text, flags) + '\n')
+        sys.stdout.flush()
     else:
-        print(text, flush = True)
+        sys.stdout.write(text + '\n')
+        sys.stdout.flush()
 
 
 def color(text, flags = None, colorize = True):
@@ -309,7 +308,7 @@ def _color_codes(flags):
         color_name = 'white'
     if 'blue' in flags:
         color_name = 'blue'
-    if 'grey' in flags:
+    if 'grey' in flags or 'gray' in flags:
         color_name = 'grey'
     if 'cyan' in flags:
         color_name = 'cyan'

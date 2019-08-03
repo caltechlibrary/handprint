@@ -1,9 +1,25 @@
-'''Handprint: HANDwritten Page RecognitIoN Test for Caltech Archives.
+'''Handprint: HANDwritten Page RecognitIoN Test
 
-This project uses alternative text recognition services on documents from the
-Caltech Archives (http://archives.caltech.edu).  Tests include the use of
-Google's OCR capabilities in their Google Cloud Vision API
-(https://cloud.google.com/vision/docs/ocr), Microsoft's Azure, and others.
+This project uses alternative text recognition services on images of
+documents containing handwritten text.  The services currently supported are
+the following, but additional services could be supported by adding suitable
+wrappers:
+
+* Microsoft Azure
+  https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision
+
+* Google Cloud Vision API
+  https://cloud.google.com/vision/docs/ocr
+
+* Amazon Textract and Rekognition
+  https://docs.aws.amazon.com/textract
+  https://docs.aws.amazon.com/rekognition
+
+Handprint can be given image files, or directories of image files, or URLs
+pointing to image files.  It will download images if necessary, resize them
+if necessary, send them to the services, wait for the results, and finally,
+create annotated versions of the images with the recognized text overlayed
+on top of the image.
 
 Authors
 -------
@@ -23,7 +39,6 @@ from   os import path
 import plac
 import sys
 from   sys import exit as exit
-import traceback
 
 import handprint
 from handprint.credentials import Credentials
@@ -42,7 +57,7 @@ disable_ssl_cert_check()
 
 
 # Main program.
-# ......................................................................
+# .............................................................................
 
 @plac.annotations(
     add_creds  = ('add credentials file for service "A"',            'option', 'a'),
@@ -254,19 +269,18 @@ Command-line arguments summary
         body.run(services, files)
     except (KeyboardInterrupt, UserCancelled) as ex:
         exit(say.info_text('Quitting.'))
-    except ServiceFailure as ex:
-        exit(say.error_text(str(ex)))
     except Exception as ex:
         if debug:
+            import traceback
             say.error('{}\n{}'.format(str(ex), traceback.format_exc()))
             import pdb; pdb.set_trace()
         else:
-            exit(say.error_text('{}'.format(str(ex))))
+            exit(say.error_text(str(ex)))
     say.info('Done.')
 
 
 # Helper functions.
-# ......................................................................
+# .............................................................................
 
 def print_version():
     print('{} version {}'.format(handprint.__title__, handprint.__version__))
@@ -279,7 +293,7 @@ def print_version():
 
 
 # Main entry point.
-# ......................................................................
+# .............................................................................
 
 # On windows, we want plac to use slash intead of hyphen for cmd-line options.
 if sys.platform.startswith('win'):
@@ -291,7 +305,7 @@ if __name__ == '__main__':
 
 
 # For Emacs users
-# ......................................................................
+# .............................................................................
 # Local Variables:
 # mode: python
 # python-indent-offset: 4

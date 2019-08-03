@@ -78,7 +78,7 @@ def handprint_path():
 
 def desktop_path():
     '''Returns the path to the user's desktop directory.'''
-    if ON_WINDOWS:
+    if sys.platform.startswith('win'):
         return path.join(path.join(os.environ['USERPROFILE']), 'Desktop')
     else:
         return path.join(path.join(path.expanduser('~')), 'Desktop')
@@ -119,6 +119,17 @@ def alt_extension(filepath, ext):
     extension given in 'ext' should NOT have a leading period: that is, it
     should be "foo", not ".foo".'''
     return path.splitext(filepath)[0] + '.' + ext
+
+
+def filter_by_extensions(item_list, endings):
+    if not item_list:
+        return []
+    if not endings:
+        return item_list
+    results = item_list
+    for ending in endings:
+        results = list(filter(lambda name: ending not in name.lower(), results))
+    return results
 
 
 def is_url(string):

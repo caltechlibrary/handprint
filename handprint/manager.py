@@ -15,6 +15,7 @@ file "LICENSE" for more information.
 '''
 
 from   blessings import Terminal
+from   colored import fg, attr
 from   concurrent.futures import ThreadPoolExecutor
 import io
 import json
@@ -36,7 +37,7 @@ from handprint.files import readable, writable, is_url, image_dimensions
 from handprint.messages import color
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.progress import ProgressIndicator
-from handprint.services import KNOWN_SERVICES
+from handprint.services import KNOWN_SERVICES, SERVICE_COLORS
 
 
 # Main class.
@@ -59,9 +60,7 @@ class Manager:
         say = self._say
 
         try:
-            say.msg('{} {}'.format(
-                color('Starting on', 'info', say.use_color()),
-                color(item, 'white', say.use_color())))
+            say.info('Starting on {}'.format(color(item, 'white')))
             if is_url(item):
                 # Make sure the URLs point to images.
                 if __debug__: log('Testing if URL contains an image: {}', item)
@@ -94,13 +93,18 @@ class Manager:
 
             # Wrap calls to the services so we can loop more easily.
             def do_send(service):
+                if say.use_color():
+                    service_name = '{}{}{}'.format(
+                        fg(SERVICE_COLORS[service]), service, attr('reset'))
+                else:
+                    service_name = service.name()
+                # Need explicitly reset color to 'info' after using service color
                 say.msg('{} {} {}'.format(
                     color('Sending to', 'info', say.use_color()),
-                    color(service, 'magenta', say.use_color()),
-                    # Need explicit color research or colorization goes wrong.
+                    service_name,
                     color('and waiting for response ...', 'info', say.use_color())))
                 service_class = KNOWN_SERVICES[service]
-                self._send(service_class, file, fmt, dest_dir)
+                self._send(service_class, service_name, file, fmt, dest_dir)
 
             # Debugging is easier if thread pools are not used.  If the number
             # of threads is set to 1, we force non-thread-pool execution.
@@ -122,20 +126,19 @@ class Manager:
             raise
 
 
-    def _send(self, service_class, file, file_format, dest_dir):
-        # Shortcuts to make the code more readable.
-        say = self._say
+    def _send(self, service_class, service_name, file, file_format, dest_dir):
+        # The service_name parameter is only needed so caller can set the color.
 
-        # The index is used both to identify the service class and to position
-        # the cursor on different lines for producing output.
         service = service_class()
         service.init_credentials()
         last_time = timer()
+        say = self._say
 
         # If need to convert format, best do it after resizing original fmt.
         need_convert = file_format not in service.accepted_formats()
         # Test the dimensions, not bytes, because of compression.
-        if image_dimensions(file) > service.max_dimensions():
+        service_max = service.max_dimensions()
+        if service_max and image_dimensions(file) > service_max:
             file = self._file_after_resizing(file, service)
         if file and need_convert:
             file = self._file_after_converting(file, 'jpg', service)
@@ -147,26 +150,24 @@ class Manager:
         except RateLimitExceeded as ex:
             time_passed = timer() - last_time
             if time_passed < 1/service.max_rate():
-                say.warn('Pausing due to rate limits')
+                say.warn('Pausing {} due to rate limits', service_name)
                 time.sleep(1/service.max_rate() - time_passed)
         if result.error:
             say.error(result.error)
             return
 
-        say.msg('{} {}.'.format(
-            color('Got result from', 'info', say.use_color()),
-            color(service, 'magenta', say.use_color())))
+        say.info('Got result from {}.'.format(service_name))
         file_name  = path.basename(file)
         base_path  = path.join(dest_dir, file_name)
         annot_file = alt_extension(base_path, str(service) + '.jpg')
-        say.info('Creating annotated image: {}'.format(relative(annot_file)))
+        say.info('Creating annotated image for {}.'.format(service_name))
         save_output(annotated_image(file, result.boxes), annot_file)
         if self._extended_results:
             txt_file  = alt_extension(base_path, str(service) + '.txt')
             json_file = alt_extension(base_path, str(service) + '.json')
-            say.info('Saving all data: {}'.format(relative(json_file)))
+            say.info('Saving all data for {}.'.format(service_name))
             save_output(json.dumps(result.data), json_file)
-            say.info('Saving extracted text: {}'.format(relative(txt_file)))
+            say.info('Saving extracted text for {}.'.format(service_name))
             save_output(result.text, txt_file)
 
 
@@ -199,6 +200,7 @@ class Manager:
                 say.error('Failed to convert {}: {}'.format(relative(file), error))
                 return None
             return converted
+
 
 
 # Helper functions.

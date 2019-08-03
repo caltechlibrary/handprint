@@ -52,9 +52,10 @@ class AmazonTR(TextRecognition):
 
 
     def max_dimensions(self):
-        '''Maximum image size as a tuple of pixel numbers: (width, height).'''
-        # https://docs.aws.amazon.com/textract/latest/dg/limits.html
-        return (2880, 2880)
+        '''Maximum image size as a tuple of pixel numbers: (width, height).
+        A value of None indicates the limits are unknown.'''
+        # I can't find a limit stated in the Amazon docs.
+        return None
 
 
     # General scheme of things:

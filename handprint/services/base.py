@@ -92,6 +92,12 @@ class TextRecognition(object):
         pass
 
 
+    def name_color(self):
+        '''Returns a color code for this service.  Codes must be taken from
+        those defined by https://pypi.org/project/colored/.'''
+        pass
+
+
     def accepted_formats(self):
         '''Returns a list of supported image file formats.'''
         pass

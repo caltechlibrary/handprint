@@ -11,15 +11,6 @@ KNOWN_SERVICES = {
     'microsoft': MicrosoftTR,
 }
 
-# The color codes are those used by Python colored:
-# https://pypi.org/project/colored/
-SERVICE_COLORS = {
-    'amazon-rekognition': 130,
-    'amazon-textract': 179,
-    'google': 135,
-    'microsoft': 117,
-}
-
 # Save this list to avoid recreating it all the time.
 SERVICES_LIST = sorted(KNOWN_SERVICES.keys())
 

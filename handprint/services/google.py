@@ -51,11 +51,20 @@ class GoogleTR(TextRecognition):
             raise AuthenticationFailure(str(ex))
 
 
+    @classmethod
     def name(self):
         '''Returns the canonical internal name for this service.'''
         return "google"
 
 
+    @classmethod
+    def name_color(self):
+        '''Returns a color code for this service.  Codes must be taken from
+        those defined by https://pypi.org/project/colored/.'''
+        return 'medium_purple_2a'
+
+
+    @classmethod
     def accepted_formats(self):
         '''Returns a list of supported image file formats.'''
         return ['jpeg', 'jpg', 'png', 'gif', 'bmp', 'raw', 'tif', 'tiff', 'pdf']

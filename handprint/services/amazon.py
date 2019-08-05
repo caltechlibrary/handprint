@@ -127,11 +127,20 @@ class AmazonTR(TextRecognition):
 class AmazonTextractTR(AmazonTR):
     '''Subclass of AmazonTR for the Textract service.'''
 
+    @classmethod
     def name(self):
         '''Returns the canonical internal name for this service.'''
         return "amazon-textract"
 
 
+    @classmethod
+    def name_color(self):
+        '''Returns a color code for this service.  Codes must be taken from
+        those defined by https://pypi.org/project/colored/.'''
+        return 'dark_orange_3a'
+
+
+    @classmethod
     def accepted_formats(self):
         '''Returns a list of supported image file formats.'''
         return ['jpeg', 'jpg', 'png', 'pdf']
@@ -152,11 +161,20 @@ class AmazonTextractTR(AmazonTR):
 class AmazonRekognitionTR(AmazonTR):
     '''Subclass of AmazonTR for the Rekognition service.'''
 
+    @classmethod
     def name(self):
         '''Returns the canonical internal name for this service.'''
         return "amazon-rekognition"
 
 
+    @classmethod
+    def name_color(self):
+        '''Returns a color code for this service.  Codes must be taken from
+        those defined by https://pypi.org/project/colored/.'''
+        return 'light_goldenrod_3'
+
+
+    @classmethod
     def accepted_formats(self):
         '''Returns a list of supported image file formats.'''
         return ['jpeg', 'jpg', 'png']

@@ -34,6 +34,7 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   colored import attr, fg
 import os
 from   os import path
 import plac
@@ -268,7 +269,11 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     try:
-        if __debug__: log('initializing main body and running services')
+        fancy = '{}Hand{}written {}p{}age {}r{}ecognit{}i{}o{}n{} {}t{}est'.format(
+            *[ fg('chartreuse_2a'), attr('reset') + fg('green') ]*6)
+        say.info('┏' + '━'*68 + '┓')
+        say.info('┃    Welcome to Handprint, the {}!    ┃'.format(fancy))
+        say.info('┗' + '━'*68 + '┛')
         body = MainBody(base_name, extended, from_file, output_dir, threads, say)
         body.run(services, files)
     except (KeyboardInterrupt, UserCancelled) as ex:

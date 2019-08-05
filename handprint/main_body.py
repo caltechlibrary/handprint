@@ -94,10 +94,10 @@ class MainBody(object):
         manager = Manager(services, procs, output_dir, extended, say)
         for index, item in enumerate(targets, start = 1):
             if print_separators:
-                say.msg('='*70, 'dark')
+                say.msg('━'*70, 'dark')
             manager.process(item, index, base_name)
         if print_separators:
-            say.msg('='*70, 'dark')
+            say.msg('━'*70, 'dark')
 
 
     def targets_from_arguments(self, files, from_file):

@@ -144,7 +144,7 @@ class TextRecognition(object):
         if self.max_dimensions():
             max_width, max_height = self.max_dimensions()
             if width > max_width or height > max_height:
-                text = 'Image dimensions {}x{} exceed Amazon limits: {}'.format(
-                    width, height, file_path)
+                text = 'Image dimensions {}x{} exceed {} limits: {}'.format(
+                    width, height, self.name(), file_path)
                 return error_result(text)
         return (image, None)

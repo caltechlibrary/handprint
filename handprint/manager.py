@@ -37,7 +37,7 @@ from handprint.files import readable, writable, is_url, image_dimensions
 from handprint.messages import color
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.progress import ProgressIndicator
-from handprint.services import KNOWN_SERVICES, SERVICE_COLORS
+from handprint.services import KNOWN_SERVICES
 
 
 # Main class.
@@ -61,8 +61,10 @@ class Manager:
 
         try:
             say.info('Starting on {}'.format(color(item, 'white')))
+            # For URLs, we download the corresponding files and name them with
+            # the base_name.
             if is_url(item):
-                # Make sure the URLs point to images.
+                # First make sure the URL actually points to an image.
                 if __debug__: log('Testing if URL contains an image: {}', item)
                 try:
                     response = request.urlopen(item)
@@ -86,6 +88,14 @@ class Manager:
                 file = path.realpath(path.join(os.getcwd(), item))
                 fmt = filename_extension(file)
 
+            # All of the services accept JPEG format, so we normalize everything
+            # to that format.
+            if fmt != 'jpg' and fmt != 'jpeg':
+                file = self._file_after_converting(file, 'jpg')
+            if not file:
+                say.warn('Skipping {}'.relative(format(file)))
+                return
+
             dest_dir = output_dir if output_dir else path.dirname(file)
             if not writable(dest_dir):
                 say.error('Cannot write output in {}.'.format(dest_dir))
@@ -93,18 +103,18 @@ class Manager:
 
             # Wrap calls to the services so we can loop more easily.
             def do_send(service):
+                service_class = KNOWN_SERVICES[service]
                 if say.use_color():
                     service_name = '{}{}{}'.format(
-                        fg(SERVICE_COLORS[service]), service, attr('reset'))
+                        fg(service_class.name_color()), service, attr('reset'))
                 else:
-                    service_name = service.name()
+                    service_name = service
                 # Need explicitly reset color to 'info' after using service color
                 say.msg('{} {} {}'.format(
                     color('Sending to', 'info', say.use_color()),
                     service_name,
                     color('and waiting for response ...', 'info', say.use_color())))
-                service_class = KNOWN_SERVICES[service]
-                self._send(service_class, service_name, file, fmt, dest_dir)
+                self._send(service_class, service_name, file, dest_dir)
 
             # Debugging is easier if thread pools are not used.  If the number
             # of threads is set to 1, we force non-thread-pool execution.
@@ -126,7 +136,7 @@ class Manager:
             raise
 
 
-    def _send(self, service_class, service_name, file, file_format, dest_dir):
+    def _send(self, service_class, service_name, file, dest_dir):
         # The service_name parameter is only needed so caller can set the color.
 
         service = service_class()
@@ -134,14 +144,10 @@ class Manager:
         last_time = timer()
         say = self._say
 
-        # If need to convert format, best do it after resizing original fmt.
-        need_convert = file_format not in service.accepted_formats()
         # Test the dimensions, not bytes, because of compression.
         service_max = service.max_dimensions()
         if service_max and image_dimensions(file) > service_max:
             file = self._file_after_resizing(file, service)
-        if file and need_convert:
-            file = self._file_after_converting(file, 'jpg', service)
         if not file:
             return
 
@@ -187,7 +193,7 @@ class Manager:
             return resized
 
 
-    def _file_after_converting(self, file, to_format, tool):
+    def _file_after_converting(self, file, to_format):
         new_file = filename_basename(file) + '.' + to_format
         say = self._say
         if path.exists(new_file):

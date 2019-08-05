@@ -64,12 +64,6 @@ class GoogleTR(TextRecognition):
         return 'medium_purple_2a'
 
 
-    @classmethod
-    def accepted_formats(self):
-        '''Returns a list of supported image file formats.'''
-        return ['jpeg', 'jpg', 'png', 'gif', 'bmp', 'raw', 'tif', 'tiff', 'pdf']
-
-
     def max_rate(self):
         '''Returns the number of calls allowed per second.'''
         # https://cloud.google.com/vision/quotas

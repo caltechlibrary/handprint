@@ -140,12 +140,6 @@ class AmazonTextractTR(AmazonTR):
         return 'dark_orange_3a'
 
 
-    @classmethod
-    def accepted_formats(self):
-        '''Returns a list of supported image file formats.'''
-        return ['jpeg', 'jpg', 'png', 'pdf']
-
-
     def result(self, file_path):
         '''Returns the results from calling the service on the 'file_path'.
         The results are returned as an TRResult named tuple.
@@ -172,12 +166,6 @@ class AmazonRekognitionTR(AmazonTR):
         '''Returns a color code for this service.  Codes must be taken from
         those defined by https://pypi.org/project/colored/.'''
         return 'light_goldenrod_3'
-
-
-    @classmethod
-    def accepted_formats(self):
-        '''Returns a list of supported image file formats.'''
-        return ['jpeg', 'jpg', 'png']
 
 
     def result(self, file_path):

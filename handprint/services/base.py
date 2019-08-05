@@ -98,11 +98,6 @@ class TextRecognition(object):
         pass
 
 
-    def accepted_formats(self):
-        '''Returns a list of supported image file formats.'''
-        pass
-
-
     def max_rate(self):
         '''Returns the number of calls allowed per second.'''
         pass

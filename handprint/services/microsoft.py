@@ -50,12 +50,6 @@ class MicrosoftTR(TextRecognition):
         return 'sky_blue_1'
 
 
-    @classmethod
-    def accepted_formats(self):
-        '''Returns a list of supported image file formats.'''
-        return ['jpeg', 'jpg', 'png', 'gif', 'bmp']
-
-
     def max_rate(self):
         '''Returns the number of calls allowed per second.'''
         # https://azure.microsoft.com/en-us/pricing/details/cognitive-services/computer-vision/

@@ -53,7 +53,7 @@ class Manager:
         self._spinner = None
 
 
-    def process(self, item, index, base_name):
+    def run_service(self, item, index, base_name):
         # Shortcuts to make the code more readable.
         output_dir = self._output_dir
         spinner = self._spinner

@@ -95,7 +95,7 @@ class MainBody(object):
         for index, item in enumerate(targets, start = 1):
             if print_separators:
                 say.msg('━'*70, 'dark')
-            manager.process(item, index, base_name)
+            manager.run_service(item, index, base_name)
         if print_separators:
             say.msg('━'*70, 'dark')
 

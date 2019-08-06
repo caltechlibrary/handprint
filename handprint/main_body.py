@@ -124,4 +124,8 @@ class MainBody(object):
                     targets += files
                 else:
                     self._say.warn('"{}" not a file or directory'.format(item))
+        # Filter files whose names have "-reduced" in them, because these are
+        # images we previously resized from originals, and the originals are
+        # (presumably) among the targets too.
+        targets = [x for x in targets if x.find('-reduced') < 0]
         return targets

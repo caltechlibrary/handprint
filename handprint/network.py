@@ -95,15 +95,15 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
                 raise error
 
 
-def download_file(url, output_file, user = None, pswd = None, spinner = None):
-    if spinner:
-        spinner.update('Downloading {}'.format(url))
+def download_file(url, output_file, user = None, pswd = None, say = None):
+    if say:
+        say.info('Downloading {}'.format(url))
     try:
         download(url, user, pswd, output_file)
         return True
     except (NoContent, ServiceFailure, AuthenticationFailure) as ex:
-        if spinner:
-            spinner.fail('Failed to download {}: {}'.format(url, str(ex)))
+        if say:
+            say.error('{}'.format(str(ex)))
     return False
 
 

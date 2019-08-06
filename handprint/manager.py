@@ -17,24 +17,28 @@ file "LICENSE" for more information.
 from   blessings import Terminal
 from   colored import fg, attr
 from   concurrent.futures import ThreadPoolExecutor
+import humanize
 import io
 from   itertools import repeat
 import json
 import os
 from   os import path
 import shutil
-from   threading import Thread
 import sys
+from   threading import Thread
 import time
 from   timeit import default_timer as timer
+import urllib
 
 import handprint
 from handprint.annotate import annotated_image
+from handprint.debug import log
 from handprint.exceptions import *
-from handprint.files import converted_image, reduced_image
+from handprint.files import converted_image, image_size, image_dimensions
+from handprint.files import reduced_image_size, reduced_image_dimensions
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
-from handprint.files import readable, writable, is_url, image_dimensions
+from handprint.files import readable, writable, is_url
 from handprint.messages import color
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
@@ -44,18 +48,53 @@ from handprint.services import KNOWN_SERVICES
 # -----------------------------------------------------------------------------
 
 class Manager:
-    def __init__(self, services, num_threads, output_dir, extended_results, say):
-        self._services = services
+    def __init__(self, service_names, num_threads, output_dir, extended, say):
+        '''Initialize manager for services.  This will also initialize the
+        credentials for individual services.
+        '''
         self._num_threads = num_threads
-        self._extended_results = extended_results
+        self._extended_results = extended
         self._output_dir = output_dir
         self._say = say
 
+        say.info('Initializing services.')
+        self._services = []
+        for service_name in service_names:
+            service = KNOWN_SERVICES[service_name]()
+            service.init_credentials()
+            self._services.append(service)
 
-    def run_service(self, item, index, base_name):
+        # In order to make the results comparable, we resize all the images
+        # to the smallest size accepted by any of the services we will run.
+        self._max_size = None
+        self._max_dimensions = None
+        for service in self._services:
+            # Only consider those services that do indicate maxima.
+            if service.max_size():
+                if self._max_size:
+                    self._max_size = min(self._max_size, service.max_size())
+                else:
+                    self._max_size = service.max_size()
+            if service.max_dimensions():
+                if self._max_dimensions:
+                    (max_width, max_height) = self._max_dimensions
+                    service_max = service.max_dimensions()
+                    self._max_dimensions = (min(max_width, service_max[0]),
+                                            min(max_height, service_max[1]))
+                else:
+                    self._max_dimensions = service.max_dimensions()
+        if __debug__: log('max_size = {}', self._max_size)
+        if __debug__: log('max_dimensions = {}', self._max_dimensions)
+
+
+    def run_services(self, item, index, base_name):
+        '''Run all requested services on the image indicated by "item", using
+        "index" and "base_name" to construct a download copy of the item if
+        it has to be downloaded from a URL first.
+        '''
         # Shortcuts to make the code more readable.
-        output_dir = self._output_dir
         services = self._services
+        output_dir = self._output_dir
         say = self._say
 
         try:
@@ -64,20 +103,20 @@ class Manager:
             # the base_name.
             if is_url(item):
                 # First make sure the URL actually points to an image.
-                if __debug__: log('Testing if URL contains an image: {}', item)
+                if __debug__: log('testing if URL contains an image: {}', item)
                 try:
-                    response = request.urlopen(item)
+                    response = urllib.request.urlopen(item)
                 except Exception as ex:
-                    if __debug__: log('Network access resulted in error: {}', str(ex))
                     say.warn('Skipping URL due to error: {}'.format(ex))
                     return
                 if response.headers.get_content_maintype() != 'image':
                     say.warn('Did not find an image at {}'.format(item))
                     return
-                fmt = response.headers.get_content_subtype()
+                orig_fmt = response.headers.get_content_subtype()
                 base = '{}-{}'.format(base_name, index)
-                file = path.realpath(path.join(output_dir, base + '.' + fmt))
-                if not download_file(item, file):
+                file = path.realpath(path.join(output_dir, base + '.' + orig_fmt))
+                if not download_file(item, file, say):
+                    say.warn('Unable to download {}'.format(item))
                     return
                 url_file = path.realpath(path.join(output_dir, base + '.url'))
                 with open(url_file, 'w') as f:
@@ -85,25 +124,27 @@ class Manager:
                     say.info('Wrote URL to {}'.format(relative(url_file)))
             else:
                 file = path.realpath(path.join(os.getcwd(), item))
-                fmt = filename_extension(file)
+                orig_fmt = filename_extension(file)
 
-            # All the services accept JPEG, so normalize all inputs to JPEG.
-            if fmt != 'jpg' and fmt != 'jpeg':
-                file = self._file_after_converting(file, 'jpg')
-            if not file:
-                say.warn('Skipping {}'.relative(format(file)))
-                return
-
+            # Sanity check.
             dest_dir = output_dir if output_dir else path.dirname(file)
             if not writable(dest_dir):
                 say.error('Cannot write output in {}.'.format(dest_dir))
                 return
 
+            # Normalize to the lowest common denominator.
+            new_file = self._normalized_file(file, orig_fmt)
+            if not new_file:
+                say.warn('Skipping {}'.format(relative(file)))
+                return
+            else:
+                file = new_file
+
             # If the number of threads is set to 1, we force non-thread-pool
             # execution to make debugging easier.
             if self._num_threads == 1:
-                for service_name in services:
-                    self._send(file, service_name, dest_dir)
+                for service in services:
+                    self._send(file, service, dest_dir)
             else:
                 with ThreadPoolExecutor(max_workers = self._num_threads) as executor:
                     executor.map(self._send, repeat(file), iter(services), repeat(dest_dir))
@@ -111,55 +152,45 @@ class Manager:
         except (KeyboardInterrupt, UserCancelled) as ex:
             say.warn('Interrupted')
             raise
-        except AuthenticationFailure as ex:
-            say.error('Unable to continue using {}: {}'.format(service, ex))
-            return
         except Exception as ex:
             say.error('Stopping due to a problem')
             raise
 
 
-    def _send(self, file, service_name, dest_dir):
+    def _send(self, file, service, dest_dir):
         '''Send the "file" to the service named "service" and write output in
-        directory "dest_dir".'''
-        # Shortcuts for better code readability.
+        directory "dest_dir".
+        '''
+        s_name = service.name()
+        s_color = service.name_color()
         say = self._say
-
-        # Create an instance of the service class and initial.
-        service = KNOWN_SERVICES[service_name]()
-        service.init_credentials()
-        color = service.name_color()
 
         # Helper functions.  Parameter value for "text" should be a format
         # string with a single "{}" where the name of the service will be put.
         def info_msg(text):
-            name = fg(color) + service_name + fg('green') if say.use_color() else service
+            name = fg(s_color) + s_name + fg('green') if say.use_color() else service
             say.info(text.format(name))
 
         def warn_msg(text):
-            name = fg(color) + service_name + fg('yellow') if say.use_color() else service
+            name = fg(s_color) + s_name + fg('yellow') if say.use_color() else service
             say.warn(text.format(name))
 
         def error_msg(text):
-            name = fg(color) + service_name + fg('red') if say.use_color() else service
+            name = fg(s_color) + s_name + fg('red') if say.use_color() else service
             say.error(text.format(name))
-
-        # Test the dimensions, not bytes, because of compression.
-        service_max = service.max_dimensions()
-        if service_max and image_dimensions(file) > service_max:
-            file = self._file_after_resizing(file, service)
-        if not file:
-            return
 
         info_msg('Sending to {} and waiting for response ...')
         last_time = timer()
         try:
             result = service.result(file)
+        except AuthenticationFailure as ex:
+            raise AuthenticationFailure('Unable to use {}: {}'.format(service, ex))
         except RateLimitExceeded as ex:
             time_passed = timer() - last_time
             if time_passed < 1/service.max_rate():
                 warn_msg('Pausing {} due to rate limits')
                 time.sleep(1/service.max_rate() - time_passed)
+                # FIXME resend after pause
         if result.error:
             error_msg('{} failed: ' + result.error)
             warn_msg('No result from {} for ' + relative(format(file)))
@@ -180,27 +211,27 @@ class Manager:
             save_output(result.text, txt_file)
 
 
-    def _file_after_resizing(self, file, tool):
-        file_ext = filename_extension(file)
-        new_file = filename_basename(file) + '-reduced.' + file_ext
-        say = self._say
-        if path.exists(new_file):
-            if __debug__: log('Using reduced image found in {}'.format(relative(new_file)))
-            return new_file
-        else:
-            say.info('Original image too large; reducing size')
-            (resized, error) = reduced_image(file, tool.max_dimensions())
-            if error:
-                say.error('Failed to resize {}: {}'.format(relative(file, error)))
-                return None
-            return resized
+    def _normalized_file(self, file, fmt):
+        '''Normalize images to same format and max size.'''
+        # All services accept JPEG, so normalize files to JPEG.
+        if fmt != 'jpg':
+            file = self._converted_file(file, 'jpg')
+        # Resize if either size or dimensions are larger than accepted
+        if file and self._max_size and self._max_size < image_size(file):
+            file = self._smaller_file(file)
+        if file and self._max_dimensions:
+            (image_width, image_height) = image_dimensions(file)
+            (max_width, max_height) = self._max_dimensions
+            if max_width < image_width or max_height < image_height:
+                file = self._resized_image(file)
+        return file
 
 
-    def _file_after_converting(self, file, to_format):
+    def _converted_file(self, file, to_format):
         new_file = filename_basename(file) + '.' + to_format
         say = self._say
         if path.exists(new_file):
-            say.info('Using converted image found in {}'.format(relative(new_file)))
+            say.info('Using already converted image in {}'.format(relative(new_file)))
             return new_file
         else:
             say.info('Converting to {} format: {}'.format(to_format, relative(file)))
@@ -209,6 +240,58 @@ class Manager:
                 say.error('Failed to convert {}: {}'.format(relative(file), error))
                 return None
             return converted
+
+
+    def _smaller_file(self, file):
+        if not file:
+            return None
+        say = self._say
+        file_ext = filename_extension(file)
+        if file.find('-reduced') > 0:
+            new_file = file
+        else:
+            new_file = filename_basename(file) + '-reduced.' + file_ext
+        if path.exists(new_file):
+            if image_size(new_file) < self._max_size:
+                say.info('Using resized image found in {}'.format(relative(new_file)))
+                return new_file
+            else:
+                # We found a "-reduced" file, perhaps from a previous run, but
+                # for the current set of services, it's larger than allowed.
+                if __debug__: log('existing resized file larger than {}b: {}',
+                                  humanize.intcomma(self._max_size), new_file)
+        say.info('Size too large; reducing size: {}'.format(relative(file)))
+        (resized, error) = reduced_image_size(file, new_file, self._max_size)
+        if error:
+            say.error('Failed to resize {}: {}'.format(relative(file), error))
+            return None
+        return resized
+
+
+    def _resized_image(self, file):
+        (max_width, max_height) = self._max_dimensions
+        file_ext = filename_extension(file)
+        say = self._say
+        if file.find('-reduced') > 0:
+            new_file = file
+        else:
+            new_file = filename_basename(file) + '-reduced.' + file_ext
+        if path.exists(new_file) and readable(new_file):
+            (image_width, image_height) = image_dimensions(new_file)
+            if image_width < max_width and image_height < max_height:
+                say.info('Using reduced image found in {}'.format(relative(new_file)))
+                return new_file
+            else:
+                # We found a "-reduced" file, perhaps from a previous run, but
+                # for the current set of services, dimension are too large.
+                if __debug__: log('existing resized file larger than {}x{}: {}',
+                                  max_width, max_height, new_file)
+        say.info('Dimensions too large; reducing dimensions: {}'.format(relative(file)))
+        (resized, error) = reduced_image_dimensions(file, new_file, max_width, max_height)
+        if error:
+            say.error('Failed to re-dimension {}: {}'.format(relative(file), error))
+            return None
+        return resized
 
 
 # Helper functions.

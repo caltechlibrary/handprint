@@ -140,6 +140,10 @@ class Manager:
             name = fg(color) + service_name + fg('yellow') if say.use_color() else service
             say.warn(text.format(name))
 
+        def error_msg(text):
+            name = fg(color) + service_name + fg('red') if say.use_color() else service
+            say.error(text.format(name))
+
         # Test the dimensions, not bytes, because of compression.
         service_max = service.max_dimensions()
         if service_max and image_dimensions(file) > service_max:
@@ -157,7 +161,8 @@ class Manager:
                 warn_msg('Pausing {} due to rate limits')
                 time.sleep(1/service.max_rate() - time_passed)
         if result.error:
-            say.error(result.error)
+            error_msg('{} failed: ' + result.error)
+            warn_msg('No result from {} for ' + relative(format(file)))
             return
 
         info_msg('Got result from {}.')
@@ -185,7 +190,7 @@ class Manager:
         else:
             say.info('Original image too large; reducing size')
             (resized, error) = reduced_image(file, tool.max_dimensions())
-            if not resized:
+            if error:
                 say.error('Failed to resize {}: {}'.format(relative(file, error)))
                 return None
             return resized
@@ -200,7 +205,7 @@ class Manager:
         else:
             say.info('Converting to {} format: {}'.format(to_format, relative(file)))
             (converted, error) = converted_image(file, to_format)
-            if not converted:
+            if error:
                 say.error('Failed to convert {}: {}'.format(relative(file), error))
                 return None
             return converted

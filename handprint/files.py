@@ -215,6 +215,8 @@ def open_url(url):
 
 def image_size(file):
     '''Returns the size of the image in 'file', in units of bytes.'''
+    if not file:
+        return 0
     return path.getsize(file)
 
 
@@ -222,9 +224,13 @@ def image_dimensions(file):
     '''Returns the pixel dimensions of the image as a tuple of (width, height).'''
     # When converting images, PIL may issue a DecompressionBombWarning but
     # it's not a concern in our application.  Ignore it.
+    if not file:
+        return (0, 0)
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         im = Image.open(file)
+        if not im:
+            return (0, 0)
         return im.size
 
 
@@ -241,41 +247,69 @@ def converted_image(file, to_format):
         warnings.simplefilter('ignore')
         try:
             im = Image.open(file)
+            im.convert('RGB')
             im.save(dest_file, canonical_format_name(to_format))
-            if __debug__: log('Saved converted image to {}', dest_file)
+            if __debug__: log('saved converted image to {}', dest_file)
             return (dest_file, None)
         except Exception as ex:
             return (None, str(ex))
 
 
-def reduced_image(file, max_dimensions):
+def reduced_image_size(orig_file, dest_file, max_size):
     '''Resizes the image and writes a new file named "ORIGINAL-reduced.EXT".
     Returns a tuple of (new_file, error).  The value of 'error' will be None
     if no error occurred; otherwise, the value will be a string summarizing the
     error that occurred and 'new_file' will be set to None.
     '''
-    extension = filename_extension(file)
-    dest_file = filename_basename(file) + '-reduced.' + extension
     with warnings.catch_warnings():
         # Catch warnings from image conversion, like DecompressionBombWarning
         warnings.simplefilter('ignore')
         try:
-            im = Image.open(file)
+            i_size = image_size(orig_file)
+            if i_size <= max_size:
+                if __debug__: log('file already smaller than requested: {}', orig_file)
+                return (orig_file, None)
+            ratio = max_size/i_size
+            if __debug__: log('resize ratio = {}', ratio)
+            im = Image.open(orig_file)
             dims = im.size
-            width_ratio = max_dimensions[0]/dims[0]
-            length_ratio = max_dimensions[1]/dims[1]
-            ratio = min(width_ratio, length_ratio)
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
-            if __debug__: log('Resizing image to {}', new_dims)
+            if __debug__: log('resizing image to {}', new_dims)
             resized = im.resize(new_dims, Image.HAMMING)
             resized.save(dest_file)
-            if __debug__: log('Saved converted image to {}', dest_file)
+            if __debug__: log('saved resized image to {}', dest_file)
+            return (dest_file, None)
+        except Exception as ex:
+            return (None, str(ex))
+
+
+def reduced_image_dimensions(orig_file, dest_file, max_width, max_height):
+    '''Resizes the image and writes a new file named "ORIGINAL-reduced.EXT".
+    Returns a tuple of (new_file, error).  The value of 'error' will be None
+    if no error occurred; otherwise, the value will be a string summarizing the
+    error that occurred and 'new_file' will be set to None.
+    '''
+    with warnings.catch_warnings():
+        # Catch warnings from image conversion, like DecompressionBombWarning
+        warnings.simplefilter('ignore')
+        try:
+            im = Image.open(orig_file)
+            dims = im.size
+            width_ratio = max_width/dims[0]
+            length_ratio = max_height/dims[1]
+            ratio = min(width_ratio, length_ratio)
+            new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
+            if __debug__: log('resizing image to {}', new_dims)
+            resized = im.resize(new_dims, Image.HAMMING)
+            resized.save(dest_file)
+            if __debug__: log('saved re-dimensioned image to {}', dest_file)
             return (dest_file, None)
         except Exception as ex:
             return (None, str(ex))
 
 
 def canonical_format_name(format):
+    '''Convert format name "format" to a consistent version.'''
     format = format.lower()
     if format in ['jpg', 'jpeg']:
         return 'jpeg'

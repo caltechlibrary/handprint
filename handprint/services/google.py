@@ -82,13 +82,8 @@ class GoogleTR(TextRecognition):
 
     def max_dimensions(self):
         '''Maximum image size as a tuple of pixel numbers: (width, height).'''
-        # No max dimensions are given in the Google docs, so this returns
-        # dimensions based on a square image of the max size.  This is not a
-        # great approach because (a) an image that doesn't have a square
-        # aspect ratio could legitimately have larger dimensions and (b) this
-        # assumes 8-bit color, but for now let's take this easy way out.
-        side = math.floor(math.sqrt(self.max_size()))
-        return (side, side)
+        # No max dimensions are given in the Google docs.
+        return None
 
 
     # General scheme of things:

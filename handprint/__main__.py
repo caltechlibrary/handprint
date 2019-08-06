@@ -66,6 +66,7 @@ disable_ssl_cert_check()
     no_color   = ('do not color-code terminal output',               'flag',   'C'),
     extended   = ('produce extended results (text file, JSON data)', 'flag',   'e'),
     from_file  = ('read list of images or URLs from file "F"',       'option', 'f'),
+    no_grid    = ('do not create results grid image (default: do)',  'flag',   'G'),
     list       = ('print list of known services',                    'flag',   'l'),
     output_dir = ('write output to directory "O"',                   'option', 'o'),
     quiet      = ('only print important messages while working',     'flag',   'q'),
@@ -77,8 +78,9 @@ disable_ssl_cert_check()
 )
 
 def main(add_creds = 'A', base_name = 'B', no_color = False, extended = False,
-         from_file = 'F', list = False, output_dir = 'O', quiet = False,
-         services = 'S', threads = 'T', version = False, debug = False, *files):
+         from_file = 'F', no_grid = False, list = False, output_dir = 'O',
+         quiet = False, services = 'S', threads = 'T', version = False,
+         debug = False, *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -126,11 +128,20 @@ The image paths or URLs can be supplied in any of the following ways:
     paths or image URLs.
 
 If given URLs, Handprint will first download the images found at the URLs to
-a local directory indicated by the option -o (/o on Windows).
+a local directory indicated by the option -o (/o on Windows).  Handprint can
+accept input images in JPEG, PNG, GIF, BMP, and TIFF formats.  To make the
+results from different services more easily comparable, Handprint will always
+convert all input images to the same format (JPEG) no matter if some services
+may accept other formats; it will also resize input images to the smallest
+size accepted by any of the services invoked if an image exceeds that size.
+(For example, if service A accepts files up to 10 MB in size and service B
+accepts files up to 5 MB, all input images will be resized to 5 MB before
+sending them to A and B, even if A could accept a higher-resolution image.)
 
 The default action is to run all known services; the option -s (/s on
-Windows) can be used to select only one service or a list of services instead.
-Lists of services should be separated by commas; e.g., "google,microsoft".
+Windows) can be used to select only one service or a list of services
+instead.  Lists of services should be separated by commas; e.g.,
+"google,microsoft".
 
 When performing OCR/HTR on images, Handprint writes the results to new files
 that it creates either in the same directories as the original files, or (if
@@ -147,10 +158,18 @@ named "somefile.jpg" will produce
 
 and so on for each image and each service used.
 
-By default, Handprint will produce only one type of output: an annotated JPEG
-image files showing the recognized words superimposed over the original
-image.  If given the -e option (/e on Windows), Handprint will produce
-extended output that includes the complete response from the service
+By default, Handprint will also create a single compound image consisting of
+all the service results arranged in a grid.  This is intended to make it
+easier to compare the results of multiple services against each other.  To
+skip the creation of the results grid, use the option -G (/G on Windows).
+The grid image will be named
+
+  somefile.results-grid.jpg
+
+By default, Handprint will produce only one type of output for each service:
+an annotated JPEG image files showing the recognized words superimposed over
+the original image.  If given the -e option (/e on Windows), Handprint will
+produce extended output that includes the complete response from the service
 (converted to a JSON file by Handprint) and the text extracted (stored as a
 .txt file).  The output of -e will be multiple files like this:
 
@@ -166,11 +185,12 @@ extended output that includes the complete response from the service
   somefile.amazon.txt
   ...
 
-If images are too large for a service, then Handprint will resize them prior
-to sending them.  It will write the reduced image to a file named
-"FILENAME-reduced.EXT", where "FILENAME" is the original file name and "EXT"
-is the file extension.  This means that if an image needs to be resized, the
-results of applying the text recognition services will be, e.g.,
+If an image is too large for some service, then Handprint will resize it
+prior to sending the image to all of the services (as noted above).  It will
+write the reduced image to a file named "FILENAME-reduced.EXT", where
+"FILENAME" is the original file name and "EXT" is the file extension.  This
+means that if an image needs to be resized, the results of applying the text
+recognition services will be, e.g.,
 
   somefile-reduced.jpg
   somefile-reduced.google.jpg
@@ -229,6 +249,7 @@ Command-line arguments summary
     say = MessageHandlerCLI(not no_color, quiet)
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = '(Hint: use {}h for help.)'.format(prefix)
+    make_grid = not no_grid
 
     # Preprocess arguments and handle early exits -----------------------------
 
@@ -275,7 +296,7 @@ Command-line arguments summary
         say.info('┃    Welcome to Handprint, the {}!    ┃'.format(fancy))
         say.info('┗' + '━'*68 + '┛')
         body = MainBody(base_name, extended, from_file, output_dir, threads, say)
-        body.run(services, files)
+        body.run(services, files, make_grid)
     except (KeyboardInterrupt, UserCancelled) as ex:
         if __debug__: log('received {}', ex.__name__)
         exit(say.info_text('Quitting.'))

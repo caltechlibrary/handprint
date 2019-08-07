@@ -126,5 +126,5 @@ class MainBody(object):
                     self._say.warn('"{}" not a file or directory'.format(item))
         # Filter files we created in past runs.
         targets = [x for x in targets if x.find('-reduced') < 0]
-        targets = [x for x in targets if x.find('results-grid') < 0]
+        targets = [x for x in targets if x.find('all-results') < 0]
         return targets

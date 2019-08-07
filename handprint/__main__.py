@@ -66,7 +66,7 @@ disable_ssl_cert_check()
     no_color   = ('do not color-code terminal output',               'flag',   'C'),
     extended   = ('produce extended results (text file, JSON data)', 'flag',   'e'),
     from_file  = ('read list of images or URLs from file "F"',       'option', 'f'),
-    no_grid    = ('do not create results grid image (default: do)',  'flag',   'G'),
+    no_grid    = ('do not create all-results grid image',            'flag',   'G'),
     list       = ('print list of known services',                    'flag',   'l'),
     output_dir = ('write output to directory "O"',                   'option', 'o'),
     quiet      = ('only print important messages while working',     'flag',   'q'),
@@ -143,10 +143,11 @@ Windows) can be used to select only one service or a list of services
 instead.  Lists of services should be separated by commas; e.g.,
 "google,microsoft".
 
-When performing OCR/HTR on images, Handprint writes the results to new files
-that it creates either in the same directories as the original files, or (if
-given the -o option) the directory indicated by the -o option (/o on Windows).
-The results will be written in files named after the original files with the
+When performing OCR/HTR on images, Handprint temporarily (unless the -e
+option is given -- see below) writes the results to new files that it creates
+either in the same directories as the original files, or (if given the -o
+option) the directory indicated by the -o option (/o on Windows).  The
+results will be written in files named after the original files with the
 addition of a string that indicates the service used.  For example, a file
 named "somefile.jpg" will produce
 
@@ -156,15 +157,17 @@ named "somefile.jpg" will produce
   somefile.amazon.jpg
   ...
 
-and so on for each image and each service used.
+and so on for each image and each service used.  These files are deleted
+after the final results grid image is created, unless the -e option (/e on
+Windows) is used to indicate that extended results should be produced.
 
-By default, Handprint will also create a single compound image consisting of
-all the service results arranged in a grid.  This is intended to make it
-easier to compare the results of multiple services against each other.  To
-skip the creation of the results grid, use the option -G (/G on Windows).
-The grid image will be named
+After gathering the results of each service for a given image, Handprint will
+create a single compound image consisting of all the annotated results images
+arranged in a grid.  This is intended to make it easier to compare the
+results of multiple services against each other.  To skip the creation of the
+results grid, use the -G option (/G on Windows).  The grid image will be named
 
-  somefile.results-grid.jpg
+  somefile.all-results.jpg
 
 By default, Handprint will produce only one type of output for each service:
 an annotated JPEG image files showing the recognized words superimposed over
@@ -185,9 +188,9 @@ produce extended output that includes the complete response from the service
   somefile.amazon.txt
   ...
 
-If an image is too large for some service, then Handprint will resize it
-prior to sending the image to all of the services (as noted above).  It will
-write the reduced image to a file named "FILENAME-reduced.EXT", where
+If an image is too large for any of the services invoked, then Handprint will
+resize it prior to sending the image to any of the services (as noted above).
+It will write the reduced image to a file named "FILENAME-reduced.EXT", where
 "FILENAME" is the original file name and "EXT" is the file extension.  This
 means that if an image needs to be resized, the results of applying the text
 recognition services will be, e.g.,

@@ -38,7 +38,7 @@ from handprint.files import converted_image, image_size, image_dimensions
 from handprint.files import reduced_image_size, reduced_image_dimensions
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
-from handprint.files import readable, writable, is_url
+from handprint.files import readable, writable, is_url, create_image_grid
 from handprint.messages import color
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
@@ -48,13 +48,14 @@ from handprint.services import KNOWN_SERVICES
 # -----------------------------------------------------------------------------
 
 class Manager:
-    def __init__(self, service_names, num_threads, output_dir, extended, say):
+    def __init__(self, service_names, num_threads, output_dir, make_grid, extended, say):
         '''Initialize manager for services.  This will also initialize the
         credentials for individual services.
         '''
         self._num_threads = num_threads
         self._extended_results = extended
         self._output_dir = output_dir
+        self._make_grid = make_grid
         self._say = say
 
         say.info('Initializing services.')
@@ -126,11 +127,13 @@ class Manager:
                 file = path.realpath(path.join(os.getcwd(), item))
                 orig_fmt = filename_extension(file)
 
-            # Sanity check.
             dest_dir = output_dir if output_dir else path.dirname(file)
             if not writable(dest_dir):
                 say.error('Cannot write output in {}.'.format(dest_dir))
                 return
+
+            # Save grid file name now, because it's based on the original file.
+            grid_file = filename_basename(file) + '.results-grid.jpg'
 
             # Normalize to the lowest common denominator.
             new_file = self._normalized_file(file, orig_fmt)
@@ -142,12 +145,18 @@ class Manager:
 
             # If the number of threads is set to 1, we force non-thread-pool
             # execution to make debugging easier.
+            results = []
             if self._num_threads == 1:
-                for service in services:
-                    self._send(file, service, dest_dir)
+                results = [self._send(file, s, dest_dir) for s in services]
             else:
                 with ThreadPoolExecutor(max_workers = self._num_threads) as executor:
-                    executor.map(self._send, repeat(file), iter(services), repeat(dest_dir))
+                    results = list(executor.map(self._send, repeat(file),
+                                                iter(services), repeat(dest_dir)))
+
+            # Create grid file if requested, and we're done.
+            if self._make_grid:
+                say.info('Creating results grid image: {}'.format(relative(grid_file)))
+                create_image_grid(results, grid_file, max_horizontal = 2)
             say.info('Done with {}'.format(relative(item)))
         except (KeyboardInterrupt, UserCancelled) as ex:
             say.warn('Interrupted')
@@ -161,22 +170,23 @@ class Manager:
         '''Send the "file" to the service named "service" and write output in
         directory "dest_dir".
         '''
-        s_name = service.name()
-        s_color = service.name_color()
+        service_name = service.name()
+        color = service.name_color()
         say = self._say
+        use_color = say.use_color()
 
         # Helper functions.  Parameter value for "text" should be a format
         # string with a single "{}" where the name of the service will be put.
         def info_msg(text):
-            name = fg(s_color) + s_name + fg('green') if say.use_color() else service
+            name = fg(color) + service_name + fg('green') if use_color else service
             say.info(text.format(name))
 
         def warn_msg(text):
-            name = fg(s_color) + s_name + fg('yellow') if say.use_color() else service
+            name = fg(color) + service_name + fg('yellow') if use_color else service
             say.warn(text.format(name))
 
         def error_msg(text):
-            name = fg(s_color) + s_name + fg('red') if say.use_color() else service
+            name = fg(color) + service_name + fg('red') if use_color else service
             say.error(text.format(name))
 
         info_msg('Sending to {} and waiting for response ...')
@@ -201,7 +211,7 @@ class Manager:
         base_path  = path.join(dest_dir, file_name)
         annot_file = alt_extension(base_path, str(service) + '.jpg')
         info_msg('Creating annotated image for {}.')
-        save_output(annotated_image(file, result.boxes), annot_file)
+        save_output(annotated_image(file, result.boxes, service_name), annot_file)
         if self._extended_results:
             txt_file  = alt_extension(base_path, str(service) + '.txt')
             json_file = alt_extension(base_path, str(service) + '.json')
@@ -209,6 +219,9 @@ class Manager:
             save_output(json.dumps(result.data), json_file)
             info_msg('Saving extracted text for {}.')
             save_output(result.text, txt_file)
+
+        # Return the annotated image file b/c we use it for the summary grid.
+        return annot_file
 
 
     def _normalized_file(self, file, fmt):
@@ -253,7 +266,7 @@ class Manager:
             new_file = filename_basename(file) + '-reduced.' + file_ext
         if path.exists(new_file):
             if image_size(new_file) < self._max_size:
-                say.info('Using resized image found in {}'.format(relative(new_file)))
+                say.info('Reusing resized image found in {}'.format(relative(new_file)))
                 return new_file
             else:
                 # We found a "-reduced" file, perhaps from a previous run, but

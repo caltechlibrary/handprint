@@ -64,7 +64,7 @@ class MainBody(object):
         self._say        = say
 
 
-    def run(self, services, files):
+    def run(self, services, files, make_grid):
         '''Run service(s) on files.'''
 
         # Set shortcut variables for better code readability below.
@@ -91,7 +91,7 @@ class MainBody(object):
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
-        manager = Manager(services, procs, output_dir, extended, say)
+        manager = Manager(services, procs, output_dir, make_grid, extended, say)
         for index, item in enumerate(targets, start = 1):
             if print_separators:
                 say.msg('━'*70, 'dark')
@@ -124,8 +124,7 @@ class MainBody(object):
                     targets += files
                 else:
                     self._say.warn('"{}" not a file or directory'.format(item))
-        # Filter files whose names have "-reduced" in them, because these are
-        # images we previously resized from originals, and the originals are
-        # (presumably) among the targets too.
+        # Filter files we created in past runs.
         targets = [x for x in targets if x.find('-reduced') < 0]
+        targets = [x for x in targets if x.find('results-grid') < 0]
         return targets

@@ -39,6 +39,7 @@ from handprint.files import reduced_image_size, reduced_image_dimensions
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
 from handprint.files import readable, writable, is_url, create_image_grid
+from handprint.files import delete_existing
 from handprint.messages import color
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
@@ -133,7 +134,7 @@ class Manager:
                 return
 
             # Save grid file name now, because it's based on the original file.
-            grid_file = filename_basename(file) + '.results-grid.jpg'
+            grid_file = filename_basename(file) + '.all-results.jpg'
 
             # Normalize to the lowest common denominator.
             new_file = self._normalized_file(file, orig_fmt)
@@ -157,6 +158,9 @@ class Manager:
             if self._make_grid:
                 say.info('Creating results grid image: {}'.format(relative(grid_file)))
                 create_image_grid(results, grid_file, max_horizontal = 2)
+            if not self._extended_results:
+                for image_file in results:
+                    delete_existing(image_file)
             say.info('Done with {}'.format(relative(item)))
         except (KeyboardInterrupt, UserCancelled) as ex:
             say.warn('Interrupted')

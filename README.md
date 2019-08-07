@@ -5,7 +5,7 @@ Apply different handwritten text recognition services and algorithms to handwrit
 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-0.10.0-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-1.0.0-b44e88.svg?style=flat-square)](http://shields.io)
 
 🏁 Log of recent changes
 -----------------------

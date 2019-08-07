@@ -1,10 +1,16 @@
 Change log for Handprint
 ========================
 
-Version 0.10.0
+Version 1.0.0
 --------------
 
+This release provides many changes over the previous versions of Handprint.  The behavior and implementation have all changed in many large and small ways, and collectively this marks the first version that can fairly be called version 1.0.0.
+
+The following are some of the notable changes in this release:
+
 * Add support for Amazon's Rekognition and Textract services.
+* Add new command-line options
+* Create a summary image consisting of individual
 * Use [READMINE](https://github.com/mhucka/readmine) structure for [README](README.md) file.
 * Update some internal code such as [network.py](handprint/network.py) to versions developed for other projects such as [Microarchiver](https://github/caltechlibrary/microarchiver).
 * Fix some small defects.

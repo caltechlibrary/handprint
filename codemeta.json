@@ -6,7 +6,7 @@
   "codeRepository": "https://github.com/caltechlibrary/handprint",
   "issueTracker": "https://github.com/caltechlibrary/handprint/issues",
   "license": "https://github.com/caltechlibrary/handprint/blob/master/LICENSE",
-  "version": "0.11.0",
+  "version": "1.0.0",
   "author": [
     {
       "@type": "Person",
@@ -17,7 +17,7 @@
       "@id": "https://orcid.org/0000-0001-9105-5960"
     }],
   "developmentStatus": "active",
-  "downloadUrl": "https://github.com/caltechlibrary/handprint/archive/0.11.0.zip",
+  "downloadUrl": "https://github.com/caltechlibrary/handprint/archive/1.0.0.zip",
   "keywords": [
     "handwritten text recognition",
     "HTR",

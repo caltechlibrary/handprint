@@ -15,6 +15,7 @@ file "LICENSE" for more information.
 '''
 
 import io
+import numpy as np
 import os
 from   os import path
 from   PIL import Image
@@ -317,3 +318,25 @@ def canonical_format_name(format):
         return 'tiff'
     else:
         return format
+
+
+# This function was originally based on code posted by user "Maxim" to
+# Stack Overflow: https://stackoverflow.com/a/46877433/743730
+
+def create_image_grid(image_files, dest_file, max_horizontal = np.iinfo(int).max):
+    '''Create image by tiling a list of images read from files.'''
+    n_images = len(image_files)
+    n_horiz = min(n_images, max_horizontal)
+    h_sizes = [0] * n_horiz
+    v_sizes = [0] * (n_images // n_horiz)
+    images = [Image.open(f) for f in image_files]
+    for i, im in enumerate(images):
+        h, v = i % n_horiz, i // n_horiz
+        h_sizes[h] = max(h_sizes[h], im.size[0])
+        v_sizes[v] = max(v_sizes[v], im.size[1])
+    h_sizes, v_sizes = np.cumsum([0] + h_sizes), np.cumsum([0] + v_sizes)
+    im_grid = Image.new('RGB', (h_sizes[-1], v_sizes[-1]), color = 'white')
+    for i, im in enumerate(images):
+        im_grid.paste(im, (h_sizes[i % n_horiz], v_sizes[i // n_horiz]))
+    im_grid.save(dest_file)
+    return im_grid

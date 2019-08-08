@@ -79,12 +79,13 @@ class MainBody(object):
         targets = self.targets_from_arguments(files, from_file)
         if not targets:
             raise RuntimeError('No images to process; quitting.')
-        num = len(targets)
-        print_separators = num > 1 and not say.be_quiet()
+        num_targets = len(targets)
+        print_separators = num_targets > 1 and not say.be_quiet()
         procs = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
 
-        say.info('Will apply services {} to {} image{}.'.format(
-            ', '.join(services), num, 's' if num > 1 else ''))
+        say.info('Will apply {} service{} ({}) to {} image{}.'.format(
+            len(services), 's' if len(services) > 1 else '', ', '.join(services),
+            num_targets, 's' if num_targets > 1 else ''))
         if self._extended:
             say.info('Will save extended results.')
         say.info('Will use {} process threads.'.format(procs))

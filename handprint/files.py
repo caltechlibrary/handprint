@@ -234,7 +234,7 @@ def open_url(url):
 
 def image_size(file):
     '''Returns the size of the image in 'file', in units of bytes.'''
-    if not file:
+    if not file or not readable(file):
         return 0
     return path.getsize(file)
 

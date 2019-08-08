@@ -135,16 +135,20 @@ class Manager:
             # Save grid file name now, because it's based on the original file.
             grid_file = filename_basename(file) + '.all-results.jpg'
 
+            # We will usually delete temporary files we create.
+            to_delete = set()
+
             # Normalize to the lowest common denominator.
-            new_file = self._normalized_file(file, orig_fmt)
+            (new_file, intermediate_files) = self._normalized_file(file, orig_fmt)
             if not new_file:
                 say.warn('Skipping {}'.format(relative(file)))
                 return
-            else:
-                file = new_file
+            file = new_file
+            if intermediate_files:
+                to_delete.update(intermediate_files)
 
-            # If the number of threads is set to 1, we force non-thread-pool
-            # execution to make debugging easier.
+            # Send the file to the services.  If the number of threads is set
+            # to 1, we force non-thread-pool execution to make debugging easier.
             results = []
             if self._num_threads == 1:
                 results = [self._send(file, s, dest_dir) for s in services]
@@ -156,14 +160,18 @@ class Manager:
             # If a service failed for some reason (e.g., a network glitch), we
             # get no result back.  Remove empty results & go on with the rest.
             results = [x for x in results if x is not None]
+            to_delete.update(results)
 
-            # Create grid file if requested, and we're done.
+            # Create grid file if requested.
             if self._make_grid:
                 say.info('Creating results grid image: {}'.format(relative(grid_file)))
                 create_image_grid(results, grid_file, max_horizontal = 2)
-            if not self._extended_results:
-                for image_file in results:
+
+            # Clean up after ourselves.
+            if self._make_grid and not self._extended_results:
+                for image_file in to_delete:
                     delete_existing(image_file)
+
             say.info('Done with {}'.format(relative(item)))
         except (KeyboardInterrupt, UserCancelled) as ex:
             say.warn('Interrupted')
@@ -216,35 +224,45 @@ class Manager:
         info_msg('Got result from {}.')
         file_name  = path.basename(file)
         base_path  = path.join(dest_dir, file_name)
-        annot_file = alt_extension(base_path, str(service) + '.jpg')
+        annot_path = alt_extension(base_path, str(service) + '.jpg')
         info_msg('Creating annotated image for {}.')
-        save_output(annotated_image(file, result.boxes, service_name), annot_file)
+        self._save_output(annotated_image(file, result.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = alt_extension(base_path, str(service) + '.txt')
             json_file = alt_extension(base_path, str(service) + '.json')
             info_msg('Saving all data for {}.')
-            save_output(json.dumps(result.data), json_file)
+            self._save_output(json.dumps(result.data), json_file)
             info_msg('Saving extracted text for {}.')
-            save_output(result.text, txt_file)
+            self._save_output(result.text, txt_file)
 
         # Return the annotated image file b/c we use it for the summary grid.
-        return annot_file
+        return annot_path
 
 
     def _normalized_file(self, file, fmt):
         '''Normalize images to same format and max size.'''
         # All services accept JPEG, so normalize files to JPEG.
+        to_delete = set()
         if fmt != 'jpg':
-            file = self._converted_file(file, 'jpg')
+            new_file = self._converted_file(file, 'jpg')
+            if path.basename(new_file) != path.basename(file):
+                to_delete.add(new_file)
+            file = new_file
         # Resize if either size or dimensions are larger than accepted
         if file and self._max_size and self._max_size < image_size(file):
-            file = self._smaller_file(file)
+            new_file = self._smaller_file(file)
+            if path.basename(new_file) != path.basename(file):
+                to_delete.add(new_file)
+            file = new_file
         if file and self._max_dimensions:
             (image_width, image_height) = image_dimensions(file)
             (max_width, max_height) = self._max_dimensions
             if max_width < image_width or max_height < image_height:
-                file = self._resized_image(file)
-        return file
+                new_file = self._resized_image(file)
+                if path.basename(new_file) != path.basename(file):
+                    to_delete.add(new_file)
+                file = new_file
+        return (file, to_delete)
 
 
     def _converted_file(self, file, to_format):
@@ -313,18 +331,27 @@ class Manager:
             return None
         return resized
 
+    def _save_output(self, result, file):
+        say = self._say
+        if isinstance(result, tuple):
+            # Assumes 2 elements: data, and error
+            (data, error) = result
+            if error:
+                say.error('Error: {}'.format(error))
+                say.warn('Unable to write {}'.format(file))
+                return
+            else:
+                result = data
+        if isinstance(result, str):
+            with open(file, 'w') as f:
+                f.write(result)
+        elif isinstance(result, io.BytesIO):
+            with open(file, 'wb') as f:
+                shutil.copyfileobj(result, f)
+
 
 # Helper functions.
 # ......................................................................
-
-def save_output(data, file):
-    if isinstance(data, str):
-        with open(file, 'w') as f:
-            f.write(data)
-    elif isinstance(data, io.BytesIO):
-        with open(file, 'wb') as f:
-            shutil.copyfileobj(data, f)
-
 
 def url_file_content(url):
     return '[InternetShortcut]\nURL={}\n'.format(url)

@@ -87,7 +87,8 @@ class AmazonTR(TextRecognition):
         # If any exceptions occur, let them be passed to caller.
         (image, error) = self._image_from_file(file_path)
         if error:
-            return error
+            return TRResult(path = file_path, data = {}, boxes = [],
+                            text = '', error = error)
 
         if __debug__: log('setting up Amazon client function "{}"', variant)
         creds = self._credentials
@@ -119,7 +120,7 @@ class AmazonTR(TextRecognition):
         except KeyboardInterrupt as ex:
             raise
         except Exception as ex:
-            text = 'Error: {} -- "{}"'.format(str(ex), file_path)
+            text = 'Error: {} -- {}'.format(str(ex), file_path)
             return TRResult(path = file_path, data = {}, boxes = [],
                             text = '', error = text)
 

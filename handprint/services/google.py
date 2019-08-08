@@ -45,7 +45,7 @@ class GoogleTR(TextRecognition):
     def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
         try:
-            if __debug__: log('Initializing credentials')
+            if __debug__: log('initializing credentials')
             GoogleCredentials()
         except Exception as ex:
             raise AuthenticationFailure(str(ex))
@@ -107,7 +107,7 @@ class GoogleTR(TextRecognition):
         '''
         # Check if we already processed it.
         if path in self._results:
-            if __debug__: log('Returning already-known result for {}', path)
+            if __debug__: log('returning already-known result for {}', path)
             return self._results[path]
 
         # Read the image and proceed with contacting the service.
@@ -116,7 +116,7 @@ class GoogleTR(TextRecognition):
             return error
 
         try:
-            if __debug__: log('Building Google vision API object')
+            if __debug__: log('building Google vision API object')
             client  = gv.ImageAnnotatorClient()
             image   = gv.types.Image(content = image)
             context = gv.types.ImageContext(language_hints = ['en-t-i0-handwrit'])
@@ -124,9 +124,9 @@ class GoogleTR(TextRecognition):
             # Iterate over the known API calls and store each result.
             result = dict.fromkeys(self._known_features)
             for feature in self._known_features:
-                if __debug__: log('Sending image to Google for {} ...', feature)
+                if __debug__: log('sending image to Google for {} ...', feature)
                 response = getattr(client, feature)(image = image, image_context = context)
-                if __debug__: log('Received result.')
+                if __debug__: log('received result.')
                 result[feature] = MessageToDict(response)
             full_text = ''
 
@@ -160,7 +160,7 @@ class GoogleTR(TextRecognition):
                             else:
                                 # Something is wrong with the vertex list.
                                 # Skip it and continue.
-                                if __debug__: log('Bad bb for {}: {}', text, bb)
+                                if __debug__: log('bad bb for {}: {}', text, bb)
 
             self._results[path] = TRResult(path = path, data = result,
                                            boxes = boxes, text = full_text,

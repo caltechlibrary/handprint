@@ -133,7 +133,7 @@ class TextRecognition(object):
 
         if not readable(file_path):
             return error_result('Unable to read file: {}'.format(file_path))
-        if __debug__: log('Reading {}', file_path)
+        if __debug__: log('reading image file {} for {}', file_path, self.name())
         image = open(file_path, 'rb').read()
         if len(image) == 0:
             return error_result('Empty file: {}'.format(file_path))
@@ -141,7 +141,7 @@ class TextRecognition(object):
             text = 'Exceeds {} byte limit for service: {}'.format(self.max_size(), file_path)
             return error_result(text)
         width, height = imagesize.get(file_path)
-        if __debug__: log('Image size is width = {}, height = {}', width, height)
+        if __debug__: log('image size is width = {}, height = {}', width, height)
         if self.max_dimensions():
             max_width, max_height = self.max_dimensions()
             if width > max_width or height > max_height:

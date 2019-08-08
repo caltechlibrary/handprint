@@ -33,7 +33,7 @@ class AmazonTR(TextRecognition):
     def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
         try:
-            if __debug__: log('Initializing credentials')
+            if __debug__: log('initializing credentials')
             self._credentials = AmazonCredentials().creds()
         except Exception as ex:
             raise AuthenticationFailure(str(ex))
@@ -80,7 +80,7 @@ class AmazonTR(TextRecognition):
         '''
         # Check if we already processed it.
         if file_path in self._results:
-            if __debug__: log('Returning already-known result for {}', file_path)
+            if __debug__: log('returning already-known result for {}', file_path)
             return self._results[file_path]
 
         # Read the image and proceed with contacting the service.
@@ -89,15 +89,15 @@ class AmazonTR(TextRecognition):
         if error:
             return error
 
-        if __debug__: log('Setting up Amazon client function "{}"', variant)
+        if __debug__: log('setting up Amazon client function "{}"', variant)
         creds = self._credentials
         try:
             client = boto3.client(variant, region_name = creds['region_name'],
                                   aws_access_key_id = creds['aws_access_key_id'],
                                   aws_secret_access_key = creds['aws_secret_access_key'])
-            if __debug__: log('Calling Amazon API function')
+            if __debug__: log('calling Amazon API function')
             response = getattr(client, api_method)( **{ image_keyword : {'Bytes': image} })
-            if __debug__: log('Received {} blocks', len(response[response_key]))
+            if __debug__: log('received {} blocks', len(response[response_key]))
             full_text = ''
             boxes = []
             width, height = imagesize.get(file_path)
@@ -110,7 +110,7 @@ class AmazonTR(TextRecognition):
                         boxes.append(TextBox(boundingBox = corners, text = text))
                     else:
                         # Something's wrong with the vertex list. Skip & continue.
-                        if __debug__: log('Bad bb for {}: {}', text, bb)
+                        if __debug__: log('bad bb for {}: {}', text, bb)
 
             result = TRResult(path = file_path, data = response, boxes = boxes,
                               text = full_text, error = None)

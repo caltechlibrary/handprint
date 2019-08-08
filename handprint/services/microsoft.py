@@ -31,7 +31,7 @@ class MicrosoftTR(TextRecognition):
     def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
         try:
-            if __debug__: log('Initializing credentials')
+            if __debug__: log('initializing credentials')
             self._credentials = MicrosoftCredentials().creds()
         except Exception as ex:
             raise AuthenticationFailure(str(ex))
@@ -94,7 +94,7 @@ class MicrosoftTR(TextRecognition):
         '''
         # Check if we already processed it.
         if path in self._results:
-            if __debug__: log('Returning already-known result for {}', path)
+            if __debug__: log('returning already-known result for {}', path)
             return self._results[path]
 
         # Read the image and proceed with contacting the service.
@@ -112,10 +112,10 @@ class MicrosoftTR(TextRecognition):
         # to submit the image for processing, then polling to wait until the
         # text is ready to be retrieved.
 
-        if __debug__: log('Sending file to MS cloud service')
+        if __debug__: log('sending file to MS cloud service')
         response, error = net('post', url, headers = headers, params = params, data = image)
         if isinstance(error, NetworkFailure):
-            if __debug__: log('Network exception: {}', str(error))
+            if __debug__: log('network exception: {}', str(error))
             return TRResult(path = path, data = {}, text = '', error = str(error))
         elif isinstance(error, RateLimitExceeded):
             # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits
@@ -123,7 +123,7 @@ class MicrosoftTR(TextRecognition):
             sleep_time = 30
             if 'Retry-After' in response.headers:
                 sleep_time = int(response.headers['Retry-After'])
-            if __debug__: log('Sleeping for {} s and retrying', sleep_time)
+            if __debug__: log('sleeping for {} s and retrying', sleep_time)
             sleep(sleep_time)
             return self.result(path)    # Recursive invocation
         elif error:
@@ -132,10 +132,10 @@ class MicrosoftTR(TextRecognition):
         if 'Operation-Location' in response.headers:
             polling_url = response.headers['Operation-Location']
         else:
-            if __debug__: log('No operation-location in response headers')
+            if __debug__: log('no operation-location in response headers')
             raise ServiceFailure('Unexpected response from Microsoft server')
 
-        if __debug__: log('Polling MS for results ...')
+        if __debug__: log('polling MS for results ...')
         analysis = {}
         poll = True
         while poll:
@@ -145,7 +145,7 @@ class MicrosoftTR(TextRecognition):
             sleep(2)
             response, error = net('get', polling_url, polling = True, headers = headers)
             if isinstance(error, NetworkFailure):
-                if __debug__: log('Network exception: {}', str(error))
+                if __debug__: log('network exception: {}', str(error))
                 return TRResult(path = path, data = {}, text = '', error = str(error))
             elif isinstance(error, RateLimitExceeded):
                 # Pause to let the server reset its timers.  It seems that MS
@@ -154,7 +154,7 @@ class MicrosoftTR(TextRecognition):
                 sleep_time = 30
                 if 'Retry-After' in response.headers:
                     sleep_time = int(response.headers['Retry-After'])
-                if __debug__: log('Sleeping for {} s and retrying', sleep_time)
+                if __debug__: log('sleeping for {} s and retrying', sleep_time)
                 sleep(sleep_time)
             elif error:
                 raise error
@@ -169,8 +169,8 @@ class MicrosoftTR(TextRecognition):
                 if 'status' in analysis and analysis['status'] == 'Failed':
                     poll = False
             else:
-                if __debug__: log('Received empty result from Microsoft.')
-        if __debug__: log('Results received.')
+                if __debug__: log('received empty result from Microsoft.')
+        if __debug__: log('results received.')
 
         # Have to extract the text into a single string.
         full_text = ''

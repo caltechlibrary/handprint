@@ -346,7 +346,7 @@ def create_image_grid(image_files, dest_file, max_horizontal = np.iinfo(int).max
     n_images = len(image_files)
     n_horiz = min(n_images, max_horizontal)
     h_sizes = [0] * n_horiz
-    v_sizes = [0] * (n_images // n_horiz)
+    v_sizes = [0] * ((n_images // n_horiz) + (1 if n_images % n_horiz > 0 else 0))
     images = [Image.open(f) for f in image_files]
     for i, im in enumerate(images):
         h, v = i % n_horiz, i // n_horiz

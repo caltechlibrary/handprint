@@ -27,7 +27,9 @@ from handprint.files import relative
 # Main functions.
 # .............................................................................
 
-def annotated_image(file, text_boxes, service_name):
+def annotated_image(file, text_boxes, service):
+    service_name = service.name()
+
     fig, axes = plt.subplots(nrows = 1, ncols = 1, figsize = (20, 20))
     axes.get_xaxis().set_visible(False)
     axes.get_yaxis().set_visible(False)
@@ -35,6 +37,13 @@ def annotated_image(file, text_boxes, service_name):
 
     if __debug__: log('reading image file {} for {}', relative(file), service_name)
     axes.imshow(mpimg.imread(file), cmap = "gray")
+
+    # Basic sanity check against something going really wrong.
+    (width, height) = fig.get_size_inches()*fig.dpi     # size in pixels
+    if width > 100000 or height > 100000:
+        # This happens occasionally at random.  I think there's some tread
+        # safety issue somewhere but I haven't solved it.
+        return None
 
     props = dict(facecolor = 'white', alpha = 0.6)
     if text_boxes:
@@ -47,8 +56,12 @@ def annotated_image(file, text_boxes, service_name):
             plt.text(vertices[0][0], vertices[0][1], text, color = 'r',
                      fontsize = 8, va = "top", bbox = props)
 
-    if __debug__: log('saving annotated {} image for {}', relative(file), service_name)
-    buf = io.BytesIO()
-    plt.savefig(buf, format = 'jpg', dpi = 300, bbox_inches = 'tight', pad_inches = 0)
-    buf.seek(0)
+    if __debug__: log('saving {} annotated image {}', service_name, relative(file))
+    try:
+        buf = io.BytesIO()
+        plt.savefig(buf, format = 'jpg', dpi = 300, bbox_inches = 'tight', pad_inches = 0)
+        buf.seek(0)
+    except Exception as ex:
+        if __debug__: log('error saving {} annotated image: {}', service_name, str(ex))
+        return None
     return buf

@@ -59,7 +59,6 @@ class Manager:
         self._make_grid = make_grid
         self._say = say
 
-        say.info('Initializing services.')
         self._services = []
         for service_name in service_names:
             service = KNOWN_SERVICES[service_name]()
@@ -154,6 +153,10 @@ class Manager:
                     results = list(executor.map(self._send, repeat(file),
                                                 iter(services), repeat(dest_dir)))
 
+            # If a service failed for some reason (e.g., a network glitch), we
+            # get no result back.  Remove empty results & go on with the rest.
+            results = [x for x in results if x is not None]
+
             # Create grid file if requested, and we're done.
             if self._make_grid:
                 say.info('Creating results grid image: {}'.format(relative(grid_file)))
@@ -208,7 +211,7 @@ class Manager:
         if result.error:
             error_msg('{} failed: ' + result.error)
             warn_msg('No result from {} for ' + relative(format(file)))
-            return
+            return None
 
         info_msg('Got result from {}.')
         file_name  = path.basename(file)

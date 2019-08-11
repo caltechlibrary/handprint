@@ -4,18 +4,23 @@ Change log for Handprint
 Version 1.0.0
 --------------
 
-This release provides many changes over the previous versions of Handprint.  The behavior and implementation have all changed in many large and small ways, and collectively this marks the first version that can fairly be called version 1.0.0.
+This release provides a great many changes over the previous versions of Handprint.  The behavior and implementation have all changed in various ways, and collectively this marks the first version that can fairly be called version 1.0.0.
 
 The following are some of the notable changes in this release:
 
-* Add support for Amazon's Rekognition and Textract services.
-* Add new command-line options
-* Create a summary image consisting of individual
-* Use [READMINE](https://github.com/mhucka/readmine) structure for [README](README.md) file.
-* Update some internal code such as [network.py](handprint/network.py) to versions developed for other projects such as [Microarchiver](https://github/caltechlibrary/microarchiver).
-* Fix some small defects.
-* Refactor some internal code.
-* Add code of conduct and contributor guidelines.
+* Support for Amazon's Rekognition and Textract services.
+* Credentials are now stored in a separate user directory; in additional, the process for installing credentials files is different, and involves invoking Handprint with the `-a` option.
+* Handprint now calls services in parallel threads, to speed up processing.  The number of threads can be set via the `-t` option.
+* To display the results of text recognition, Handprint now creates a summary image showing all service's results in an _N&nbsp;x&nbsp;N_ grid, thus allowing easy inspection and comparison of results across services.  By default, this is now the only output Handprint produces unless the `-e` option.  With `-e`, Handprint also stores the raw data from the services and the pure text output.
+* Intermediate results files are now deleted unless the `-e` flag is given, reducing clutter and confusion.
+* The [tests/images](tests/images) subdirectory has been reorganized, some previous images have been deleted, and some new ones have been added
+* Internal code such as [network.py](handprint/network.py) has been updated to versions developed for other projects such as [Microarchiver](https://github/caltechlibrary/microarchiver).
+* New command-line options.
+* Fix more bugs.
+* More error checking throughout.
+* Refactored some internal code.
+* The repository now uses [READMINE](https://github.com/mhucka/readmine) structure for [README](README.md) file.
+* Added code of conduct and contributor guidelines to the repository.
 
 
 Version 0.9.0

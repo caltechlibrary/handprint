@@ -64,4 +64,6 @@ def annotated_image(file, text_boxes, service):
     except Exception as ex:
         if __debug__: log('error saving {} annotated image: {}', service_name, str(ex))
         return None
+    finally:
+        plt.close(fig)
     return buf

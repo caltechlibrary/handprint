@@ -10,7 +10,7 @@ Apply different handwritten text recognition services and algorithms to handwrit
 🏁 Log of recent changes
 -----------------------
 
-_Version 0.10.0_: Addition of support for Amazon's Rekognition and Textract services, updates to internal code and some small bug fixes, and addition of code of conduct and contributor guidelines.
+_Version 1.0.0_: This release features changes to behavior and internal implementation, and marks the first sufficiently complete version of Handprint that I feel can be called a proper version 1.0.  Changes include: new way to specify credential files, new default output (where the results of multiple services are placed onto a single large image for easier comparison), new command-line arguments, support for parallel thread execution, and more.
 
 The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
 

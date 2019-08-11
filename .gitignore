@@ -68,3 +68,7 @@ __pycache__
 build
 dist
 *.all-results.jpg
+*.amazon-rekognition.jpg
+*.amazon-textract.jpg
+*.microsoft.jpg
+*.google.jpg

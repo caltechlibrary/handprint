@@ -8,7 +8,6 @@ This release provides a great many changes over the previous versions of Handpri
 
 The following are some of the notable changes in this release:
 
-* Support for Amazon's Rekognition and Textract services.
 * Credentials are now stored in a separate user directory; in additional, the process for installing credentials files is different, and involves invoking Handprint with the `-a` option.
 * Handprint now calls services in parallel threads, to speed up processing.  The number of threads can be set via the `-t` option.
 * To display the results of text recognition, Handprint now creates a summary image showing all service's results in an _N&nbsp;x&nbsp;N_ grid, thus allowing easy inspection and comparison of results across services.  By default, this is now the only output Handprint produces unless the `-e` option.  With `-e`, Handprint also stores the raw data from the services and the pure text output.
@@ -16,7 +15,7 @@ The following are some of the notable changes in this release:
 * The [tests/images](tests/images) subdirectory has been reorganized, some previous images have been deleted, and some new ones have been added
 * Internal code such as [network.py](handprint/network.py) has been updated to versions developed for other projects such as [Microarchiver](https://github/caltechlibrary/microarchiver).
 * New command-line options.
-* Fix more bugs.
+* More bugs fixed.
 * More error checking throughout.
 * Refactored some internal code.
 * The repository now uses [READMINE](https://github.com/mhucka/readmine) structure for [README](README.md) file.

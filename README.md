@@ -10,7 +10,7 @@ Apply different handwritten text recognition services and algorithms to handwrit
 🏁 Log of recent changes
 -----------------------
 
-_Version 1.0.0_: This release features changes to behavior and internal implementation, and marks the first sufficiently complete version of Handprint that I feel can be called a proper version 1.0.  Changes include: new way to specify credential files, new default output (where the results of multiple services are placed onto a single large image for easier comparison), new command-line arguments, support for parallel thread execution, and more.
+_Version 1.0.0_: This release features changes to behavior and internal implementation, and marks a sufficiently complete version of Handprint that can perhaps reasonably be called a version 1.0.  Changes include: new way to specify credential files, new default output (where the results of multiple services are placed onto a single large image for easier comparison), new command-line arguments, support for parallel thread execution, and more.
 
 The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
 
@@ -131,7 +131,7 @@ Getting this information is a simple process for Amazon's services. Instructions
 Handprint comes with a single command-line interface program called `handprint`.  Here is a screen cast to give a sense for what it's like to run Handprint. Click on the following image:
 
 <p align="center">
-  <a href="https://asciinema.org/a/hDWutEH69LrbzcSAxfLwQWFhI"><img src=".graphics/handprint-asciinema.png" alt="Screencast of simple Handprint demo"></a>
+  <a href=".graphics/handprint-screencast.gif"><img src=".graphics/handprint-preview-image.png" alt="Screencast of simple Handprint demo"></a>
 </p>
 
 The `handprint` command-line program should end up installed in a location where software is normally installed on your computer, if the installation steps described in the previous section proceed successfully.  Running Handprint from a terminal shell then should be as simple as running any other shell command on your system:

@@ -293,8 +293,11 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     try:
-        fancy = '{}Hand{}written {}p{}age {}r{}ecognit{}i{}o{}n{} {}t{}est'.format(
-            *[ fg('chartreuse_2a'), attr('reset') + fg('green') ]*6)
+        if say.use_color():
+            fancy = '{}Hand{}written {}p{}age {}r{}ecognit{}i{}o{}n{} {}t{}est'.format(
+                *[ fg('chartreuse_2a'), attr('reset') + fg('green') ]*6)
+        else:
+            fancy = 'HANDwritten Page RecognItioN Test'
         say.info('┏' + '━'*68 + '┓')
         say.info('┃    Welcome to Handprint, the {}!    ┃'.format(fancy))
         say.info('┗' + '━'*68 + '┛')

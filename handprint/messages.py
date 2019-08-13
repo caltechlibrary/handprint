@@ -152,7 +152,7 @@ def color(text, flags = None, colorize = True):
     Optional color modifiers:
        'underline', 'bold', 'reverse', 'dark'
     '''
-    (prefix, color_name, attributes) = _color_codes(flags)
+    (color_name, attributes) = _color_codes(flags)
     if colorize:
         if attributes and color_name:
             return colored(text, color_name, attrs = attributes)
@@ -162,8 +162,6 @@ def color(text, flags = None, colorize = True):
             return colored(text, attrs = attributes)
         else:
             return text
-    elif prefix:
-        return prefix + ': ' + str(text)
     else:
         return text
 
@@ -188,10 +186,8 @@ def _color_codes(flags):
     else:
         attrib = []
     if 'error' in flags:
-        prefix = 'ERROR'
         color_name = 'red'
     if 'warning' in flags or 'warn' in flags:
-        prefix = 'WARNING'
         color_name = 'yellow'
     if 'info' in flags:
         color_name = 'green'
@@ -213,4 +209,4 @@ def _color_codes(flags):
         attrib.append('reverse')
     if 'dark' in flags:
         attrib.append('dark')
-    return (prefix, color_name, attrib)
+    return (color_name, attrib)

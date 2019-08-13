@@ -132,6 +132,11 @@ class Manager:
                 say.error('Cannot write output in {}.'.format(dest_dir))
                 return
 
+            # Sanity check
+            if not path.getsize(file) > 0:
+                say.warn('Skipping zero-length file {}'.format(relative(file)))
+                return
+
             # Save grid file name now, because it's based on the original file.
             grid_file = filename_basename(file) + '.all-results.jpg'
 

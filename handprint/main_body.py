@@ -22,8 +22,9 @@ from   sys import exit as exit
 import handprint
 from handprint.debug import set_debug, log
 from handprint.exceptions import *
-from handprint.files import filename_extension, files_in_directory, is_url
-from handprint.files import readable, writable, filter_by_extensions
+from handprint.files import filename_extension, filename_basename
+from handprint.files import files_in_directory, filter_by_extensions
+from handprint.files import readable, writable, is_url
 from handprint.manager import Manager
 from handprint.network import network_available, disable_ssl_cert_check
 from handprint.processes import available_cpus
@@ -128,4 +129,16 @@ class MainBody(object):
         # Filter files we created in past runs.
         targets = [x for x in targets if x.find('-reduced') < 0]
         targets = [x for x in targets if x.find('all-results') < 0]
-        return targets
+
+        # If there is both a jpg and another format of a given file, ignore
+        # the other formats and just use the jpg.
+        keep = []
+        for item in targets:
+            ext = filename_extension(item)
+            base = filename_basename(item)
+            if (ext != 'jpg' and ext != 'jpeg'
+                and (base + '.jpg' in targets or base + '.jpeg' in targets)):
+                # jpg version of file is also present => skip this other version
+                continue
+            keep.append(item)
+        return keep

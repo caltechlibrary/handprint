@@ -209,16 +209,17 @@ recognition services will be, e.g.,
 
 When the inputs are URLs, Handprint must download a copy of the image located
 at the network address (because it is not possible to write the results in
-the network locations represented by the URLs.).  This means the -o (/o on
-Windows) option is required if any of the inputs are URLs.  The images and
-other results will be stored files whose root names have the form
-"document-N", where "N" is an integer.  The root name can be changed using
-the -b option (/b on Windows).  The image at networked locations will be
-converted to ordinary JPEG format for maximum compatibility with the
-different OCR services and written to "document-N.jpg", and the URL
-corresponding to each document will be written in a file named
-"document-N.url" so that it is possible to connect each "document-N.jpg" to
-the URL it came from.
+the network locations represented by the URLs.).  The images and other
+results will be stored files whose root names have the form "document-N",
+where "N" is an integer.  The root name can be changed using the -b option
+(/b on Windows).  The image at networked locations will be converted to
+ordinary JPEG format for maximum compatibility with the different OCR
+services and written to "document-N.jpg", and the URL corresponding to each
+document will be written in a file named "document-N.url" so that it is
+possible to connect each "document-N.jpg" to the URL it came from.
+
+Finally, note that the use of the -G option (/G on Windows) WITHOUT the -e
+option is an error because it means no output would be produced.
 
 Additional command-line arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -277,6 +278,9 @@ Command-line arguments summary
         Credentials.save_credentials(service, creds_file)
         exit(say.info_text('Saved credentials for service "{}".'.format(service)))
 
+    if no_grid and not extended:
+        exit(say.error_text('{}G without {}e produces no output. {}'.format(
+            prefix, prefix, hint)))
     if any(item.startswith('-') for item in files):
         exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
     if not files and from_file == 'F':

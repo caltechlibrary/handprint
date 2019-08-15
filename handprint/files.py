@@ -253,13 +253,14 @@ def image_dimensions(file):
         return im.size
 
 
-def converted_image(file, to_format):
+def converted_image(file, to_format, dest_file = None):
     '''Returns a tuple of (success, output file, error message).
     Returns a tuple of (new_file, error).  The value of 'error' will be None
     if no error occurred; otherwise, the value will be a string summarizing the
     error that occurred and 'new_file' will be set to None.
     '''
-    dest_file = filename_basename(file) + '.' + to_format
+    if dest_file is None:
+        dest_file = filename_basename(file) + '.' + to_format
     # When converting images, PIL may issue a DecompressionBombWarning but
     # it's not a concern in our application.  Ignore it.
     with warnings.catch_warnings():

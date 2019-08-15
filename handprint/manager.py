@@ -138,13 +138,14 @@ class Manager:
                 return
 
             # Save grid file name now, because it's based on the original file.
-            grid_file = filename_basename(file) + '.all-results.jpg'
+            basename = path.basename(filename_basename(file))
+            grid_file = path.realpath(path.join(dest_dir, basename + '.all-results.jpg'))
 
             # We will usually delete temporary files we create.
             to_delete = set()
 
             # Normalize to the lowest common denominator.
-            (new_file, intermediate_files) = self._normalized_file(file, orig_fmt)
+            (new_file, intermediate_files) = self._normalized(file, orig_fmt, dest_dir)
             if not new_file:
                 say.warn('Skipping {}'.format(relative(file)))
                 return
@@ -244,12 +245,12 @@ class Manager:
         return annot_path
 
 
-    def _normalized_file(self, file, fmt):
+    def _normalized(self, file, fmt, dest_dir):
         '''Normalize images to same format and max size.'''
         # All services accept JPEG, so normalize files to JPEG.
         to_delete = set()
         if fmt != 'jpg':
-            new_file = self._converted_file(file, 'jpg')
+            new_file = self._converted_file(file, 'jpg', dest_dir)
             if path.basename(new_file) != path.basename(file):
                 to_delete.add(new_file)
             file = new_file
@@ -270,15 +271,16 @@ class Manager:
         return (file, to_delete)
 
 
-    def _converted_file(self, file, to_format):
-        new_file = filename_basename(file) + '.' + to_format
+    def _converted_file(self, file, to_format, dest_dir):
+        basename = path.basename(filename_basename(file))
+        new_file = path.join(dest_dir, basename + '.' + to_format)
         say = self._say
         if path.exists(new_file):
             say.info('Using already converted image in {}'.format(relative(new_file)))
             return new_file
         else:
             say.info('Converting to {} format: {}'.format(to_format, relative(file)))
-            (converted, error) = converted_image(file, to_format)
+            (converted, error) = converted_image(file, to_format, new_file)
             if error:
                 say.error('Failed to convert {}: {}'.format(relative(file), error))
                 return None

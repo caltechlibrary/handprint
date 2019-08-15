@@ -149,9 +149,8 @@ either in the same directories as the original files, or (if given the -o
 option) the directory indicated by the -o option (/o on Windows).  The
 results will be written in files named after the original files with the
 addition of a string that indicates the service used.  For example, a file
-named "somefile.jpg" will produce
+named "somefile.jpg" will result in
 
-  somefile.jpg
   somefile.google.jpg
   somefile.microsoft.jpg
   somefile.amazon.jpg
@@ -159,9 +158,10 @@ named "somefile.jpg" will produce
 
 and so on for each image and each service used.  These files are deleted
 after the final results grid image is created, unless the -e option (/e on
-Windows) is used to indicate that extended results should be produced.
+Windows) is used to indicate that extended results should be produced; in that
+case, these individual annotated image files are kept.
 
-After gathering the results of each service for a given image, Handprint will
+After gathering the results of each service for a given input, Handprint will
 create a single compound image consisting of all the annotated results images
 arranged in a grid.  This is intended to make it easier to compare the
 results of multiple services against each other.  To skip the creation of the
@@ -169,14 +169,11 @@ results grid, use the -G option (/G on Windows).  The grid image will be named
 
   somefile.all-results.jpg
 
-By default, Handprint will produce only one type of output for each service:
-an annotated JPEG image files showing the recognized words superimposed over
-the original image.  If given the -e option (/e on Windows), Handprint will
-produce extended output that includes the complete response from the service
-(converted to a JSON file by Handprint) and the text extracted (stored as a
-.txt file).  The output of -e will be multiple files like this:
+If given the -e option (/e on Windows), Handprint will produce extended
+output that includes the complete response from the service (converted to a
+JSON file by Handprint) and the text extracted (stored as a .txt file).  The
+output of -e will be multiple files like this:
 
-  somefile.jpg
   somefile.google.jpg
   somefile.google.json
   somefile.google.txt
@@ -187,6 +184,11 @@ produce extended output that includes the complete response from the service
   somefile.amazon.json
   somefile.amazon.txt
   ...
+
+The files will written to the directory indicated by -o, or (if -o is not
+used) the directory where "somefile" is located.  When -o is not used and
+the input images are given as URLs, then the files are written to the current
+working directory instead.
 
 If an image is too large for any of the services invoked, then Handprint will
 resize it prior to sending the image to any of the services (as noted above).

@@ -110,7 +110,7 @@ def filename_basename(file):
 def filename_extension(file):
     parts = file.rpartition('.')
     if len(parts) > 1:
-        return parts[-1].lower()
+        return '.' + parts[-1].lower()
     else:
         return ''
 

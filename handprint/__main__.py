@@ -131,7 +131,7 @@ If given URLs, Handprint will first download the images found at the URLs to
 a local directory indicated by the option -o (/o on Windows).  Handprint can
 accept input images in JPEG, PNG, GIF, BMP, and TIFF formats.  To make the
 results from different services more easily comparable, Handprint will always
-convert all input images to the same format (JPEG) no matter if some services
+convert all input images to the same format (PNG) no matter if some services
 may accept other formats; it will also resize input images to the smallest
 size accepted by any of the services invoked if an image exceeds that size.
 (For example, if service A accepts files up to 10 MB in size and service B
@@ -151,9 +151,9 @@ results will be written in files named after the original files with the
 addition of a string that indicates the service used.  For example, a file
 named "somefile.jpg" will result in
 
-  somefile.google.jpg
-  somefile.microsoft.jpg
-  somefile.amazon.jpg
+  somefile.google.png
+  somefile.microsoft.png
+  somefile.amazon.png
   ...
 
 and so on for each image and each service used.  These files are deleted
@@ -167,20 +167,20 @@ arranged in a grid.  This is intended to make it easier to compare the
 results of multiple services against each other.  To skip the creation of the
 results grid, use the -G option (/G on Windows).  The grid image will be named
 
-  somefile.all-results.jpg
+  somefile.all-results.png
 
 If given the -e option (/e on Windows), Handprint will produce extended
 output that includes the complete response from the service (converted to a
 JSON file by Handprint) and the text extracted (stored as a .txt file).  The
 output of -e will be multiple files like this:
 
-  somefile.google.jpg
+  somefile.google.png
   somefile.google.json
   somefile.google.txt
-  somefile.microsoft.jpg
+  somefile.microsoft.png
   somefile.microsoft.json
   somefile.microsoft.txt
-  somefile.amazon.jpg
+  somefile.amazon.png
   somefile.amazon.json
   somefile.amazon.txt
   ...
@@ -197,15 +197,15 @@ It will write the reduced image to a file named "FILENAME-reduced.EXT", where
 means that if an image needs to be resized, the results of applying the text
 recognition services will be, e.g.,
 
-  somefile-reduced.jpg
-  somefile-reduced.google.jpg
+  somefile-reduced.png
+  somefile-reduced.google.png
   somefile-reduced.google.json
   somefile-reduced.google.txt
-  somefile-reduced.microsoft.jpg
+  somefile-reduced.microsoft.png
   somefile-reduced.microsoft.json
   somefile-reduced.microsoft.txt
   somefile-reduced.amazon.json
-  somefile-reduced.amazon.jpg
+  somefile-reduced.amazon.png
   somefile-reduced.amazon.txt
   ...
 
@@ -215,10 +215,10 @@ the network locations represented by the URLs.).  The images and other
 results will be stored files whose root names have the form "document-N",
 where "N" is an integer.  The root name can be changed using the -b option
 (/b on Windows).  The image at networked locations will be converted to
-ordinary JPEG format for maximum compatibility with the different OCR
-services and written to "document-N.jpg", and the URL corresponding to each
+ordinary PNG format for maximum compatibility with the different OCR
+services and written to "document-N.png", and the URL corresponding to each
 document will be written in a file named "document-N.url" so that it is
-possible to connect each "document-N.jpg" to the URL it came from.
+possible to connect each "document-N.png" to the URL it came from.
 
 Finally, note that the use of the -G option (/G on Windows) WITHOUT the -e
 option is an error because it means no output would be produced.

@@ -181,14 +181,14 @@ After credentials are installed, running Handprint _without_ the `-a` option wil
 
 Handprint considers each input path individually, and determines when an input is a URL based on whether the given path begins with letters followed by the characters `:/` followed by the rest of the path (e.g., `http://some/other/characters`).  If any of the input images are URLs, Handprint will first download the images found at the URLs to a directory indicated by the option `-o` (`/o` on Windows).  If a destination directory is not provided via `-o`, the current working directory where Handprint is running is used instead.
 
-No matter whether files or URLs, each input should be a single image of a document page in which text should be recognized.  Handprint reads a number of common formats: JP2, JPEG, PNG, GIF, BMP, and TIFF.  However, for simplicity and maximum compatibility with all cloud services, **Handprint always converts all input files to JPEG** if they are not already in that format, before sending them to a service.  Handprint also resizes images if necessary, to the smallest size accepted by any of the services invoked if an image exceeds that size.  (For example, if service A accepts files up to 10 MB in size and service B accepts files up to 5 MB, all input images will be resized to 5 MB before sending them to A and B, even if A could accept a higher-resolution image.)
+No matter whether files or URLs, each input should be a single image of a document page in which text should be recognized.  Handprint reads a number of common formats: JP2, JPEG, PNG, GIF, BMP, and TIFF.  However, for simplicity and maximum compatibility with all cloud services, **Handprint always converts all input files to PNG** if they are not already in that format, before sending them to a service.  Handprint also resizes images if necessary, to the smallest size accepted by any of the services invoked if an image exceeds that size.  (For example, if service A accepts files up to 10 MB in size and service B accepts files up to 5 MB, all input images will be resized to 5 MB before sending them to A and B, even if A could accept a higher-resolution image.)
 
 Note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to store the URLs in a file in combination with the `-f` option (`/f` on Windows).
 
 
 ### _Annotated output images_
 
-By default, Handprint will create one output file for each input file.  This file will be have the suffix `.all-results.jpg` and contain an annotated version of the input file for each service invoked, tiled in a _N_&times;_N_ grid fashion to produce one (big) output image.  Here is a sample image to illustrate:
+By default, Handprint will create one output file for each input file.  This file will be have the suffix `.all-results.png` and contain an annotated version of the input file for each service invoked, tiled in a _N_&times;_N_ grid fashion to produce one (big) output image.  Here is a sample image to illustrate:
 
 <p align="center">
 <img src=".graphics/all-results-example.jpg" alt="Example annotated results output image">
@@ -202,11 +202,11 @@ The individual results, as well as individual annotated images corresponding to 
 If the `-e` option `-e` (`/e` on Windows) is used, Handprint saves not only the overview image containing all the results, but also, individual annotated images for each service's results, the raw data (converted to a JSON file by Handprint), and the text extracted by the service.  These additional outputs will be written in files named after the original files with the addition of a string that indicates the service used.  For example, a file named `somefile.jpg` will produce
 
 ```
-somefile.jpg
-somefile.amazon-textract.jpg
+somefile.png
+somefile.amazon-textract.png
 somefile.amazon-textract.json
 somefile.amazon-textract.txt
-somefile.google.jpg
+somefile.google.png
 somefile.google.json
 somefile.google.txt
 ...
@@ -223,28 +223,28 @@ To deal with this situation, Handprint manufactures its own file names when a UR
 ```
 document-1.jpeg
 document-1.url
-document-1.google.jpg
+document-1.google.png
 document-1.google.json
 document-1.google.txt
-document-1.microsoft.jpg
+document-1.microsoft.png
 document-1.microsoft.json
 document-1.microsoft.txt
 ...
 document-2.jpeg
 document-2.url
-document-2.google.jpg
+document-2.google.png
 document-2.google.json
 document-2.google.txt
-document-2.microsoft.jpg
+document-2.microsoft.png
 document-2.microsoft.json
 document-2.microsoft.txt
 ...
 document-3.jpeg
 document-3.url
-document-3.google.jpg
+document-3.google.png
 document-3.google.json
 document-3.google.txt
-document-3.microsoft.jpg
+document-3.microsoft.png
 document-3.microsoft.json
 document-3.microsoft.txt
 ...
@@ -255,11 +255,11 @@ The base name `document` can be changed using the `-b` option (`/b` on Windows).
 Finally, if an image is too large for any of the services invoked, then Handprint will resize it prior to sending the image to any of the services (as noted above).  It will write the reduced image to a file named `FILENAME-reduced.EXT`, where `FILENAME` is the original file name and `EXT` is the file extension.  This means that if an image needs to be resized, the results of applying the text recognition services will be, e.g.,
 
 ```
-document-1-reduced.jpg
-document-1-reduced.google.jpg
+document-1-reduced.png
+document-1-reduced.google.png
 document-1-reduced.google.json
 document-1-reduced.google.txt
-document-1-reduced.microsoft.jpg
+document-1-reduced.microsoft.png
 document-1-reduced.microsoft.json
 document-1-reduced.microsoft.txt
 ...

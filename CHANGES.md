@@ -11,7 +11,7 @@ The following are some of the notable changes in this release:
 * Credentials are now stored in a separate user directory; in additional, the process for installing credentials files is different, and involves invoking Handprint with the `-a` option.
 * Handprint now calls services in parallel threads, to speed up processing.  The number of threads can be set via the `-t` option.
 * To display the results of text recognition, Handprint now creates a summary image showing all service's results in an _N&nbsp;x&nbsp;N_ grid, thus allowing easy inspection and comparison of results across services.  By default, this is now the _only_ output that Handprint produces unless given the `-e` option.  With `-e`, Handprint also stores the raw data from the services and the pure text output.
-* Images are now always sent to HTR services in JPEG format, even when a service accepts other formats.  Source images will be converted to JPEG if they are not already in that format.  (This simplifies processing and code flow.)
+* Images are now always sent to HTR services in PNG format, even when a service accepts other formats.  Source images will be converted to PNG if they are not already in that format.  (This simplifies processing and code flow.)
 * Intermediate results files are now deleted unless the `-e` flag is given, reducing clutter and confusion.
 * Some additional command-line arguments have been changed in backwards-incompatible ways.
 * The [tests/images](tests/images) subdirectory has been reorganized, some previous images have been deleted, and some new ones have been added

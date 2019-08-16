@@ -20,6 +20,7 @@ import sys
 from   sys import exit as exit
 
 import handprint
+from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.debug import set_debug, log
 from handprint.exceptions import *
 from handprint.files import filename_extension, filename_basename
@@ -119,8 +120,8 @@ class MainBody(object):
                 elif path.isdir(item):
                     # It's a directory, so look for files within.
                     # Ignore files that appear to be the previous output of Handprint.
-                    # (These are files that end in, e.g., ".google.jpg")
-                    handprint_endings = ['.' + x + '.jpg' for x in services_list()]
+                    # (These are files that end in, e.g., ".google.png")
+                    handprint_endings = ['.' + x + _OUTPUT_EXT for x in services_list()]
                     files = files_in_directory(item, extensions = ACCEPTED_FORMATS)
                     files = filter_by_extensions(files, handprint_endings)
                     targets += files
@@ -130,15 +131,14 @@ class MainBody(object):
         targets = [x for x in targets if x.find('-reduced') < 0]
         targets = [x for x in targets if x.find('all-results') < 0]
 
-        # If there is both a jpg and another format of a given file, ignore
-        # the other formats and just use the jpg.
+        # If there is both a file in the format we generate and another
+        # format of that file, ignore the other formats and just use ours.
         keep = []
         for item in targets:
-            ext = filename_extension(item)
+            ext  = filename_extension(item)
             base = filename_basename(item)
-            if (ext != 'jpg' and ext != 'jpeg'
-                and (base + '.jpg' in targets or base + '.jpeg' in targets)):
-                # jpg version of file is also present => skip this other version
+            if ext != _OUTPUT_EXT and (base + _OUTPUT_EXT in targets):
+                # png version of file is also present => skip this other version
                 continue
             keep.append(item)
         return keep

@@ -31,6 +31,7 @@ from   timeit import default_timer as timer
 import urllib
 
 import handprint
+from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.annotate import annotated_image
 from handprint.debug import log
 from handprint.exceptions import *
@@ -125,7 +126,7 @@ class Manager:
                     say.info('Wrote URL to {}'.format(relative(url_file)))
             else:
                 file = path.realpath(path.join(os.getcwd(), item))
-                orig_fmt = filename_extension(file)
+                orig_fmt = filename_extension(file)[1:]
 
             dest_dir = output_dir if output_dir else path.dirname(file)
             if not writable(dest_dir):
@@ -139,7 +140,7 @@ class Manager:
 
             # Save grid file name now, because it's based on the original file.
             basename = path.basename(filename_basename(file))
-            grid_file = path.realpath(path.join(dest_dir, basename + '.all-results.jpg'))
+            grid_file = path.realpath(path.join(dest_dir, basename + '.all-results.png'))
 
             # We will usually delete temporary files we create.
             to_delete = set()
@@ -230,7 +231,7 @@ class Manager:
         info_msg('Got result from {}.')
         file_name  = path.basename(file)
         base_path  = path.join(dest_dir, file_name)
-        annot_path = alt_extension(base_path, str(service) + '.jpg')
+        annot_path = alt_extension(base_path, str(service) + '.png')
         info_msg('Creating annotated image for {}.')
         self._save_output(annotated_image(file, result.boxes, service), annot_path)
         if self._extended_results:
@@ -247,10 +248,10 @@ class Manager:
 
     def _normalized(self, file, fmt, dest_dir):
         '''Normalize images to same format and max size.'''
-        # All services accept JPEG, so normalize files to JPEG.
+        # All services accept PNG, so normalize files to PNG.
         to_delete = set()
-        if fmt != 'jpg':
-            new_file = self._converted_file(file, 'jpg', dest_dir)
+        if fmt != _OUTPUT_FORMAT:
+            new_file = self._converted_file(file, _OUTPUT_FORMAT, dest_dir)
             if path.basename(new_file) != path.basename(file):
                 to_delete.add(new_file)
             file = new_file
@@ -295,7 +296,7 @@ class Manager:
         if file.find('-reduced') > 0:
             new_file = file
         else:
-            new_file = filename_basename(file) + '-reduced.' + file_ext
+            new_file = filename_basename(file) + '-reduced' + file_ext
         if path.exists(new_file):
             if image_size(new_file) < self._max_size:
                 say.info('Reusing resized image found in {}'.format(relative(new_file)))
@@ -320,7 +321,7 @@ class Manager:
         if file.find('-reduced') > 0:
             new_file = file
         else:
-            new_file = filename_basename(file) + '-reduced.' + file_ext
+            new_file = filename_basename(file) + '-reduced' + file_ext
         if path.exists(new_file) and readable(new_file):
             (image_width, image_height) = image_dimensions(new_file)
             if image_width < max_width and image_height < max_height:

@@ -338,8 +338,14 @@ class Manager:
             return None
         return resized
 
+
     def _save_output(self, result, file):
         say = self._say
+
+        # First perform some sanity checks.
+        if result is None:
+            say.warn('No data for {}'.format(file))
+            return
         if isinstance(result, tuple):
             # Assumes 2 elements: data, and error
             (data, error) = result
@@ -349,12 +355,17 @@ class Manager:
                 return
             else:
                 result = data
+
+        if __debug__: log('writing output to file {}', relative(file))
         if isinstance(result, str):
             with open(file, 'w') as f:
                 f.write(result)
         elif isinstance(result, io.BytesIO):
             with open(file, 'wb') as f:
                 shutil.copyfileobj(result, f)
+        else:
+            # There's no other type in the code, so if we get here ...
+            raise InternalError('Unexpected data in save_output() -- please report this.')
 
 
 # Helper functions.

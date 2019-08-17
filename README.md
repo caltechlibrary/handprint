@@ -157,18 +157,20 @@ The `-h` option (`/h` on Windows) will make `handprint` display some help inform
 
 ### _Supported HTR/OCR services_
 
-Handprint can contact more than one cloud service for HTR.  You can use the `-l` option (`/l` on Windows) to make Handprint display a list of the services currently implemented:
+Handprint can contact more than one cloud service for HTR.  You can use the `-l` option (`/l` on Windows) to make it display a list of the services currently implemented:
 
 ```
 # handprint -l
 Known services: amazon-rekognition, amazon-textract, google, microsoft
 ```
 
-By default, Handprint will run every known service in turn.  To invoke only specific services, use the `-s` option (`/s` on Windows) followed by a service name or a list of names separated by commas (e.g.,
-`google,microsoft`).  For example, to use only Microsoft, invoke Handprint like this:
-```bash
-handprint -s microsoft /path/to/images
+By default, Handprint will run every known service in turn, creating annotated images to represent the results of each individual service.  To invoke only specific services, use the `-s` option (`/s` on Windows) followed by a service name or a list of names separated by commas (e.g., `google,microsoft`).  For example, the following command will save the results of invoking only Microsoft's text recognition service on a page from [Clara Barton's unpublished draft book "The Life of My Childhood"](https://picryl.com/media/clara-barton-papers-speeches-and-writings-file-1849-1947-books-the-life-of-71), available in Handprint's source directory:
+```csh
+handprint -s microsoft tests/images/public-domain/clara-barton-life-of-my-childhood-p90.jpg
 ```
+
+Here is what that result looks like:
+<img src=".graphics/clara-barton-page.png" alt="Example of running Microsoft's service on a page from Clara Barton's unpublished draft book, The Life of My Childhood.">
 
 
 ### _Input files and URLs_
@@ -188,11 +190,16 @@ Note that providing URLs on the command line can be problematic due to how termi
 
 ### _Annotated output images_
 
-By default, Handprint will create one output file for each input file.  This file will be have the suffix `.all-results.png` and contain an annotated version of the input file for each service invoked, tiled in a _N_&times;_N_ grid fashion to produce one (big) output image.  Here is a sample image to illustrate:
+By default, Handprint will create a single output file for each input file.  This file will be have the suffix `.all-results.png` and contain an annotated version of the results for each service invoked, tiled in a _N_&times;_N_ grid fashion to produce one (big) output image.  Here is a sample output image to illustrate:
 
 <p align="center">
 <img src=".graphics/all-results-example.jpg" alt="Example annotated results output image">
 </p>
+
+The 2&times;2 image above was produced by running the following command from the Handprint source directory:
+```csh
+handprint tests/images/public-domain/H96566k.jpg
+```
 
 The individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked.  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
 
@@ -218,10 +225,10 @@ A complication arises with using URLs in combination with the `-e` option: how s
 https://hale.archives.caltech.edu/adore-djatoka//resolver?rft_id=https%3A%2F%2Fhale.archives.caltech.edu%2Fislandora%2Fobject%2Fhale%253A85240%2Fdatastream%2FJP2%2Fview%3Ftoken%3D7997253eb6195d89b2615e8fa60708a97204a4cdefe527a5ab593395ac7d4327&url_ver=Z39.88-2004&svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion&svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&svc.format=image%2Fjpeg&svc.level=4&svc.rotate=0
 ```
 
-To deal with this situation, Handprint manufactures its own file names when a URL is encountered.  The scheme is simple: by default, Handprint will use a base name of `document-N`, where `N` is an integer.  The integers start from `1` for every run of Handprint, and the integers count the URLs found either on the command line or in the file indicated by the `-f` option.  The image found at a given URL is stored in a file named `document-N.E` where `E` is the format extension (e.g., `document-1.jpeg`, `document-1.png`, etc.).  The URL itself is stored in another file named `document-1.url`.  Thus, the files produced by Handprint will look like this when the `-e` option is used:
+To deal with this situation, Handprint manufactures its own file names when a URL is encountered.  The scheme is simple: by default, Handprint will use a base name of `document-N`, where `N` is an integer.  The integers start from `1` for every run of Handprint, and the integers count the URLs found either on the command line or in the file indicated by the `-f` option.  The image found at a given URL is stored in a file named `document-N.E` where `E` is the format extension (e.g., `document-1.jpg`, `document-1.png`, etc.).  The URL itself is stored in another file named `document-1.url`.  Thus, the files produced by Handprint will look like this when the `-e` option is used (assuming, for this example, that the files at the source URLs are in JPEG format):
 
 ```
-document-1.jpeg
+document-1.jpg
 document-1.url
 document-1.google.png
 document-1.google.json
@@ -230,7 +237,7 @@ document-1.microsoft.png
 document-1.microsoft.json
 document-1.microsoft.txt
 ...
-document-2.jpeg
+document-2.jpg
 document-2.url
 document-2.google.png
 document-2.google.json
@@ -239,7 +246,7 @@ document-2.microsoft.png
 document-2.microsoft.json
 document-2.microsoft.txt
 ...
-document-3.jpeg
+document-3.jpg
 document-3.url
 document-3.google.png
 document-3.google.json
@@ -250,7 +257,7 @@ document-3.microsoft.txt
 ...
 ```
 
-The base name `document` can be changed using the `-b` option (`/b` on Windows).  For example, running Handprint with the option `-b einstein` will cause the outputs to be named `einstein-1.jpeg`, `einstein-1.url`, etc.
+The base name `document` can be changed using the `-b` option (`/b` on Windows).  For example, running Handprint with the option `-b einstein` will cause the outputs to be named `einstein-1.jpg`, `einstein-1.url`, etc.
 
 Finally, if an image is too large for any of the services invoked, then Handprint will resize it prior to sending the image to any of the services (as noted above).  It will write the reduced image to a file named `FILENAME-reduced.EXT`, where `FILENAME` is the original file name and `EXT` is the file extension.  This means that if an image needs to be resized, the results of applying the text recognition services will be, e.g.,
 
@@ -286,7 +293,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-V`     | `--version`       | Display program version info and exit | | |
 | `-@`     | `--debug`         | Debugging mode | Normal mode | |
 
-⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpeg`, `document-1.google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.
+⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpg`, `document-1.google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.
 
 
 ⚑ Known issues and limitations

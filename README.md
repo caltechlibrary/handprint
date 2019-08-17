@@ -338,10 +338,13 @@ Handprint benefitted from feedback from several people, notably from Tommy Keswi
 
 Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Turf with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
+* [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
 * [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
+* [colored](https://gitlab.com/dslackw/colored) &ndash; library for color and formatting in terminal
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
 * [halo](https://github.com/ManrajGrover/halo) &ndash; busy-spinners for Python command-line programs
+* [humanize](https://github.com/jmoiron/humanize) &ndash; make numbers more easily readable by humans
 * [httplib2](https://github.com/httplib2/httplib2) &ndash; a comprehensive HTTP client library
 * [imagesize](https://github.com/shibukawa/imagesize_py) &ndash; determine the dimensions of an image
 * [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
@@ -349,6 +352,7 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library
 * [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
+* [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python
 * [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
 * [termcolor](https://pypi.org/project/termcolor/) &ndash; ANSI color formatting for output in terminal

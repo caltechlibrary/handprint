@@ -14,7 +14,6 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-from   blessings import Terminal
 from   colored import fg, attr
 from   concurrent.futures import ThreadPoolExecutor
 import humanize

@@ -8,7 +8,7 @@
 
 __version__     = '1.0.0'
 __title__       = 'handprint'
-__description__ = 'Handprint: HANDwritten Page RecognitIoN Test for Caltech Archives'
+__description__ = 'Handprint: HANDwritten Page RecognitIoN Test'
 __url__         = 'https://github.com/caltechlibrary/handprint'
 __author__      = 'Michael Hucka <mhucka@caltech.edu>'
 __email__       = 'helpdesk@library.caltech.edu'

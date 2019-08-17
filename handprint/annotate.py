@@ -51,7 +51,10 @@ import matplotlib.pyplot as plt
 # switch not only the backend, but also the output format to PNG (which is
 # a format that Cairo does write) in order to make it all work.
 #
-plt.switch_backend('cairo')
+try:
+    plt.switch_backend('cairo')
+except:
+    pass
 
 import matplotlib.image as mpimg
 

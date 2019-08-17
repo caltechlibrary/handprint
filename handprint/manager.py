@@ -214,8 +214,8 @@ class Manager:
         last_time = timer()
         try:
             result = service.result(file)
-        except AuthenticationFailure as ex:
-            raise AuthenticationFailure('Unable to use {}: {}'.format(service, ex))
+        except AuthFailure as ex:
+            raise AuthFailure('Unable to use {}: {}'.format(service, ex))
         except RateLimitExceeded as ex:
             time_passed = timer() - last_time
             if time_passed < 1/service.max_rate():

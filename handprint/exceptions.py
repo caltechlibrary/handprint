@@ -34,7 +34,7 @@ class CorruptedContent(Exception):
     '''Content corruption has been detected.'''
     pass
 
-class AuthenticationFailure(Exception):
+class AuthFailure(Exception):
     '''Problem obtaining or using authentication credentials.'''
     pass
 

@@ -34,7 +34,7 @@ class MicrosoftTR(TextRecognition):
             if __debug__: log('initializing credentials')
             self._credentials = MicrosoftCredentials().creds()
         except Exception as ex:
-            raise AuthenticationFailure(str(ex))
+            raise AuthFailure(str(ex))
 
 
     @classmethod

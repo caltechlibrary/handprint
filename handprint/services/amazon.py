@@ -36,7 +36,7 @@ class AmazonTR(TextRecognition):
             if __debug__: log('initializing credentials')
             self._credentials = AmazonCredentials().creds()
         except Exception as ex:
-            raise AuthenticationFailure(str(ex))
+            raise AuthFailure(str(ex))
 
 
     def max_rate(self):

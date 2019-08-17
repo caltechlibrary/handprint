@@ -48,7 +48,7 @@ class GoogleTR(TextRecognition):
             if __debug__: log('initializing credentials')
             GoogleCredentials()
         except Exception as ex:
-            raise AuthenticationFailure(str(ex))
+            raise AuthFailure(str(ex))
 
 
     @classmethod
@@ -168,7 +168,7 @@ class GoogleTR(TextRecognition):
             return self._results[path]
         except google.api_core.exceptions.PermissionDenied as ex:
             text = 'Authentication failure for Google service -- {}'.format(ex)
-            raise AuthenticationFailure(text)
+            raise AuthFailure(text)
         except KeyboardInterrupt as ex:
             raise
         except Exception as ex:

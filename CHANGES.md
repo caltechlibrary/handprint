@@ -16,10 +16,10 @@ The following are some of the notable changes in this release:
 * Some additional command-line arguments have been changed in backwards-incompatible ways.
 * The [tests/images](tests/images) subdirectory has been reorganized, some previous images have been deleted, and some new ones have been added
 * Internal code such as [network.py](handprint/network.py) has been updated to versions developed for other projects such as [Microarchiver](https://github/caltechlibrary/microarchiver).
-* New command-line options.
-* More bugs fixed.
-* More error checking throughout.
-* Refactored some internal code.
+* There are new command-line options.
+* More bugs have been fixed in the code.
+* More error checking has been added throughout.
+* Much of the internal code has been refactored and rewritten.
 * The repository now uses [READMINE](https://github.com/mhucka/readmine) structure for [README](README.md) file.
 * Added code of conduct and contributor guidelines to the repository.
 

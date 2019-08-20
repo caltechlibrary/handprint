@@ -3,10 +3,11 @@ Handprint<img width="100px" align="right" src=".graphics/noun_Hand_733265.svg">
 
 A program to apply different handwritten text recognition services and algorithms to images of handwritten text pages, and produce an annotated image (and optionally more) showing the results.
 
+[![Latest release](https://img.shields.io/badge/Latest_release-1.0.0-b44e88.svg?style=flat-square)](http://shields.io)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
-[![Latest release](https://img.shields.io/badge/Latest_release-1.0.0-b44e88.svg?style=flat-square)](http://shields.io)
-[![Stars](https://img.shields.io/github/stars/caltechlibrary/handprint?style=flat-square&color=lightgray)](https://github.com/caltechlibrary/handprint/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
+
 
 🏁 Log of recent changes
 -----------------------

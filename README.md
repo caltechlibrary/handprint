@@ -1,7 +1,7 @@
 Handprint<img width="15%" align="right" src=".graphics/noun_Hand_733265.png">
 =========
 
-A program to apply different handwritten text recognition services and algorithms to images of handwritten text pages, and produce an annotated image (and optionally more) showing the results.
+A Python program to apply different handwritten text recognition services to images of handwritten text pages, and produce an annotated image (and optionally more) showing the text recognized.
 
 [![Latest release](https://img.shields.io/badge/Latest_release-1.0.0-b44e88.svg?style=flat-square)](http://shields.io)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
@@ -44,12 +44,15 @@ Table of Contents
 
 Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the performance of alternative services for [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.  Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/), and more.  Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, to visualize the results.  The image at right shows an example.
 
-Handprint can work with individual images, directories of images, and URLs pointing to images on remote servers.  In addition to producing annotated images as output, it can output the raw results from an HTR service as JSON and text files.    Handprint is written in Python and can use multiple processor threads for parallel execution.
+Handprint can work with individual images, directories of images, and URLs pointing to images on remote servers.  In addition to producing annotated images as output, it can output the raw results from an HTR service as JSON and text files.  Handprint can use multiple processor threads for parallel execution.
 
 ✺ Installation and configuration
 -------------------------------
 
-Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft.  Installing Handprint requires both installing a copy of Handprint on your computer and supplying your copy with credentials for accessing the cloud services you want to use.
+The instructions below assume you have a Python interpreter installed on your computer; if that's not the case, please first install Python, and familiarize yourself with running Python programs on your system.
+
+Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft.  Installing Handprint requires a both installing a copy of Handprint on your computer and supplying your copy with credentials for accessing the cloud services you want to use.
+
 
 ### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
 

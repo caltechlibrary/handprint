@@ -82,7 +82,6 @@ class MainBody(object):
         if not targets:
             raise RuntimeError('No images to process; quitting.')
         num_targets = len(targets)
-        print_separators = num_targets > 1 and not say.be_quiet()
         procs = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
 
         say.info('Will apply {} service{} ({}) to {} image{}.'.format(
@@ -95,6 +94,7 @@ class MainBody(object):
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
         manager = Manager(services, procs, output_dir, make_grid, extended, say)
+        print_separators = num_targets > 1 and not say.be_quiet()
         for index, item in enumerate(targets, start = 1):
             if print_separators:
                 say.msg('━'*70, 'dark')

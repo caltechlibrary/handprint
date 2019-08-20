@@ -280,9 +280,9 @@ Handprint produces color-coded diagnostic output as it runs, by default.  Howeve
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
 
-If given the `-V` option (`/V` on Windows), this program will print the version and other information, and exit without doing anything else.
+If given the `-@` option (`/@` on Windows), this program will print additional diagnostic output as it runs; in addition, it will start the Python debugger (`pdb`) when an exception occurs, instead of simply exiting.  *Important*: some Python version/platform combinations seem to crash outright if `pdb` is invoked in a process thread &ndash; something that is likely to happen if you are debugging the execution of Handprint. Consequently, Handprint's debug mode (via the `-@` option) almost always has to be combined with `-t 1` to make Handprint use only one thread.
 
-If given the `-@` option (`/@` on Windows), this program will print additional diagnostic output as it runs; in addition, it will start the Python debugger (`pdb`) when an exception occurs, instead of simply exiting.
+If given the `-V` option (`/V` on Windows), this program will print the version and other information, and exit without doing anything else.
 
 
 ### _Command line options summary_

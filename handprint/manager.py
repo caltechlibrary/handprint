@@ -100,32 +100,10 @@ class Manager:
         try:
             say.info('Starting on {}'.format(
                 styled(item, 'white') if say.use_color() else item))
-            # For URLs, we download the corresponding files and name them with
-            # the base_name.
-            if is_url(item):
-                # First make sure the URL actually points to an image.
-                if __debug__: log('testing if URL contains an image: {}', item)
-                try:
-                    response = urllib.request.urlopen(item)
-                except Exception as ex:
-                    say.warn('Skipping URL due to error: {}'.format(ex))
-                    return
-                if response.headers.get_content_maintype() != 'image':
-                    say.warn('Did not find an image at {}'.format(item))
-                    return
-                orig_fmt = response.headers.get_content_subtype()
-                base = '{}-{}'.format(base_name, index)
-                file = path.realpath(path.join(output_dir, base + '.' + orig_fmt))
-                if not download_file(item, file, say):
-                    say.warn('Unable to download {}'.format(item))
-                    return
-                url_file = path.realpath(path.join(output_dir, base + '.url'))
-                with open(url_file, 'w') as f:
-                    f.write(url_file_content(item))
-                    say.info('Wrote URL to {}'.format(relative(url_file)))
-            else:
-                file = path.realpath(path.join(os.getcwd(), item))
-                orig_fmt = filename_extension(file)[1:]
+
+            (file, orig_fmt) = self._get(item, base_name, index)
+            if not file:
+                return
 
             dest_dir = output_dir if output_dir else path.dirname(file)
             if not writable(dest_dir):
@@ -185,6 +163,42 @@ class Manager:
         except Exception as ex:
             say.error('Stopping due to a problem')
             raise
+
+
+    def _get(self, item, base_name, index):
+        # Shortcuts to make the code more readable.
+        output_dir = self._output_dir
+        say = self._say
+
+        # For URLs, we download the corresponding files and name them with
+        # the base_name.
+        if is_url(item):
+            # First make sure the URL actually points to an image.
+            if __debug__: log('testing if URL contains an image: {}', item)
+            try:
+                response = urllib.request.urlopen(item)
+            except Exception as ex:
+                say.warn('Skipping URL due to error: {}'.format(ex))
+                return (None, None)
+            if response.headers.get_content_maintype() != 'image':
+                say.warn('Did not find an image at {}'.format(item))
+                return (None, None)
+            orig_fmt = response.headers.get_content_subtype()
+            base = '{}-{}'.format(base_name, index)
+            file = path.realpath(path.join(output_dir, base + '.' + orig_fmt))
+            if not download_file(item, file, say):
+                say.warn('Unable to download {}'.format(item))
+                return (None, None)
+            url_file = path.realpath(path.join(output_dir, base + '.url'))
+            with open(url_file, 'w') as f:
+                f.write(url_file_content(item))
+                say.info('Wrote URL to {}'.format(relative(url_file)))
+        else:
+            file = path.realpath(path.join(os.getcwd(), item))
+            orig_fmt = filename_extension(file)[1:]
+
+        if __debug__: log('{} has original format {}', relative(file), orig_fmt)
+        return (file, orig_fmt)
 
 
     def _send(self, file, service, dest_dir):

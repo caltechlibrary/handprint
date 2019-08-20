@@ -298,19 +298,7 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     try:
-        if say.use_color():
-            cb = ['chartreuse', 'bold']
-            name = styled('Handprint', cb)
-            text = '{}written {}age {}ecognit{}o{} {}est'.format(
-                styled('Hand', cb), styled('p', cb), styled('r', cb),
-                styled('i', cb), styled('n', cb), styled('t', cb))
-        else:
-            name = 'Handprint'
-            text = 'HANDwritten Page RecognItioN Test'
-        say.info('┏' + '━'*68 + '┓')
-        say.info('┃    Welcome to {}, the {}!    ┃'.format(name, text))
-        say.info('┗' + '━'*68 + '┛')
-
+        print_intro(say)
         body = MainBody(base_name, extended, from_file, output_dir, threads, say)
         body.run(services, files, make_grid)
     except (KeyboardInterrupt, UserCancelled) as ex:
@@ -337,6 +325,21 @@ def print_version():
     print('')
     print('Known services: {}'.format(', '.join(services_list())))
     print('Credentials are stored in {}'.format(Credentials.credentials_dir()))
+
+
+def print_intro(say):
+    if say.use_color():
+        cb = ['chartreuse', 'bold']
+        name = styled('Handprint', cb)
+        acronym = '{}written {}age {}ecognit{}o{} {}est'.format(
+            styled('Hand', cb), styled('p', cb), styled('r', cb),
+            styled('i', cb), styled('n', cb), styled('t', cb))
+    else:
+        name = 'Handprint'
+        acronym = 'HANDwritten Page RecognItioN Test'
+    say.info('┏' + '━'*68 + '┓')
+    say.info('┃    Welcome to {}, the {}!    ┃'.format(name, acronym))
+    say.info('┗' + '━'*68 + '┛')
 
 
 # Main entry point.

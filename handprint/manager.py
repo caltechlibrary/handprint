@@ -14,7 +14,6 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-from   colored import fg, attr
 from   concurrent.futures import ThreadPoolExecutor
 import humanize
 import io
@@ -191,29 +190,12 @@ class Manager:
         '''Send the "file" to the service named "service" and write output in
         directory "dest_dir".
         '''
-        service_name = service.name()
-        color = service.name_color()
         say = self._say
         use_color = say.use_color()
+        color = service.name_color()
+        service_name = styled(service.name(), color) if use_color else service.name()
 
-        # Helper functions.  Parameter value for "text" should be a format
-        # string with a single "{}" where the name of the service will be put.
-        def info_msg(text):
-            # name = styled(color) + service_name + styled('reset') if use_color else service
-            # say.info(name)
-            say.info(text.format(styled(service_name, color)))
-
-        def warn_msg(text):
-            # name = fg(color) + service_name + fg('yellow') if use_color else service
-            # say.warn(text.format(name))
-            say.warn(text.format(styled(service_name, color)))
-
-        def error_msg(text):
-            # name = fg(color) + service_name + fg('red') if use_color else service
-            # say.error(text.format(name))
-            say.error(text.format(styled(service_name, color)))
-
-        info_msg('Sending to {} and waiting for response ...')
+        say.info('Sending to {} and waiting for response ...'.format(service_name))
         last_time = timer()
         try:
             result = service.result(file)
@@ -222,26 +204,26 @@ class Manager:
         except RateLimitExceeded as ex:
             time_passed = timer() - last_time
             if time_passed < 1/service.max_rate():
-                warn_msg('Pausing {} due to rate limits')
+                say.warn('Pausing {} due to rate limits'.format(service_name))
                 time.sleep(1/service.max_rate() - time_passed)
                 # FIXME resend after pause
         if result.error:
-            error_msg('{} failed: ' + result.error)
-            warn_msg('No result from {} for ' + relative(format(file)))
+            say.error('{} failed: {}'.format(service_name, result.error))
+            say.warn('No result from {} for {}'.format(service_name, relative(file)))
             return None
 
-        info_msg('Got result from {}.')
+        say.info('Got result from {}.'.format(service_name))
         file_name  = path.basename(file)
         base_path  = path.join(dest_dir, file_name)
         annot_path = alt_extension(base_path, str(service) + '.png')
-        info_msg('Creating annotated image for {}.')
+        say.info('Creating annotated image for {}.'.format(service_name))
         self._save_output(annotated_image(file, result.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = alt_extension(base_path, str(service) + '.txt')
             json_file = alt_extension(base_path, str(service) + '.json')
-            info_msg('Saving all data for {}.')
+            say.info('Saving all data for {}.'.format(service_name))
             self._save_output(json.dumps(result.data), json_file)
-            info_msg('Saving extracted text for {}.')
+            say.info('Saving extracted text for {}.'.format(service_name))
             self._save_output(result.text, txt_file)
 
         # Return the annotated image file b/c we use it for the summary grid.

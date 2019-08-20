@@ -13,7 +13,6 @@ import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials
 from handprint.files import readable
 from handprint.services.base import TextRecognition, TRResult, TextBox
-from handprint.messages import msg
 from handprint.exceptions import *
 from handprint.debug import log
 from handprint.network import net

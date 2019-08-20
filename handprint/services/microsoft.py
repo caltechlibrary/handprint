@@ -13,7 +13,6 @@ from   time import sleep
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
 from handprint.services.base import TextRecognition, TRResult, TextBox
-from handprint.messages import msg
 from handprint.exceptions import *
 from handprint.debug import log
 from handprint.network import net

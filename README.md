@@ -12,7 +12,7 @@ A program to apply different handwritten text recognition services and algorithm
 🏁 Log of recent changes
 -----------------------
 
-_Version 1.0.0_: This is a sufficiently complete version of Handprint that, perhaps, can finally be called a version 1.0.  Changes include: new way to provide credential files, new default output (in which results from different services are placed side-by-side in a single large image), new command-line arguments, parallel execution, and more.
+_Version 1.0.0_: This is a sufficiently complete version of Handprint that can finally be called a version 1.0.  Changes compared to version 0.10.0 include: new way to provide credential files, new default output (in which results from different services are placed side-by-side in a single large image), new command-line arguments, parallel execution, and more.
 
 The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
 
@@ -72,7 +72,7 @@ A one-time configuration step is needed for each cloud-based HTR service after y
 handprint -a SERVICENAME CREDENTIALSFILE.json
 ```
 
-_SERVICENAME_ must be one of the service names printed by running `handprint -l`, and `CREDENTIALSFILE.json` must have one of the formats discussed below.  When you run this command, Handprint will copy `CREDENTIALSFILE.json` to a private location, and thereafter uses the credentials to access _SERVICENAME_.  (The private location is different on different sytems; for example, on macOS it is `~/Library/Application Support/Handprint/`.)  Examples are given below.
+_SERVICENAME_ must be one of the service names printed by running `handprint -l`, and `CREDENTIALSFILE.json` must have one of the formats discussed below.  When you run this command, Handprint will copy `CREDENTIALSFILE.json` to a private location, and thereafter uses the credentials to access _SERVICENAME_.  (The private location is different on different systems; for example, on macOS it is `~/Library/Application Support/Handprint/`.)  Examples are given below.
 
 
 #### Microsoft

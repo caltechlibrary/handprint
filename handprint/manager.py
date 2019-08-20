@@ -40,7 +40,7 @@ from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
 from handprint.files import readable, writable, is_url, create_image_grid
 from handprint.files import delete_existing
-from handprint.messages import color
+from handprint.messages import styled
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
 
@@ -99,7 +99,7 @@ class Manager:
         say = self._say
 
         try:
-            say.info('Starting on {}'.format(color(item, 'white')))
+            say.info('Starting on {}'.format(styled(item, 'white')))
             # For URLs, we download the corresponding files and name them with
             # the base_name.
             if is_url(item):
@@ -199,16 +199,19 @@ class Manager:
         # Helper functions.  Parameter value for "text" should be a format
         # string with a single "{}" where the name of the service will be put.
         def info_msg(text):
-            name = fg(color) + service_name + fg('green') if use_color else service
-            say.info(text.format(name))
+            # name = styled(color) + service_name + styled('reset') if use_color else service
+            # say.info(name)
+            say.info(text.format(styled(service_name, color)))
 
         def warn_msg(text):
-            name = fg(color) + service_name + fg('yellow') if use_color else service
-            say.warn(text.format(name))
+            # name = fg(color) + service_name + fg('yellow') if use_color else service
+            # say.warn(text.format(name))
+            say.warn(text.format(styled(service_name, color)))
 
         def error_msg(text):
-            name = fg(color) + service_name + fg('red') if use_color else service
-            say.error(text.format(name))
+            # name = fg(color) + service_name + fg('red') if use_color else service
+            # say.error(text.format(name))
+            say.error(text.format(styled(service_name, color)))
 
         info_msg('Sending to {} and waiting for response ...')
         last_time = timer()

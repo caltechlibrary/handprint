@@ -34,7 +34,6 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-from   colored import attr, fg
 import os
 from   os import path
 import plac
@@ -49,7 +48,7 @@ from handprint.files import filename_extension, files_in_directory, is_url
 from handprint.files import readable, writable
 from handprint.main_body import MainBody
 from handprint.manager import Manager
-from handprint.messages import MessageHandlerCLI
+from handprint.messages import MessageHandlerCLI, styled
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
 
@@ -300,13 +299,18 @@ Command-line arguments summary
 
     try:
         if say.use_color():
-            fancy = '{}Hand{}written {}p{}age {}r{}ecognit{}i{}o{}n{} {}t{}est'.format(
-                *[ fg('chartreuse_2a'), attr('reset') + fg('green') ]*6)
+            cb = ['chartreuse', 'bold']
+            name = styled('Handprint', cb)
+            text = '{}written {}age {}ecognit{}o{} {}est'.format(
+                styled('Hand', cb), styled('p', cb), styled('r', cb),
+                styled('i', cb), styled('n', cb), styled('t', cb))
         else:
-            fancy = 'HANDwritten Page RecognItioN Test'
+            name = 'Handprint'
+            text = 'HANDwritten Page RecognItioN Test'
         say.info('┏' + '━'*68 + '┓')
-        say.info('┃    Welcome to Handprint, the {}!    ┃'.format(fancy))
+        say.info('┃    Welcome to {}, the {}!    ┃'.format(name, text))
         say.info('┗' + '━'*68 + '┛')
+
         body = MainBody(base_name, extended, from_file, output_dir, threads, say)
         body.run(services, files, make_grid)
     except (KeyboardInterrupt, UserCancelled) as ex:

@@ -45,9 +45,9 @@ class MicrosoftTR(TextRecognition):
 
     @classmethod
     def name_color(self):
-        '''Returns a color code for this service.  Codes must be taken from
-        those defined by https://pypi.org/project/colored/.'''
-        return 'sky_blue_1'
+        '''Returns a color code for this service.  See the color definitions
+        in messages.py.'''
+        return 'lightblue2'
 
 
     def max_rate(self):

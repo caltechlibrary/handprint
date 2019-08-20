@@ -59,9 +59,9 @@ class GoogleTR(TextRecognition):
 
     @classmethod
     def name_color(self):
-        '''Returns a color code for this service.  Codes must be taken from
-        those defined by https://pypi.org/project/colored/.'''
-        return 'medium_purple_2a'
+        '''Returns a color code for this service.  See the color definitions
+        in messages.py.'''
+        return 'mediumorchid'
 
 
     def max_rate(self):

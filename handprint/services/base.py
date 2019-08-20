@@ -93,8 +93,8 @@ class TextRecognition(object):
 
 
     def name_color(self):
-        '''Returns a color code for this service.  Codes must be taken from
-        those defined by https://pypi.org/project/colored/.'''
+        '''Returns a color code for this service.  See the color definitions
+        in messages.py.'''
         pass
 
 

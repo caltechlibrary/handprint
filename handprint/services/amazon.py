@@ -136,9 +136,9 @@ class AmazonTextractTR(AmazonTR):
 
     @classmethod
     def name_color(self):
-        '''Returns a color code for this service.  Codes must be taken from
-        those defined by https://pypi.org/project/colored/.'''
-        return 'dark_orange_3a'
+        '''Returns a color code for this service.  See the color definitions
+        in messages.py.'''
+        return 'yellow3'
 
 
     def result(self, file_path):
@@ -164,9 +164,9 @@ class AmazonRekognitionTR(AmazonTR):
 
     @classmethod
     def name_color(self):
-        '''Returns a color code for this service.  Codes must be taken from
-        those defined by https://pypi.org/project/colored/.'''
-        return 'light_goldenrod_3'
+        '''Returns a color code for this service.  See the color definitions
+        in messages.py.'''
+        return 'darkorange3'
 
 
     def result(self, file_path):

@@ -15,7 +15,7 @@ file "LICENSE" for more information.
 '''
 
 import colorful
-colorful.use_true_colors()
+colorful.use_256_ansi_colors()
 
 import sys
 
@@ -834,7 +834,7 @@ colorful.update_palette(_COLORS)
 # (particularly Windows) and not all are that useful in pratice.
 
 _STYLES = {
-    'info'          : colorful.limegreen,
+    'info'          : colorful.springgreen3,
     'warn'          : colorful.orange,
     'warning'       : colorful.orange,
     'error'         : colorful.red,

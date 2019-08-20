@@ -1,4 +1,4 @@
-Handprint<img width="100px" align="right" src=".graphics/noun_Hand_733265.svg">
+Handprint<img width="15%" align="right" src=".graphics/noun_Hand_733265.png">
 =========
 
 A program to apply different handwritten text recognition services and algorithms to images of handwritten text pages, and produce an annotated image (and optionally more) showing the results.
@@ -375,6 +375,6 @@ Finally, I am grateful for computing &amp; institutional resources made availabl
     
 <div align="center">
   <a href="https://www.caltech.edu">
-    <img width="100" height="100" src=".graphics/caltech-round.svg">
+    <img width="120px" src=".graphics/caltech-round.png">
   </a>
 </div>

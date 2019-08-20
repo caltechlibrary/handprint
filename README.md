@@ -27,7 +27,8 @@ Table of Contents
    * [Input files and URLs](#input-files-and-urls)
    * [Annotated output images](#annotated-output-images)
    * [Extended results](#extended-results)
-   * [Command line options](#command-line-options)
+   * [Other options](#other-options)
+   * [Command line options summary](#command-line-options-summary)
 * [Known issues and limitations](#known-issues-and-limitations)
 * [Getting help](#-getting-help)
 * [Contributing](#-contributing)
@@ -273,7 +274,18 @@ document-1-reduced.microsoft.txt
 ...
 ```
 
-### _Command line options_
+### _Other options_
+
+Handprint produces color-coded diagnostic output as it runs, by default.  However, some terminals or terminal configurations may make it hard to read the text with colors, so Handprint offers the `-C` option (`/C` on Windows) to turn off colored output.
+
+Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
+
+If given the `-V` option (`/V` on Windows), this program will print the version and other information, and exit without doing anything else.
+
+If given the `-@` option (`/@` on Windows), this program will print additional diagnostic output as it runs; in addition, it will start the Python debugger (`pdb`) when an exception occurs, instead of simply exiting.
+
+
+### _Command line options summary_
 
 The following table summarizes all the command line options available. (Note: on Windows computers, `/` must be used as the prefix character instead of the `-` dash character):
 

@@ -98,7 +98,8 @@ class Manager:
         say = self._say
 
         try:
-            say.info('Starting on {}'.format(styled(item, 'white')))
+            say.info('Starting on {}'.format(
+                styled(item, 'white') if say.use_color() else item))
             # For URLs, we download the corresponding files and name them with
             # the base_name.
             if is_url(item):

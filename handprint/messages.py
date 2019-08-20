@@ -834,7 +834,7 @@ colorful.update_palette(_COLORS)
 # (particularly Windows) and not all are that useful in pratice.
 
 _STYLES = {
-    'info'          : colorful.springgreen3,
+    'info'          : colorful.springgreen4,
     'warn'          : colorful.orange,
     'warning'       : colorful.orange,
     'error'         : colorful.red,

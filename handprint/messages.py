@@ -65,7 +65,7 @@ class MessageHandlerCLI(MessageHandlerBase):
     def info(self, text, details = ''):
         '''Prints an informational message.'''
         if not self.be_quiet():
-            msg(self.info_text(text, details))
+            print(self.info_text(text, details), flush = True)
 
 
     def warn_text(self, text, details = ''):
@@ -75,7 +75,7 @@ class MessageHandlerCLI(MessageHandlerBase):
 
     def warn(self, text, details = ''):
         '''Prints a nonfatal, noncritical warning message.'''
-        msg(self.warn_text(text, details))
+        print(self.info_text(text, details), flush = True)
 
 
     def error_text(self, text, details = ''):
@@ -85,7 +85,7 @@ class MessageHandlerCLI(MessageHandlerBase):
 
     def error(self, text, details = ''):
         '''Prints a message reporting a critical error.'''
-        msg(self.error_text(text, details))
+        print(self.error_text(text, details), flush = True)
 
 
     def fatal_text(self, text, details = ''):
@@ -101,7 +101,7 @@ class MessageHandlerCLI(MessageHandlerBase):
         exit the program; it leaves that to the caller in case the caller
         needs to perform additional tasks before exiting.
         '''
-        msg(self.fatal_text(text, details))
+        print(self.fatal_text(text, details), flush = True)
 
 
     def yes_no(self, question):
@@ -114,20 +114,11 @@ class MessageHandlerCLI(MessageHandlerBase):
 
 
     def msg(self, text, flags = None):
-        msg(self.msg_text(text, flags))
+        print(self.msg_text(text, flags), flush = True)
 
 
 # Message utility funcions.
 # .............................................................................
-
-def msg(text):
-    '''Like the standard print(), but flushes the output immediately.
-    Flushing immediately is useful when piping the output of a script,
-    because Python by default will buffer the output in that situation and
-    this makes it very difficult to see what is happening in real time.
-    '''
-    print(text, flush = True)
-
 
 def styled(text, flags = None, colorize = True):
     '''Style the 'text' according to 'flags' if 'colorize' is True.

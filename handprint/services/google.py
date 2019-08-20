@@ -61,7 +61,7 @@ class GoogleTR(TextRecognition):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'mediumorchid'
+        return 'deepskyblue1'
 
 
     def max_rate(self):
@@ -178,7 +178,7 @@ class GoogleTR(TextRecognition):
                 # printed to the terminal and we end up here.
                 raise KeyboardInterrupt
             else:
-                text = 'Error: failed to convert "{}": {}'.format(path, ex)
+                text = 'Error: {} -- {}'.format(str(ex), path)
                 return TRResult(path = path, data = {}, boxes = [],
                                 text = '', error = text)
 

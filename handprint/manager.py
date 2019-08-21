@@ -185,6 +185,12 @@ class Manager:
                 return (None, None)
             orig_fmt = response.headers.get_content_subtype()
             base = '{}-{}'.format(base_name, index)
+            # If we weren't given an output dir, then for URLs, we have no
+            # choice but to use the current dir to download the file.
+            # Important: don't change self._output_dir because if other
+            # inputs *are* files, then those files will need other output dirs.
+            if not output_dir:
+                output_dir = os.getcwd()
             file = path.realpath(path.join(output_dir, base + '.' + orig_fmt))
             if not download_file(item, file, say):
                 say.warn('Unable to download {}'.format(item))

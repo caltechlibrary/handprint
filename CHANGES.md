@@ -1,6 +1,12 @@
 Change log for Handprint
 ========================
 
+Version 1.0.1
+--------------
+
+This version adds instructions for installing from PyPI and fixes a bug writing files downloaded from URLs.
+
+
 Version 1.0.0
 --------------
 

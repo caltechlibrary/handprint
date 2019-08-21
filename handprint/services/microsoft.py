@@ -13,7 +13,6 @@ from   time import sleep
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
 from handprint.services.base import TextRecognition, TRResult, TextBox
-from handprint.messages import msg
 from handprint.exceptions import *
 from handprint.debug import log
 from handprint.network import net
@@ -28,23 +27,26 @@ class MicrosoftTR(TextRecognition):
         self._results = {}
 
 
-    def init_credentials(self, credentials_dir = None):
+    def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
-        if __debug__: log('Getting credentials from {}', credentials_dir)
         try:
-            self._credentials = MicrosoftCredentials(credentials_dir).creds()
+            if __debug__: log('initializing credentials')
+            self._credentials = MicrosoftCredentials().creds()
         except Exception as ex:
-            raise AuthenticationFailure(str(ex))
+            raise AuthFailure(str(ex))
 
 
+    @classmethod
     def name(self):
         '''Returns the canonical internal name for this service.'''
         return "microsoft"
 
 
-    def accepted_formats(self):
-        '''Returns a list of supported image file formats.'''
-        return ['jpeg', 'jpg', 'png', 'gif', 'bmp']
+    @classmethod
+    def name_color(self):
+        '''Returns a color code for this service.  See the color definitions
+        in messages.py.'''
+        return 'lightblue2'
 
 
     def max_rate(self):
@@ -91,13 +93,13 @@ class MicrosoftTR(TextRecognition):
         '''
         # Check if we already processed it.
         if path in self._results:
+            if __debug__: log('returning already-known result for {}', path)
             return self._results[path]
 
-        if __debug__: log('Reading {}', path)
-        image = open(path, 'rb').read()
-        if len(image) > self.max_size():
-            text = 'File exceeds {} byte limit for Microsoft service'.format(self.max_size())
-            return TRResult(path = path, data = {}, text = '', error = text, boxes = [])
+        # Read the image and proceed with contacting the service.
+        (image, error) = self._image_from_file(path)
+        if error:
+            return error
 
         base_url = 'https://westus.api.cognitive.microsoft.com/vision/v2.0/'
         url = base_url + 'recognizeText'
@@ -109,10 +111,10 @@ class MicrosoftTR(TextRecognition):
         # to submit the image for processing, then polling to wait until the
         # text is ready to be retrieved.
 
-        if __debug__: log('Sending file to MS cloud service')
+        if __debug__: log('sending file to MS cloud service')
         response, error = net('post', url, headers = headers, params = params, data = image)
         if isinstance(error, NetworkFailure):
-            if __debug__: log('Network exception: {}', str(error))
+            if __debug__: log('network exception: {}', str(error))
             return TRResult(path = path, data = {}, text = '', error = str(error))
         elif isinstance(error, RateLimitExceeded):
             # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits
@@ -120,7 +122,7 @@ class MicrosoftTR(TextRecognition):
             sleep_time = 30
             if 'Retry-After' in response.headers:
                 sleep_time = int(response.headers['Retry-After'])
-            if __debug__: log('Sleeping for {} s and retrying', sleep_time)
+            if __debug__: log('sleeping for {} s and retrying', sleep_time)
             sleep(sleep_time)
             return self.result(path)    # Recursive invocation
         elif error:
@@ -129,10 +131,10 @@ class MicrosoftTR(TextRecognition):
         if 'Operation-Location' in response.headers:
             polling_url = response.headers['Operation-Location']
         else:
-            if __debug__: log('No operation-location in response headers')
+            if __debug__: log('no operation-location in response headers')
             raise ServiceFailure('Unexpected response from Microsoft server')
 
-        if __debug__: log('Polling MS for results ...')
+        if __debug__: log('polling MS for results ...')
         analysis = {}
         poll = True
         while poll:
@@ -142,7 +144,7 @@ class MicrosoftTR(TextRecognition):
             sleep(2)
             response, error = net('get', polling_url, polling = True, headers = headers)
             if isinstance(error, NetworkFailure):
-                if __debug__: log('Network exception: {}', str(error))
+                if __debug__: log('network exception: {}', str(error))
                 return TRResult(path = path, data = {}, text = '', error = str(error))
             elif isinstance(error, RateLimitExceeded):
                 # Pause to let the server reset its timers.  It seems that MS
@@ -151,7 +153,7 @@ class MicrosoftTR(TextRecognition):
                 sleep_time = 30
                 if 'Retry-After' in response.headers:
                     sleep_time = int(response.headers['Retry-After'])
-                if __debug__: log('Sleeping for {} s and retrying', sleep_time)
+                if __debug__: log('sleeping for {} s and retrying', sleep_time)
                 sleep(sleep_time)
             elif error:
                 raise error
@@ -166,8 +168,8 @@ class MicrosoftTR(TextRecognition):
                 if 'status' in analysis and analysis['status'] == 'Failed':
                     poll = False
             else:
-                if __debug__: log('Received empty result from Microsoft.')
-        if __debug__: log('Results received.')
+                if __debug__: log('received empty result from Microsoft.')
+        if __debug__: log('results received.')
 
         # Have to extract the text into a single string.
         full_text = ''

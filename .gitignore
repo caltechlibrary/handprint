@@ -67,6 +67,15 @@ __pycache__
 
 build
 dist
-
-# This is the default location for credentials files.
-creds
+*-reduced.jpg
+*-reduced.png
+*.all-results.jpg
+*.all-results.png
+*.amazon-rekognition.jpg
+*.amazon-textract.jpg
+*.microsoft.jpg
+*.google.jpg
+*.amazon-rekognition.png
+*.amazon-textract.png
+*.microsoft.png
+*.google.png

@@ -42,25 +42,26 @@ class GoogleTR(TextRecognition):
         self._results = {}
 
 
-    def init_credentials(self, credentials_dir = None):
+    def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
-        # Haven't been able to get this to work by reading the credentials:
-        # self.credentials = GoogleCredentials(credentials_dir).creds()
-        if __debug__: log('Getting credentials from {}', credentials_dir)
         try:
-            GoogleCredentials(credentials_dir)
+            if __debug__: log('initializing credentials')
+            GoogleCredentials()
         except Exception as ex:
-            raise AuthenticationFailure(str(ex))
+            raise AuthFailure(str(ex))
 
 
+    @classmethod
     def name(self):
         '''Returns the canonical internal name for this service.'''
         return "google"
 
 
-    def accepted_formats(self):
-        '''Returns a list of supported image file formats.'''
-        return ['jpeg', 'jpg', 'png', 'gif', 'bmp', 'raw', 'tif', 'tiff', 'pdf']
+    @classmethod
+    def name_color(self):
+        '''Returns a color code for this service.  See the color definitions
+        in messages.py.'''
+        return 'deepskyblue1'
 
 
     def max_rate(self):
@@ -81,14 +82,24 @@ class GoogleTR(TextRecognition):
 
     def max_dimensions(self):
         '''Maximum image size as a tuple of pixel numbers: (width, height).'''
-        # No max dimensions are given in the Google docs, so this returns
-        # dimensions based on a square image of the max size.  This is not a
-        # great approach because (a) an image that doesn't have a square
-        # aspect ratio could legitimately have larger dimensions and (b) this
-        # assumes 8-bit color, but for now let's take this easy way out.
-        side = math.floor(math.sqrt(self.max_size()))
-        return (side, side)
+        # No max dimensions are given in the Google docs.
+        return None
 
+
+    # General scheme of things:
+    #
+    # * Return errors (via TRResult) if a result could not be obtained
+    #   because of an error specific to a particular path/item.  The guiding
+    #   principle here is: if the calling loop is processing multiple items,
+    #   can it be expected to be able to go on to the next item if this error
+    #   occurred?
+    #
+    # * Raises exceptions if a problem occurs that should stop the calling
+    #   code from continuing with this service.  This includes things like
+    #   authentication failures, because authentication failures tend to
+    #   involve all uses of a service and not just a specific item.
+    #
+    # * Otherwise, returns a TRResult if successful.
 
     def result(self, path):
         '''Returns the results from calling the service on the 'path'.  The
@@ -96,16 +107,16 @@ class GoogleTR(TextRecognition):
         '''
         # Check if we already processed it.
         if path in self._results:
+            if __debug__: log('returning already-known result for {}', path)
             return self._results[path]
 
-        if __debug__: log('Reading {}', path)
-        image = open(path, 'rb').read()
-        if len(image) > self.max_size():
-            text = 'File exceeds {} byte limit for Google service'.format(self.max_size())
-            return TRResult(path = path, data = {}, text = '', error = text, boxes = [])
+        # Read the image and proceed with contacting the service.
+        (image, error) = self._image_from_file(path)
+        if error:
+            return error
 
         try:
-            if __debug__: log('Building Google vision API object')
+            if __debug__: log('building Google vision API object')
             client  = gv.ImageAnnotatorClient()
             image   = gv.types.Image(content = image)
             context = gv.types.ImageContext(language_hints = ['en-t-i0-handwrit'])
@@ -113,9 +124,9 @@ class GoogleTR(TextRecognition):
             # Iterate over the known API calls and store each result.
             result = dict.fromkeys(self._known_features)
             for feature in self._known_features:
-                if __debug__: log('Sending image to Google for {} ...', feature)
+                if __debug__: log('sending image to Google for {} ...', feature)
                 response = getattr(client, feature)(image = image, image_context = context)
-                if __debug__: log('Received result.')
+                if __debug__: log('received result.')
                 result[feature] = MessageToDict(response)
             full_text = ''
 
@@ -149,7 +160,7 @@ class GoogleTR(TextRecognition):
                             else:
                                 # Something is wrong with the vertex list.
                                 # Skip it and continue.
-                                if __debug__: log('Bad bb for {}: {}', text, bb)
+                                if __debug__: log('bad bb for {}: {}', text, bb)
 
             self._results[path] = TRResult(path = path, data = result,
                                            boxes = boxes, text = full_text,
@@ -157,7 +168,7 @@ class GoogleTR(TextRecognition):
             return self._results[path]
         except google.api_core.exceptions.PermissionDenied as ex:
             text = 'Authentication failure for Google service -- {}'.format(ex)
-            raise AuthenticationFailure(text)
+            raise AuthFailure(text)
         except KeyboardInterrupt as ex:
             raise
         except Exception as ex:
@@ -167,7 +178,7 @@ class GoogleTR(TextRecognition):
                 # printed to the terminal and we end up here.
                 raise KeyboardInterrupt
             else:
-                text = 'Error: failed to convert "{}": {}'.format(path, ex)
+                text = 'Error: {} -- {}'.format(str(ex), path)
                 return TRResult(path = path, data = {}, boxes = [],
                                 text = '', error = text)
 

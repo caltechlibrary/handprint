@@ -7,16 +7,23 @@ import os
 from   os import path
 
 import handprint
+from handprint.exceptions import *
+from handprint.files import readable
 
 from .base import Credentials
 
 class AmazonCredentials(Credentials):
-    def __init__(self, credentials_dir = None):
-        self.credentials_dir = credentials_dir
-        self.credentials_file = path.join(credentials_dir, 'amazon_credentials.json')
-        with open(self.credentials_file, 'r') as file:
-            self.credentials = json.load(file)
+    def __init__(self):
+        cfile = path.join(self.credentials_dir(), 'amazon_credentials.json')
+        if not path.exists(cfile):
+            raise AuthFailure('Credentials for Amazon have not been installed')
+        elif not readable(cfile):
+            raise AuthFailure('Amazon credentials file unreadable: {}'.format(cfile))
 
-
-    def credentials_file():
-        return self.credentials_file
+        self.creds_file = cfile
+        try:
+            with open(cfile, 'r') as file:
+                self.credentials = json.load(file)
+        except Exception as ex:
+            raise AuthFailure(
+                'Unable to parse Amazon exceptions file: {}'.format(str(ex)))

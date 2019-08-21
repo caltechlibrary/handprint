@@ -6,11 +6,11 @@
 # @website https://github.com/caltechlibrary/handprint
 # =============================================================================
 
-__version__     = '0.10.0'
+__version__     = '1.0.0'
 __title__       = 'handprint'
-__description__ = 'Handprint: HANDwritten Page RecognitIoN Test for Caltech Archives'
+__description__ = 'Handprint: HANDwritten Page RecognitIoN Test'
 __url__         = 'https://github.com/caltechlibrary/handprint'
-__author__      = 'Michael Hucka <mhucka@caltech.edu>'
-__email__       = 'helpdesk@library.caltech.edu'
-__license__     = 'BSD 3-clause license -- see LICENSE file'
+__author__      = 'Michael Hucka'
+__email__       = 'mhucka@library.caltech.edu'
+__license__     = 'BSD 3-clause license'
 __copyright__   = 'Copyright (C) 2018-2019 by the California Institute of Technology'

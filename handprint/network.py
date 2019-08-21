@@ -95,15 +95,15 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
                 raise error
 
 
-def download_file(url, output_file, user = None, pswd = None, spinner = None):
-    if spinner:
-        spinner.update('Downloading {}'.format(url))
+def download_file(url, output_file, user = None, pswd = None, say = None):
+    if say:
+        say.info('Downloading {}'.format(url))
     try:
         download(url, user, pswd, output_file)
         return True
-    except (NoContent, ServiceFailure, AuthenticationFailure) as ex:
-        if spinner:
-            spinner.fail('Failed to download {}: {}'.format(url, str(ex)))
+    except (NoContent, ServiceFailure, AuthFailure) as ex:
+        if say:
+            say.error('{}'.format(str(ex)))
     return False
 
 
@@ -163,7 +163,7 @@ def download(url, user, password, local_destination, recursing = 0):
                     f.write(chunk)
         req.close()
     elif code in [401, 402, 403, 407, 451, 511]:
-        raise AuthenticationFailure(addurl('Access is forbidden'))
+        raise AuthFailure(addurl('Access is forbidden'))
     elif code in [404, 410]:
         raise NoContent(addurl('No content found'))
     elif code in [405, 406, 409, 411, 412, 414, 417, 428, 431, 505, 510]:
@@ -237,7 +237,7 @@ def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwar
     if code == 400:
         error = RequestError('Server rejected the request')
     elif code in [401, 402, 403, 407, 451, 511]:
-        error = AuthenticationFailure(addurl('Access is forbidden'))
+        error = AuthFailure(addurl('Access is forbidden'))
     elif code in [404, 410] and not polling:
         error = NoContent(addurl("No content found"))
     elif code in [405, 406, 409, 411, 412, 414, 417, 428, 431, 505, 510]:

@@ -302,7 +302,7 @@ Command-line arguments summary
         body = MainBody(base_name, extended, from_file, output_dir, threads, say)
         body.run(services, files, make_grid)
     except (KeyboardInterrupt, UserCancelled) as ex:
-        if __debug__: log('received {}', ex.__name__)
+        if __debug__: log('received {}', sys.exc_info()[0].__name__)
         exit(say.info_text('Quitting.'))
     except Exception as ex:
         if debug:

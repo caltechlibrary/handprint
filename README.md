@@ -1,16 +1,20 @@
-Handprint<img width="15%" align="right" src=".graphics/noun_Hand_733265.png">
+Handprint<img width="15%" align="right" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/noun_Hand_733265.png">
 =========
 
 A Python program to apply different handwritten text recognition services to images of handwritten text pages, and produce an annotated image (and optionally more) showing the text recognized.
 
-[![Latest release](https://img.shields.io/badge/Latest_release-1.0.0-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/badge/Latest_release-1.0.1-b44e88.svg?style=flat-square)](http://shields.io)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
 [![DOI](http://img.shields.io/badge/DOI-10.22002%20%2f%20D1.1268-navy.svg?style=flat-square)](https://data.caltech.edu/records/1268)
+![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)
+
 
 🏁 Log of recent changes
 -----------------------
+
+_Version 1.0.1_: This version adds instructions for installing from PyPI and fixes a bug writing files downloaded from URLs.
 
 _Version 1.0.0_: This is a sufficiently complete version of Handprint that can finally be called a version 1.0.  Changes compared to version 0.10.0 include: new way to provide credential files, new default output (in which results from different services are placed side-by-side in a single large image), new command-line arguments, parallel execution, and more.
 
@@ -40,7 +44,7 @@ Table of Contents
 ☀ Introduction
 -------------
 
-<img align="right" width="550px" src=".graphics/glaser-example-google.jpg">
+<img align="right" width="550px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/glaser-example-google.jpg">
 
 Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the performance of alternative services for [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.  Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/), and more.  Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, to visualize the results.  The image at right shows an example.
 
@@ -49,24 +53,23 @@ Handprint can work with individual images, directories of images, and URLs point
 ✺ Installation and configuration
 -------------------------------
 
-The instructions below assume you have a Python interpreter installed on your computer; if that's not the case, please first install Python, and familiarize yourself with running Python programs on your system.
+The instructions below assume you have a Python interpreter installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system.
 
 Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft.  Installing Handprint requires a both installing a copy of Handprint on your computer and supplying your copy with credentials for accessing the cloud services you want to use.
 
 
 ### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
 
-The following is probably the simplest and most direct way to install this software on your computer:
+The following is probably the simplest and most direct way to install the latest release of Handprint on your computer:
+```sh
+sudo python3 -m pip install handprint --upgrade
+```
+
+Alternatively, you can install the latest version directly from the GitHub repository using the following command:
 ```sh
 sudo python3 -m pip install git+https://github.com/caltechlibrary/handprint.git --upgrade
 ```
 
-Alternatively, you can instead clone this GitHub repository and then run `setup.py` manually.  First, create a directory somewhere on your computer where you want to store the files, and cd to it from a terminal shell.  Next, execute the following commands:
-```sh
-git clone https://github.com/caltechlibrary/handprint.git
-cd handprint
-sudo python3 -m pip install . --upgrade
-```
 
 ### ⓶&nbsp;&nbsp; _Add cloud service credentials_
 
@@ -143,7 +146,7 @@ handprint -a amazon-rekognition myamazoncredentials.json
 Handprint comes with a single command-line interface program called `handprint`.  Here is a screen cast to give a sense for what it's like to run Handprint. Click on the following image:
 
 <p align="center">
-  <a href=".graphics/handprint-screencast.gif"><img src=".graphics/handprint-preview-image.png" alt="Screencast of simple Handprint demo"></a>
+  <a href="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/handprint-screencast.gif"><img src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/handprint-preview-image.png" alt="Screencast of simple Handprint demo"></a>
 </p>
 
 The `handprint` command-line program should end up installed in a location where software is normally installed on your computer, if the installation steps described in the previous section proceed successfully.  Running Handprint from a terminal shell then should be as simple as running any other shell command on your system:
@@ -176,7 +179,7 @@ handprint -s microsoft tests/images/public-domain/clara-barton-life-of-my-childh
 ```
 
 Here is what that result looks like:
-<img src=".graphics/clara-barton-page.png" alt="Example of running Microsoft's service on a page from Clara Barton's unpublished draft book, The Life of My Childhood.">
+<img src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/clara-barton-page.png" alt="Example of running Microsoft's service on a page from Clara Barton's unpublished draft book, The Life of My Childhood.">
 
 
 ### _Input files and URLs_
@@ -199,7 +202,7 @@ Note that providing URLs on the command line can be problematic due to how termi
 By default, Handprint will create a single output file for each input file.  This file will be have the suffix `.all-results.png` and contain an annotated version of the results for each service invoked, tiled in a _N_&times;_N_ grid fashion to produce one (big) output image.  Here is a sample output image to illustrate:
 
 <p align="center">
-<img src=".graphics/all-results-example.jpg" alt="Example annotated results output image">
+<img src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/all-results-example.jpg" alt="Example annotated results output image">
 </p>
 
 The 2&times;2 image above was produced by running the following command from the Handprint source directory:
@@ -378,6 +381,6 @@ Finally, I am grateful for computing &amp; institutional resources made availabl
     
 <div align="center">
   <a href="https://www.caltech.edu">
-    <img width="120px" src=".graphics/caltech-round.png">
+    <img width="120px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/caltech-round.png">
   </a>
 </div>

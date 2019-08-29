@@ -60,14 +60,19 @@ Handprint includes several adapters for working with cloud-based HTR services fr
 
 ### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
 
-The following is probably the simplest and most direct way to install the latest release of Handprint on your computer:
-```sh
-sudo python3 -m pip install handprint --upgrade
+On **Linux**, **macOS**, and **Windows** operating systems, you should be able to install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have the `pip` package or are uncertain, first run the following command in a terminal command line interpreter: 
+```
+sudo python3 -m ensurepip
 ```
 
-Alternatively, you can install the latest version directly from the GitHub repository using the following command:
+Then, to install Handprint from the Python package repository, run the following command:
+```
+python3 -m pip install handprint --user --upgrade
+```
+
+As an alternative to getting it from PyPI, you can instruct `pip` to install Handprint directly from the GitHub repository:
 ```sh
-sudo python3 -m pip install git+https://github.com/caltechlibrary/handprint.git --upgrade
+python3 -m pip install git+https@github.com:caltechlibrary/handprint.git --user --upgrade
 ```
 
 

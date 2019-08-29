@@ -20,6 +20,7 @@ colorful.use_256_ansi_colors()
 import sys
 
 import handprint
+from handprint.debug import log
 from handprint.exceptions import *
 
 
@@ -145,7 +146,7 @@ def styled(text, flags = None, colorize = True):
     if not _STYLES_INITIALIZED:
         import handprint.messages_styles
         _STYLES_INITIALIZED = True
-    from handprint.messages_styles import _STYLES, _COLORS
+    from handprint.messages_styles import _STYLES
     if type(flags) is not list:
         flags = [flags]
 
@@ -157,6 +158,12 @@ def styled(text, flags = None, colorize = True):
             attribs &= colorful.reset
         elif c in _STYLES:
             attribs &= _STYLES[c]
-        elif c in _COLORS:
-            attribs &= getattr(colorful, c.lower())
+        else:
+            # Color names for colorful have to start with a lower case letter,
+            # which is really easy to screw up.  Let's help ourselves.
+            c = c[:1].lower() + c[1:]
+            try:
+                attribs &= getattr(colorful, c)
+            except Exception:
+                if __debug__: log('colorful does not recognize color {}', c)
     return attribs | text

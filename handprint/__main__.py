@@ -48,7 +48,7 @@ from handprint.files import filename_extension, files_in_directory, is_url
 from handprint.files import readable, writable
 from handprint.main_body import MainBody
 from handprint.manager import Manager
-from handprint.messages import MessageHandlerCLI, styled
+from handprint.messages import MessageHandler, styled
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
 
@@ -251,7 +251,7 @@ Command-line arguments summary
 
     # Initial setup -----------------------------------------------------------
 
-    say = MessageHandlerCLI(not no_color, quiet)
+    say = MessageHandler(not no_color, quiet)
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = '(Hint: use {}h for help.)'.format(prefix)
     make_grid = not no_grid

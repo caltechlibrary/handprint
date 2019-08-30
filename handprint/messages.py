@@ -26,21 +26,8 @@ from handprint.exceptions import *
 
 # Exported classes.
 # .............................................................................
-# The basic principle of writing the classes (like this one) that get used
-# elsewhere is that they should take the information they need.  This means,
-# for example, that 'use_color' is handed to the CLI version of this object,
-# not to the base class class, even though use_color is something that may be
-# relevant to more than one of the main classes.  This is a matter of
-# separation of concerns and information hiding.
 
-class MessageHandlerBase():
-    '''Base class for message-printing classes in Handprint!'''
-
-    def __init__(self):
-        pass
-
-
-class MessageHandlerCLI(MessageHandlerBase):
+class MessageHandler():
     '''Class for printing console messages and asking the user questions.'''
 
     def __init__(self, use_color, quiet):
@@ -57,52 +44,52 @@ class MessageHandlerCLI(MessageHandlerBase):
         return self._quiet
 
 
-    def info_text(self, text, details = ''):
+    def info_text(self, text, *args):
         '''Prints an informational message.'''
         if not self.be_quiet():
-            return styled(text, 'info', self._colorize)
+            return styled(text.format(*args), 'info', self._colorize)
 
 
-    def info(self, text, details = ''):
+    def info(self, text, *args):
         '''Prints an informational message.'''
         if not self.be_quiet():
-            print(self.info_text(text, details), flush = True)
+            print(self.info_text(text, *args), flush = True)
 
 
-    def warn_text(self, text, details = ''):
+    def warn_text(self, text, *args):
         '''Prints a nonfatal, noncritical warning message.'''
-        return styled('Warning: ' + text, 'warn', self._colorize)
+        return styled(text.format(*args), 'warn', self._colorize)
 
 
-    def warn(self, text, details = ''):
+    def warn(self, text, *args):
         '''Prints a nonfatal, noncritical warning message.'''
-        print(self.info_text(text, details), flush = True)
+        print(self.warn_text(text, *args), flush = True)
 
 
-    def error_text(self, text, details = ''):
+    def error_text(self, text, *args):
         '''Prints a message reporting a critical error.'''
-        return styled('Error: ' + text, 'error', self._colorize)
+        return styled(text.format(*args), 'error', self._colorize)
 
 
-    def error(self, text, details = ''):
+    def error(self, text, *args):
         '''Prints a message reporting a critical error.'''
-        print(self.error_text(text, details), flush = True)
+        print(self.error_text(text, *args), flush = True)
 
 
-    def fatal_text(self, text, details = ''):
+    def fatal_text(self, text, *args):
         '''Prints a message reporting a fatal error.  This method does not
         exit the program; it leaves that to the caller in case the caller
         needs to perform additional tasks before exiting.
         '''
-        return styled('FATAL: ' + text, 'fatal', self._colorize)
+        return styled('FATAL: ' + text.format(*args), ['error', 'bold'], self._colorize)
 
 
-    def fatal(self, text, details = ''):
+    def fatal(self, text, *args):
         '''Prints a message reporting a fatal error.  This method does not
         exit the program; it leaves that to the caller in case the caller
         needs to perform additional tasks before exiting.
         '''
-        print(self.fatal_text(text, details), flush = True)
+        print(self.fatal_text(text, *args), flush = True)
 
 
     def yes_no(self, question):

@@ -60,26 +60,26 @@ disable_ssl_cert_check()
 # .............................................................................
 
 @plac.annotations(
-    add_creds  = ('add credentials file for service "A"',            'option', 'a'),
-    base_name  = ('use base name "B" to name downloaded images',     'option', 'b'),
-    no_color   = ('do not color-code terminal output',               'flag',   'C'),
-    extended   = ('produce extended results (text file, JSON data)', 'flag',   'e'),
-    from_file  = ('read list of images or URLs from file "F"',       'option', 'f'),
-    no_grid    = ('do not create all-results grid image',            'flag',   'G'),
-    list       = ('print list of known services',                    'flag',   'l'),
-    output_dir = ('write output to directory "O"',                   'option', 'o'),
-    quiet      = ('only print important messages while working',     'flag',   'q'),
-    services   = ('invoke HTR/OCR service "S" (default: "all")',     'option', 's'),
-    threads    = ('number of threads to use (default: #cores/2)',    'option', 't'),
-    version    = ('print version info and exit',                     'flag',   'V'),
-    debug      = ('turn on debug tracing & exception catching',      'flag',   '@'),
+    add_creds  = ('add credentials file for service "A"',              'option', 'a'),
+    base_name  = ('use base name "B" to name downloaded images',       'option', 'b'),
+    no_color   = ('do not color-code terminal output',                 'flag',   'C'),
+    extended   = ('produce extended results (text file, JSON data)',   'flag',   'e'),
+    from_file  = ('read list of images or URLs from file "F"',         'option', 'f'),
+    no_grid    = ('do not create all-results grid image',              'flag',   'G'),
+    list       = ('print list of known services',                      'flag',   'l'),
+    output_dir = ('write output to directory "O"',                     'option', 'o'),
+    quiet      = ('only print important messages while working',       'flag',   'q'),
+    services   = ('invoke HTR/OCR service "S" (default: "all")',       'option', 's'),
+    threads    = ('number of threads to use (default: #cores/2)',      'option', 't'),
+    version    = ('print version info and exit',                       'flag',   'V'),
+    debug      = ('write detailed trace to "OUT" ("-" means console)', 'option', '@'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
 
 def main(add_creds = 'A', base_name = 'B', no_color = False, extended = False,
          from_file = 'F', no_grid = False, list = False, output_dir = 'O',
          quiet = False, services = 'S', threads = 'T', version = False,
-         debug = False, *files):
+         debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -241,9 +241,11 @@ Handprint within subshells inside other environments such as Emacs.)
 If given the -V option (/V on Windows), this program will print the version
 and other information, and exit without doing anything else.
 
-If given the -@ option (/@ on Windows), this program will print additional
-diagnostic output as it runs; in addition, it will start the Python debugger
-(pdb) when an exception occurs, instead of simply exiting.
+If given the -@ argument (/@ on Windows), this program will output a detailed
+trace of what it is doing to the terminal window, and will also drop into a
+debugger upon the occurrence of any errors.  The debug trace will be sent to
+the given destination, which can be '-' to indicate console output, or a file
+path to send the output to a file.
 
 Command-line arguments summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -255,11 +257,12 @@ Command-line arguments summary
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = '(Hint: use {}h for help.)'.format(prefix)
     make_grid = not no_grid
+    debugging = debug != 'OUT'
 
     # Preprocess arguments and handle early exits -----------------------------
 
-    if debug:
-        set_debug(True)
+    if debugging:
+        set_debug(True, debug)
     if version:
         print_version()
         exit()
@@ -305,7 +308,7 @@ Command-line arguments summary
         if __debug__: log('received {}', sys.exc_info()[0].__name__)
         exit(say.info_text('Quitting.'))
     except Exception as ex:
-        if debug:
+        if debugging:
             import traceback
             say.error('{}\n{}'.format(str(ex), traceback.format_exc()))
             import pdb; pdb.set_trace()

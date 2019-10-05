@@ -318,10 +318,11 @@ Command-line arguments summary
 # .............................................................................
 
 def print_version():
-    print('{} version {}'.format(handprint.__title__, handprint.__version__))
-    print('Author: {}'.format(handprint.__author__))
-    print('URL: {}'.format(handprint.__url__))
-    print('License: {}'.format(handprint.__license__))
+    this_module = sys.modules[__package__]
+    print('{} version {}'.format(this_module.__name__, this_module.__version__))
+    print('Authors: {}'.format(this_module.__author__))
+    print('URL: {}'.format(this_module.__url__))
+    print('License: {}'.format(this_module.__license__))
     print('')
     print('Known services: {}'.format(', '.join(services_list())))
     print('Credentials are stored in {}'.format(Credentials.credentials_dir()))

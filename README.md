@@ -223,7 +223,6 @@ Handprint supports comparing the output of HTR services to expected output (i.e.
 * The ground-truth text file should be located in the same directory as the input image file.
 * The text should be line oriented, with each line representing a line of text in the image.
 * The text should be plain text only.  No Unicode or binary encodings.  (This limitation comes from the HTR services, which &ndash; as of thisf writing &ndash; return results in plain text format.)
-* Spaces should be normalized such that runs of multiple spaces are replaced with a single space, and leading spaces on a line are removed.
 
 Handprint will write the comparison results to a tab-delimited file named after the input image and service but with the extension `.tsv`.  For example, for an input image `somefile.jpg` and results received from Google, the comparison results will be written to `somefile.google.tsv`.  The output file will have one row for each line of text in the input, plus an additional row at the end for total number of errors found.  Each row will have the following columns:
 
@@ -237,7 +236,9 @@ CER is computed as
  100&nbsp;&times;&nbsp;(<i>i</i> + <i>s</i> + <i>d</i>)/<i>n</i>
 </p>
 
-where _i_ is the number of inserted characters, _s_ the number of substituted characters, and _d_ the number of deleted characters needed to transform the the text received into the expected text, and _n_ is the number of characters in the expected text line.  Comparisons are done on an exact basis; character case is not changed, punctuation is not removed, and stop words are not removed.
+where _i_ is the number of inserted characters, _s_ the number of substituted characters, and _d_ the number of deleted characters needed to transform the the text received into the expected text, and _n_ is the number of characters in the expected text line.  This approach to normalizing the CER value is conventional but note that it can lead to values greater than 100%.
+
+Comparisons are done on an exact basis; character case is not changed, punctuation is not removed, and stop words are not removed.  However, multiple contiguous spaces are converted to one space, and leading spaces are removed from text lines.
 
 Here is an example of a tab-separated file produced using `-c`:
 

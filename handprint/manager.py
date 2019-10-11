@@ -14,14 +14,17 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   collections import namedtuple
 from   concurrent.futures import ThreadPoolExecutor
 import humanize
 import io
 from   itertools import repeat
 import json
+import math
 import os
 from   os import path
 import shutil
+from   stringdist import levenshtein
 import sys
 from   threading import Thread
 import time
@@ -44,16 +47,40 @@ from handprint.network import network_available, download_file, disable_ssl_cert
 from handprint.services import KNOWN_SERVICES
 
 
+# Helper data types.
+# -----------------------------------------------------------------------------
+
+Input = namedtuple('Input', 'item_source item_format item_file file dest_dir temp_files')
+Input.__doc__ = '''Input and related materials for a file sent to a service
+  'item_source' is the original source, which may be a URL or a file
+  'item_format' is the data or file format of the original source
+  'item_file' is the file we create to store the source content
+  'file' is item_file after applying reductions
+  'dest_dir' is the directory where normalized_file was written
+  'temp_files' is a list of temporary files generated when creating normalized_file
+'''
+
+Result = namedtuple('Result', 'service original annotated report')
+Result.__doc__ = '''Results from calling an HTR service on an input.
+  'service' is the service used
+  'original' is the original input image sent to the service
+  'annotated' is the annotated image file we create from the service output
+  'report' is a TSV file, the result of comparing the text to the ground truth
+'''
+
+
 # Main class.
 # -----------------------------------------------------------------------------
 
 class Manager:
-    def __init__(self, service_names, num_threads, output_dir, make_grid, extended, say):
+    def __init__(self, service_names, num_threads, output_dir, make_grid,
+                 compare, extended, say):
         '''Initialize manager for services.  This will also initialize the
         credentials for individual services.
         '''
         self._num_threads = num_threads
         self._extended_results = extended
+        self._compare = compare
         self._output_dir = output_dir
         self._make_grid = make_grid
         self._say = say
@@ -69,7 +96,6 @@ class Manager:
         self._max_size = None
         self._max_dimensions = None
         for service in self._services:
-            # Only consider those services that do indicate maxima.
             if service.max_size():
                 if self._max_size:
                     self._max_size = min(self._max_size, service.max_size())
@@ -94,67 +120,52 @@ class Manager:
         '''
         # Shortcuts to make the code more readable.
         services = self._services
-        output_dir = self._output_dir
         say = self._say
+        use_color = say.use_color()
 
+        say.info('Starting on {}'.format(styled(item, 'white') if use_color else item))
         try:
-            say.info('Starting on {}'.format(
-                styled(item, 'white') if say.use_color() else item))
-
-            (file, orig_fmt) = self._get(item, base_name, index)
-            if not file:
+            (item_file, item_fmt) = self._get(item, base_name, index)
+            if not item_file:
                 return
 
-            dest_dir = output_dir if output_dir else path.dirname(file)
+            dest_dir = self._output_dir if self._output_dir else path.dirname(item_file)
             if not writable(dest_dir):
                 say.error('Cannot write output in {}.'.format(dest_dir))
                 return
 
-            # Sanity check
-            if not path.getsize(file) > 0:
-                say.warn('Skipping zero-length file {}'.format(relative(file)))
+            # Normalize input image to the lowest common denominator.
+            page = self._normalized(item, item_fmt, item_file, dest_dir)
+            if not page.file:
+                say.warn('Skipping {}'.format(relative(item_file)))
                 return
 
-            # Save grid file name now, because it's based on the original file.
-            basename = path.basename(filename_basename(file))
-            grid_file = path.realpath(path.join(dest_dir, basename + '.all-results.png'))
-
-            # We will usually delete temporary files we create.
-            to_delete = set()
-
-            # Normalize to the lowest common denominator.
-            (new_file, intermediate_files) = self._normalized(file, orig_fmt, dest_dir)
-            if not new_file:
-                say.warn('Skipping {}'.format(relative(file)))
-                return
-            file = new_file
-            if intermediate_files:
-                to_delete.update(intermediate_files)
-
-            # Send the file to the services.  If the number of threads is set
-            # to 1, we force non-thread-pool execution to make debugging easier.
-            results = []
+            # Send the file to the services and get Result tuples back.
             if self._num_threads == 1:
-                results = [self._send(file, s, dest_dir) for s in services]
+                # For 1 thread, avoid thread pool to make debugging easier.
+                results = [self._send(page, s) for s in services]
             else:
-                with ThreadPoolExecutor(max_workers = self._num_threads) as executor:
-                    results = list(executor.map(self._send, repeat(file),
-                                                iter(services), repeat(dest_dir)))
+                with ThreadPoolExecutor(max_workers = self._num_threads) as tpe:
+                    results = list(tpe.map(self._send, repeat(page), iter(services)))
 
             # If a service failed for some reason (e.g., a network glitch), we
             # get no result back.  Remove empty results & go on with the rest.
             results = [x for x in results if x is not None]
-            to_delete.update(results)
 
             # Create grid file if requested.
             if self._make_grid:
+                base = path.basename(filename_basename(item_file))
+                grid_file = path.realpath(path.join(dest_dir, base + '.all-results.png'))
                 say.info('Creating results grid image: {}'.format(relative(grid_file)))
-                create_image_grid(results, grid_file, max_horizontal = 2)
+                images = [r.annotated for r in results]
+                width = math.ceil(math.sqrt(len(images)))
+                create_image_grid(images, grid_file, max_horizontal = width)
 
             # Clean up after ourselves.
-            if self._make_grid and not self._extended_results:
-                for image_file in to_delete:
-                    delete_existing(image_file)
+            if not self._extended_results:
+                for file in set(page.temp_files | {r.annotated for r in results}):
+                    if file and path.exists(file):
+                        delete_existing(file)
 
             say.info('Done with {}'.format(relative(item)))
         except (KeyboardInterrupt, UserCancelled) as ex:
@@ -203,12 +214,16 @@ class Manager:
             file = path.realpath(path.join(os.getcwd(), item))
             orig_fmt = filename_extension(file)[1:]
 
+        if not path.getsize(file) > 0:
+            say.warn('File has zero length: {}'.format(relative(file)))
+            return (None, None)
+
         if __debug__: log('{} has original format {}', relative(file), orig_fmt)
         return (file, orig_fmt)
 
 
-    def _send(self, file, service, dest_dir):
-        '''Send the "file" to the service named "service" and write output in
+    def _send(self, image, service):
+        '''Send the "image" to the service named "service" and write output in
         directory "dest_dir".
         '''
         say = self._say
@@ -219,7 +234,7 @@ class Manager:
         say.info('Sending to {} and waiting for response ...'.format(service_name))
         last_time = timer()
         try:
-            result = service.result(file)
+            output = service.result(image.file)
         except AuthFailure as ex:
             raise AuthFailure('Unable to use {}: {}'.format(service, ex))
         except RateLimitExceeded as ex:
@@ -228,42 +243,53 @@ class Manager:
                 say.warn('Pausing {} due to rate limits'.format(service_name))
                 time.sleep(1/service.max_rate() - time_passed)
                 # FIXME resend after pause
-        if result.error:
-            say.error('{} failed: {}'.format(service_name, result.error))
-            say.warn('No result from {} for {}'.format(service_name, relative(file)))
+        if output.error:
+            say.error('{} failed: {}'.format(service_name, output.error))
+            say.warn('No result from {} for {}'.format(service_name, relative(image.file)))
             return None
 
         say.info('Got result from {}.'.format(service_name))
-        file_name  = path.basename(file)
-        base_path  = path.join(dest_dir, file_name)
-        annot_path = alt_extension(base_path, str(service) + '.png')
-        say.info('Creating annotated image for {}.'.format(service_name))
-        self._save_output(annotated_image(file, result.boxes, service), annot_path)
+        file_name   = path.basename(image.file)
+        base_path   = path.join(image.dest_dir, file_name)
+        annot_path  = None
+        report_path = None
+        if self._make_grid:
+            annot_path  = alt_extension(base_path, str(service) + '.png')
+            say.info('Creating annotated image for {}.'.format(service_name))
+            self._save_output(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = alt_extension(base_path, str(service) + '.txt')
             json_file = alt_extension(base_path, str(service) + '.json')
             say.info('Saving all data for {}.'.format(service_name))
-            self._save_output(json.dumps(result.data), json_file)
+            self._save_output(json.dumps(output.data), json_file)
             say.info('Saving extracted text for {}.'.format(service_name))
-            self._save_output(result.text, txt_file)
+            self._save_output(output.text, txt_file)
+        if self._compare:
+            gt_file = alt_extension(image.item_file, 'gt.txt')
+            report_path = alt_extension(image.item_file, str(service) + '.tsv')
+            if readable(gt_file):
+                say.info('Saving {} comparison to ground truth'.format(service_name))
+                self._save_output(self._error_report(output.text, gt_file), report_path)
+            else:
+                say.info('Skipping {} comparison because {} not available'.format(
+                    service_name, relative(gt_file)))
+        return Result(service, image, annot_path, report_path)
 
-        # Return the annotated image file b/c we use it for the summary grid.
-        return annot_path
 
-
-    def _normalized(self, file, fmt, dest_dir):
+    def _normalized(self, orig_item, orig_fmt, item_file, dest_dir):
         '''Normalize images to same format and max size.'''
         # All services accept PNG, so normalize files to PNG.
         to_delete = set()
-        if fmt != _OUTPUT_FORMAT:
+        file = item_file
+        if orig_fmt != _OUTPUT_FORMAT:
             new_file = self._converted_file(file, _OUTPUT_FORMAT, dest_dir)
-            if path.basename(new_file) != path.basename(file):
+            if new_file and path.basename(new_file) != path.basename(file):
                 to_delete.add(new_file)
             file = new_file
         # Resize if either size or dimensions are larger than accepted
         if file and self._max_size and self._max_size < image_size(file):
             new_file = self._smaller_file(file)
-            if path.basename(new_file) != path.basename(file):
+            if new_file and  path.basename(new_file) != path.basename(file):
                 to_delete.add(new_file)
             file = new_file
         if file and self._max_dimensions:
@@ -271,10 +297,10 @@ class Manager:
             (max_width, max_height) = self._max_dimensions
             if max_width < image_width or max_height < image_height:
                 new_file = self._resized_image(file)
-                if path.basename(new_file) != path.basename(file):
+                if new_file and path.basename(new_file) != path.basename(file):
                     to_delete.add(new_file)
                 file = new_file
-        return (file, to_delete)
+        return Input(orig_item, orig_fmt, item_file, file, dest_dir, to_delete)
 
 
     def _converted_file(self, file, to_format, dest_dir):
@@ -343,6 +369,35 @@ class Manager:
             say.error('Failed to re-dimension {}: {}'.format(relative(file), error))
             return None
         return resized
+
+
+    def _error_report(self, result_text, gt_file):
+        say = self._say
+
+        if __debug__: log('reading gt file {}', gt_file)
+        gt_lines = []
+        with open(gt_file, 'r') as f:
+            gt_lines = f.read().splitlines()
+        if len(gt_lines) == 0:
+            say.warn('Empty ground truth file: {}'.format(gt_file))
+            return None
+
+        # We return data in tab-delimited format.
+        output = ['# errors\tCER (%)\tExpected text\tActual text']
+        result_lines = result_text.splitlines()
+        total_errors = 0
+        for expected, obtained in zip(gt_lines, result_lines):
+            # The stringdist package definition of levenshtein_norm() divides
+            # by the longest of the two strings, whereas my reading of what
+            # ocrevalUAtion and others do is they devide by the reference
+            # string.  That's why the following doesn't use levenshtein_norm().
+            lev = levenshtein(expected, obtained)
+            cer = '{:.2f}'.format(100 * float(lev)/len(expected))
+            output.append('{}\t{}\t{}\t{}'.format(lev, cer, expected, obtained))
+            total_errors += lev
+        output.append('Total # errors')
+        output.append(str(total_errors))
+        return '\n'.join(output)
 
 
     def _save_output(self, result, file):

@@ -66,7 +66,7 @@ class MainBody(object):
         self._say        = say
 
 
-    def run(self, services, files, make_grid):
+    def run(self, services, files, make_grid, compare):
         '''Run service(s) on files.'''
 
         # Set shortcut variables for better code readability below.
@@ -93,7 +93,7 @@ class MainBody(object):
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
-        manager = Manager(services, procs, output_dir, make_grid, extended, say)
+        manager = Manager(services, procs, output_dir, make_grid, compare, extended, say)
         print_separators = num_targets > 1 and not say.be_quiet()
         for index, item in enumerate(targets, start = 1):
             if print_separators:

@@ -257,11 +257,9 @@ characteristics:
 Handprint will write the comparison results to a tab-delimited file named
 after the input image and service but with the extension ".tsv".  For
 example, for an input image "somefile.jpg" and results received from Google,
-the comparison results will be written to "somefile.google.tsv" or
-"somefile-reduced.google.tsv", depending on whether the input image was
-reduced in size as discussed above.  (The use of a tab-delimited format rather
-than comma-delimited format avoids the need to quote commas and other
-characters in the text.)
+the comparison results will be written to "somefile.google.tsv".  (The use of
+a tab-delimited format rather than comma-delimited format avoids the need to
+quote commas and other characters in the text.)
 
 Comparisons are done on an exact basis; character case is not changed,
 punctuation is not removed, and stop words are not removed.

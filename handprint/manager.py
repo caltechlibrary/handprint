@@ -387,6 +387,9 @@ class Manager:
         result_lines = result_text.splitlines()
         total_errors = 0
         for expected, obtained in zip(gt_lines, result_lines):
+            # Remove leading spaces and compress runs of spaces
+            expected = ' '.join(expected.split())
+            obtained = ' '.join(obtained.split())
             # The stringdist package definition of levenshtein_norm() divides
             # by the longest of the two strings, but it is more conventional in
             # OCR papers and software to divide by the length of the reference.

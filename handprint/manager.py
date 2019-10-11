@@ -388,11 +388,13 @@ class Manager:
         total_errors = 0
         for expected, obtained in zip(gt_lines, result_lines):
             # The stringdist package definition of levenshtein_norm() divides
-            # by the longest of the two strings, whereas my reading of what
-            # ocrevalUAtion and others do is they devide by the reference
-            # string.  That's why the following doesn't use levenshtein_norm().
+            # by the longest of the two strings, but it is more conventional in
+            # OCR papers and software to divide by the length of the reference.
             lev = levenshtein(expected, obtained)
-            cer = '{:.2f}'.format(100 * float(lev)/len(expected))
+            if len(expected) > 0:
+                cer = '{:.2f}'.format(100 * float(lev)/len(expected))
+            else:
+                cer = 'n/a'
             output.append('{}\t{}\t{}\t{}'.format(lev, cer, expected, obtained))
             total_errors += lev
         output.append('Total # errors')

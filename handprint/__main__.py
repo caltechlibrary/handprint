@@ -62,6 +62,7 @@ disable_ssl_cert_check()
 @plac.annotations(
     add_creds  = ('add credentials file for service "A"',              'option', 'a'),
     base_name  = ('use base name "B" to name downloaded images',       'option', 'b'),
+    compare    = ('compare text results to ground truth files',        'flag',   'c'),
     no_color   = ('do not color-code terminal output',                 'flag',   'C'),
     extended   = ('produce extended results (text file, JSON data)',   'flag',   'e'),
     from_file  = ('read list of images or URLs from file "F"',         'option', 'f'),
@@ -76,10 +77,10 @@ disable_ssl_cert_check()
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
 
-def main(add_creds = 'A', base_name = 'B', no_color = False, extended = False,
-         from_file = 'F', no_grid = False, list = False, output_dir = 'O',
-         quiet = False, services = 'S', threads = 'T', version = False,
-         debug = 'OUT', *files):
+def main(add_creds = 'A', base_name = 'B', compare = False, no_color = False,
+         extended = False, from_file = 'F', no_grid = False, list = False,
+         output_dir = 'O', quiet = False, services = 'S', threads = 'T',
+         version = False, debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -137,10 +138,12 @@ size accepted by any of the services invoked if an image exceeds that size.
 accepts files up to 5 MB, all input images will be resized to 5 MB before
 sending them to A and B, even if A could accept a higher-resolution image.)
 
-The default action is to run all known services; the option -s (/s on
+The default action is to run all known services.  The option -s (/s on
 Windows) can be used to select only one service or a list of services
 instead.  Lists of services should be separated by commas; e.g.,
-"google,microsoft".
+"google,microsoft".  To find out which services are supported by Handprint, run
+it with the command-line flag -l (or /l on Windows), which will make Handprint
+print a list of the known services and exit immediately.
 
 When performing OCR/HTR on images, Handprint temporarily (unless the -e
 option is given -- see below) writes the results to new files that it creates
@@ -155,10 +158,13 @@ named "somefile.jpg" will result in
   somefile.amazon.png
   ...
 
-and so on for each image and each service used.  These files are deleted
-after the final results grid image is created, unless the -e option (/e on
+and so on for each image and each service used.  THESE FILES ARE DELETED
+after the final results grid image is created, UNLESS the -e option (/e on
 Windows) is used to indicate that extended results should be produced; in that
 case, these individual annotated image files are kept.
+
+Visual display of recognition results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After gathering the results of each service for a given input, Handprint will
 create a single compound image consisting of all the annotated results images
@@ -219,8 +225,46 @@ services and written to "document-N.png", and the URL corresponding to each
 document will be written in a file named "document-N.url" so that it is
 possible to connect each "document-N.png" to the URL it came from.
 
-Finally, note that the use of the -G option (/G on Windows) WITHOUT the -e
-option is an error because it means no output would be produced.
+Finally, note that the use of the -G option (/G on Windows) WITHOUT either
+the -e or -c option is an error because it means no output would be produced.
+
+Comparing results to expected output
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Handprint supports comparing the output of HTR services to expected output
+(i.e., ground truth) using the option -c (or /c on Windows).  This facility
+requires that the user provides text files that contain the expected text
+for each input image.  The ground-truth text files must have the following
+characteristics:
+
+ a) The file containing the expected results should be named ".gt.txt", with
+    a base name identical to the image file.  For example, an image file named
+    "somefile.jpg" should have a corresponding text file "somefile.gt.txt".
+
+ b) The ground-truth text file should be located in the same directory as the
+    input image file.
+
+ c) The text should be line oriented, with each line representing a line of
+    text in the image.
+
+ d) The text should be plain text only.  No Unicode or binary encodings.
+    (This limitation comes from the HTR services, which -- as of this
+    writing -- return results in plain text format.)
+
+ e) Spaces should be normalized such that runs of multiple spaces are replaced
+    with a single space, and leading spaces on a line are removed.
+
+Handprint will write the comparison results to a tab-delimited file named
+after the input image and service but with the extension ".tsv".  For
+example, for an input image "somefile.jpg" and results received from Google,
+the comparison results will be written to "somefile.google.tsv" or
+"somefile-reduced.google.tsv", depending on whether the input image was
+reduced in size as discussed above.  (The use of a tab-delimited format rather
+than comma-delimited format avoids the need to quote commas and other
+characters in the text.)
+
+Comparisons are done on an exact basis; character case is not changed,
+punctuation is not removed, and stop words are not removed.
 
 Additional command-line arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -282,9 +326,9 @@ Command-line arguments summary
         Credentials.save_credentials(service, creds_file)
         exit(say.info_text('Saved credentials for service "{}".'.format(service)))
 
-    if no_grid and not extended:
-        exit(say.error_text('{}G without {}e produces no output. {}'.format(
-            prefix, prefix, hint)))
+    if no_grid and not extended and not compare:
+        exit(say.error_text('{}G without {}e or {}c produces no output. {}'.format(
+            prefix, prefix, prefix, hint)))
     if any(item.startswith('-') for item in files):
         exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
     if not files and from_file == 'F':
@@ -303,7 +347,7 @@ Command-line arguments summary
     try:
         print_intro(say)
         body = MainBody(base_name, extended, from_file, output_dir, threads, say)
-        body.run(services, files, make_grid)
+        body.run(services, files, make_grid, compare)
     except (KeyboardInterrupt, UserCancelled) as ex:
         if __debug__: log('received {}', sys.exc_info()[0].__name__)
         exit(say.info_text('Quitting.'))

@@ -251,9 +251,6 @@ characteristics:
     (This limitation comes from the HTR services, which -- as of this
     writing -- return results in plain text format.)
 
- e) Spaces should be normalized such that runs of multiple spaces are replaced
-    with a single space, and leading spaces on a line are removed.
-
 Handprint will write the comparison results to a tab-delimited file named
 after the input image and service but with the extension ".tsv".  For
 example, for an input image "somefile.jpg" and results received from Google,
@@ -261,8 +258,17 @@ the comparison results will be written to "somefile.google.tsv".  (The use of
 a tab-delimited format rather than comma-delimited format avoids the need to
 quote commas and other characters in the text.)
 
+Handprint reports, for each text line, the number of errors (the Levenshtein
+edit distance) and the character error rate (CER), and at the end it also
+reports a sum total of errors.  The CER is computed as the Levenshtein edit
+distance of each line divided by the number of characters in the expected
+line text, multiplied by 100; this approach to normalizing the CER value is
+conventional but note that it can lead to values greater than 100%.
+
 Comparisons are done on an exact basis; character case is not changed,
-punctuation is not removed, and stop words are not removed.
+punctuation is not removed, and stop words are not removed.  However,
+multiple contiguous spaces are converted to one space, and leading spaces are
+removed from text lines.
 
 Additional command-line arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

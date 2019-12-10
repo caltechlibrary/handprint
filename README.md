@@ -216,7 +216,6 @@ The individual results, as well as individual annotated images corresponding to 
 
 ### _Comparing extracted text to ground truth text_
 
-
 Handprint supports comparing the output of HTR services to expected output (i.e., ground truth) using the option `-c` (or `/c` on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:
 
 * The file containing the expected results should be named `.gt.txt`, with a base name identical to the image file.  For example, an image file named `somefile.jpg` should have a corresponding text file `somefile.gt.txt`.
@@ -394,7 +393,7 @@ The [vector artwork](https://thenounproject.com/search/?q=hand&i=733265) of a ha
 
 Handprint benefitted from feedback from several people, notably from Tommy Keswick, Mariella Soprano, Peter Collopy and Stephen Davison.
 
-Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Turf with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
+Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Handprint with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python

@@ -21,6 +21,6 @@ with open(path.join(here, 'requirements.txt')) as f:
     reqs = f.read().rstrip().splitlines()
 
 setup(
-    setup_cfg        = True,
+    setup_requires = ['wheel'],
     install_requires = reqs,
 )

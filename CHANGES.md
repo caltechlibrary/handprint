@@ -1,6 +1,13 @@
 Change log for Handprint
 ========================
 
+Version 1.0.2
+--------------
+
+* Fix [issue #9](https://github.com/caltechlibrary/handprint/issues/9): credentials files are not saved in expected location.
+* Edit the `README.md` file.
+
+
 Version 1.0.1
 --------------
 

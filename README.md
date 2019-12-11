@@ -7,7 +7,7 @@ The <i><ins><b>Hand</b></ins>written <ins><b>p</b></ins>age <ins><b>r</b></ins>e
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
-[![DOI](http://img.shields.io/badge/DOI-10.22002%20%2f%20D1.1269-navy.svg?style=flat-square)](https://data.caltech.edu/records/1269)
+[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1323)](https://data.caltech.edu/records/1323)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
 
 

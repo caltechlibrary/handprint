@@ -20,7 +20,6 @@ class Credentials(object):
     creds_dir = user_config_dir('Handprint')
 
     def __init__(self):
-        self.creds_file = None
         self.credentials = None
 
 

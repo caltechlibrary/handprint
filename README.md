@@ -11,12 +11,12 @@ A Python program to apply different handwritten text recognition services to ima
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
 
 
-🏁 Log of recent changes
+❡ Log of recent changes
 -----------------------
 
 The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
 
-Table of Contents
+§ Table of Contents
 -----------------
 
 * [Introduction](#-introduction)
@@ -37,7 +37,7 @@ Table of Contents
 * [Authors and history](#-authors-and-history)
 * [Acknowledgments](#︎-acknowledgments)
 
-☀ Introduction
+☞ Introduction
 -------------
 
 <img align="right" width="550px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/glaser-example-google.jpg">
@@ -46,7 +46,7 @@ Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a sma
 
 Handprint can work with individual images, directories of images, and URLs pointing to images on remote servers.  In addition to producing annotated images as output, it can output the raw results from an HTR service as JSON and text files.  Handprint can use multiple processor threads for parallel execution.
 
-✺ Installation and configuration
+✎ Installation and configuration
 -------------------------------
 
 The instructions below assume you have a Python interpreter installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system.
@@ -374,19 +374,19 @@ If you find an issue, please submit it in [the GitHub issue tracker](https://git
 I would be happy to receive your help and participation with enhancing Handprint!  Please visit the [guidelines for contributing](CONTRIBUTING.md) for some tips on getting started.
 
 
-☮︎ License
+⧴ License
 ---------
 
 Copyright (C) 2018&ndash;2019, Caltech.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
 
 
-❡ Authors and history
+☺︎ Authors and history
 --------------------
 
 [Mike Hucka](https://github.com/mhucka) designed and implemented Handprint beginning in mid-2018.
 
 
-☺︎ Acknowledgments
+♡ Acknowledgments
 -----------------------
 
 The [vector artwork](https://thenounproject.com/search/?q=hand&i=733265) of a hand used as a logo for Handprint was created by [Kevin](https://thenounproject.com/kevn/) from the Noun Project.  It is licensed under the Creative Commons [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/) license.

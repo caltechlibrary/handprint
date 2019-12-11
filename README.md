@@ -1,7 +1,7 @@
 Handprint<img width="15%" align="right" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/noun_Hand_733265.png">
 =========
 
-The <i><ins><b>Hand</b></ins>written <ins><b>p</b></ins>age <ins><b>r</b></ins>ecognit<ins><b>i</b></ins>o<ins><b>n</b></ins> <ins><b>t</b></ins>est</i> program applies HTR services to images of handwritten text and produces an annotated image (and optionally more) showing the text recognized.
+The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies HTR services to images of handwritten text and produces an annotated image (and optionally more) showing the text recognized.
 
 [![Latest release](https://img.shields.io/github/v/release/caltechlibrary/handprint.svg?style=flat-square&color=b44e88&label=Latest%20release)](https://github.com/caltechlibrary/handprint/releases)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
@@ -46,7 +46,7 @@ Table of Contents
 
 <img align="right" width="550px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/glaser-example-google.jpg">
 
-Handprint (<i><ins><b>Hand</b></ins>written <ins><b>p</b></ins>age <ins><b>r</b></ins>ecognit<ins><b>i</b></ins>o<ins><b>n</b></ins> <ins><b>t</b></ins>est</i>) is a small project to examine the performance of alternative services for [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.  Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/), and more.  Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, to visualize the results.  The image at right shows an example.
+Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the performance of alternative services for [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.  Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/), and more.  Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, to visualize the results.  The image at right shows an example.
 
 Handprint can work with individual images, directories of images, and URLs pointing to images on remote servers.  In addition to producing annotated images as output, it can output the raw results from an HTR service as JSON and text files.  Handprint can use multiple processor threads for parallel execution.
 

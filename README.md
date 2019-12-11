@@ -1,13 +1,13 @@
 Handprint<img width="15%" align="right" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/noun_Hand_733265.png">
 =========
 
-A Python program to apply different handwritten text recognition services to images of handwritten text pages, and produce an annotated image (and optionally more) showing the text recognized.
+The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies HTR services to images of handwritten text and produces an annotated image (and optionally more) showing the text recognized.
 
-[![Latest release](https://img.shields.io/badge/Latest_release-1.0.1-b44e88.svg?style=flat-square)](http://shields.io)
+[![Latest release](https://img.shields.io/github/v/release/caltechlibrary/handprint.svg?style=flat-square&color=b44e88&label=Latest%20release)](https://github.com/caltechlibrary/handprint/releases)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
-[![DOI](http://img.shields.io/badge/DOI-10.22002%20%2f%20D1.1269-navy.svg?style=flat-square)](https://data.caltech.edu/records/1269)
+[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1324)](https://data.caltech.edu/records/1324)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
 
 

@@ -14,6 +14,7 @@ The <i><ins><b>Hand</b></ins>written <ins><b>p</b></ins>age <ins><b>r</b></ins>e
 🏁 Log of recent changes
 -----------------------
 
+_Version 1.0.3_: This version fixes an internal bug involving the credentials file used for Amazon services.<br>
 _Version 1.0.2_: This version fixes an important [bug in how credential files are stored](https://github.com/caltechlibrary/handprint/issues/9).<br>
 _Version 1.0.1_: This version adds info for installing from PyPI, and fixes a bug writing files downloaded from URLs.
 

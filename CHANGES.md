@@ -1,6 +1,11 @@
 Change log for Handprint
 ========================
 
+Version 1.0.3
+--------------
+
+* Fix an internal bug getting the credentials file for Amazon services.
+
 Version 1.0.2
 --------------
 

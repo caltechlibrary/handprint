@@ -22,7 +22,7 @@ from handprint.debug import log
 
 
 # Main class.
-# -----------------------------------------------------------------------------
+# .............................................................................
 # The self._results property is a dictionary used to cache the results for
 # a given file.  This is to avoid using API calls to get the different
 # subelements of the results.

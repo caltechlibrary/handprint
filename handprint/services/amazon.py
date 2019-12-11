@@ -19,7 +19,7 @@ from handprint.network import net
 
 
 # Main class.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 class AmazonTR(TextRecognition):
     '''Base class for Amazon text recognition services.'''
@@ -181,7 +181,7 @@ class AmazonRekognitionTR(AmazonTR):
 
 
 # Miscellaneous utilities.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 def corner_list(polygon, width, height):
     '''Takes a boundingBox value from Google vision's JSON output and returns

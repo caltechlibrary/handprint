@@ -19,7 +19,7 @@ from handprint.network import net
 
 
 # Main class.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 class MicrosoftTR(TextRecognition):
     def __init__(self):

@@ -14,7 +14,7 @@ from .credentials_files import credentials_filename
 
 
 # Main class.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 class Credentials(object):
     creds_dir = user_config_dir('Handprint', 'CaltechLibrary')

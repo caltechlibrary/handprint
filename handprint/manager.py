@@ -48,7 +48,7 @@ from handprint.services import KNOWN_SERVICES
 
 
 # Helper data types.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 Input = namedtuple('Input', 'item_source item_format item_file file dest_dir temp_files')
 Input.__doc__ = '''Input and related materials for a file sent to a service
@@ -70,7 +70,7 @@ Result.__doc__ = '''Results from calling an HTR service on an input.
 
 
 # Main class.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 class Manager:
     def __init__(self, service_names, num_threads, output_dir, make_grid,

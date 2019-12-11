@@ -14,11 +14,8 @@ The <i><ins><b>Hand</b></ins>written <ins><b>p</b></ins>age <ins><b>r</b></ins>e
 🏁 Log of recent changes
 -----------------------
 
-_Version 1.0.2_: This version fixes an important [bug in how credential files are stored](https://github.com/caltechlibrary/handprint/issues/9).
-
-_Version 1.0.1_: This version adds instructions for installing from PyPI and fixes a bug writing files downloaded from URLs.
-
-_Version 1.0.0_: This is a sufficiently complete version of Handprint that can finally be called a version 1.0.  Changes compared to version 0.10.0 include: new way to provide credential files, new default output (in which results from different services are placed side-by-side in a single large image), new command-line arguments, parallel execution, and more.
+_Version 1.0.2_: This version fixes an important [bug in how credential files are stored](https://github.com/caltechlibrary/handprint/issues/9).<br>
+_Version 1.0.1_: This version adds info for installing from PyPI, and fixes a bug writing files downloaded from URLs.
 
 The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
 

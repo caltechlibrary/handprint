@@ -11,6 +11,19 @@ Version 1.1.0
 * Most test images have been removed from `tests/images` and put instead in a more organized fashion in a separate repository, [htr-test-cases](https://github.com/caltechlibrary/htr-test-cases/).
 
 
+Version 1.0.3
+--------------
+
+* Fix an internal bug getting the credentials file for Amazon services.
+
+
+Version 1.0.2
+--------------
+
+* Fix [issue #9](https://github.com/caltechlibrary/handprint/issues/9): credentials files are not saved in expected location.
+* Edit the `README.md` file.
+
+
 Version 1.0.1
 --------------
 

@@ -128,8 +128,8 @@ class MainBody(object):
                 else:
                     self._say.warn('"{}" not a file or directory', item)
         # Filter files we created in past runs.
-        targets = [x for x in targets if x.find('-reduced') < 0]
-        targets = [x for x in targets if x.find('all-results') < 0]
+        targets = [x for x in targets if '-reduced' not in x]
+        targets = [x for x in targets if 'all-results' not in x]
 
         # If there is both a file in the format we generate and another
         # format of that file, ignore the other formats and just use ours.

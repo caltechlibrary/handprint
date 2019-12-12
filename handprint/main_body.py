@@ -17,7 +17,6 @@ file "LICENSE" for more information.
 import os
 from   os import path
 import sys
-from   sys import exit as exit
 
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT

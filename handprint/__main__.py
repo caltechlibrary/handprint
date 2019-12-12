@@ -321,26 +321,26 @@ Command-line arguments summary
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
-            exit(say.error_text('Unknown service: "{}". {}'.format(service, hint)))
+            exit(say.error_text('Unknown service: "{}". {}', service, hint))
         if not files or len(files) > 1:
-            exit(say.error_text('Option {}a requires one file. {}'.format(prefix, hint)))
+            exit(say.error_text('Option {}a requires one file. {}', prefix, hint))
         creds_file = files[0]
         if not readable(creds_file):
-            exit(say.error_text('File not readable: {}'.format(creds_file)))
+            exit(say.error_text('File not readable: {}', creds_file))
         Credentials.save_credentials(service, creds_file)
-        exit(say.info_text('Saved credentials for service "{}".'.format(service)))
+        exit(say.info_text('Saved credentials for service "{}".', service))
 
     if no_grid and not extended and not compare:
-        exit(say.error_text('{}G without {}e or {}c produces no output. {}'.format(
-            prefix, prefix, prefix, hint)))
+        exit(say.error_text('{}G without {}e or {}c produces no output. {}',
+                            prefix, prefix, prefix, hint))
     if any(item.startswith('-') for item in files):
-        exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
+        exit(say.error_text('Unrecognized option in arguments. {}', hint))
     if not files and from_file == 'F':
-        exit(say.error_text('Need provide images or URLs. {}'.format(hint)))
+        exit(say.error_text('Need provide images or URLs. {}', hint))
 
     services = services_list() if services == 'S' else services.lower().split(',')
     if not all(s in services_list() for s in services):
-        exit(say.error_text('"{}" is not a known services. {}'.format(services, hint)))
+        exit(say.error_text('"{}" is not a known services. {}', services, hint))
 
     base_name  = 'document' if base_name == 'B' else base_name
     from_file  = None if from_file == 'F' else from_file
@@ -390,7 +390,7 @@ def print_intro(say):
         name = 'Handprint'
         acronym = 'HANDwritten Page RecognItioN Test'
     say.info('┏' + '━'*68 + '┓')
-    say.info('┃    Welcome to {}, the {}!    ┃'.format(name, acronym))
+    say.info('┃    Welcome to {}, the {}!    ┃', name, acronym)
     say.info('┗' + '━'*68 + '┛')
 
 

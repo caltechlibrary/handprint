@@ -84,12 +84,12 @@ class MainBody(object):
         num_targets = len(targets)
         procs = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
 
-        say.info('Will apply {} service{} ({}) to {} image{}.'.format(
-            len(services), 's' if len(services) > 1 else '', ', '.join(services),
-            num_targets, 's' if num_targets > 1 else ''))
+        say.info('Will apply {} service{} ({}) to {} image{}.',
+                 len(services), 's' if len(services) > 1 else '',
+                 ', '.join(services), num_targets, 's' if num_targets > 1 else '')
         if self._extended:
             say.info('Will save extended results.')
-        say.info('Will use {} process threads.'.format(procs))
+        say.info('Will use {} process threads.', procs)
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
@@ -126,7 +126,7 @@ class MainBody(object):
                     files = filter_by_extensions(files, handprint_endings)
                     targets += files
                 else:
-                    self._say.warn('"{}" not a file or directory'.format(item))
+                    self._say.warn('"{}" not a file or directory', item)
         # Filter files we created in past runs.
         targets = [x for x in targets if x.find('-reduced') < 0]
         targets = [x for x in targets if x.find('all-results') < 0]

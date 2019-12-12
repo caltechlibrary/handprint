@@ -97,13 +97,13 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
 
 def download_file(url, output_file, user = None, pswd = None, say = None):
     if say:
-        say.info('Downloading {}'.format(url))
+        say.info('Downloading {}', url)
     try:
         download(url, user, pswd, output_file)
         return True
     except (NoContent, ServiceFailure, AuthFailure) as ex:
         if say:
-            say.error('{}'.format(str(ex)))
+            say.error('{}', str(ex))
     return False
 
 

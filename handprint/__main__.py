@@ -50,6 +50,7 @@ from handprint.main_body import MainBody
 from handprint.manager import Manager
 from handprint.messages import MessageHandler, styled
 from handprint.network import disable_ssl_cert_check
+from handprint.processes import available_cpus
 from handprint.services import services_list
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
@@ -345,6 +346,7 @@ Command-line arguments summary
     base_name  = 'document' if base_name == 'B' else base_name
     from_file  = None if from_file == 'F' else from_file
     output_dir = None if output_dir == 'O' else output_dir
+    threads    = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
 
     # Do the real work --------------------------------------------------------
 

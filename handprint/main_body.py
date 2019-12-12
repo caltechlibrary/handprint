@@ -28,7 +28,6 @@ from handprint.files import files_in_directory, filter_by_extensions
 from handprint.files import readable, writable, is_url
 from handprint.manager import Manager
 from handprint.network import network_available, disable_ssl_cert_check
-from handprint.processes import available_cpus
 from handprint.services import ACCEPTED_FORMATS, services_list
 
 
@@ -82,18 +81,17 @@ class MainBody(object):
         if not targets:
             raise RuntimeError('No images to process; quitting.')
         num_targets = len(targets)
-        procs = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
 
         say.info('Will apply {} service{} ({}) to {} image{}.',
                  len(services), 's' if len(services) > 1 else '',
                  ', '.join(services), num_targets, 's' if num_targets > 1 else '')
         if self._extended:
             say.info('Will save extended results.')
-        say.info('Will use {} process threads.', procs)
+        say.info('Will use {} process threads.', threads)
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
-        manager = Manager(services, procs, output_dir, make_grid, compare, extended, say)
+        manager = Manager(services, threads, output_dir, make_grid, compare, extended, say)
         print_separators = num_targets > 1 and not say.be_quiet()
         for index, item in enumerate(targets, start = 1):
             if print_separators:

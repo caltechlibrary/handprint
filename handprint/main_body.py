@@ -28,6 +28,8 @@ from handprint.files import readable, writable, is_url
 from handprint.manager import Manager
 from handprint.network import network_available, disable_ssl_cert_check
 from handprint.services import ACCEPTED_FORMATS, services_list
+from handprint.styled import styled
+from handprint.ui import inform, alert, warn
 
 
 # Exported classes.
@@ -36,7 +38,7 @@ from handprint.services import ACCEPTED_FORMATS, services_list
 class MainBody(object):
     '''Main body for Handprint.'''
 
-    def __init__(self, base_name, extended, from_file, output_dir, threads, say):
+    def __init__(self, base_name, extended, from_file, output_dir, threads):
         '''Initialize internal state and prepare for running services.'''
 
         if not network_available():
@@ -61,7 +63,6 @@ class MainBody(object):
         self._from_file  = from_file
         self._output_dir = output_dir
         self._threads    = threads
-        self._say        = say
 
 
     def run(self, services, files, make_grid, compare):
@@ -73,7 +74,6 @@ class MainBody(object):
         from_file  = self._from_file
         output_dir = self._output_dir
         threads    = self._threads
-        say        = self._say
 
         # Gather up some things and get prepared.
         targets = self.targets_from_arguments(files, from_file)
@@ -81,23 +81,23 @@ class MainBody(object):
             raise RuntimeError('No images to process; quitting.')
         num_targets = len(targets)
 
-        say.info('Will apply {} service{} ({}) to {} image{}.',
-                 len(services), 's' if len(services) > 1 else '',
-                 ', '.join(services), num_targets, 's' if num_targets > 1 else '')
+        inform('Will apply {} service{} ({}) to {} image{}.',
+               len(services), 's' if len(services) > 1 else '',
+               ', '.join(services), num_targets, 's' if num_targets > 1 else '')
         if self._extended:
-            say.info('Will save extended results.')
-        say.info('Will use {} process threads.', threads)
+            inform('Will save extended results.')
+        inform('Will use {} process threads.', threads)
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
-        manager = Manager(services, threads, output_dir, make_grid, compare, extended, say)
-        print_separators = num_targets > 1 and not say.be_quiet()
+        manager = Manager(services, threads, output_dir, make_grid, compare, extended)
+        print_separators = num_targets > 1
         for index, item in enumerate(targets, start = 1):
             if print_separators:
-                say.msg('━'*70, 'dark')
+                inform(styled('━'*70, 'dark'))
             manager.run_services(item, index, base_name)
         if print_separators:
-            say.msg('━'*70, 'dark')
+            inform(styled('━'*70, 'dark'))
 
 
     def targets_from_arguments(self, files, from_file):
@@ -123,7 +123,7 @@ class MainBody(object):
                     files = filter_by_extensions(files, handprint_endings)
                     targets += files
                 else:
-                    self._say.warn('"{}" not a file or directory', item)
+                    warn('"{}" not a file or directory', item)
         # Filter files we created in past runs.
         targets = [x for x in targets if '-reduced' not in x]
         targets = [x for x in targets if 'all-results' not in x]

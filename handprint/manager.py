@@ -42,9 +42,10 @@ from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
 from handprint.files import readable, writable, is_url, create_image_grid
 from handprint.files import delete_existing
-from handprint.messages import styled
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
+from handprint.styled import styled
+from handprint.ui import inform, alert, warn
 
 
 # Helper data types.
@@ -74,7 +75,7 @@ Result.__doc__ = '''Results from calling an HTR service on an input.
 
 class Manager:
     def __init__(self, service_names, num_threads, output_dir, make_grid,
-                 compare, extended, say):
+                 compare, extended):
         '''Initialize manager for services.  This will also initialize the
         credentials for individual services.
         '''
@@ -83,7 +84,6 @@ class Manager:
         self._compare = compare
         self._output_dir = output_dir
         self._make_grid = make_grid
-        self._say = say
 
         self._services = []
         for service_name in service_names:
@@ -120,10 +120,8 @@ class Manager:
         '''
         # Shortcuts to make the code more readable.
         services = self._services
-        say = self._say
-        use_color = say.use_color()
 
-        say.info('Starting on {}'.format(styled(item, 'white') if use_color else item))
+        inform('Starting on {}', styled(item, 'white'))
         try:
             (item_file, item_fmt) = self._get(item, base_name, index)
             if not item_file:
@@ -131,13 +129,13 @@ class Manager:
 
             dest_dir = self._output_dir if self._output_dir else path.dirname(item_file)
             if not writable(dest_dir):
-                say.error('Cannot write output in {}.', dest_dir)
+                alert('Cannot write output in {}.', dest_dir)
                 return
 
             # Normalize input image to the lowest common denominator.
             page = self._normalized(item, item_fmt, item_file, dest_dir)
             if not page.file:
-                say.warn('Skipping {}', relative(item_file))
+                warn('Skipping {}', relative(item_file))
                 return
 
             # Send the file to the services and get Result tuples back.
@@ -156,7 +154,7 @@ class Manager:
             if self._make_grid:
                 base = path.basename(filename_basename(item_file))
                 grid_file = path.realpath(path.join(dest_dir, base + '.all-results.png'))
-                say.info('Creating results grid image: {}', relative(grid_file))
+                inform('Creating results grid image: {}', relative(grid_file))
                 images = [r.annotated for r in results]
                 width = math.ceil(math.sqrt(len(images)))
                 create_image_grid(images, grid_file, max_horizontal = width)
@@ -167,19 +165,18 @@ class Manager:
                     if file and path.exists(file):
                         delete_existing(file)
 
-            say.info('Done with {}'.format(relative(item)))
+            inform('Done with {}'. relative(item))
         except (KeyboardInterrupt, UserCancelled) as ex:
-            say.warn('Interrupted')
+            warn('Interrupted')
             raise
         except Exception as ex:
-            say.error('Stopping due to a problem')
+            alert('Stopping due to a problem')
             raise
 
 
     def _get(self, item, base_name, index):
         # Shortcuts to make the code more readable.
         output_dir = self._output_dir
-        say = self._say
 
         # For URLs, we download the corresponding files and name them with
         # the base_name.
@@ -189,10 +186,10 @@ class Manager:
             try:
                 response = urllib.request.urlopen(item)
             except Exception as ex:
-                say.warn('Skipping URL due to error: {}', ex)
+                warn('Skipping URL due to error: {}', ex)
                 return (None, None)
             if response.headers.get_content_maintype() != 'image':
-                say.warn('Did not find an image at {}', item)
+                warn('Did not find an image at {}', item)
                 return (None, None)
             orig_fmt = response.headers.get_content_subtype()
             base = '{}-{}'.format(base_name, index)
@@ -203,19 +200,19 @@ class Manager:
             if not output_dir:
                 output_dir = os.getcwd()
             file = path.realpath(path.join(output_dir, base + '.' + orig_fmt))
-            if not download_file(item, file, say):
-                say.warn('Unable to download {}', item)
+            if not download_file(item, file):
+                warn('Unable to download {}', item)
                 return (None, None)
             url_file = path.realpath(path.join(output_dir, base + '.url'))
             with open(url_file, 'w') as f:
                 f.write(url_file_content(item))
-                say.info('Wrote URL to {}', relative(url_file))
+                inform('Wrote URL to {}', relative(url_file))
         else:
             file = path.realpath(path.join(os.getcwd(), item))
             orig_fmt = filename_extension(file)[1:]
 
         if not path.getsize(file) > 0:
-            say.warn('File has zero length: {}', relative(file))
+            warn('File has zero length: {}', relative(file))
             return (None, None)
 
         if __debug__: log('{} has original format {}', relative(file), orig_fmt)
@@ -226,52 +223,49 @@ class Manager:
         '''Send the "image" to the service named "service" and write output in
         directory "dest_dir".
         '''
-        say = self._say
-        use_color = say.use_color()
-        color = service.name_color()
-        service_name = styled(service.name(), color) if use_color else service.name()
+        service_name = styled(service.name(), service.name_color())
 
-        say.info('Sending to {} and waiting for response ...', service_name)
+        inform('Sending to {} and waiting for response ...', service_name)
         last_time = timer()
         try:
             output = service.result(image.file)
         except AuthFailure as ex:
-            raise AuthFailure('Unable to use {}: {}'.format(service, ex))
+            raise AuthFailure('Unable to use {}: {}', service, ex)
         except RateLimitExceeded as ex:
             time_passed = timer() - last_time
             if time_passed < 1/service.max_rate():
-                say.warn('Pausing {} due to rate limits'.format(service_name))
+                warn('Pausing {} due to rate limits', service_name)
                 time.sleep(1/service.max_rate() - time_passed)
                 # FIXME resend after pause
         if output.error:
-            say.error('{} failed: {}', service_name, output.error)
-            say.warn('No result from {} for {}', service_name, relative(image.file))
+            alert('{} failed: {}', service_name, output.error)
+            warn('No result from {} for {}', service_name, relative(image.file))
             return None
 
-        say.info('Got result from {}.', service_name)
+        inform('Got result from {}.', service_name)
         file_name   = path.basename(image.file)
         base_path   = path.join(image.dest_dir, file_name)
         annot_path  = None
         report_path = None
         if self._make_grid:
             annot_path  = alt_extension(base_path, str(service) + '.png')
-            say.info('Creating annotated image for {}.', service_name)
+            inform('Creating annotated image for {}.', service_name)
             self._save_output(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = alt_extension(base_path, str(service) + '.txt')
             json_file = alt_extension(base_path, str(service) + '.json')
-            say.info('Saving all data for {}.', service_name)
+            inform('Saving all data for {}.', service_name)
             self._save_output(json.dumps(output.data), json_file)
-            say.info('Saving extracted text for {}.', service_name)
+            inform('Saving extracted text for {}.', service_name)
             self._save_output(output.text, txt_file)
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')
             report_path = alt_extension(image.item_file, str(service) + '.tsv')
             if readable(gt_file):
-                say.info('Saving {} comparison to ground truth', service_name)
+                inform('Saving {} comparison to ground truth', service_name)
                 self._save_output(self._error_report(output.text, gt_file), report_path)
             else:
-                say.info('Skipping {} comparison because {} not available',
+                inform('Skipping {} comparison because {} not available',
                          service_name, relative(gt_file))
         return Result(service, image, annot_path, report_path)
 
@@ -306,15 +300,14 @@ class Manager:
     def _converted_file(self, file, to_format, dest_dir):
         basename = path.basename(filename_basename(file))
         new_file = path.join(dest_dir, basename + '.' + to_format)
-        say = self._say
         if path.exists(new_file):
-            say.info('Using already converted image in {}', relative(new_file))
+            inform('Using already converted image in {}', relative(new_file))
             return new_file
         else:
-            say.info('Converting to {} format: {}', to_format, relative(file))
+            inform('Converting to {} format: {}', to_format, relative(file))
             (converted, error) = converted_image(file, to_format, new_file)
             if error:
-                say.error('Failed to convert {}: {}', relative(file), error)
+                alert('Failed to convert {}: {}', relative(file), error)
                 return None
             return converted
 
@@ -322,7 +315,6 @@ class Manager:
     def _smaller_file(self, file):
         if not file:
             return None
-        say = self._say
         file_ext = filename_extension(file)
         if file.find('-reduced') > 0:
             new_file = file
@@ -330,17 +322,17 @@ class Manager:
             new_file = filename_basename(file) + '-reduced' + file_ext
         if path.exists(new_file):
             if image_size(new_file) < self._max_size:
-                say.info('Reusing resized image found in {}', relative(new_file))
+                inform('Reusing resized image found in {}', relative(new_file))
                 return new_file
             else:
                 # We found a "-reduced" file, perhaps from a previous run, but
                 # for the current set of services, it's larger than allowed.
                 if __debug__: log('existing resized file larger than {}b: {}',
                                   humanize.intcomma(self._max_size), new_file)
-        say.info('Size too large; reducing size: {}', relative(file))
+        inform('Size too large; reducing size: {}', relative(file))
         (resized, error) = reduced_image_size(file, new_file, self._max_size)
         if error:
-            say.error('Failed to resize {}: {}', relative(file), error)
+            alert('Failed to resize {}: {}', relative(file), error)
             return None
         return resized
 
@@ -348,7 +340,6 @@ class Manager:
     def _resized_image(self, file):
         (max_width, max_height) = self._max_dimensions
         file_ext = filename_extension(file)
-        say = self._say
         if file.find('-reduced') > 0:
             new_file = file
         else:
@@ -356,30 +347,28 @@ class Manager:
         if path.exists(new_file) and readable(new_file):
             (image_width, image_height) = image_dimensions(new_file)
             if image_width < max_width and image_height < max_height:
-                say.info('Using reduced image found in {}', relative(new_file))
+                inform('Using reduced image found in {}', relative(new_file))
                 return new_file
             else:
                 # We found a "-reduced" file, perhaps from a previous run, but
                 # for the current set of services, dimension are too large.
                 if __debug__: log('existing resized file larger than {}x{}: {}',
                                   max_width, max_height, new_file)
-        say.info('Dimensions too large; reducing dimensions: {}'.format(relative(file)))
+        inform('Dimensions too large; reducing dimensions: {}', relative(file))
         (resized, error) = reduced_image_dimensions(file, new_file, max_width, max_height)
         if error:
-            say.error('Failed to re-dimension {}: {}', relative(file), error)
+            alert('Failed to re-dimension {}: {}', relative(file), error)
             return None
         return resized
 
 
     def _error_report(self, result_text, gt_file):
-        say = self._say
-
         if __debug__: log('reading gt file {}', gt_file)
         gt_lines = []
         with open(gt_file, 'r') as f:
             gt_lines = f.read().splitlines()
         if len(gt_lines) == 0:
-            say.warn('Empty ground truth file: {}', gt_file)
+            warn('Empty ground truth file: {}', gt_file)
             return None
 
         # We return data in tab-delimited format.
@@ -406,18 +395,16 @@ class Manager:
 
 
     def _save_output(self, result, file):
-        say = self._say
-
         # First perform some sanity checks.
         if result is None:
-            say.warn('No data for {}', file)
+            warn('No data for {}', file)
             return
         if isinstance(result, tuple):
             # Assumes 2 elements: data, and error
             (data, error) = result
             if error:
-                say.error('Error: {}'.format(error))
-                say.warn('Unable to write {}', file)
+                alert('Error: {}', error)
+                warn('Unable to write {}', file)
                 return
             else:
                 result = data

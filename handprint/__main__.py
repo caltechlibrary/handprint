@@ -48,10 +48,11 @@ from handprint.files import filename_extension, files_in_directory, is_url
 from handprint.files import readable, writable
 from handprint.main_body import MainBody
 from handprint.manager import Manager
-from handprint.messages import MessageHandler, styled
 from handprint.network import disable_ssl_cert_check
 from handprint.processes import available_cpus
 from handprint.services import services_list
+from handprint.styled import styled
+from handprint.ui import UI, inform, alert
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
 disable_ssl_cert_check()
@@ -302,46 +303,53 @@ Command-line arguments summary
 
     # Initial setup -----------------------------------------------------------
 
-    say = MessageHandler(not no_color, quiet)
+    debugging = debug != 'OUT'
+    use_color = not no_color
+    make_grid = not no_grid
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = '(Hint: use {}h for help.)'.format(prefix)
-    make_grid = not no_grid
-    debugging = debug != 'OUT'
+    ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test', False, use_color, quiet)
 
     # Preprocess arguments and handle early exits -----------------------------
 
     if debugging:
         set_debug(True, debug)
+
     if version:
         print_version()
-        exit()
+        exit(0)
     if list:
-        say.info('Known services: {}'.format(', '.join(services_list())))
-        exit()
-
+        inform('Known services: {}', ', '.join(services_list()))
+        exit(0)
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
-            exit(say.error_text('Unknown service: "{}". {}', service, hint))
+            alert('Unknown service: "{}". {}', service, hint)
+            exit(1)
         if not files or len(files) > 1:
-            exit(say.error_text('Option {}a requires one file. {}', prefix, hint))
+            alert('Option {}a requires one file. {}', prefix, hint)
+            exit(1)
         creds_file = files[0]
         if not readable(creds_file):
-            exit(say.error_text('File not readable: {}', creds_file))
+            alert('File not readable: {}', creds_file)
+            exit(1)
         Credentials.save_credentials(service, creds_file)
-        exit(say.info_text('Saved credentials for service "{}".', service))
-
+        inform('Saved credentials for service "{}".', service)
+        exit(0)
     if no_grid and not extended and not compare:
-        exit(say.error_text('{}G without {}e or {}c produces no output. {}',
-                            prefix, prefix, prefix, hint))
+        alert('{0}G without {0}e or {0}c produces no output. {}', prefix, hint)
+        exit(1)
     if any(item.startswith('-') for item in files):
-        exit(say.error_text('Unrecognized option in arguments. {}', hint))
+        alert('Unrecognized option in arguments. {}', hint)
+        exit(1)
     if not files and from_file == 'F':
-        exit(say.error_text('Need provide images or URLs. {}', hint))
+        alert('Need provide images or URLs. {}', hint)
+        exit(1)
 
     services = services_list() if services == 'S' else services.lower().split(',')
     if not all(s in services_list() for s in services):
-        exit(say.error_text('"{}" is not a known services. {}', services, hint))
+        alert('"{}" is not a known services. {}', services, hint)
+        exit(1)
 
     base_name  = 'document' if base_name == 'B' else base_name
     from_file  = None if from_file == 'F' else from_file
@@ -351,20 +359,22 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     try:
-        print_intro(say)
-        body = MainBody(base_name, extended, from_file, output_dir, threads, say)
+        print_intro(ui)
+        body = MainBody(base_name, extended, from_file, output_dir, threads)
         body.run(services, files, make_grid, compare)
     except (KeyboardInterrupt, UserCancelled) as ex:
         if __debug__: log('received {}', sys.exc_info()[0].__name__)
-        exit(say.info_text('Quitting.'))
+        inform('Quitting.')
+        exit(0)
     except Exception as ex:
         if debugging:
             import traceback
-            say.error('{}\n{}'.format(str(ex), traceback.format_exc()))
+            alert('{}\n{}', str(ex), traceback.format_exc())
             import pdb; pdb.set_trace()
         else:
-            exit(say.error_text(str(ex)))
-    say.info('Done.')
+            alert(str(ex))
+            exit(2)
+    inform('Done.')
 
 
 # Helper functions.
@@ -381,8 +391,8 @@ def print_version():
     print('Credentials are stored in {}'.format(Credentials.credentials_dir()))
 
 
-def print_intro(say):
-    if say.use_color():
+def print_intro(ui):
+    if ui.use_color():
         cb = ['chartreuse', 'bold']
         name = styled('Handprint', cb)
         acronym = '{}written {}age {}ecognit{}o{} {}est'.format(
@@ -391,9 +401,9 @@ def print_intro(say):
     else:
         name = 'Handprint'
         acronym = 'HANDwritten Page RecognItioN Test'
-    say.info('┏' + '━'*68 + '┓')
-    say.info('┃    Welcome to {}, the {}!    ┃', name, acronym)
-    say.info('┗' + '━'*68 + '┛')
+    inform('┏' + '━'*68 + '┓')
+    inform('┃    Welcome to {}, the {}!    ┃', name, acronym)
+    inform('┗' + '━'*68 + '┛')
 
 
 # Main entry point.

@@ -16,6 +16,8 @@ import warnings
 import handprint
 from   handprint.debug import log
 from   handprint.exceptions import *
+from   handprint.styled import styled
+from   handprint.ui import inform, alert, warn
 
 
 # Constants.
@@ -95,15 +97,13 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
                 raise error
 
 
-def download_file(url, output_file, user = None, pswd = None, say = None):
-    if say:
-        say.info('Downloading {}', url)
+def download_file(url, output_file, user = None, pswd = None):
+    inform('Downloading {}', url)
     try:
         download(url, user, pswd, output_file)
         return True
     except (NoContent, ServiceFailure, AuthFailure) as ex:
-        if say:
-            say.error('{}', str(ex))
+        alert('{}', str(ex))
     return False
 
 

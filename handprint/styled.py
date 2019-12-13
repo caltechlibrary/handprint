@@ -16,10 +16,11 @@ file "LICENSE" for more information.
 
 
 import colorful
+from colorful.core import ColorfulString
+
 colorful.use_256_ansi_colors()
 
 from .debug import log
-
 
 
 # Exported classes.
@@ -81,7 +82,7 @@ def styled(text, flags = None, colorize = True):
     Optional style additions:
        'bold', 'underlined', 'italic', 'blink', 'struckthrough'
     '''
-    # Fail early if we're not colorizing.
+    # Return early if we're not colorizing.
     if not colorize:
         return text
 
@@ -111,3 +112,8 @@ def styled(text, flags = None, colorize = True):
             except Exception:
                 if __debug__: log('colorful does not recognize color {}', c)
     return attribs | text
+
+
+def unstyled(str):
+    '''Remove styling, if any, from the given string.'''
+    return str.orig_string if isinstance(str, ColorfulString) else str

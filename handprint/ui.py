@@ -28,7 +28,7 @@ from   time import sleep
 from .debug import log
 from .exceptions import *
 from .files import readable
-from .styled import Styled
+from .styled import Styled, unstyled
 
 
 # Exported functions
@@ -43,6 +43,9 @@ def inform(text, *args):
     args are values to use in those placeholders.
     '''
     ui = UI.instance()
+    if not ui.use_color():
+        text = unstyled(text)
+        args = [unstyled(x) for x in args]
     ui.inform(text, *args)
 
 
@@ -53,6 +56,9 @@ def warn(text, *args):
     alert(...) method instead.)
     '''
     ui = UI.instance()
+    if not ui.use_color():
+        text = unstyled(text)
+        args = [unstyled(x) for x in args]
     ui.warn(text, *args)
 
 
@@ -61,6 +67,9 @@ def alert(text, *args):
     there is a problem that will prevent normal execution.
     '''
     ui = UI.instance()
+    if not ui.use_color():
+        text = unstyled(text)
+        args = [unstyled(x) for x in args]
     ui.alert(text, *args)
 
 
@@ -75,6 +84,9 @@ def alert_fatal(text, *args, **kwargs):
     application can regain control and exit.
     '''
     ui = UI.instance()
+    if not ui.use_color():
+        text = unstyled(text)
+        args = [unstyled(x) for x in args]
     ui.alert_fatal(text, *args, **kwargs)
 
 

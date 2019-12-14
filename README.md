@@ -221,31 +221,31 @@ Handprint supports comparing the output of HTR services to expected output (i.e.
 * The file containing the expected results should be named `.gt.txt`, with a base name identical to the image file.  For example, an image file named `somefile.jpg` should have a corresponding text file `somefile.gt.txt`.
 * The ground-truth text file should be located in the same directory as the input image file.
 * The text should be line oriented, with each line representing a line of text in the image.
-* The text should be plain text only.  No Unicode or binary encodings.  (This limitation comes from the HTR services, which &ndash; as of thisf writing &ndash; return results in plain text format.)
+* The text should be plain text only.  No Unicode or binary encodings.  (This limitation comes from the HTR services, which &ndash; as of this writing &ndash; return results in plain text format.)
 
-Handprint will write the comparison results to a tab-delimited file named after the input image and service but with the extension `.tsv`.  For example, for an input image `somefile.jpg` and results received from Google, the comparison results will be written to `somefile.google.tsv`.  The output file will have one row for each line of text in the input, plus an additional row at the end for total number of errors found.  Each row will have the following columns:
+Handprint will write the comparison results to a tab-delimited file named after the input image and service but with the extension `.tsv`.  For example, for an input image `somefile.jpg` and results received from Google, the comparison results will be written to `somefile.google.tsv`.  The use of a tab-delimited format rather than comma-delimited format avoids the need to quote commas and other characters in the text.  The output file will have one row for each line of text in the input, plus an additional row at the end for total number of errors found.  Each row will have the following columns:
 
 1. number of errors on that line of text (computed as [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)),
-2. the _character error rate_ (CER) for that line (see below)
+2. the _character error rate_ (CER) for the line (see below)
 3. the expected text on that line
 4. the text received from the service for that line
 
-CER is computed as
+The character error rate (CER) is computed as
 <p align="center">
  100&nbsp;&times;&nbsp;(<i>i</i> + <i>s</i> + <i>d</i>)/<i>n</i>
 </p>
 
-where _i_ is the number of inserted characters, _s_ the number of substituted characters, and _d_ the number of deleted characters needed to transform the the text received into the expected text, and _n_ is the number of characters in the expected text line.  This approach to normalizing the CER value is conventional but note that it can lead to values greater than 100%.
+where _i_ is the number of inserted characters, _s_ the number of substituted characters, and _d_ the number of deleted characters needed to transform the the text received into the expected text, and _n_ is the number of characters in the expected text line.  This approach to normalizing the CER value is conventional but note that it **can lead to values greater than 100%**.
 
-Comparisons are done on an exact basis; character case is not changed, punctuation is not removed, and stop words are not removed.  However, multiple contiguous spaces are converted to one space, and leading spaces are removed from text lines.
+Scoring is done by Handprint on an exact basis; character case is not changed, punctuation is not removed, and stop words are not removed.  However, multiple contiguous spaces are converted to one space, and leading spaces are removed from text lines.
 
-Here is an example of a tab-separated file produced using `-c`:
+Handprint attempts to cope with possibly-missing text in the HTR results by matching up likely corresponding lines in the expected and received results.  It does this by comparing each line of ground-truth text to each line of the HTR results using [longest common subsequence similarity](https://en.wikipedia.org/wiki/Longest_common_subsequence_problem) as implemented by the LCSSEQ function in the [textdistance](https://github.com/life4/textdistance) package.  If the lines do not pass a threshold score, Handprint looks at subsequent lines of the HTR results and tries to reestablish correspondence to ground truth.  If nothing else in the HTR results appear close enough to the expected ground-truth line, the line is assumed to be missing from the HTR results and scored appropriately.
+
+The following is an example of a tab-separated file produced using `-c`.  This example shows a case where two lines were missing entirely from the HTR results; for those lines, the number of errors equals the length of the ground-truth text lines and the CER is 100%.
 
 <p align="center">
-<img width="75%" src=".graphics/example-tsv-file.png">
+<img width="60%" src=".graphics/example-tsv-file.png">
 </p>
-
-The use of a tab-delimited format rather than comma-delimited format avoids the need to quote commas and other characters in the text.
 
 
 ### _Extended results_

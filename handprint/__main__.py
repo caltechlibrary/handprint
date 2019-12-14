@@ -272,6 +272,17 @@ punctuation is not removed, and stop words are not removed.  However,
 multiple contiguous spaces are converted to one space, and leading spaces are
 removed from text lines.
 
+Handprint attempts to cope with possibly-missing text in the HTR results by
+matching up likely corresponding lines in the expected and received results.
+It does this by comparing each line of ground-truth text to each line of the
+HTR results using longest common subsequence similarity, as implemented by
+the LCSSEQ function in the Python "textdistance" package.  If the lines do
+not pass a threshold score, Handprint looks at subsequent lines of the HTR
+results and tries to reestablish correspondence to ground truth.  If nothing
+else in the HTR results appear close enough to the expected ground-truth
+line, the line is assumed to be missing from the HTR results and scored
+appropriately.
+
 Additional command-line arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

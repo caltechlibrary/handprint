@@ -28,6 +28,7 @@ The file [CHANGES](CHANGES.md) contains a more complete change log that includes
    * [Input files and URLs](#input-files-and-urls)
    * [Annotated output images](#annotated-output-images)
    * [Extended results](#extended-results)
+   * [Comparison to ground truth text](#comparison-to-ground-truth-text)
    * [Other options](#other-options)
    * [Command line options summary](#command-line-options-summary)
 * [Known issues and limitations](#known-issues-and-limitations)
@@ -214,7 +215,7 @@ handprint tests/images/public-domain/H96566k.jpg
 The individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked.  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
 
 
-### _Comparing extracted text to ground truth text_
+### _Comparison to ground truth text_
 
 Handprint supports comparing the output of HTR services to expected output (i.e., ground truth) using the option `-c` (or `/c` on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:
 

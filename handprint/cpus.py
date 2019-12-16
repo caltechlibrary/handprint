@@ -1,5 +1,5 @@
 '''
-processes.py: utilities for working with processes on a system.
+cpus.py: find out about CPUS on the host computer
 
 Authors
 -------

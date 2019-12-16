@@ -34,15 +34,15 @@ import urllib
 
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
-from handprint.annotate import annotated_image
 from handprint.debug import log
 from handprint.exceptions import *
-from handprint.files import converted_image, image_size, image_dimensions
-from handprint.files import reduced_image_size, reduced_image_dimensions
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
-from handprint.files import readable, writable, is_url, create_image_grid
+from handprint.files import readable, writable, is_url
 from handprint.files import delete_existing
+from handprint.images import converted_image, annotated_image, create_image_grid
+from handprint.images import image_size, image_dimensions
+from handprint.images import reduced_image_size, reduced_image_dimensions
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
 from handprint.styled import styled

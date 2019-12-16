@@ -1,5 +1,5 @@
 '''
-annotate.py: utility for annotating an image with text recognition results
+images.py: utilities for working with images in Handprint
 
 Authors
 -------
@@ -16,8 +16,15 @@ file "LICENSE" for more information.
 
 import io
 import matplotlib
+import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+from   os import path
+from   PIL import Image
+import warnings
 
+# The following is needed for function annotated_image(...) in this file.
 # On macOS 10.13.6 with Python 3.5.7 and matplotlib 3.0.3, when running with
 # parallel treads, I experienced random failures in the AGG renderer.  The
 # error always manifested itself as an exception that ended like this, on
@@ -56,16 +63,121 @@ try:
 except:
     pass
 
-import matplotlib.image as mpimg
-
 import handprint
 from handprint.debug import log
 from handprint.exceptions import *
-from handprint.files import relative
+from handprint.files import relative, readable
 
 
 # Main functions.
 # .............................................................................
+
+def canonical_format_name(format):
+    '''Convert format name "format" to a consistent version.'''
+    format = format.lower()
+    if format in ['jpg', 'jpeg']:
+        return 'jpeg'
+    elif format in ['tiff', 'tif']:
+        return 'tiff'
+    else:
+        return format
+
+
+def image_size(file):
+    '''Returns the size of the image in 'file', in units of bytes.'''
+    if not file or not readable(file):
+        return 0
+    return path.getsize(file)
+
+
+def image_dimensions(file):
+    '''Returns the pixel dimensions of the image as a tuple of (width, height).'''
+    # When converting images, PIL may issue a DecompressionBombWarning but
+    # it's not a concern in our application.  Ignore it.
+    if not file:
+        return (0, 0)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        im = Image.open(file)
+        if not im:
+            return (0, 0)
+        return im.size
+
+
+def reduced_image_size(orig_file, dest_file, max_size):
+    '''Resizes the image and writes a new file named "ORIGINAL-reduced.EXT".
+    Returns a tuple of (new_file, error).  The value of 'error' will be None
+    if no error occurred; otherwise, the value will be a string summarizing the
+    error that occurred and 'new_file' will be set to None.
+    '''
+    with warnings.catch_warnings():
+        # Catch warnings from image conversion, like DecompressionBombWarning
+        warnings.simplefilter('ignore')
+        try:
+            i_size = image_size(orig_file)
+            if i_size <= max_size:
+                if __debug__: log('file already smaller than requested: {}', orig_file)
+                return (orig_file, None)
+            ratio = max_size/i_size
+            if __debug__: log('resize ratio = {}', ratio)
+            im = Image.open(orig_file)
+            dims = im.size
+            new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
+            if __debug__: log('resizing image to {}', new_dims)
+            resized = im.resize(new_dims, Image.HAMMING)
+            resized.save(dest_file)
+            if __debug__: log('saved resized image to {}', dest_file)
+            return (dest_file, None)
+        except Exception as ex:
+            return (None, str(ex))
+
+
+def reduced_image_dimensions(orig_file, dest_file, max_width, max_height):
+    '''Resizes the image and writes a new file named "ORIGINAL-reduced.EXT".
+    Returns a tuple of (new_file, error).  The value of 'error' will be None
+    if no error occurred; otherwise, the value will be a string summarizing the
+    error that occurred and 'new_file' will be set to None.
+    '''
+    with warnings.catch_warnings():
+        # Catch warnings from image conversion, like DecompressionBombWarning
+        warnings.simplefilter('ignore')
+        try:
+            im = Image.open(orig_file)
+            dims = im.size
+            width_ratio = max_width/dims[0]
+            length_ratio = max_height/dims[1]
+            ratio = min(width_ratio, length_ratio)
+            new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
+            if __debug__: log('resizing image to {}', new_dims)
+            resized = im.resize(new_dims, Image.HAMMING)
+            resized.save(dest_file)
+            if __debug__: log('saved re-dimensioned image to {}', dest_file)
+            return (dest_file, None)
+        except Exception as ex:
+            return (None, str(ex))
+
+
+def converted_image(file, to_format, dest_file = None):
+    '''Returns a tuple of (success, output file, error message).
+    Returns a tuple of (new_file, error).  The value of 'error' will be None
+    if no error occurred; otherwise, the value will be a string summarizing the
+    error that occurred and 'new_file' will be set to None.
+    '''
+    if dest_file is None:
+        dest_file = filename_basename(file) + '.' + to_format
+    # When converting images, PIL may issue a DecompressionBombWarning but
+    # it's not a concern in our application.  Ignore it.
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        try:
+            im = Image.open(file)
+            im.convert('RGB')
+            im.save(dest_file, canonical_format_name(to_format))
+            if __debug__: log('saved converted image to {}', dest_file)
+            return (dest_file, None)
+        except Exception as ex:
+            return (None, str(ex))
+
 
 def annotated_image(file, text_boxes, service):
     service_name = service.name()
@@ -99,3 +211,25 @@ def annotated_image(file, text_boxes, service):
     plt.close(fig)
 
     return buf
+
+
+# This function was originally based on code posted by user "Maxim" to
+# Stack Overflow: https://stackoverflow.com/a/46877433/743730
+
+def create_image_grid(image_files, dest_file, max_horizontal = np.iinfo(int).max):
+    '''Create image by tiling a list of images read from files.'''
+    n_images = len(image_files)
+    n_horiz = min(n_images, max_horizontal)
+    h_sizes = [0] * n_horiz
+    v_sizes = [0] * ((n_images // n_horiz) + (1 if n_images % n_horiz > 0 else 0))
+    images = [Image.open(f) for f in image_files]
+    for i, im in enumerate(images):
+        h, v = i % n_horiz, i // n_horiz
+        h_sizes[h] = max(h_sizes[h], im.size[0])
+        v_sizes[v] = max(v_sizes[v], im.size[1])
+    h_sizes, v_sizes = np.cumsum([0] + h_sizes), np.cumsum([0] + v_sizes)
+    im_grid = Image.new('RGB', (h_sizes[-1], v_sizes[-1]), color = 'white')
+    for i, im in enumerate(images):
+        im_grid.paste(im, (h_sizes[i % n_horiz], v_sizes[i // n_horiz]))
+    im_grid.save(dest_file)
+    return im_grid

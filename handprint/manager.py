@@ -38,7 +38,7 @@ from handprint.debug import log
 from handprint.exceptions import *
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
-from handprint.files import readable, writable, is_url
+from handprint.files import readable, writable, nonempty, is_url
 from handprint.files import delete_existing
 from handprint.images import converted_image, annotated_image, create_image_grid
 from handprint.images import image_size, image_dimensions
@@ -262,12 +262,18 @@ class Manager:
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')
             report_path = alt_extension(image.item_file, str(service) + '.tsv')
-            if readable(gt_file):
+            if readable(gt_file) and nonempty(gt_file):
+                with open(gt_file, 'r') as f:
+                    if __debug__: log('reading ground truth from {}', gt_file)
+                    gt_text = f.read()
                 inform('Saving {} comparison to ground truth', service_name)
-                self._save(text_comparison(output.text, gt_file), report_path)
+                self._save(text_comparison(output.text, gt_text), report_path)
+            elif not nonempty(gt_file):
+                warn('Skipping {} comparison because {} is empty',
+                     service_name, relative(gt_file))
             else:
-                inform('Skipping {} comparison because {} not available',
-                         service_name, relative(gt_file))
+                warn('Skipping {} comparison because {} not available',
+                     service_name, relative(gt_file))
         return Result(service, image, annot_path, report_path)
 
 

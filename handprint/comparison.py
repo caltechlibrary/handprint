@@ -33,15 +33,7 @@ _SIMILARITY_THRESHOLD = 0.5
 # Main functions.
 # .............................................................................
 
-def text_comparison(htr_text, gt_file):
-    if __debug__: log('reading gt file {}', gt_file)
-    gt_lines = []
-    with open(gt_file, 'r') as f:
-        gt_lines = f.read().splitlines()
-    if len(gt_lines) == 0:
-        warn('Empty ground truth file: {}', gt_file)
-        return None
-
+def text_comparison(htr_text, gt_text):
     # We return data as 4 columns.
     output = [('# errors', 'CER (%)', 'Expected text', 'Actual text')]
     total_errors = 0
@@ -51,7 +43,7 @@ def text_comparison(htr_text, gt_file):
     # them using a normalized LCSSEQ distance.
     htr_index = 0
     htr_lines = htr_text.splitlines()
-    for gt_line in gt_lines:
+    for gt_line in gt_text.splitlines():
         htr_line = htr_lines[htr_index]
         if lcsseq_score(gt_line, htr_line) >= _SIMILARITY_THRESHOLD:
             (lev, cer, expected, obtained) = line_score(gt_line, htr_line)

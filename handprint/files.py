@@ -46,6 +46,12 @@ def writable(dest):
     return os.access(dest, os.F_OK | os.W_OK)
 
 
+def nonempty(dest):
+    '''Returns True if the file is not empty.'''
+    # FIXME: this gives the wrong answer if the file is compressed.
+    return readable(dest) and path.getsize(dest) > 0
+
+
 def module_path():
     '''Returns the absolute path to our module installation directory.'''
     # The path returned by module.__path__ is to the directory containing

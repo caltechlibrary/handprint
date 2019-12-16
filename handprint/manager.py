@@ -251,20 +251,20 @@ class Manager:
         if self._make_grid:
             annot_path  = alt_extension(base_path, str(service) + '.png')
             inform('Creating annotated image for {}.', service_name)
-            self._save_output(annotated_image(image.file, output.boxes, service), annot_path)
+            self._save(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = alt_extension(base_path, str(service) + '.txt')
             json_file = alt_extension(base_path, str(service) + '.json')
             inform('Saving all data for {}.', service_name)
-            self._save_output(json.dumps(output.data), json_file)
+            self._save(json.dumps(output.data), json_file)
             inform('Saving extracted text for {}.', service_name)
-            self._save_output(output.text, txt_file)
+            self._save(output.text, txt_file)
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')
             report_path = alt_extension(image.item_file, str(service) + '.tsv')
             if readable(gt_file):
                 inform('Saving {} comparison to ground truth', service_name)
-                self._save_output(text_comparison(output.text, gt_file), report_path)
+                self._save(text_comparison(output.text, gt_file), report_path)
             else:
                 inform('Skipping {} comparison because {} not available',
                          service_name, relative(gt_file))
@@ -363,7 +363,7 @@ class Manager:
         return resized
 
 
-    def _save_output(self, result, file):
+    def _save(self, result, file):
         # First perform some sanity checks.
         if result is None:
             warn('No data for {}', file)

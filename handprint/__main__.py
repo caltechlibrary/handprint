@@ -41,6 +41,7 @@ import sys
 from   sys import exit as exit
 
 import handprint
+from handprint.cpus import available_cpus
 from handprint.credentials import Credentials
 from handprint.debug import set_debug, log
 from handprint.exceptions import *
@@ -49,7 +50,6 @@ from handprint.files import readable, writable
 from handprint.main_body import MainBody
 from handprint.manager import Manager
 from handprint.network import disable_ssl_cert_check
-from handprint.processes import available_cpus
 from handprint.services import services_list
 from handprint.styled import styled
 from handprint.ui import UI, inform, alert

@@ -128,7 +128,6 @@ class GoogleTR(TextRecognition):
                 response = getattr(client, feature)(image = image, image_context = context)
                 if __debug__: log('received result.')
                 result[feature] = MessageToDict(response)
-            full_text = ''
 
             # Extract text and bounding boxes into our format.
             # Their structure looks like this:

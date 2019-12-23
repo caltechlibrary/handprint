@@ -148,15 +148,15 @@ def text_comparison(htr_text, gt_text):
                 break
 
     # We return data as 4 columns.
-    output = ['# errors\tCER (%)\tExpected text\tActual text']
+    output = ['# Errors\tCER (%)\tExpected text\tActual text']
     total_errors = 0
     for line in results:
         total_errors += line.distance
         output.append('{}\t{}\t{}\t{}'.format(
             line.distance, line.cer, line.gt_text, line.htr_text))
     # Append total errors count, and we're done.
-    output.append('Total # errors')
-    output.append(str(total_errors))
+    output.append('Total # errors\t\t\t')
+    output.append(str(total_errors) + '\t\t\t')
     return '\n'.join(output)
 
 

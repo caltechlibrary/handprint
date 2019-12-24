@@ -5,7 +5,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 
 [![Latest release](https://img.shields.io/github/v/release/caltechlibrary/handprint.svg?style=flat-square&color=b44e88&label=Latest%20release)](https://github.com/caltechlibrary/handprint/releases)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
-[![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
+[![Python](https://img.shields.io/badge/Python-3.5+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
 [![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1324)](https://data.caltech.edu/records/1324)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
@@ -14,7 +14,9 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 ❡ Log of recent changes
 -----------------------
 
-The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
+_Version 1.1.0_: New options `-c` and `-r` added, allowing comparison of extracted text to expected (ground truth) text; see [the relevant section in this README file](#comparison-to-ground-truth-text) for more information. Also, the debug option `-@` now accepts an argument for where to send the debug output trace; the behavior change of `-@` is not backward compatible.  Finally, there are internal architectural and organizational changes.
+
+The file [CHANGES](CHANGES.md) contains a more complete change log, and includes information about previous releases.
 
 § Table of Contents
 -----------------
@@ -238,7 +240,9 @@ The character error rate (CER) is computed as
 
 where _i_ is the number of inserted characters, _s_ the number of substituted characters, and _d_ the number of deleted characters needed to transform the the text received into the expected text, and _n_ is the number of characters in the expected text line.  This approach to normalizing the CER value is conventional but note that it **can lead to values greater than 100%**.
 
-Scoring is done by Handprint on an exact basis; character case is not changed, punctuation is not removed, and stop words are not removed.  However, multiple contiguous spaces are converted to one space, and leading spaces are removed from text lines.
+By default, scoring is done by Handprint on an exact basis; character case is not changed, punctuation is not removed, and stop words are not removed.  However, multiple contiguous spaces are converted to one space, and leading spaces are removed from text lines.
+
+If given the option `-r` (`/r` on Windows), Handprint will relax the comparison algorithm further, as follows: it will convert all text to lower case, and it will ignore certain sentence punctuation characters, namely `,`, `.`, `:`, and `;`.  The rationale for these particular choices comes from experience with actual texts and HTR services.  For example, a difference sometimes seen between HTR services is how they handle seemingly large spaces between a word and a subsequent comma or period: sometimes the HTR service will add a space before the comma or period, but inspection of the input document will reveal sloppiness in the author's handwriting and neither the addition nor the omission of a space is provably right or wrong.  To avoid biasing the results one way or another, it is better to omit the punctuation.  On the other hand, this may not always be desirable, and thus needs to be a user-controlled option.
 
 Handprint attempts to cope with possibly-missing text in the HTR results by matching up likely corresponding lines in the expected and received results.  It does this by comparing each line of ground-truth text to each line of the HTR results using [longest common subsequence similarity](https://en.wikipedia.org/wiki/Longest_common_subsequence_problem) as implemented by the LCSSEQ function in the [textdistance](https://github.com/life4/textdistance) package.  If the lines do not pass a threshold score, Handprint looks at subsequent lines of the HTR results and tries to reestablish correspondence to ground truth.  If nothing else in the HTR results appear close enough to the expected ground-truth line, the line is assumed to be missing from the HTR results and scored appropriately.
 
@@ -323,7 +327,7 @@ Handprint produces color-coded diagnostic output as it runs, by default.  Howeve
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
 
-If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing, and will also drop into a debugger upon the occurrence of any errors.  The debug trace will be written to the given destination, which can be a dash character (`-`) to indicate console output, or a file path.  *Important*: some Python version/platform combinations seem to crash outright if `pdb` is invoked in a process thread &ndash; something that is likely to happen if you are debugging the execution of Handprint. Consequently, Handprint's debug mode (via the `-@` option) almost always has to be combined with `-t 1` to make Handprint use only one thread.
+If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing, and will also invoke [`pdb`](https://docs.python.org/library/pdb.html) upon the occurrence of any errors.  The trace will be written to the given destination, which can be a dash character (`-`) to indicate console output, or a file path.  *Important*: some Python version/platform combinations crash if `pdb` is invoked in a process thread &ndash; which is likely to happen if you are debugging the execution of Handprint. Consequently, to avoid this risk, **always use `-t 1` when debugging** to make Handprint use only one thread.
 
 If given the `-V` option (`/V` on Windows), this program will print the version and other information, and exit without doing anything else.
 
@@ -332,11 +336,11 @@ If given the `-V` option (`/V` on Windows), this program will print the version 
 
 The following table summarizes all the command line options available. (Note: on Windows computers, `/` must be used as the prefix character instead of the `-` dash character):
 
-| Short&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Long&nbsp;form&nbsp;opt | Meaning | Default |  |
-|---------- |-------------------|----------------------|---------|---|
+| Short&nbsp;&nbsp;&nbsp;&nbsp; | Long&nbsp;form | Meaning | Default |  |
+|------------------------------ |----------------|---------|---------|--|
 | `-a`_A_   | `--add-creds`_A_  | Add credentials for service _A_ and exit | | |
-| `-b`_B_   | `--base-name`_B_  | Write outputs to files named _B_-n | Use the base names of the image files | ⚑ |
-| `-c`      | `--compare`       | Compare text to ground truth | |
+| `-b`_B_   | `--base-name`_B_  | Write outputs to files named _B_-n | Use base names of image files | ⚑ |
+| `-c`      | `--compare`       | Compare to ground truth; also see `-r` | |
 | `-C`      | `--no-color`      | Don't color-code the output | Use colors in the terminal output |
 | `-e`      | `--extended`      | Produce extended results | Produce only results overview image | |
 | `-f`_F_   | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs on command line |
@@ -345,6 +349,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-l`      | `--list`          | Display known services and exit | | | 
 | `-o`_O_   | `--output`_O_     | Write outputs to directory _O_ | Directories where images are found | |
 | `-q`      | `--quiet`         | Don't print messages while working | Be chatty while working |
+| `-r`      | `--relaxed`       | Use looser criteria for `--compare` | |
 | `-s`_S_   | `--service`_S_    | Use recognition service _S_ | "all" | |
 | `-t`_T_   | `--threads`_T_    | Use _T_ number of threads | Use (#cores)/2 threads | |
 | `-V`      | `--version`       | Display program version info and exit | | |
@@ -413,6 +418,7 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python
 * [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
+* [textdistance](https://github.com/orsinium/textdistance) &ndash; compute distances between text sequences
 * [termcolor](https://pypi.org/project/termcolor/) &ndash; ANSI color formatting for output in terminal
 
 Finally, I am grateful for computing &amp; institutional resources made available by the California Institute of Technology.

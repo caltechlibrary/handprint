@@ -5,22 +5,20 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 
 [![Latest release](https://img.shields.io/github/v/release/caltechlibrary/handprint.svg?style=flat-square&color=b44e88&label=Latest%20release)](https://github.com/caltechlibrary/handprint/releases)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
-[![Python](https://img.shields.io/badge/Python-3.4+-brightgreen.svg?style=flat-square)](http://shields.io)
+[![Python](https://img.shields.io/badge/Python-3.5+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
 [![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1324)](https://data.caltech.edu/records/1324)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
 
 
-🏁 Log of recent changes
+❡ Log of recent changes
 -----------------------
 
-_Version 1.0.3_: This version fixes an internal bug involving the credentials file used for Amazon services.<br>
-_Version 1.0.2_: This version fixes an important [bug in how credential files are stored](https://github.com/caltechlibrary/handprint/issues/9).<br>
-_Version 1.0.1_: This version adds info for installing from PyPI, and fixes a bug writing files downloaded from URLs.
+_Version 1.1.0_: New options `-c` and `-r` added, allowing comparison of extracted text to expected (ground truth) text; see [the relevant section in this README file](#comparison-to-ground-truth-text) for more information. Also, the debug option `-@` now accepts an argument for where to send the debug output trace; the behavior change of `-@` is not backward compatible.  Finally, there are internal architectural and organizational changes.
 
-The file [CHANGES](CHANGES.md) contains a more complete change log that includes information about previous releases.
+The file [CHANGES](CHANGES.md) contains a more complete change log, and includes information about previous releases.
 
-Table of Contents
+§ Table of Contents
 -----------------
 
 * [Introduction](#-introduction)
@@ -32,6 +30,7 @@ Table of Contents
    * [Input files and URLs](#input-files-and-urls)
    * [Annotated output images](#annotated-output-images)
    * [Extended results](#extended-results)
+   * [Comparison to ground truth text](#comparison-to-ground-truth-text)
    * [Other options](#other-options)
    * [Command line options summary](#command-line-options-summary)
 * [Known issues and limitations](#known-issues-and-limitations)
@@ -41,7 +40,7 @@ Table of Contents
 * [Authors and history](#-authors-and-history)
 * [Acknowledgments](#︎-acknowledgments)
 
-☀ Introduction
+☞ Introduction
 -------------
 
 <img align="right" width="550px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/glaser-example-google.jpg">
@@ -50,7 +49,7 @@ Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a sma
 
 Handprint can work with individual images, directories of images, and URLs pointing to images on remote servers.  In addition to producing annotated images as output, it can output the raw results from an HTR service as JSON and text files.  Handprint can use multiple processor threads for parallel execution.
 
-✺ Installation and configuration
+✎ Installation and configuration
 -------------------------------
 
 The instructions below assume you have a Python interpreter installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system.
@@ -60,14 +59,19 @@ Handprint includes several adapters for working with cloud-based HTR services fr
 
 ### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
 
-The following is probably the simplest and most direct way to install the latest release of Handprint on your computer:
-```sh
-sudo python3 -m pip install handprint --upgrade
+On **Linux**, **macOS**, and **Windows** operating systems, you should be able to install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have the `pip` package or are uncertain if you do, first run the following command in a terminal command line interpreter: 
+```
+sudo python3 -m ensurepip
 ```
 
-Alternatively, you can install the latest version directly from the GitHub repository using the following command:
+Then, to install Handprint from the Python package repository, run the following command:
+```
+python3 -m pip install handprint --user --upgrade
+```
+
+As an alternative to getting it from PyPI, you can instruct `pip` to install Handprint directly from the GitHub repository:
 ```sh
-sudo python3 -m pip install git+https://github.com/caltechlibrary/handprint.git --upgrade
+python3 -m pip install git+https@github.com:caltechlibrary/handprint.git --user --upgrade
 ```
 
 
@@ -213,9 +217,45 @@ handprint tests/images/public-domain/H96566k.jpg
 The individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked.  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
 
 
-### Extended results
+### _Comparison to ground truth text_
 
-If the `-e` option `-e` (`/e` on Windows) is used, Handprint saves not only the overview image containing all the results, but also, individual annotated images for each service's results, the raw data (converted to a JSON file by Handprint), and the text extracted by the service.  These additional outputs will be written in files named after the original files with the addition of a string that indicates the service used.  For example, a file named `somefile.jpg` will produce
+Handprint supports comparing the output of HTR services to expected output (i.e., ground truth) using the option `-c` (or `/c` on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:
+
+* The file containing the expected results should be named `.gt.txt`, with a base name identical to the image file.  For example, an image file named `somefile.jpg` should have a corresponding text file `somefile.gt.txt`.
+* The ground-truth text file should be located in the same directory as the input image file.
+* The text should be line oriented, with each line representing a line of text in the image.
+* The text should be plain text only.  No Unicode or binary encodings.  (This limitation comes from the HTR services, which &ndash; as of this writing &ndash; return results in plain text format.)
+
+Handprint will write the comparison results to a tab-delimited file named after the input image and service but with the extension `.tsv`.  For example, for an input image `somefile.jpg` and results received from Google, the comparison results will be written to `somefile.google.tsv`.  The use of a tab-delimited format rather than comma-delimited format avoids the need to quote commas and other characters in the text.  The output file will have one row for each line of text in the input, plus an additional row at the end for total number of errors found.  Each row will have the following columns:
+
+1. number of errors on that line of text (computed as [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)),
+2. the _character error rate_ (CER) for the line (see below)
+3. the expected text on that line
+4. the text received from the service for that line
+
+The character error rate (CER) is computed as
+<p align="center">
+ 100&nbsp;&times;&nbsp;(<i>i</i> + <i>s</i> + <i>d</i>)/<i>n</i>
+</p>
+
+where _i_ is the number of inserted characters, _s_ the number of substituted characters, and _d_ the number of deleted characters needed to transform the the text received into the expected text, and _n_ is the number of characters in the expected text line.  This approach to normalizing the CER value is conventional but note that it **can lead to values greater than 100%**.
+
+By default, scoring is done by Handprint on an exact basis; character case is not changed, punctuation is not removed, and stop words are not removed.  However, multiple contiguous spaces are converted to one space, and leading spaces are removed from text lines.
+
+If given the option `-r` (`/r` on Windows), Handprint will relax the comparison algorithm further, as follows: it will convert all text to lower case, and it will ignore certain sentence punctuation characters, namely `,`, `.`, `:`, and `;`.  The rationale for these particular choices comes from experience with actual texts and HTR services.  For example, a difference sometimes seen between HTR services is how they handle seemingly large spaces between a word and a subsequent comma or period: sometimes the HTR service will add a space before the comma or period, but inspection of the input document will reveal sloppiness in the author's handwriting and neither the addition nor the omission of a space is provably right or wrong.  To avoid biasing the results one way or another, it is better to omit the punctuation.  On the other hand, this may not always be desirable, and thus needs to be a user-controlled option.
+
+Handprint attempts to cope with possibly-missing text in the HTR results by matching up likely corresponding lines in the expected and received results.  It does this by comparing each line of ground-truth text to each line of the HTR results using [longest common subsequence similarity](https://en.wikipedia.org/wiki/Longest_common_subsequence_problem) as implemented by the LCSSEQ function in the [textdistance](https://github.com/life4/textdistance) package.  If the lines do not pass a threshold score, Handprint looks at subsequent lines of the HTR results and tries to reestablish correspondence to ground truth.  If nothing else in the HTR results appear close enough to the expected ground-truth line, the line is assumed to be missing from the HTR results and scored appropriately.
+
+The following is an example of a tab-separated file produced using `-c`.  This example shows a case where two lines were missing entirely from the HTR results; for those lines, the number of errors equals the length of the ground-truth text lines and the CER is 100%.
+
+<p align="center">
+<img width="60%" src=".graphics/example-tsv-file.png">
+</p>
+
+
+### _Extended results_
+
+If the option `-e` (`/e` on Windows) is used, Handprint saves not only the overview image containing all the results, but also, individual annotated images for each service's results, the raw data (converted to a JSON file by Handprint), and the text extracted by the service.  These additional outputs will be written in files named after the original files with the addition of a string that indicates the service used.  For example, a file named `somefile.jpg` will produce
 
 ```
 somefile.png
@@ -287,7 +327,7 @@ Handprint produces color-coded diagnostic output as it runs, by default.  Howeve
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
 
-If given the `-@` option (`/@` on Windows), this program will print additional diagnostic output as it runs; in addition, it will start the Python debugger (`pdb`) when an exception occurs, instead of simply exiting.  *Important*: some Python version/platform combinations seem to crash outright if `pdb` is invoked in a process thread &ndash; something that is likely to happen if you are debugging the execution of Handprint. Consequently, Handprint's debug mode (via the `-@` option) almost always has to be combined with `-t 1` to make Handprint use only one thread.
+If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing, and will also invoke [`pdb`](https://docs.python.org/library/pdb.html) upon the occurrence of any errors.  The trace will be written to the given destination, which can be a dash character (`-`) to indicate console output, or a file path.  *Important*: some Python version/platform combinations crash if `pdb` is invoked in a process thread &ndash; which is likely to happen if you are debugging the execution of Handprint. Consequently, to avoid this risk, **always use `-t 1` when debugging** to make Handprint use only one thread.
 
 If given the `-V` option (`/V` on Windows), this program will print the version and other information, and exit without doing anything else.
 
@@ -296,24 +336,27 @@ If given the `-V` option (`/V` on Windows), this program will print the version 
 
 The following table summarizes all the command line options available. (Note: on Windows computers, `/` must be used as the prefix character instead of the `-` dash character):
 
-| Short    | Long&nbsp;form&nbsp;opt&nbsp;&nbsp;&nbsp; | Meaning | Default |  |
-|----------|-------------------|----------------------|---------|---|
-| `-a`_A_  | `--add-creds`_A_  | Add credentials for service _A_ and exit | | |
-| `-b`_B_  | `--base-name`_B_  | Write outputs to files named _B_-n | Use the base names of the image files | ⚑ |
-| `-C`     | `--no-color`      | Don't color-code the output | Use colors in the terminal output |
-| `-e`     | `--extended`      | Produce extended results | Produce only results overview image | |
-| `-f`_F_  | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs on command line |
-| `-G`     | `--no-grid`       | Do not produce results overview image | Produce an _N_&times;_N_ grid image| |
-| `-h`     | `--help`          | Display help text and exit | | |
-| `-l`     | `--list`          | Display list of known services and exit | | | 
-| `-o`_O_  | `--output`_O_     | Write outputs to directory _O_ | Directories where images are found | |
-| `-q`     | `--quiet`         | Don't print messages while working | Be chatty while working |
-| `-s`_S_  | `--service`_S_    | Use recognition service _S_ | "all" | |
-| `-t`_T_  | `--threads`_T_    | Use _T_ number of threads | Use #cores/2 threads | |
-| `-V`     | `--version`       | Display program version info and exit | | |
-| `-@`     | `--debug`         | Debugging mode | Normal mode | |
+| Short&nbsp;&nbsp;&nbsp;&nbsp; | Long&nbsp;form | Meaning | Default |  |
+|------------------------------ |----------------|---------|---------|--|
+| `-a`_A_   | `--add-creds`_A_  | Add credentials for service _A_ and exit | | |
+| `-b`_B_   | `--base-name`_B_  | Write outputs to files named _B_-n | Use base names of image files | ⚑ |
+| `-c`      | `--compare`       | Compare to ground truth; also see `-r` | |
+| `-C`      | `--no-color`      | Don't color-code the output | Use colors in the terminal output |
+| `-e`      | `--extended`      | Produce extended results | Produce only results overview image | |
+| `-f`_F_   | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs on command line |
+| `-G`      | `--no-grid`       | Don't produce results summary image | Produce an _N_&times;_N_ grid image| |
+| `-h`      | `--help`          | Display help text and exit | | |
+| `-l`      | `--list`          | Display known services and exit | | | 
+| `-o`_O_   | `--output`_O_     | Write outputs to directory _O_ | Directories where images are found | |
+| `-q`      | `--quiet`         | Don't print messages while working | Be chatty while working |
+| `-r`      | `--relaxed`       | Use looser criteria for `--compare` | |
+| `-s`_S_   | `--service`_S_    | Use recognition service _S_ | "all" | |
+| `-t`_T_   | `--threads`_T_    | Use _T_ number of threads | Use (#cores)/2 threads | |
+| `-V`      | `--version`       | Display program version info and exit | | |
+| `-@`_OUT_ | `--debug`_OUT_    | Debugging mode; write trace to _OUT_ | Normal mode | ⬥ |
 
-⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpg`, `document-1.google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.
+⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpg`, `document-1.google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.<br>
+⬥ &nbsp; To write to the console, use the character `-` as the value of _OUT_; otherwise, _OUT_ must be the name of a file where the output should be written.
 
 
 ⚑ Known issues and limitations
@@ -337,26 +380,26 @@ If you find an issue, please submit it in [the GitHub issue tracker](https://git
 I would be happy to receive your help and participation with enhancing Handprint!  Please visit the [guidelines for contributing](CONTRIBUTING.md) for some tips on getting started.
 
 
-☮︎ License
+⧴ License
 ---------
 
 Copyright (C) 2018&ndash;2019, Caltech.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
 
 
-❡ Authors and history
+☺︎ Authors and history
 --------------------
 
 [Mike Hucka](https://github.com/mhucka) designed and implemented Handprint beginning in mid-2018.
 
 
-☺︎ Acknowledgments
+♡ Acknowledgments
 -----------------------
 
 The [vector artwork](https://thenounproject.com/search/?q=hand&i=733265) of a hand used as a logo for Handprint was created by [Kevin](https://thenounproject.com/kevn/) from the Noun Project.  It is licensed under the Creative Commons [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/) license.
 
 Handprint benefitted from feedback from several people, notably from Tommy Keswick, Mariella Soprano, Peter Collopy and Stephen Davison.
 
-Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Turf with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
+Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Handprint with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
@@ -369,12 +412,15 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [imagesize](https://github.com/shibukawa/imagesize_py) &ndash; determine the dimensions of an image
 * [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
 * [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
+* [numpy](https://numpy.org) &ndash; package for scientific computing in Python
 * [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library
 * [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
 * [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python
 * [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
+* [StringDist](https://github.com/obulkin/string-dist) &ndash; library for calculating string distances
+* [textdistance](https://github.com/orsinium/textdistance) &ndash; compute distances between text sequences
 * [termcolor](https://pypi.org/project/termcolor/) &ndash; ANSI color formatting for output in terminal
 
 Finally, I am grateful for computing &amp; institutional resources made available by the California Institute of Technology.

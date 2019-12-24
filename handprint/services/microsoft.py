@@ -19,7 +19,7 @@ from handprint.network import net
 
 
 # Main class.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 class MicrosoftTR(TextRecognition):
     def __init__(self):
@@ -46,7 +46,7 @@ class MicrosoftTR(TextRecognition):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'lightblue2'
+        return 'lightBlue2'
 
 
     def max_rate(self):

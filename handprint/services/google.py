@@ -22,7 +22,7 @@ from handprint.debug import log
 
 
 # Main class.
-# -----------------------------------------------------------------------------
+# .............................................................................
 # The self._results property is a dictionary used to cache the results for
 # a given file.  This is to avoid using API calls to get the different
 # subelements of the results.
@@ -61,7 +61,7 @@ class GoogleTR(TextRecognition):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'deepskyblue1'
+        return 'deepSkyBlue1'
 
 
     def max_rate(self):
@@ -128,7 +128,6 @@ class GoogleTR(TextRecognition):
                 response = getattr(client, feature)(image = image, image_context = context)
                 if __debug__: log('received result.')
                 result[feature] = MessageToDict(response)
-            full_text = ''
 
             # Extract text and bounding boxes into our format.
             # Their structure looks like this:

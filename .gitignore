@@ -60,7 +60,7 @@ TAGS
 
 *.pyc
 __pycache__
-
+*.egg-info
 
 # Project-specific things to ignore:
 # .............................................................................

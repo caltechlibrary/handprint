@@ -19,7 +19,7 @@ from handprint.network import net
 
 
 # Main class.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 class AmazonTR(TextRecognition):
     '''Base class for Amazon text recognition services.'''
@@ -137,7 +137,7 @@ class AmazonTextractTR(AmazonTR):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'lightgoldenrod4'
+        return 'lightGoldenrod4'
 
 
     def result(self, file_path):
@@ -165,7 +165,7 @@ class AmazonRekognitionTR(AmazonTR):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'darkorange3'
+        return 'darkOrange3'
 
 
     def result(self, file_path):
@@ -181,7 +181,7 @@ class AmazonRekognitionTR(AmazonTR):
 
 
 # Miscellaneous utilities.
-# -----------------------------------------------------------------------------
+# .............................................................................
 
 def corner_list(polygon, width, height):
     '''Takes a boundingBox value from Google vision's JSON output and returns

@@ -14,6 +14,10 @@ from handprint.files import readable
 from .base import Credentials
 from .credentials_files import credentials_filename
 
+
+# Main class.
+# .............................................................................
+
 class AmazonCredentials(Credentials):
     def __init__(self):
         cfile = path.join(self.credentials_dir(), credentials_filename('amazon'))

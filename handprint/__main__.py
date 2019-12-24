@@ -41,6 +41,7 @@ import sys
 from   sys import exit as exit
 
 import handprint
+from handprint.cpus import available_cpus
 from handprint.credentials import Credentials
 from handprint.debug import set_debug, log
 from handprint.exceptions import *
@@ -48,9 +49,10 @@ from handprint.files import filename_extension, files_in_directory, is_url
 from handprint.files import readable, writable
 from handprint.main_body import MainBody
 from handprint.manager import Manager
-from handprint.messages import MessageHandlerCLI, styled
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
+from handprint.styled import styled
+from handprint.ui import UI, inform, alert, warn
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
 disable_ssl_cert_check()
@@ -60,26 +62,28 @@ disable_ssl_cert_check()
 # .............................................................................
 
 @plac.annotations(
-    add_creds  = ('add credentials file for service "A"',            'option', 'a'),
-    base_name  = ('use base name "B" to name downloaded images',     'option', 'b'),
-    no_color   = ('do not color-code terminal output',               'flag',   'C'),
-    extended   = ('produce extended results (text file, JSON data)', 'flag',   'e'),
-    from_file  = ('read list of images or URLs from file "F"',       'option', 'f'),
-    no_grid    = ('do not create all-results grid image',            'flag',   'G'),
-    list       = ('print list of known services',                    'flag',   'l'),
-    output_dir = ('write output to directory "O"',                   'option', 'o'),
-    quiet      = ('only print important messages while working',     'flag',   'q'),
-    services   = ('invoke HTR/OCR service "S" (default: "all")',     'option', 's'),
-    threads    = ('number of threads to use (default: #cores/2)',    'option', 't'),
-    version    = ('print version info and exit',                     'flag',   'V'),
-    debug      = ('turn on debug tracing & exception catching',      'flag',   '@'),
+    add_creds  = ('add credentials file for service "A"',              'option', 'a'),
+    base_name  = ('use base name "B" to name downloaded images',       'option', 'b'),
+    compare    = ('compare text results to ground truth files',        'flag',   'c'),
+    no_color   = ('do not color-code terminal output',                 'flag',   'C'),
+    extended   = ('produce extended results (text file, JSON data)',   'flag',   'e'),
+    from_file  = ('read list of images or URLs from file "F"',         'option', 'f'),
+    no_grid    = ('do not create all-results grid image',              'flag',   'G'),
+    list       = ('print list of known services',                      'flag',   'l'),
+    output_dir = ('write output to directory "O"',                     'option', 'o'),
+    quiet      = ('only print important messages while working',       'flag',   'q'),
+    relaxed    = ('make --compare use more relaxed criteria',          'flag',   'r'),
+    services   = ('invoke HTR/OCR service "S" (default: "all")',       'option', 's'),
+    threads    = ('number of threads to use (default: #cores/2)',      'option', 't'),
+    version    = ('print version info and exit',                       'flag',   'V'),
+    debug      = ('write detailed trace to "OUT" ("-" means console)', 'option', '@'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
 
-def main(add_creds = 'A', base_name = 'B', no_color = False, extended = False,
-         from_file = 'F', no_grid = False, list = False, output_dir = 'O',
-         quiet = False, services = 'S', threads = 'T', version = False,
-         debug = False, *files):
+def main(add_creds = 'A', base_name = 'B', compare = False, no_color = False,
+         extended = False, from_file = 'F', no_grid = False, list = False,
+         output_dir = 'O', quiet = False, relaxed = False, services = 'S',
+         threads = 'T', version = False, debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -137,10 +141,12 @@ size accepted by any of the services invoked if an image exceeds that size.
 accepts files up to 5 MB, all input images will be resized to 5 MB before
 sending them to A and B, even if A could accept a higher-resolution image.)
 
-The default action is to run all known services; the option -s (/s on
+The default action is to run all known services.  The option -s (/s on
 Windows) can be used to select only one service or a list of services
 instead.  Lists of services should be separated by commas; e.g.,
-"google,microsoft".
+"google,microsoft".  To find out which services are supported by Handprint, run
+it with the command-line flag -l (or /l on Windows), which will make Handprint
+print a list of the known services and exit immediately.
 
 When performing OCR/HTR on images, Handprint temporarily (unless the -e
 option is given -- see below) writes the results to new files that it creates
@@ -155,10 +161,13 @@ named "somefile.jpg" will result in
   somefile.amazon.png
   ...
 
-and so on for each image and each service used.  These files are deleted
-after the final results grid image is created, unless the -e option (/e on
+and so on for each image and each service used.  THESE FILES ARE DELETED
+after the final results grid image is created, UNLESS the -e option (/e on
 Windows) is used to indicate that extended results should be produced; in that
 case, these individual annotated image files are kept.
+
+Visual display of recognition results
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After gathering the results of each service for a given input, Handprint will
 create a single compound image consisting of all the annotated results images
@@ -219,8 +228,65 @@ services and written to "document-N.png", and the URL corresponding to each
 document will be written in a file named "document-N.url" so that it is
 possible to connect each "document-N.png" to the URL it came from.
 
-Finally, note that the use of the -G option (/G on Windows) WITHOUT the -e
-option is an error because it means no output would be produced.
+Finally, note that the use of the -G option (/G on Windows) WITHOUT either
+the -e or -c option is an error because it means no output would be produced.
+
+Comparing results to expected output
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Handprint supports comparing the output of HTR services to expected output
+(i.e., ground truth) using the option -c (or /c on Windows).  This facility
+requires that the user provides text files that contain the expected text
+for each input image.  The ground-truth text files must have the following
+characteristics:
+
+ a) The file containing the expected results should be named ".gt.txt", with
+    a base name identical to the image file.  For example, an image file named
+    "somefile.jpg" should have a corresponding text file "somefile.gt.txt".
+
+ b) The ground-truth text file should be located in the same directory as the
+    input image file.
+
+ c) The text should be line oriented, with each line representing a line of
+    text in the image.
+
+ d) The text should be plain text only.  No Unicode or binary encodings.
+    (This limitation comes from the HTR services, which -- as of this
+    writing -- return results in plain text format.)
+
+Handprint will write the comparison results to a tab-delimited file named
+after the input image and service but with the extension ".tsv".  For
+example, for an input image "somefile.jpg" and results received from Google,
+the comparison results will be written to "somefile.google.tsv".  (The use of
+a tab-delimited format rather than comma-delimited format avoids the need to
+quote commas and other characters in the text.)
+
+Handprint reports, for each text line, the number of errors (the Levenshtein
+edit distance) and the character error rate (CER), and at the end it also
+reports a sum total of errors.  The CER is computed as the Levenshtein edit
+distance of each line divided by the number of characters in the expected
+line text, multiplied by 100; this approach to normalizing the CER value is
+conventional but note that it can lead to values greater than 100%.
+
+By default, comparisons are done on an exact basis; character case is not
+changed, punctuation is not removed, and stop words are not removed.
+However, multiple contiguous spaces are converted to one space, and leading
+spaces are removed from text lines.  If given the option -r (/r on Windows),
+Handprint will relax the comparison algorithm as follows:
+
+ i) convert all text to lower case
+ ii) ignore certain sentence punctuation characters, namely , . : ;
+
+Handprint attempts to cope with possibly-missing text in the HTR results by
+matching up likely corresponding lines in the expected and received results.
+It does this by comparing each line of ground-truth text to each line of the
+HTR results using longest common subsequence similarity, as implemented by
+the LCSSEQ function in the Python "textdistance" package.  If the lines do
+not pass a threshold score, Handprint looks at subsequent lines of the HTR
+results and tries to reestablish correspondence to ground truth.  If nothing
+else in the HTR results appear close enough to the expected ground-truth
+line, the line is assumed to be missing from the HTR results and scored
+appropriately.
 
 Additional command-line arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -241,9 +307,11 @@ Handprint within subshells inside other environments such as Emacs.)
 If given the -V option (/V on Windows), this program will print the version
 and other information, and exit without doing anything else.
 
-If given the -@ option (/@ on Windows), this program will print additional
-diagnostic output as it runs; in addition, it will start the Python debugger
-(pdb) when an exception occurs, instead of simply exiting.
+If given the -@ argument (/@ on Windows), this program will output a detailed
+trace of what it is doing to the terminal window, and will also drop into a
+debugger upon the occurrence of any errors.  The debug trace will be sent to
+the given destination, which can be '-' to indicate console output, or a file
+path to send the output to a file.
 
 Command-line arguments summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -251,84 +319,101 @@ Command-line arguments summary
 
     # Initial setup -----------------------------------------------------------
 
-    say = MessageHandlerCLI(not no_color, quiet)
+    debugging = debug != 'OUT'
+    use_color = not no_color
+    make_grid = not no_grid
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = '(Hint: use {}h for help.)'.format(prefix)
-    make_grid = not no_grid
+    ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test', False, use_color, quiet)
 
     # Preprocess arguments and handle early exits -----------------------------
 
-    if debug:
-        set_debug(True)
+    if debugging:
+        set_debug(True, debug)
+
     if version:
         print_version()
-        exit()
+        exit(0)
     if list:
-        say.info('Known services: {}'.format(', '.join(services_list())))
-        exit()
+        inform('Known services: {}', ', '.join(services_list()))
+        exit(0)
+
+    print_intro(ui)
 
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
-            exit(say.error_text('Unknown service: "{}". {}'.format(service, hint)))
+            alert('Unknown service: "{}". {}', service, hint)
+            exit(1)
         if not files or len(files) > 1:
-            exit(say.error_text('Option {}a requires one file. {}'.format(prefix, hint)))
+            alert('Option {}a requires one file. {}', prefix, hint)
+            exit(1)
         creds_file = files[0]
         if not readable(creds_file):
-            exit(say.error_text('File not readable: {}'.format(creds_file)))
+            alert('File not readable: {}', creds_file)
+            exit(1)
         Credentials.save_credentials(service, creds_file)
-        exit(say.info_text('Saved credentials for service "{}".'.format(service)))
-
-    if no_grid and not extended:
-        exit(say.error_text('{}G without {}e produces no output. {}'.format(
-            prefix, prefix, hint)))
+        inform('Saved credentials for service "{}".', service)
+        exit(0)
+    if no_grid and not extended and not compare:
+        alert('{0}G without {0}e or {0}c produces no output. {1}', prefix, hint)
+        exit(1)
     if any(item.startswith('-') for item in files):
-        exit(say.error_text('Unrecognized option in arguments. {}'.format(hint)))
+        alert('Unrecognized option in arguments. {}', hint)
+        exit(1)
     if not files and from_file == 'F':
-        exit(say.error_text('Need provide images or URLs. {}'.format(hint)))
+        alert('Need images or URLs to have something to do. {}', hint)
+        exit(1)
+    if relaxed and not compare:
+        warn('Option {0}r without {0}c has no effect. {1}', prefix, hint)
 
     services = services_list() if services == 'S' else services.lower().split(',')
     if not all(s in services_list() for s in services):
-        exit(say.error_text('"{}" is not a known services. {}'.format(services, hint)))
+        alert('"{}" is not a known services. {}', services, hint)
+        exit(1)
 
     base_name  = 'document' if base_name == 'B' else base_name
     from_file  = None if from_file == 'F' else from_file
     output_dir = None if output_dir == 'O' else output_dir
+    compare    = 'relaxed' if (compare and relaxed) else compare
+    threads    = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
 
     # Do the real work --------------------------------------------------------
 
     try:
-        print_intro(say)
-        body = MainBody(base_name, extended, from_file, output_dir, threads, say)
-        body.run(services, files, make_grid)
+        body = MainBody(base_name, extended, from_file, output_dir, threads)
+        body.run(services, files, make_grid, compare)
     except (KeyboardInterrupt, UserCancelled) as ex:
         if __debug__: log('received {}', sys.exc_info()[0].__name__)
-        exit(say.info_text('Quitting.'))
+        inform('Quitting.')
+        exit(0)
     except Exception as ex:
-        if debug:
+        if debugging:
             import traceback
-            say.error('{}\n{}'.format(str(ex), traceback.format_exc()))
+            alert('{}\n{}', str(ex), traceback.format_exc())
             import pdb; pdb.set_trace()
         else:
-            exit(say.error_text(str(ex)))
-    say.info('Done.')
+            alert(str(ex))
+            exit(2)
+    inform('Done.')
 
 
 # Helper functions.
 # .............................................................................
 
 def print_version():
-    print('{} version {}'.format(handprint.__title__, handprint.__version__))
-    print('Author: {}'.format(handprint.__author__))
-    print('URL: {}'.format(handprint.__url__))
-    print('License: {}'.format(handprint.__license__))
+    this_module = sys.modules[__package__]
+    print('{} version {}'.format(this_module.__name__, this_module.__version__))
+    print('Authors: {}'.format(this_module.__author__))
+    print('URL: {}'.format(this_module.__url__))
+    print('License: {}'.format(this_module.__license__))
     print('')
     print('Known services: {}'.format(', '.join(services_list())))
     print('Credentials are stored in {}'.format(Credentials.credentials_dir()))
 
 
-def print_intro(say):
-    if say.use_color():
+def print_intro(ui):
+    if ui.use_color():
         cb = ['chartreuse', 'bold']
         name = styled('Handprint', cb)
         acronym = '{}written {}age {}ecognit{}o{} {}est'.format(
@@ -337,9 +422,9 @@ def print_intro(say):
     else:
         name = 'Handprint'
         acronym = 'HANDwritten Page RecognItioN Test'
-    say.info('┏' + '━'*68 + '┓')
-    say.info('┃    Welcome to {}, the {}!    ┃'.format(name, acronym))
-    say.info('┗' + '━'*68 + '┛')
+    inform('┏' + '━'*68 + '┓')
+    inform('┃    Welcome to {}, the {}!    ┃', name, acronym)
+    inform('┗' + '━'*68 + '┛')
 
 
 # Main entry point.

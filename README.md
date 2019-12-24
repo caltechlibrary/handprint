@@ -412,12 +412,14 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [imagesize](https://github.com/shibukawa/imagesize_py) &ndash; determine the dimensions of an image
 * [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
 * [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
+* [numpy](https://numpy.org) &ndash; package for scientific computing in Python
 * [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library
 * [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
 * [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python
 * [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
+* [StringDist](https://github.com/obulkin/string-dist) &ndash; library for calculating string distances
 * [textdistance](https://github.com/orsinium/textdistance) &ndash; compute distances between text sequences
 * [termcolor](https://pypi.org/project/termcolor/) &ndash; ANSI color formatting for output in terminal
 

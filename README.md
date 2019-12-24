@@ -104,7 +104,7 @@ handprint -a microsoft myazurecredentials.json
 
 Credentials for using a Google service account need to be stored in a JSON file that contains many fields.  The overall format looks like this:
 
-```
+```json
 {
   "type": "service_account",
   "project_id": "theid",
@@ -249,7 +249,7 @@ Handprint attempts to cope with possibly-missing text in the HTR results by matc
 The following is an example of a tab-separated file produced using `-c`.  This example shows a case where two lines were missing entirely from the HTR results; for those lines, the number of errors equals the length of the ground-truth text lines and the CER is 100%.
 
 <p align="center">
-<img width="60%" src=".graphics/example-tsv-file.png">
+<img width="60%" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/example-tsv-file.png">
 </p>
 
 

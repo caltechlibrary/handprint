@@ -315,8 +315,7 @@ path to send the output to a file.
 
 Command-line arguments summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    '''
+'''
 
     # Initial setup -----------------------------------------------------------
 

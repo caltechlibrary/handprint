@@ -86,7 +86,7 @@ class MainBody(object):
                ', '.join(services), num_targets, 's' if num_targets > 1 else '')
         if self._extended:
             inform('Will save extended results.')
-        inform('Will use {} process threads.', threads)
+        inform('Will use up to {} process threads.', threads)
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')

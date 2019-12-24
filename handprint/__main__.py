@@ -339,6 +339,8 @@ Command-line arguments summary
         inform('Known services: {}', ', '.join(services_list()))
         exit(0)
 
+    print_intro(ui)
+
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
@@ -361,7 +363,7 @@ Command-line arguments summary
         alert('Unrecognized option in arguments. {}', hint)
         exit(1)
     if not files and from_file == 'F':
-        alert('Need provide images or URLs. {}', hint)
+        alert('Need images or URLs to have something to do. {}', hint)
         exit(1)
     if relaxed and not compare:
         warn('Option {0}r without {0}c has no effect. {1}', prefix, hint)
@@ -380,7 +382,6 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     try:
-        print_intro(ui)
         body = MainBody(base_name, extended, from_file, output_dir, threads)
         body.run(services, files, make_grid, compare)
     except (KeyboardInterrupt, UserCancelled) as ex:

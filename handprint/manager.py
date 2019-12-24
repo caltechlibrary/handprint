@@ -262,12 +262,13 @@ class Manager:
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')
             report_path = alt_extension(image.item_file, str(service) + '.tsv')
+            relaxed = (self._compare == 'relaxed')
             if readable(gt_file) and nonempty(gt_file):
                 with open(gt_file, 'r') as f:
                     if __debug__: log('reading ground truth from {}', gt_file)
                     gt_text = f.read()
                 inform('Saving {} comparison to ground truth', service_name)
-                self._save(text_comparison(output.text, gt_text), report_path)
+                self._save(text_comparison(output.text, gt_text, relaxed), report_path)
             elif not nonempty(gt_file):
                 warn('Skipping {} comparison because {} is empty',
                      service_name, relative(gt_file))

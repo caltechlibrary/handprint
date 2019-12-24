@@ -52,7 +52,7 @@ from handprint.manager import Manager
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
 from handprint.styled import styled
-from handprint.ui import UI, inform, alert
+from handprint.ui import UI, inform, alert, warn
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
 disable_ssl_cert_check()
@@ -72,6 +72,7 @@ disable_ssl_cert_check()
     list       = ('print list of known services',                      'flag',   'l'),
     output_dir = ('write output to directory "O"',                     'option', 'o'),
     quiet      = ('only print important messages while working',       'flag',   'q'),
+    relaxed    = ('make --compare use more relaxed criteria',          'flag',   'r'),
     services   = ('invoke HTR/OCR service "S" (default: "all")',       'option', 's'),
     threads    = ('number of threads to use (default: #cores/2)',      'option', 't'),
     version    = ('print version info and exit',                       'flag',   'V'),
@@ -81,8 +82,8 @@ disable_ssl_cert_check()
 
 def main(add_creds = 'A', base_name = 'B', compare = False, no_color = False,
          extended = False, from_file = 'F', no_grid = False, list = False,
-         output_dir = 'O', quiet = False, services = 'S', threads = 'T',
-         version = False, debug = 'OUT', *files):
+         output_dir = 'O', quiet = False, relaxed = False, services = 'S',
+         threads = 'T', version = False, debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -267,10 +268,14 @@ distance of each line divided by the number of characters in the expected
 line text, multiplied by 100; this approach to normalizing the CER value is
 conventional but note that it can lead to values greater than 100%.
 
-Comparisons are done on an exact basis; character case is not changed,
-punctuation is not removed, and stop words are not removed.  However,
-multiple contiguous spaces are converted to one space, and leading spaces are
-removed from text lines.
+By default, comparisons are done on an exact basis; character case is not
+changed, punctuation is not removed, and stop words are not removed.
+However, multiple contiguous spaces are converted to one space, and leading
+spaces are removed from text lines.  If given the option -r (/r on Windows),
+Handprint will relax the comparison algorithm as follows:
+
+ i) convert all text to lower case
+ ii) ignore certain sentence punctuation characters, namely , . : ;
 
 Handprint attempts to cope with possibly-missing text in the HTR results by
 matching up likely corresponding lines in the expected and received results.
@@ -310,7 +315,8 @@ path to send the output to a file.
 
 Command-line arguments summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-'''
+
+    '''
 
     # Initial setup -----------------------------------------------------------
 
@@ -332,6 +338,7 @@ Command-line arguments summary
     if list:
         inform('Known services: {}', ', '.join(services_list()))
         exit(0)
+
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
@@ -348,7 +355,7 @@ Command-line arguments summary
         inform('Saved credentials for service "{}".', service)
         exit(0)
     if no_grid and not extended and not compare:
-        alert('{0}G without {0}e or {0}c produces no output. {}', prefix, hint)
+        alert('{0}G without {0}e or {0}c produces no output. {1}', prefix, hint)
         exit(1)
     if any(item.startswith('-') for item in files):
         alert('Unrecognized option in arguments. {}', hint)
@@ -356,6 +363,8 @@ Command-line arguments summary
     if not files and from_file == 'F':
         alert('Need provide images or URLs. {}', hint)
         exit(1)
+    if relaxed and not compare:
+        warn('Option {0}r without {0}c has no effect. {1}', prefix, hint)
 
     services = services_list() if services == 'S' else services.lower().split(',')
     if not all(s in services_list() for s in services):
@@ -365,6 +374,7 @@ Command-line arguments summary
     base_name  = 'document' if base_name == 'B' else base_name
     from_file  = None if from_file == 'F' else from_file
     output_dir = None if output_dir == 'O' else output_dir
+    compare    = 'relaxed' if (compare and relaxed) else compare
     threads    = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
 
     # Do the real work --------------------------------------------------------

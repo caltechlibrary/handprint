@@ -10,6 +10,7 @@ Version 1.1.0
 * Change the debug option `-@` to accept an argument for where to send the debug output trace. The behavior change of `-@` is not backward compatible.
 * Internally, package metadata is now stored in `setup.cfg`.  Also, there is no `handprint/__version__.py` anymore, and instead, some special code in `handprint/__init__.py` extracts package-level variables directly from the installation created by `pip`.
 * Most test images have been removed from `tests/images` and put instead in a more organized fashion in a separate repository, [htr-test-cases](https://github.com/caltechlibrary/htr-test-cases/).
+* Add some missing package imports.
 
 
 Version 1.0.3

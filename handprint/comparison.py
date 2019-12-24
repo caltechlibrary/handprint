@@ -43,11 +43,13 @@ Line.__doc__ = '''Data about one line in the comparison results.
 
 _SIMILARITY_THRESHOLD = 0.5
 
+_PUNCTUATION_REMOVER = str.maketrans('', '', '.,:;')
+
 
 # Main functions.
 # .............................................................................
 
-def text_comparison(htr_text, gt_text):
+def text_comparison(htr_text, gt_text, relaxed = False):
     '''Compare the HTR result text in "htr_text" with the expected ground truth
     text in "gt_text".  Returns a tab-separated table describing the results.
 
@@ -109,6 +111,12 @@ def text_comparison(htr_text, gt_text):
     htr_index = 0
     results   = []
 
+    if relaxed:
+        gt_lines  = [text.lower() for text in gt_lines]
+        gt_lines  = [text.translate(_PUNCTUATION_REMOVER) for text in gt_lines]
+        htr_lines = [text.lower() for text in htr_lines]
+        htr_lines = [text.translate(_PUNCTUATION_REMOVER) for text in htr_lines]
+
     for gt_line in gt_lines:
         htr_line = htr_lines[htr_index]
         if lcsseq_score(gt_line, htr_line) >= _SIMILARITY_THRESHOLD:
@@ -148,14 +156,14 @@ def text_comparison(htr_text, gt_text):
                 break
 
     # We return data as 4 columns.
-    output = ['# Errors\tCER (%)\tExpected text\tActual text']
+    output = ['Errors\tCER (%)\tExpected text\tReceived text']
     total_errors = 0
     for line in results:
         total_errors += line.distance
         output.append('{}\t{}\t{}\t{}'.format(
             line.distance, line.cer, line.gt_text, line.htr_text))
     # Append total errors count, and we're done.
-    output.append('Total # errors\t\t\t')
+    output.append('Total errors\t\t\t')
     output.append(str(total_errors) + '\t\t\t')
     return '\n'.join(output)
 

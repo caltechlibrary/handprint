@@ -100,8 +100,11 @@ def image_dimensions(file):
         warnings.simplefilter('ignore')
         im = Image.open(file)
         if not im:
+            im.close()
             return (0, 0)
-        return im.size
+        the_size = im.size
+        im.close()
+        return the_size
 
 
 def reduced_image_size(orig_file, dest_file, max_size):

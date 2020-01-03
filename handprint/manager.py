@@ -324,7 +324,7 @@ class Manager:
         if not file:
             return None
         file_ext = filename_extension(file)
-        if file.find('-reduced') > 0:
+        if '-reduced' in file:
             new_file = file
         else:
             new_file = filename_basename(file) + '-reduced' + file_ext
@@ -348,7 +348,7 @@ class Manager:
     def _resized_image(self, file):
         (max_width, max_height) = self._max_dimensions
         file_ext = filename_extension(file)
-        if file.find('-reduced') > 0:
+        if '-reduced' in file:
             new_file = file
         else:
             new_file = filename_basename(file) + '-reduced' + file_ext

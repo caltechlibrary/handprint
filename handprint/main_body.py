@@ -56,7 +56,7 @@ class MainBody(object):
                     raise RuntimeError('Directory not writable: {}'.format(output_dir))
             else:
                 os.mkdir(output_dir)
-                if __debug__: log('Created output_dir directory {}', output_dir)
+                if __debug__: log('created output_dir directory {}', output_dir)
 
         self._base_name  = base_name
         self._extended   = extended
@@ -103,11 +103,11 @@ class MainBody(object):
     def targets_from_arguments(self, files, from_file):
         targets = []
         if from_file:
-            if __debug__: log('Opening {}', from_file)
+            if __debug__: log('opening {}', from_file)
             with open(from_file) as f:
                 targets = f.readlines()
             targets = [line.rstrip('\n') for line in targets]
-            if __debug__: log('Read {} lines from {}.', len(targets), from_file)
+            if __debug__: log('read {} lines from {}.', len(targets), from_file)
         else:
             for item in files:
                 if is_url(item):

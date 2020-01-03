@@ -1,6 +1,15 @@
 Change log for Handprint
 ========================
 
+Version 1.2.0
+--------------
+
+* This version changes the way output files are named.  The new scheme always includes the string `handprint` in the file name for easier recognition and to help reduce the chances of file name collisions.  The scheme uses the naming pattern `somefile.handprint.png` for
+the rescaled image, `somefile.handprint-service.ext` for the
+various service outputs, and `somefile.handprint-all.png` for the
+summary grid image.
+
+
 Version 1.1.0
 --------------
 

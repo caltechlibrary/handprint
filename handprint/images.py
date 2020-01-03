@@ -125,8 +125,10 @@ def reduced_image_size(orig_file, dest_file, max_size):
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
             if __debug__: log('resizing image to {}', new_dims)
             resized = im.resize(new_dims, Image.HAMMING)
+            if __debug__: log('saving resized image to {}', dest_file)
+            if orig_file == dest_file:
+                im.seek(0)
             resized.save(dest_file)
-            if __debug__: log('saved resized image to {}', dest_file)
             return (dest_file, None)
         except Exception as ex:
             return (None, str(ex))
@@ -150,14 +152,16 @@ def reduced_image_dimensions(orig_file, dest_file, max_width, max_height):
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
             if __debug__: log('resizing image to {}', new_dims)
             resized = im.resize(new_dims, Image.HAMMING)
+            if __debug__: log('saving re-dimensioned image to {}', dest_file)
+            if orig_file == dest_file:
+                im.seek(0)
             resized.save(dest_file)
-            if __debug__: log('saved re-dimensioned image to {}', dest_file)
             return (dest_file, None)
         except Exception as ex:
             return (None, str(ex))
 
 
-def converted_image(file, to_format, dest_file = None):
+def converted_image(orig_file, to_format, dest_file = None):
     '''Returns a tuple of (success, output file, error message).
     Returns a tuple of (new_file, error).  The value of 'error' will be None
     if no error occurred; otherwise, the value will be a string summarizing the
@@ -170,10 +174,13 @@ def converted_image(file, to_format, dest_file = None):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         try:
-            im = Image.open(file)
+            im = Image.open(orig_file)
+            if __debug__: log('converting {} to RGB', orig_file)
             im.convert('RGB')
+            if __debug__: log('saving converted image to {}', dest_file)
+            if orig_file == dest_file:
+                im.seek(0)
             im.save(dest_file, canonical_format_name(to_format))
-            if __debug__: log('saved converted image to {}', dest_file)
             return (dest_file, None)
         except Exception as ex:
             return (None, str(ex))

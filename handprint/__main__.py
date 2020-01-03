@@ -156,9 +156,9 @@ results will be written in files named after the original files with the
 addition of a string that indicates the service used.  For example, a file
 named "somefile.jpg" will result in
 
-  somefile.google.png
-  somefile.microsoft.png
-  somefile.amazon.png
+  somefile.handprint-google.png
+  somefile.handprint-microsoft.png
+  somefile.handprint-amazon.png
   ...
 
 and so on for each image and each service used.  THESE FILES ARE DELETED
@@ -175,22 +175,22 @@ arranged in a grid.  This is intended to make it easier to compare the
 results of multiple services against each other.  To skip the creation of the
 results grid, use the -G option (/G on Windows).  The grid image will be named
 
-  somefile.all-results.png
+  somefile.handprint-all.png
 
 If given the -e option (/e on Windows), Handprint will produce extended
 output that includes the complete response from the service (converted to a
 JSON file by Handprint) and the text extracted (stored as a .txt file).  The
 output of -e will be multiple files like this:
 
-  somefile.google.png
-  somefile.google.json
-  somefile.google.txt
-  somefile.microsoft.png
-  somefile.microsoft.json
-  somefile.microsoft.txt
-  somefile.amazon.png
-  somefile.amazon.json
-  somefile.amazon.txt
+  somefile.handprint-google.png
+  somefile.handprint-google.json
+  somefile.handprint-google.txt
+  somefile.handprint-microsoft.png
+  somefile.handprint-microsoft.json
+  somefile.handprint-microsoft.txt
+  somefile.handprint-amazon.png
+  somefile.handprint-amazon.json
+  somefile.handprint-amazon.txt
   ...
 
 The files will written to the directory indicated by -o, or (if -o is not
@@ -200,22 +200,13 @@ working directory instead.
 
 If an image is too large for any of the services invoked, then Handprint will
 resize it prior to sending the image to any of the services (as noted above).
-It will write the reduced image to a file named "FILENAME-reduced.EXT", where
+It will write the reduced image to a file named "FILENAME.handprint.EXT", where
 "FILENAME" is the original file name and "EXT" is the file extension.  This
-means that if an image needs to be resized, the results of applying the text
-recognition services will be, e.g.,
+file is normally deleted, unless you use the -e option (/e on Windows)
+mentioned above, in which case you will find this additional file in the same
+location as the others:
 
-  somefile-reduced.png
-  somefile-reduced.google.png
-  somefile-reduced.google.json
-  somefile-reduced.google.txt
-  somefile-reduced.microsoft.png
-  somefile-reduced.microsoft.json
-  somefile-reduced.microsoft.txt
-  somefile-reduced.amazon.json
-  somefile-reduced.amazon.png
-  somefile-reduced.amazon.txt
-  ...
+  somefile.handprint.png
 
 When the inputs are URLs, Handprint must download a copy of the image located
 at the network address (because it is not possible to write the results in

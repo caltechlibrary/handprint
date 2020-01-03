@@ -118,15 +118,17 @@ class MainBody(object):
                     # It's a directory, so look for files within.
                     # Ignore files that appear to be the previous output of Handprint.
                     # (These are files that end in, e.g., ".google.png")
-                    handprint_endings = ['.' + x + _OUTPUT_EXT for x in services_list()]
+                    handprint_endings = ['.handprint' + _OUTPUT_EXT]
+                    handprint_endings += ['.handprint-' + x + _OUTPUT_EXT
+                                          for x in services_list()]
                     files = files_in_directory(item, extensions = ACCEPTED_FORMATS)
                     files = filter_by_extensions(files, handprint_endings)
                     targets += files
                 else:
                     warn('"{}" not a file or directory', item)
+
         # Filter files we created in past runs.
-        targets = [x for x in targets if '-reduced' not in x]
-        targets = [x for x in targets if 'all-results' not in x]
+        targets = [x for x in targets if '.handprint' not in x]
 
         # If there is both a file in the format we generate and another
         # format of that file, ignore the other formats and just use ours.

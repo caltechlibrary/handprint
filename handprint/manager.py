@@ -154,7 +154,7 @@ class Manager:
             # Create grid file if requested.
             if self._make_grid:
                 base = path.basename(filename_basename(item_file))
-                grid_file = path.realpath(path.join(dest_dir, base + '.all-results.png'))
+                grid_file = path.realpath(path.join(dest_dir, base + '.handprint-all.png'))
                 inform('Creating results grid image: {}', relative(grid_file))
                 images = [r.annotated for r in results]
                 width = math.ceil(math.sqrt(len(images)))
@@ -249,19 +249,19 @@ class Manager:
         annot_path  = None
         report_path = None
         if self._make_grid:
-            annot_path  = alt_extension(base_path, str(service) + '.png')
+            annot_path = self._renamed(base_path, str(service), 'png')
             inform('Creating annotated image for {}.', service_name)
             self._save(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
-            txt_file  = alt_extension(base_path, str(service) + '.txt')
-            json_file = alt_extension(base_path, str(service) + '.json')
+            txt_file  = self._renamed(base_path, str(service), 'txt')
+            json_file = self._renamed(base_path, str(service), 'json')
             inform('Saving all data for {}.', service_name)
             self._save(json.dumps(output.data), json_file)
             inform('Saving extracted text for {}.', service_name)
             self._save(output.text, txt_file)
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')
-            report_path = alt_extension(image.item_file, str(service) + '.tsv')
+            report_path = self._renamed(image.item_file, str(service), 'tsv')
             relaxed = (self._compare == 'relaxed')
             if readable(gt_file) and nonempty(gt_file):
                 with open(gt_file, 'r') as f:
@@ -307,7 +307,7 @@ class Manager:
 
     def _converted_file(self, file, to_format, dest_dir):
         basename = path.basename(filename_basename(file))
-        new_file = path.join(dest_dir, basename + '.' + to_format)
+        new_file = path.join(dest_dir, basename + '.handprint.' + to_format)
         if path.exists(new_file):
             inform('Using already converted image in {}', relative(new_file))
             return new_file
@@ -324,17 +324,15 @@ class Manager:
         if not file:
             return None
         file_ext = filename_extension(file)
-        if '-reduced' in file:
-            new_file = file
-        else:
-            new_file = filename_basename(file) + '-reduced' + file_ext
+        name_tail = '.handprint' + file_ext
+        new_file = file if name_tail in file else filename_basename(file) + name_tail
         if path.exists(new_file):
             if image_size(new_file) < self._max_size:
                 inform('Reusing resized image found in {}', relative(new_file))
                 return new_file
             else:
-                # We found a "-reduced" file, perhaps from a previous run, but
-                # for the current set of services, it's larger than allowed.
+                # We found a ".handprint.ext" file, perhaps from a previous run,
+                # but for the current set of services, it's larger than allowed.
                 if __debug__: log('existing resized file larger than {}b: {}',
                                   humanize.intcomma(self._max_size), new_file)
         inform('Size too large; reducing size: {}', relative(file))
@@ -348,10 +346,8 @@ class Manager:
     def _resized_image(self, file):
         (max_width, max_height) = self._max_dimensions
         file_ext = filename_extension(file)
-        if '-reduced' in file:
-            new_file = file
-        else:
-            new_file = filename_basename(file) + '-reduced' + file_ext
+        name_tail = '.handprint' + file_ext
+        new_file = file if name_tail in file else filename_basename(file) + name_tail
         if path.exists(new_file) and readable(new_file):
             (image_width, image_height) = image_dimensions(new_file)
             if image_width < max_width and image_height < max_height:
@@ -395,6 +391,11 @@ class Manager:
         else:
             # There's no other type in the code, so if we get here ...
             raise InternalError('Unexpected data in save_output() -- please report this.')
+
+
+    def _renamed(self, base_path, service_name, format):
+        (root, ext) = path.splitext(base_path)
+        return root + '-' + service_name + '.' + format
 
 
 # Helper functions.

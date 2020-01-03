@@ -248,9 +248,9 @@ characteristics:
 Handprint will write the comparison results to a tab-delimited file named
 after the input image and service but with the extension ".tsv".  For
 example, for an input image "somefile.jpg" and results received from Google,
-the comparison results will be written to "somefile.google.tsv".  (The use of
-a tab-delimited format rather than comma-delimited format avoids the need to
-quote commas and other characters in the text.)
+the comparison results will be written to "somefile.handprint-google.tsv".
+(The use of a tab-delimited format rather than comma-delimited format avoids
+the need to quote commas and other characters in the text.)
 
 Handprint reports, for each text line, the number of errors (the Levenshtein
 edit distance) and the character error rate (CER), and at the end it also

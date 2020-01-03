@@ -203,7 +203,7 @@ Note that providing URLs on the command line can be problematic due to how termi
 
 ### _Annotated output images_
 
-By default, Handprint will create a single output file for each input file.  This file will be have the suffix `.all-results.png` and contain an annotated version of the results for each service invoked, tiled in a _N_&times;_N_ grid fashion to produce one (big) output image.  Here is a sample output image to illustrate:
+By default, Handprint will create a single output file for each input file.  This file will be have the suffix `.handprint-all.png` and contain an annotated version of the results for each service invoked, tiled in a _N_&times;_N_ grid fashion to produce one (big) output image.  Here is a sample output image to illustrate:
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/all-results-example.jpg" alt="Example annotated results output image">
@@ -214,7 +214,7 @@ The 2&times;2 image above was produced by running the following command from the
 handprint tests/images/public-domain/H96566k.jpg
 ```
 
-The individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked.  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
+The individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked (described in more detail below).  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
 
 
 ### _Comparison to ground truth text_
@@ -226,7 +226,7 @@ Handprint supports comparing the output of HTR services to expected output (i.e.
 * The text should be line oriented, with each line representing a line of text in the image.
 * The text should be plain text only.  No Unicode or binary encodings.  (This limitation comes from the HTR services, which &ndash; as of this writing &ndash; return results in plain text format.)
 
-Handprint will write the comparison results to a tab-delimited file named after the input image and service but with the extension `.tsv`.  For example, for an input image `somefile.jpg` and results received from Google, the comparison results will be written to `somefile.google.tsv`.  The use of a tab-delimited format rather than comma-delimited format avoids the need to quote commas and other characters in the text.  The output file will have one row for each line of text in the input, plus an additional row at the end for total number of errors found.  Each row will have the following columns:
+Handprint will write the comparison results to a tab-delimited file named after the input image and service but with the extension `.tsv`.  For example, for an input image `somefile.jpg` and results received from Google, the comparison results will be written to `somefile.handprint-google.tsv`.  The use of a tab-delimited format rather than comma-delimited format avoids the need to quote commas and other characters in the text.  The output file will have one row for each line of text in the input, plus an additional row at the end for total number of errors found.  Each row will have the following columns:
 
 1. number of errors on that line of text (computed as [Levenshtein distance](https://en.wikipedia.org/wiki/Levenshtein_distance)),
 2. the _character error rate_ (CER) for the line (see below)
@@ -258,13 +258,13 @@ The following is an example of a tab-separated file produced using `-c`.  This e
 If the option `-e` (`/e` on Windows) is used, Handprint saves not only the overview image containing all the results, but also, individual annotated images for each service's results, the raw data (converted to a JSON file by Handprint), and the text extracted by the service.  These additional outputs will be written in files named after the original files with the addition of a string that indicates the service used.  For example, a file named `somefile.jpg` will produce
 
 ```
-somefile.png
-somefile.amazon-textract.png
-somefile.amazon-textract.json
-somefile.amazon-textract.txt
-somefile.google.png
-somefile.google.json
-somefile.google.txt
+somefile.handprint.png
+somefile.handprint-amazon-textract.png
+somefile.handprint-amazon-textract.json
+somefile.handprint-amazon-textract.txt
+somefile.handprint-google.png
+somefile.handprint-google.json
+somefile.handprint-google.txt
 ...
 ```
 
@@ -279,46 +279,39 @@ To deal with this situation, Handprint manufactures its own file names when a UR
 ```
 document-1.jpg
 document-1.url
-document-1.google.png
-document-1.google.json
-document-1.google.txt
-document-1.microsoft.png
-document-1.microsoft.json
-document-1.microsoft.txt
+document-1.handprint-google.png
+document-1.handprint-google.json
+document-1.handprint-google.txt
+document-1.handprint-microsoft.png
+document-1.handprint-microsoft.json
+document-1.handprint-microsoft.txt
 ...
 document-2.jpg
 document-2.url
-document-2.google.png
-document-2.google.json
-document-2.google.txt
-document-2.microsoft.png
-document-2.microsoft.json
-document-2.microsoft.txt
+document-2.handprint-google.png
+document-2.handprint-google.json
+document-2.handprint-google.txt
+document-2.handprint-microsoft.png
+document-2.handprint-microsoft.json
+document-2.handprint-microsoft.txt
 ...
 document-3.jpg
 document-3.url
-document-3.google.png
-document-3.google.json
-document-3.google.txt
-document-3.microsoft.png
-document-3.microsoft.json
-document-3.microsoft.txt
+document-3.handprint-google.png
+document-3.handprint-google.json
+document-3.handprint-google.txt
+document-3.handprint-microsoft.png
+document-3.handprint-microsoft.json
+document-3.handprint-microsoft.txt
 ...
 ```
 
 The base name `document` can be changed using the `-b` option (`/b` on Windows).  For example, running Handprint with the option `-b einstein` will cause the outputs to be named `einstein-1.jpg`, `einstein-1.url`, etc.
 
-Finally, if an image is too large for any of the services invoked, then Handprint will resize it prior to sending the image to any of the services (as noted above).  It will write the reduced image to a file named `FILENAME-reduced.EXT`, where `FILENAME` is the original file name and `EXT` is the file extension.  This means that if an image needs to be resized, the results of applying the text recognition services will be, e.g.,
+Finally, if an image is too large for any of the services invoked, then Handprint will resize it prior to sending the image to any of the services (as noted above).  It will write the reduced image to a file named `FILENAME.handprint.EXT`, where `FILENAME` is the original file name and `EXT` is the file extension.  This file is normally deleted, unless you use the `-e` option (`/e` on Windows) mentioned above, in which case you will find this additional file in the same location as the others:
 
 ```
-document-1-reduced.png
-document-1-reduced.google.png
-document-1-reduced.google.json
-document-1-reduced.google.txt
-document-1-reduced.microsoft.png
-document-1-reduced.microsoft.json
-document-1-reduced.microsoft.txt
-...
+document-1.handprint.png
 ```
 
 ### _Other options_
@@ -355,7 +348,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-V`      | `--version`       | Display program version info and exit | | |
 | `-@`_OUT_ | `--debug`_OUT_    | Debugging mode; write trace to _OUT_ | Normal mode | ⬥ |
 
-⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpg`, `document-1.google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.<br>
+⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpg`, `document-1.handprint-google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.<br>
 ⬥ &nbsp; To write to the console, use the character `-` as the value of _OUT_; otherwise, _OUT_ must be the name of a file where the output should be written.
 
 

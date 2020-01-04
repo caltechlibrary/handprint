@@ -103,11 +103,8 @@ class MainBody(object):
     def targets_from_arguments(self, files, from_file):
         targets = []
         if from_file:
-            if __debug__: log('opening {}', from_file)
-            with open(from_file) as f:
-                targets = f.readlines()
-            targets = [line.rstrip('\n') for line in targets]
-            if __debug__: log('read {} lines from {}.', len(targets), from_file)
+            if __debug__: log('reading {}', from_file)
+            targets = filter(None, open(from_file).read().splitlines())
         else:
             for item in files:
                 if is_url(item):
@@ -128,7 +125,7 @@ class MainBody(object):
                     warn('"{}" not a file or directory', item)
 
         # Filter files we created in past runs.
-        targets = [x for x in targets if '.handprint' not in x]
+        targets = filter(lambda name: '.handprint' not in name, targets)
 
         # If there is both a file in the format we generate and another
         # format of that file, ignore the other formats and just use ours.

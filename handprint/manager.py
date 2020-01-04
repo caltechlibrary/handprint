@@ -207,7 +207,7 @@ class Manager:
             url_file = path.realpath(path.join(output_dir, base + '.url'))
             with open(url_file, 'w') as f:
                 f.write(url_file_content(item))
-                inform('Wrote URL to {}', relative(url_file))
+                inform('Wrote URL to {}', styled(relative(url_file), 'white_on_gray'))
         else:
             file = path.realpath(path.join(os.getcwd(), item))
             orig_fmt = filename_extension(file)[1:]
@@ -264,9 +264,8 @@ class Manager:
             report_path = self._renamed(image.item_file, str(service), 'tsv')
             relaxed = (self._compare == 'relaxed')
             if readable(gt_file) and nonempty(gt_file):
-                with open(gt_file, 'r') as f:
-                    if __debug__: log('reading ground truth from {}', gt_file)
-                    gt_text = f.read()
+                if __debug__: log('reading ground truth from {}', gt_file)
+                gt_text = open(gt_file, 'r').read()
                 inform('Saving {} comparison to ground truth', service_name)
                 self._save(text_comparison(output.text, gt_text, relaxed), report_path)
             elif not nonempty(gt_file):

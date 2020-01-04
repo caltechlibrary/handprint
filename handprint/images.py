@@ -122,7 +122,6 @@ def reduced_image_size(orig_file, dest_file, max_size):
             if i_size <= max_size:
                 if __debug__: log('file already smaller than requested: {}', orig_file)
                 return (orig_file, None)
-            import pdb; pdb.set_trace()
             ratio = max_size/i_size
             if __debug__: log('resize ratio = {}', ratio)
             im = Image.open(orig_file)
@@ -154,8 +153,9 @@ def reduced_image_dimensions(orig_file, dest_file, max_width, max_height):
             width_ratio = max_width/dims[0]
             length_ratio = max_height/dims[1]
             ratio = min(width_ratio, length_ratio)
+            if __debug__: log('rescale ratio = {}', ratio)
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
-            if __debug__: log('resizing image to {}', new_dims)
+            if __debug__: log('rescaling image to {}', new_dims)
             resized = im.resize(new_dims, Image.HAMMING)
             if __debug__: log('saving re-dimensioned image to {}', dest_file)
             if orig_file == dest_file:

@@ -5,12 +5,14 @@ Version 1.2.0
 --------------
 
 * This version changes the way output files are named.  The new scheme always includes the string `handprint` in the file name for easier recognition and to help reduce the chances of file name collisions.  The scheme uses the naming pattern `somefile.handprint.png` for
-the rescaled image, `somefile.handprint-service.ext` for the
-various service outputs, and `somefile.handprint-all.png` for the
+the rescaled input image, `somefile.handprint-service.ext` for the
+various service output results, and `somefile.handprint-all.png` for the
 summary grid image.  (Issue #10.)
 * PDF files are now accepted as input. (Issue #11.)  Note, however, that
 Handprint will only extract the first image in the PDF file.
 * The order in which resizing and rescaling is done has been swapped: if a file is too large, Handprint will first rescale it, and then if it is still too big (in byte size), it will resize the file.  This appears to result in images that have higher resolution than the previous approach, which did the steps in the opposite order.
+* The URLs in the file of example URLs, `tests/urls/caltech-archives-urls.txt`, have become invalid. They have been replaced with other URLs that are valid (as of right now, anyway).
+* A few more bugs have been fixed.
 
 
 Version 1.1.0

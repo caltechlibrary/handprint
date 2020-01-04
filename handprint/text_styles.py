@@ -57,6 +57,7 @@ _STYLES = {
     'italic'        : colorful.italic,
     'struckthrough' : colorful.struckthrough,
     'underlined'    : colorful.underlined,
+    'white_on_gray' : colorful.white_on_gray50,
 }
 
 colorful.update_palette(_STYLES)

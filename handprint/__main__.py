@@ -132,14 +132,17 @@ The image paths or URLs can be supplied in any of the following ways:
 
 If given URLs, Handprint will first download the images found at the URLs to
 a local directory indicated by the option -o (/o on Windows).  Handprint can
-accept input images in JPEG, PNG, GIF, BMP, and TIFF formats.  To make the
-results from different services more easily comparable, Handprint will always
-convert all input images to the same format (PNG) no matter if some services
-may accept other formats; it will also resize input images to the smallest
-size accepted by any of the services invoked if an image exceeds that size.
-(For example, if service A accepts files up to 10 MB in size and service B
-accepts files up to 5 MB, all input images will be resized to 5 MB before
-sending them to A and B, even if A could accept a higher-resolution image.)
+accept input images in JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF formats.  To
+make the results from different services more easily comparable, Handprint
+will always convert all input images to the same format (PNG) no matter if
+some services may accept other formats; it will also resize input images to
+the smallest size accepted by any of the services invoked if an image exceeds
+that size.  (For example, if service A accepts files up to 10 MB in size and
+service B accepts files up to 5 MB, all input images will be resized to 5 MB
+before sending them to A and B, even if A could accept a higher-resolution
+image.)  In addition, a limitation of Handprint's current PDF support is that
+only the first image in a PDF file is read -- if a PDF file contains
+more than one image, the remaining images are ignored.
 
 The default action is to run all known services.  The option -s (/s on
 Windows) can be used to select only one service or a list of services

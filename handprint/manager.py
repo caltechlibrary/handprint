@@ -289,11 +289,6 @@ class Manager:
                 to_delete.add(new_file)
             file = new_file
         # Resize if either size or dimensions are larger than accepted
-        if file and self._max_size and self._max_size < image_size(file):
-            new_file = self._smaller_file(file)
-            if new_file and  path.basename(new_file) != path.basename(file):
-                to_delete.add(new_file)
-            file = new_file
         if file and self._max_dimensions:
             (image_width, image_height) = image_dimensions(file)
             (max_width, max_height) = self._max_dimensions
@@ -302,6 +297,11 @@ class Manager:
                 if new_file and path.basename(new_file) != path.basename(file):
                     to_delete.add(new_file)
                 file = new_file
+        if file and self._max_size and self._max_size < image_size(file):
+            new_file = self._smaller_file(file)
+            if new_file and  path.basename(new_file) != path.basename(file):
+                to_delete.add(new_file)
+            file = new_file
         return Input(orig_item, orig_fmt, item_file, file, dest_dir, to_delete)
 
 
@@ -309,7 +309,7 @@ class Manager:
         basename = path.basename(filename_basename(file))
         new_file = path.join(dest_dir, basename + '.handprint.' + to_format)
         if path.exists(new_file):
-            inform('Using already converted image in {}', relative(new_file))
+            inform('Using existing converted image in {}', relative(new_file))
             return new_file
         else:
             inform('Converting to {} format: {}', to_format, relative(file))

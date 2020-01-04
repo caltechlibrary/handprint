@@ -67,6 +67,7 @@ import handprint
 from handprint.debug import log
 from handprint.exceptions import *
 from handprint.files import relative, readable
+from handprint.files import filename_extension, filename_basename
 
 
 # Main functions.
@@ -121,6 +122,7 @@ def reduced_image_size(orig_file, dest_file, max_size):
             if i_size <= max_size:
                 if __debug__: log('file already smaller than requested: {}', orig_file)
                 return (orig_file, None)
+            import pdb; pdb.set_trace()
             ratio = max_size/i_size
             if __debug__: log('resize ratio = {}', ratio)
             im = Image.open(orig_file)
@@ -170,23 +172,44 @@ def converted_image(orig_file, to_format, dest_file = None):
     if no error occurred; otherwise, the value will be a string summarizing the
     error that occurred and 'new_file' will be set to None.
     '''
+    dest_format = canonical_format_name(to_format)
     if dest_file is None:
-        dest_file = filename_basename(file) + '.' + to_format
-    # When converting images, PIL may issue a DecompressionBombWarning but
-    # it's not a concern in our application.  Ignore it.
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        try:
-            im = Image.open(orig_file)
-            if __debug__: log('converting {} to RGB', orig_file)
-            im.convert('RGB')
-            if __debug__: log('saving converted image to {}', dest_file)
-            if orig_file == dest_file:
-                im.seek(0)
-            im.save(dest_file, canonical_format_name(to_format))
+        dest_file = filename_basename(file) + '.' + dest_format
+    # PIL is unable to read PDF files, so in that particular case, we have to
+    # convert it using another tool.
+    if filename_extension(orig_file) == '.pdf':
+        import fitz
+        doc = fitz.open(orig_file)
+        if len(doc) >= 1:
+            if len(doc) >= 2:
+                if __debug__: log('{} has > 1 images; using only 1st', orig_file)
+            # FIXME: if there's more than 1 image, we could extra the rest.
+            # Doing so will require some architectural changes first.
+            if __debug__: log('extracting 1st image from {}', dest_file)
+            page = doc[0]
+            pix = page.getPixmap(alpha = False)
+            if __debug__: log('writing {}', dest_file)
+            pix.writeImage(dest_file, dest_format)
             return (dest_file, None)
-        except Exception as ex:
-            return (None, str(ex))
+        else:
+            if __debug__: log('fitz says there is no image image in {}', orig_file)
+            return (None, 'Cannot find an image inside {}'.format(orig_file))
+    else:
+        # When converting images, PIL may issue a DecompressionBombWarning but
+        # it's not a concern in our application.  Ignore it.
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            try:
+                im = Image.open(orig_file)
+                if __debug__: log('converting {} to RGB', orig_file)
+                im.convert('RGB')
+                if __debug__: log('saving converted image to {}', dest_file)
+                if orig_file == dest_file:
+                    im.seek(0)
+                im.save(dest_file, dest_format)
+                return (dest_file, None)
+            except Exception as ex:
+                return (None, str(ex))
 
 
 def annotated_image(file, text_boxes, service):

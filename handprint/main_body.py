@@ -124,11 +124,14 @@ class MainBody(object):
                 else:
                     warn('"{}" not a file or directory', item)
 
-        # Filter files we created in past runs.
+        # Filter files created in past runs.
         targets = filter(lambda name: '.handprint' not in name, targets)
 
         # If there is both a file in the format we generate and another
         # format of that file, ignore the other formats and just use ours.
+        # Note: the value of targets is an iterator, but b/c it's tested inside
+        # the loop, a separate list is needed (else get unexpected results).
+        targets = list(targets)
         keep = []
         for item in targets:
             ext  = filename_extension(item)

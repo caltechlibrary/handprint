@@ -113,14 +113,7 @@ class MainBody(object):
                     targets.append(item)
                 elif path.isdir(item):
                     # It's a directory, so look for files within.
-                    # Ignore files that appear to be the previous output of Handprint.
-                    # (These are files that end in, e.g., ".google.png")
-                    handprint_endings = ['.handprint' + _OUTPUT_EXT]
-                    handprint_endings += ['.handprint-' + x + _OUTPUT_EXT
-                                          for x in services_list()]
-                    files = files_in_directory(item, extensions = ACCEPTED_FORMATS)
-                    files = filter_by_extensions(files, handprint_endings)
-                    targets += files
+                    targets += files_in_directory(item, extensions = ACCEPTED_FORMATS)
                 else:
                     warn('"{}" not a file or directory', item)
 

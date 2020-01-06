@@ -134,18 +134,18 @@ class Manager:
                 return
 
             # Normalize input image to the lowest common denominator.
-            page = self._normalized(item, item_fmt, item_file, dest_dir)
-            if not page.file:
+            image = self._normalized(item, item_fmt, item_file, dest_dir)
+            if not image.file:
                 warn('Skipping {}', relative(item_file))
                 return
 
             # Send the file to the services and get Result tuples back.
             if self._num_threads == 1:
                 # For 1 thread, avoid thread pool to make debugging easier.
-                results = [self._send(page, s) for s in services]
+                results = [self._send(image, s) for s in services]
             else:
                 with ThreadPoolExecutor(max_workers = self._num_threads) as tpe:
-                    results = list(tpe.map(self._send, repeat(page), iter(services)))
+                    results = list(tpe.map(self._send, repeat(image), iter(services)))
 
             # If a service failed for some reason (e.g., a network glitch), we
             # get no result back.  Remove empty results & go on with the rest.
@@ -156,13 +156,13 @@ class Manager:
                 base = path.basename(filename_basename(item_file))
                 grid_file = path.realpath(path.join(dest_dir, base + '.handprint-all.png'))
                 inform('Creating results grid image: {}', relative(grid_file))
-                images = [r.annotated for r in results]
-                width = math.ceil(math.sqrt(len(images)))
-                create_image_grid(images, grid_file, max_horizontal = width)
+                all_results = [r.annotated for r in results]
+                width = math.ceil(math.sqrt(len(all_results)))
+                create_image_grid(all_results, grid_file, max_horizontal = width)
 
             # Clean up after ourselves.
             if not self._extended_results:
-                for file in set(page.temp_files | {r.annotated for r in results}):
+                for file in set(image.temp_files | {r.annotated for r in results}):
                     if file and path.exists(file):
                         delete_existing(file)
 

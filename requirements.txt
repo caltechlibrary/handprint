@@ -24,3 +24,4 @@ StringDist>=1.0.9
 termcolor>=1.1.0
 textdistance>=4.1.5
 urllib3>=1.25
+wheel>=0.33.0

@@ -428,6 +428,12 @@ def print_intro(ui):
 if sys.platform.startswith('win'):
     main.prefix_chars = '/'
 
+# The following entry point definition is for the console_scripts keyword
+# option to setuptools.  The entry point for console_scripts has to be a
+# function that takes zero arguments.
+def console_scripts_main():
+    plac.call(main)
+
 # The following allows users to invoke this using "python3 -m handprint".
 if __name__ == '__main__':
     plac.call(main)

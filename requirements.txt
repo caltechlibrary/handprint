@@ -1,5 +1,5 @@
 appdirs>=1.4.3
-boto3>=1.9.193
+boto3>=1.10.0
 colorful>=0.5.1
 google-api-core>=1.4.0
 google-api-python-client>=1.7.4

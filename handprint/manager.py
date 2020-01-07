@@ -410,7 +410,10 @@ class Manager:
 
     def _renamed(self, base_path, service_name, format):
         (root, ext) = path.splitext(base_path)
-        return root + '-' + service_name + '.' + format
+        if '.handprint' in root:
+            return '{}-{}.{}'.format(root, service_name, format)
+        else:
+            return '{}.handprint-{}.{}'.format(root, service_name, format)
 
 
 # Helper functions.

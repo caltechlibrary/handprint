@@ -56,7 +56,7 @@ class MainBody(object):
                     raise RuntimeError('Directory not writable: {}'.format(output_dir))
             else:
                 os.mkdir(output_dir)
-                if __debug__: log('Created output_dir directory {}', output_dir)
+                if __debug__: log('created output_dir directory {}', output_dir)
 
         self._base_name  = base_name
         self._extended   = extended
@@ -103,11 +103,8 @@ class MainBody(object):
     def targets_from_arguments(self, files, from_file):
         targets = []
         if from_file:
-            if __debug__: log('Opening {}', from_file)
-            with open(from_file) as f:
-                targets = f.readlines()
-            targets = [line.rstrip('\n') for line in targets]
-            if __debug__: log('Read {} lines from {}.', len(targets), from_file)
+            if __debug__: log('reading {}', from_file)
+            targets = filter(None, open(from_file).read().splitlines())
         else:
             for item in files:
                 if is_url(item):
@@ -116,20 +113,18 @@ class MainBody(object):
                     targets.append(item)
                 elif path.isdir(item):
                     # It's a directory, so look for files within.
-                    # Ignore files that appear to be the previous output of Handprint.
-                    # (These are files that end in, e.g., ".google.png")
-                    handprint_endings = ['.' + x + _OUTPUT_EXT for x in services_list()]
-                    files = files_in_directory(item, extensions = ACCEPTED_FORMATS)
-                    files = filter_by_extensions(files, handprint_endings)
-                    targets += files
+                    targets += files_in_directory(item, extensions = ACCEPTED_FORMATS)
                 else:
                     warn('"{}" not a file or directory', item)
-        # Filter files we created in past runs.
-        targets = [x for x in targets if '-reduced' not in x]
-        targets = [x for x in targets if 'all-results' not in x]
+
+        # Filter files created in past runs.
+        targets = filter(lambda name: '.handprint' not in name, targets)
 
         # If there is both a file in the format we generate and another
         # format of that file, ignore the other formats and just use ours.
+        # Note: the value of targets is an iterator, but b/c it's tested inside
+        # the loop, a separate list is needed (else get unexpected results).
+        targets = list(targets)
         keep = []
         for item in targets:
             ext  = filename_extension(item)

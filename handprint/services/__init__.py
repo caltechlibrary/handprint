@@ -2,7 +2,7 @@ from .amazon import AmazonRekognitionTR, AmazonTextractTR
 from .google import GoogleTR
 from .microsoft import MicrosoftTR
 
-ACCEPTED_FORMATS = ('.jpg', '.jpeg', '.jp2', '.png', '.gif', '.bmp',
+ACCEPTED_FORMATS = ('.jpg', '.jpeg', '.jp2', '.pdf', '.png', '.gif', '.bmp',
                     '.tif', '.tiff')
 
 KNOWN_SERVICES = {

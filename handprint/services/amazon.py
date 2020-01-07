@@ -24,11 +24,6 @@ from handprint.network import net
 class AmazonTR(TextRecognition):
     '''Base class for Amazon text recognition services.'''
 
-    def __init__(self):
-        '''Initializes the credentials to use for accessing this service.'''
-        self._results = {}
-
-
     def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
         try:
@@ -77,11 +72,6 @@ class AmazonTR(TextRecognition):
         '''Returns the results from calling the service on the 'file_path'.
         The results are returned as an TRResult named tuple.
         '''
-        # Check if we already processed it.
-        if file_path in self._results:
-            if __debug__: log('returning already-known result for {}', file_path)
-            return self._results[file_path]
-
         # Read the image and proceed with contacting the service.
         # If any exceptions occur, let them be passed to caller.
         (image, error) = self._image_from_file(file_path)
@@ -92,7 +82,8 @@ class AmazonTR(TextRecognition):
         if __debug__: log('setting up Amazon client function "{}"', variant)
         creds = self._credentials
         try:
-            client = boto3.client(variant, region_name = creds['region_name'],
+            session = boto3.session.Session()
+            client = session.client(variant, region_name = creds['region_name'],
                                   aws_access_key_id = creds['aws_access_key_id'],
                                   aws_secret_access_key = creds['aws_secret_access_key'])
             if __debug__: log('calling Amazon API function')
@@ -112,10 +103,8 @@ class AmazonTR(TextRecognition):
                         # Something's wrong with the vertex list. Skip & continue.
                         if __debug__: log('bad bb for {}: {}', text, bb)
 
-            result = TRResult(path = file_path, data = response, boxes = boxes,
-                              text = full_text, error = None)
-            self._results[file_path] = result
-            return result
+            return TRResult(path = file_path, data = response, boxes = boxes,
+                            text = full_text, error = None)
         except KeyboardInterrupt as ex:
             raise
         except Exception as ex:

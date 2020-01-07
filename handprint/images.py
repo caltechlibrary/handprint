@@ -67,6 +67,7 @@ import handprint
 from handprint.debug import log
 from handprint.exceptions import *
 from handprint.files import relative, readable
+from handprint.files import filename_extension, filename_basename
 
 
 # Main functions.
@@ -100,8 +101,11 @@ def image_dimensions(file):
         warnings.simplefilter('ignore')
         im = Image.open(file)
         if not im:
+            im.close()
             return (0, 0)
-        return im.size
+        the_size = im.size
+        im.close()
+        return the_size
 
 
 def reduced_image_size(orig_file, dest_file, max_size):
@@ -125,8 +129,10 @@ def reduced_image_size(orig_file, dest_file, max_size):
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
             if __debug__: log('resizing image to {}', new_dims)
             resized = im.resize(new_dims, Image.HAMMING)
+            if __debug__: log('saving resized image to {}', dest_file)
+            if orig_file == dest_file:
+                im.seek(0)
             resized.save(dest_file)
-            if __debug__: log('saved resized image to {}', dest_file)
             return (dest_file, None)
         except Exception as ex:
             return (None, str(ex))
@@ -147,36 +153,63 @@ def reduced_image_dimensions(orig_file, dest_file, max_width, max_height):
             width_ratio = max_width/dims[0]
             length_ratio = max_height/dims[1]
             ratio = min(width_ratio, length_ratio)
+            if __debug__: log('rescale ratio = {}', ratio)
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
-            if __debug__: log('resizing image to {}', new_dims)
+            if __debug__: log('rescaling image to {}', new_dims)
             resized = im.resize(new_dims, Image.HAMMING)
+            if __debug__: log('saving re-dimensioned image to {}', dest_file)
+            if orig_file == dest_file:
+                im.seek(0)
             resized.save(dest_file)
-            if __debug__: log('saved re-dimensioned image to {}', dest_file)
             return (dest_file, None)
         except Exception as ex:
             return (None, str(ex))
 
 
-def converted_image(file, to_format, dest_file = None):
+def converted_image(orig_file, to_format, dest_file = None):
     '''Returns a tuple of (success, output file, error message).
     Returns a tuple of (new_file, error).  The value of 'error' will be None
     if no error occurred; otherwise, the value will be a string summarizing the
     error that occurred and 'new_file' will be set to None.
     '''
+    dest_format = canonical_format_name(to_format)
     if dest_file is None:
-        dest_file = filename_basename(file) + '.' + to_format
-    # When converting images, PIL may issue a DecompressionBombWarning but
-    # it's not a concern in our application.  Ignore it.
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        try:
-            im = Image.open(file)
-            im.convert('RGB')
-            im.save(dest_file, canonical_format_name(to_format))
-            if __debug__: log('saved converted image to {}', dest_file)
+        dest_file = filename_basename(file) + '.' + dest_format
+    # PIL is unable to read PDF files, so in that particular case, we have to
+    # convert it using another tool.
+    if filename_extension(orig_file) == '.pdf':
+        import fitz
+        doc = fitz.open(orig_file)
+        if len(doc) >= 1:
+            if len(doc) >= 2:
+                if __debug__: log('{} has > 1 images; using only 1st', orig_file)
+            # FIXME: if there's more than 1 image, we could extra the rest.
+            # Doing so will require some architectural changes first.
+            if __debug__: log('extracting 1st image from {}', dest_file)
+            page = doc[0]
+            pix = page.getPixmap(alpha = False)
+            if __debug__: log('writing {}', dest_file)
+            pix.writeImage(dest_file, dest_format)
             return (dest_file, None)
-        except Exception as ex:
-            return (None, str(ex))
+        else:
+            if __debug__: log('fitz says there is no image image in {}', orig_file)
+            return (None, 'Cannot find an image inside {}'.format(orig_file))
+    else:
+        # When converting images, PIL may issue a DecompressionBombWarning but
+        # it's not a concern in our application.  Ignore it.
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            try:
+                im = Image.open(orig_file)
+                if __debug__: log('converting {} to RGB', orig_file)
+                im.convert('RGB')
+                if __debug__: log('saving converted image to {}', dest_file)
+                if orig_file == dest_file:
+                    im.seek(0)
+                im.save(dest_file, dest_format)
+                return (dest_file, None)
+            except Exception as ex:
+                return (None, str(ex))
 
 
 def annotated_image(file, text_boxes, service):

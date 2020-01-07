@@ -26,7 +26,7 @@ from   os import path
 import shutil
 
 import sys
-from   threading import Thread
+from   threading import Thread, Lock
 import time
 from   timeit import default_timer as timer
 import urllib
@@ -75,6 +75,8 @@ Result.__doc__ = '''Results from calling an HTR service on an input.
 # .............................................................................
 
 class Manager:
+    '''Manage invocation of services and creation of outputs.'''
+
     def __init__(self, service_names, num_threads, output_dir, make_grid,
                  compare, extended):
         '''Initialize manager for services.  This will also initialize the
@@ -134,18 +136,18 @@ class Manager:
                 return
 
             # Normalize input image to the lowest common denominator.
-            page = self._normalized(item, item_fmt, item_file, dest_dir)
-            if not page.file:
+            image = self._normalized(item, item_fmt, item_file, dest_dir)
+            if not image.file:
                 warn('Skipping {}', relative(item_file))
                 return
 
             # Send the file to the services and get Result tuples back.
             if self._num_threads == 1:
                 # For 1 thread, avoid thread pool to make debugging easier.
-                results = [self._send(page, s) for s in services]
+                results = [self._send(image, s) for s in services]
             else:
                 with ThreadPoolExecutor(max_workers = self._num_threads) as tpe:
-                    results = list(tpe.map(self._send, repeat(page), iter(services)))
+                    results = list(tpe.map(self._send, repeat(image), iter(services)))
 
             # If a service failed for some reason (e.g., a network glitch), we
             # get no result back.  Remove empty results & go on with the rest.
@@ -154,15 +156,15 @@ class Manager:
             # Create grid file if requested.
             if self._make_grid:
                 base = path.basename(filename_basename(item_file))
-                grid_file = path.realpath(path.join(dest_dir, base + '.all-results.png'))
+                grid_file = path.realpath(path.join(dest_dir, base + '.handprint-all.png'))
                 inform('Creating results grid image: {}', relative(grid_file))
-                images = [r.annotated for r in results]
-                width = math.ceil(math.sqrt(len(images)))
-                create_image_grid(images, grid_file, max_horizontal = width)
+                all_results = [r.annotated for r in results]
+                width = math.ceil(math.sqrt(len(all_results)))
+                create_image_grid(all_results, grid_file, max_horizontal = width)
 
             # Clean up after ourselves.
             if not self._extended_results:
-                for file in set(page.temp_files | {r.annotated for r in results}):
+                for file in set(image.temp_files | {r.annotated for r in results}):
                     if file and path.exists(file):
                         delete_existing(file)
 
@@ -207,7 +209,7 @@ class Manager:
             url_file = path.realpath(path.join(output_dir, base + '.url'))
             with open(url_file, 'w') as f:
                 f.write(url_file_content(item))
-                inform('Wrote URL to {}', relative(url_file))
+                inform('Wrote URL to {}', styled(relative(url_file), 'white_on_gray'))
         else:
             file = path.realpath(path.join(os.getcwd(), item))
             orig_fmt = filename_extension(file)[1:]
@@ -219,6 +221,19 @@ class Manager:
         if __debug__: log('{} has original format {}', relative(file), orig_fmt)
         return (file, orig_fmt)
 
+
+    # The following thread lock is used in _send(...) around a call to creating
+    # an annotated image of the results from a service.  The annotation
+    # function in question uses image functions from matplotlib, and during
+    # multithreaded execution, for reasons that are not clear to me, sometimes
+    # an annotated image for a given service would end up with results from
+    # another service also added over it.  I've been unable to find an error
+    # in my code, and suspect the problem is some kind of thread safety issue
+    # in those low-level image functions (perhaps only on some platforms like
+    # macOS).  Preventing multithreaded execution around that one call seems
+    # to be enough to stop the problem.  Admittedly, it's a sledgehammer
+    # approach, but many hours of testing have yet to find a better solution.
+    _lock = Lock()
 
     def _send(self, image, service):
         '''Send the "image" to the service named "service" and write output in
@@ -249,24 +264,24 @@ class Manager:
         annot_path  = None
         report_path = None
         if self._make_grid:
-            annot_path  = alt_extension(base_path, str(service) + '.png')
+            annot_path = self._renamed(base_path, str(service), 'png')
             inform('Creating annotated image for {}.', service_name)
-            self._save(annotated_image(image.file, output.boxes, service), annot_path)
+            with self._lock:
+                self._save(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
-            txt_file  = alt_extension(base_path, str(service) + '.txt')
-            json_file = alt_extension(base_path, str(service) + '.json')
+            txt_file  = self._renamed(base_path, str(service), 'txt')
+            json_file = self._renamed(base_path, str(service), 'json')
             inform('Saving all data for {}.', service_name)
             self._save(json.dumps(output.data), json_file)
             inform('Saving extracted text for {}.', service_name)
             self._save(output.text, txt_file)
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')
-            report_path = alt_extension(image.item_file, str(service) + '.tsv')
+            report_path = self._renamed(image.item_file, str(service), 'tsv')
             relaxed = (self._compare == 'relaxed')
             if readable(gt_file) and nonempty(gt_file):
-                with open(gt_file, 'r') as f:
-                    if __debug__: log('reading ground truth from {}', gt_file)
-                    gt_text = f.read()
+                if __debug__: log('reading ground truth from {}', gt_file)
+                gt_text = open(gt_file, 'r').read()
                 inform('Saving {} comparison to ground truth', service_name)
                 self._save(text_comparison(output.text, gt_text, relaxed), report_path)
             elif not nonempty(gt_file):
@@ -289,11 +304,6 @@ class Manager:
                 to_delete.add(new_file)
             file = new_file
         # Resize if either size or dimensions are larger than accepted
-        if file and self._max_size and self._max_size < image_size(file):
-            new_file = self._smaller_file(file)
-            if new_file and  path.basename(new_file) != path.basename(file):
-                to_delete.add(new_file)
-            file = new_file
         if file and self._max_dimensions:
             (image_width, image_height) = image_dimensions(file)
             (max_width, max_height) = self._max_dimensions
@@ -302,14 +312,19 @@ class Manager:
                 if new_file and path.basename(new_file) != path.basename(file):
                     to_delete.add(new_file)
                 file = new_file
+        if file and self._max_size and self._max_size < image_size(file):
+            new_file = self._smaller_file(file)
+            if new_file and  path.basename(new_file) != path.basename(file):
+                to_delete.add(new_file)
+            file = new_file
         return Input(orig_item, orig_fmt, item_file, file, dest_dir, to_delete)
 
 
     def _converted_file(self, file, to_format, dest_dir):
         basename = path.basename(filename_basename(file))
-        new_file = path.join(dest_dir, basename + '.' + to_format)
+        new_file = path.join(dest_dir, basename + '.handprint.' + to_format)
         if path.exists(new_file):
-            inform('Using already converted image in {}', relative(new_file))
+            inform('Using existing converted image in {}', relative(new_file))
             return new_file
         else:
             inform('Converting to {} format: {}', to_format, relative(file))
@@ -324,17 +339,15 @@ class Manager:
         if not file:
             return None
         file_ext = filename_extension(file)
-        if file.find('-reduced') > 0:
-            new_file = file
-        else:
-            new_file = filename_basename(file) + '-reduced' + file_ext
+        name_tail = '.handprint' + file_ext
+        new_file = file if name_tail in file else filename_basename(file) + name_tail
         if path.exists(new_file):
             if image_size(new_file) < self._max_size:
                 inform('Reusing resized image found in {}', relative(new_file))
                 return new_file
             else:
-                # We found a "-reduced" file, perhaps from a previous run, but
-                # for the current set of services, it's larger than allowed.
+                # We found a ".handprint.ext" file, perhaps from a previous run,
+                # but for the current set of services, it's larger than allowed.
                 if __debug__: log('existing resized file larger than {}b: {}',
                                   humanize.intcomma(self._max_size), new_file)
         inform('Size too large; reducing size: {}', relative(file))
@@ -348,10 +361,8 @@ class Manager:
     def _resized_image(self, file):
         (max_width, max_height) = self._max_dimensions
         file_ext = filename_extension(file)
-        if file.find('-reduced') > 0:
-            new_file = file
-        else:
-            new_file = filename_basename(file) + '-reduced' + file_ext
+        name_tail = '.handprint' + file_ext
+        new_file = file if name_tail in file else filename_basename(file) + name_tail
         if path.exists(new_file) and readable(new_file):
             (image_width, image_height) = image_dimensions(new_file)
             if image_width < max_width and image_height < max_height:
@@ -395,6 +406,14 @@ class Manager:
         else:
             # There's no other type in the code, so if we get here ...
             raise InternalError('Unexpected data in save_output() -- please report this.')
+
+
+    def _renamed(self, base_path, service_name, format):
+        (root, ext) = path.splitext(base_path)
+        if '.handprint' in root:
+            return '{}-{}.{}'.format(root, service_name, format)
+        else:
+            return '{}.handprint-{}.{}'.format(root, service_name, format)
 
 
 # Helper functions.

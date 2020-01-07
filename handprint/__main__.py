@@ -132,14 +132,17 @@ The image paths or URLs can be supplied in any of the following ways:
 
 If given URLs, Handprint will first download the images found at the URLs to
 a local directory indicated by the option -o (/o on Windows).  Handprint can
-accept input images in JPEG, PNG, GIF, BMP, and TIFF formats.  To make the
-results from different services more easily comparable, Handprint will always
-convert all input images to the same format (PNG) no matter if some services
-may accept other formats; it will also resize input images to the smallest
-size accepted by any of the services invoked if an image exceeds that size.
-(For example, if service A accepts files up to 10 MB in size and service B
-accepts files up to 5 MB, all input images will be resized to 5 MB before
-sending them to A and B, even if A could accept a higher-resolution image.)
+accept input images in JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF formats.  To
+make the results from different services more easily comparable, Handprint
+will always convert all input images to the same format (PNG) no matter if
+some services may accept other formats; it will also resize input images to
+the smallest size accepted by any of the services invoked if an image exceeds
+that size.  (For example, if service A accepts files up to 10 MB in size and
+service B accepts files up to 5 MB, all input images will be resized to 5 MB
+before sending them to A and B, even if A could accept a higher-resolution
+image.)  In addition, a limitation of Handprint's current PDF support is that
+only the first image in a PDF file is read -- if a PDF file contains
+more than one image, the remaining images are ignored.
 
 The default action is to run all known services.  The option -s (/s on
 Windows) can be used to select only one service or a list of services
@@ -156,9 +159,9 @@ results will be written in files named after the original files with the
 addition of a string that indicates the service used.  For example, a file
 named "somefile.jpg" will result in
 
-  somefile.google.png
-  somefile.microsoft.png
-  somefile.amazon.png
+  somefile.handprint-google.png
+  somefile.handprint-microsoft.png
+  somefile.handprint-amazon.png
   ...
 
 and so on for each image and each service used.  THESE FILES ARE DELETED
@@ -175,22 +178,22 @@ arranged in a grid.  This is intended to make it easier to compare the
 results of multiple services against each other.  To skip the creation of the
 results grid, use the -G option (/G on Windows).  The grid image will be named
 
-  somefile.all-results.png
+  somefile.handprint-all.png
 
 If given the -e option (/e on Windows), Handprint will produce extended
 output that includes the complete response from the service (converted to a
 JSON file by Handprint) and the text extracted (stored as a .txt file).  The
 output of -e will be multiple files like this:
 
-  somefile.google.png
-  somefile.google.json
-  somefile.google.txt
-  somefile.microsoft.png
-  somefile.microsoft.json
-  somefile.microsoft.txt
-  somefile.amazon.png
-  somefile.amazon.json
-  somefile.amazon.txt
+  somefile.handprint-google.png
+  somefile.handprint-google.json
+  somefile.handprint-google.txt
+  somefile.handprint-microsoft.png
+  somefile.handprint-microsoft.json
+  somefile.handprint-microsoft.txt
+  somefile.handprint-amazon.png
+  somefile.handprint-amazon.json
+  somefile.handprint-amazon.txt
   ...
 
 The files will written to the directory indicated by -o, or (if -o is not
@@ -200,22 +203,13 @@ working directory instead.
 
 If an image is too large for any of the services invoked, then Handprint will
 resize it prior to sending the image to any of the services (as noted above).
-It will write the reduced image to a file named "FILENAME-reduced.EXT", where
+It will write the reduced image to a file named "FILENAME.handprint.EXT", where
 "FILENAME" is the original file name and "EXT" is the file extension.  This
-means that if an image needs to be resized, the results of applying the text
-recognition services will be, e.g.,
+file is normally deleted, unless you use the -e option (/e on Windows)
+mentioned above, in which case you will find this additional file in the same
+location as the others:
 
-  somefile-reduced.png
-  somefile-reduced.google.png
-  somefile-reduced.google.json
-  somefile-reduced.google.txt
-  somefile-reduced.microsoft.png
-  somefile-reduced.microsoft.json
-  somefile-reduced.microsoft.txt
-  somefile-reduced.amazon.json
-  somefile-reduced.amazon.png
-  somefile-reduced.amazon.txt
-  ...
+  somefile.handprint.png
 
 When the inputs are URLs, Handprint must download a copy of the image located
 at the network address (because it is not possible to write the results in
@@ -257,9 +251,9 @@ characteristics:
 Handprint will write the comparison results to a tab-delimited file named
 after the input image and service but with the extension ".tsv".  For
 example, for an input image "somefile.jpg" and results received from Google,
-the comparison results will be written to "somefile.google.tsv".  (The use of
-a tab-delimited format rather than comma-delimited format avoids the need to
-quote commas and other characters in the text.)
+the comparison results will be written to "somefile.handprint-google.tsv".
+(The use of a tab-delimited format rather than comma-delimited format avoids
+the need to quote commas and other characters in the text.)
 
 Handprint reports, for each text line, the number of errors (the Levenshtein
 edit distance) and the character error rate (CER), and at the end it also

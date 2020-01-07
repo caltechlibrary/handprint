@@ -23,9 +23,6 @@ from handprint.debug import log
 
 # Main class.
 # .............................................................................
-# The self._results property is a dictionary used to cache the results for
-# a given file.  This is to avoid using API calls to get the different
-# subelements of the results.
 
 class GoogleTR(TextRecognition):
     # The following is based on the table of Google Cloud Vision features at
@@ -34,12 +31,6 @@ class GoogleTR(TextRecognition):
     _known_features = ['face_detection', 'landmark_detection',
                        'label_detection', 'text_detection',
                        'document_text_detection', 'image_properties']
-
-
-    def __init__(self):
-        '''Initializes the credentials to use for accessing this service.'''
-        # Dictionary where the keys are the paths and values are an TRResult.
-        self._results = {}
 
 
     def init_credentials(self):
@@ -105,11 +96,6 @@ class GoogleTR(TextRecognition):
         '''Returns the results from calling the service on the 'path'.  The
         results are returned as an TRResult named tuple.
         '''
-        # Check if we already processed it.
-        if path in self._results:
-            if __debug__: log('returning already-known result for {}', path)
-            return self._results[path]
-
         # Read the image and proceed with contacting the service.
         (image, error) = self._image_from_file(path)
         if error:
@@ -161,10 +147,8 @@ class GoogleTR(TextRecognition):
                                 # Skip it and continue.
                                 if __debug__: log('bad bb for {}: {}', text, bb)
 
-            self._results[path] = TRResult(path = path, data = result,
-                                           boxes = boxes, text = full_text,
-                                           error = None)
-            return self._results[path]
+            return TRResult(path = path, data = result, boxes = boxes,
+                            text = full_text, error = None)
         except google.api_core.exceptions.PermissionDenied as ex:
             text = 'Authentication failure for Google service -- {}'.format(ex)
             raise AuthFailure(text)

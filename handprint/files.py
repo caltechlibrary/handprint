@@ -67,11 +67,11 @@ def handprint_path():
     if sys.platform.startswith('win'):
         from winreg import OpenKey, CloseKey, QueryValueEx, HKEY_LOCAL_MACHINE, KEY_READ
         try:
-            if __debug__: log('Reading Windows registry entry')
+            if __debug__: log('reading Windows registry entry')
             key = OpenKey(HKEY_LOCAL_MACHINE, _HANDPRINT_REG_PATH)
             value, regtype = QueryValueEx(key, 'Path')
             CloseKey(key)
-            if __debug__: log('Path to windows installation: {}'.format(value))
+            if __debug__: log('path to windows installation: {}'.format(value))
             return value
         except WindowsError:
             # Kind of a problem. Punt and return a default value.
@@ -158,10 +158,10 @@ def relative(file):
 def make_dir(dir_path):
     '''Creates directory 'dir_path' (including intermediate directories).'''
     if path.isdir(dir_path):
-        if __debug__: log('Reusing existing directory {}', dir_path)
+        if __debug__: log('reusing existing directory {}', dir_path)
         return
     else:
-        if __debug__: log('Creating directory {}', dir_path)
+        if __debug__: log('creating directory {}', dir_path)
         # If this gets an exception, let it bubble up to caller.
         os.makedirs(dir_path)
 
@@ -213,7 +213,11 @@ def delete_existing(file):
 def copy_file(src, dst):
     '''Copy a file from "src" to "dst".'''
     if __debug__: log('copying file {} to {}', src, dst)
-    shutil.copy2(src, dst, follow_symlinks = True)
+    try:
+        shutil.copy2(src, dst, follow_symlinks = True)
+    except:
+        if __debug__: log('shutils.copy2() failed; trying copy()')
+        shutil.copy(src, dst, follow_symlinks = True)
 
 
 def open_file(file):

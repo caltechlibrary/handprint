@@ -134,7 +134,8 @@ class TextRecognition(object):
         if not readable(file_path):
             return error_result('Unable to read file: {}'.format(file_path))
         if __debug__: log('reading image file {} for {}', file_path, self.name())
-        image = open(file_path, 'rb').read()
+        with open(file_path, 'rb') as image_file:
+            image = image_file.read()
         if len(image) == 0:
             return error_result('Empty file: {}'.format(file_path))
         if len(image) > self.max_size():

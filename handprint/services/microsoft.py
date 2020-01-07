@@ -22,10 +22,6 @@ from handprint.network import net
 # .............................................................................
 
 class MicrosoftTR(TextRecognition):
-    def __init__(self):
-        '''Initializes the credentials to use for accessing this service.'''
-        self._results = {}
-
 
     def init_credentials(self):
         '''Initializes the credentials to use for accessing this service.'''
@@ -91,11 +87,6 @@ class MicrosoftTR(TextRecognition):
         '''Returns all the results from calling the service on the 'path'. The
         results are returned as an TRResult named tuple.
         '''
-        # Check if we already processed it.
-        if path in self._results:
-            if __debug__: log('returning already-known result for {}', path)
-            return self._results[path]
-
         # Read the image and proceed with contacting the service.
         (image, error) = self._image_from_file(path)
         if error:
@@ -187,7 +178,5 @@ class MicrosoftTR(TextRecognition):
             boxes.append(TextBox(boundingBox = chunk['boundingBox'], text = chunk['text']))
 
         # Put it all together.
-        self._results[path] = TRResult(path = path, data = analysis,
-                                       text = full_text, boxes = boxes,
-                                       error = None)
-        return self._results[path]
+        return TRResult(path = path, data = analysis, text = full_text,
+                        boxes = boxes, error = None)

@@ -4,13 +4,15 @@ Change log for Handprint
 Version 1.2.0
 --------------
 
-* PDF files are now accepted as input. (Issue #11.)  Note, however, that
-Handprint will only extract the first image in the PDF file.
+* Two bugs related to running with multiple threads (the default) are hopefully fixed in this version:
+  * Sometimes the annotated image generated from a given service would have the results from another service also written over it.  This was inconsistent and intermittent, and the exact cause is still unclear, but this version of Handprint implements a workaround that hopefully stops this from happening.
+  * The Amazon service interface would sometimes fail with an error related to `endpoint_resolver`.  This was due to the previous code not following recommendations about using a different connection session object in each separate thread. This is now fixed.
 * This version changes the way output files are named.  The new scheme always includes the string `handprint` in the file name for easier recognition and to help reduce the chances of file name collisions.  The scheme uses the naming pattern `somefile.handprint.png` for
 the rescaled input image, `somefile.handprint-service.ext` for the
 various service output results, and `somefile.handprint-all.png` for the
 summary grid image.  (Issue #10.)
-* When running with multiple threads (the default), sometimes the annotated image generated from a given service would have the results from another service also written over it.  This was inconsistent and intermittent, and the exact cause is still unclear, but this version implements a workaround that hopefully stops this from happening.
+* PDF files are now accepted as input. (Issue #11.)  Note, however, that
+Handprint will only extract the first image in the PDF file.
 * The order in which resizing and rescaling is done has been swapped: if a file is too large, Handprint will first rescale it, and then if it is still too big (in byte size), it will resize the file.  This appears to result in images that have higher resolution than the previous approach, which did the steps in the opposite order.
 * The URLs in the file of example URLs, `tests/urls/caltech-archives-urls.txt`, have become invalid. They have been replaced with other URLs that are valid (as of right now, anyway).
 * A few more bugs have been fixed.

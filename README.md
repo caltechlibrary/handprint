@@ -14,7 +14,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 ❡ Log of recent changes
 -----------------------
 
-_Version 1.1.0_: New options `-c` and `-r` added, allowing comparison of extracted text to expected (ground truth) text; see [the relevant section in this README file](#comparison-to-ground-truth-text) for more information. Also, the debug option `-@` now accepts an argument for where to send the debug output trace; the behavior change of `-@` is not backward compatible.  Finally, there are internal architectural and organizational changes.
+_Version 1.2.0_: This version fixes a bug in creating annotated results images, in which results from multiple services were overwritten on top of each other. It also fixes a bug with the Amazon interface that resulted in occasional random errors about `endpoint_resolver`. This version of Handprint also changes how output files are written; the new scheme uses the naming pattern `somefile.handprint.png` for the rescaled input image, `somefile.handprint-service.png` for the various service output results, and `somefile.handprint-all.png` for the summary grid image.  Handprint now also accepts PDF files as input.
 
 The file [CHANGES](CHANGES.md) contains a more complete change log, and includes information about previous releases.
 

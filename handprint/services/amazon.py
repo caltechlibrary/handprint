@@ -82,7 +82,8 @@ class AmazonTR(TextRecognition):
         if __debug__: log('setting up Amazon client function "{}"', variant)
         creds = self._credentials
         try:
-            client = boto3.client(variant, region_name = creds['region_name'],
+            session = boto3.session.Session()
+            client = session.client(variant, region_name = creds['region_name'],
                                   aws_access_key_id = creds['aws_access_key_id'],
                                   aws_secret_access_key = creds['aws_secret_access_key'])
             if __debug__: log('calling Amazon API function')

@@ -213,7 +213,11 @@ def delete_existing(file):
 def copy_file(src, dst):
     '''Copy a file from "src" to "dst".'''
     if __debug__: log('copying file {} to {}', src, dst)
-    shutil.copy2(src, dst, follow_symlinks = True)
+    try:
+        shutil.copy2(src, dst, follow_symlinks = True)
+    except:
+        if __debug__: log('shutils.copy2() failed; trying copy()')
+        shutil.copy(src, dst, follow_symlinks = True)
 
 
 def open_file(file):

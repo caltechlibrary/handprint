@@ -26,7 +26,7 @@ from   os import path
 import shutil
 
 import sys
-from   threading import Thread
+from   threading import Thread, Lock
 import time
 from   timeit import default_timer as timer
 import urllib
@@ -75,6 +75,8 @@ Result.__doc__ = '''Results from calling an HTR service on an input.
 # .............................................................................
 
 class Manager:
+    '''Manage invocation of services and creation of outputs.'''
+
     def __init__(self, service_names, num_threads, output_dir, make_grid,
                  compare, extended):
         '''Initialize manager for services.  This will also initialize the
@@ -220,6 +222,19 @@ class Manager:
         return (file, orig_fmt)
 
 
+    # The following thread lock is used in _send(...) around a call to creating
+    # an annotated image of the results from a service.  The annotation
+    # function in question uses image functions from matplotlib, and during
+    # multithreaded execution, for reasons that are not clear to me, sometimes
+    # an annotated image for a given service would end up with results from
+    # another service also added over it.  I've been unable to find an error
+    # in my code, and suspect the problem is some kind of thread safety issue
+    # in those low-level image functions (perhaps only on some platforms like
+    # macOS).  Preventing multithreaded execution around that one call seems
+    # to be enough to stop the problem.  Admittedly, it's a sledgehammer
+    # approach, but many hours of testing have yet to find a better solution.
+    _lock = Lock()
+
     def _send(self, image, service):
         '''Send the "image" to the service named "service" and write output in
         directory "dest_dir".
@@ -251,7 +266,8 @@ class Manager:
         if self._make_grid:
             annot_path = self._renamed(base_path, str(service), 'png')
             inform('Creating annotated image for {}.', service_name)
-            self._save(annotated_image(image.file, output.boxes, service), annot_path)
+            with self._lock:
+                self._save(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = self._renamed(base_path, str(service), 'txt')
             json_file = self._renamed(base_path, str(service), 'json')

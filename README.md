@@ -353,7 +353,7 @@ The following table summarizes all the command line options available. (Note: on
 
 
 ☹︎ Known issues and limitations
--------------------------------
+------------------------------
 
 Here are some known limitations in the current version of Handprint:
 

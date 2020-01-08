@@ -352,13 +352,14 @@ The following table summarizes all the command line options available. (Note: on
 ⬥ &nbsp; To write to the console, use the character `-` as the value of _OUT_; otherwise, _OUT_ must be the name of a file where the output should be written.
 
 
-⚑ Known issues and limitations
+☹︎ Known issues and limitations
 -------------------------------
 
 Here are some known limitations in the current version of Handprint:
 
 * The Amazon Rekognition API will return [at most 50 words in an image](https://docs.aws.amazon.com/rekognition/latest/dg/limits.html).
 * Some services have different file size restrictions depending on the format of the file, but Handprint always uses the same limit for all files for a given service.  This is a code simplification.
+* When the input is a PDF file, only the first image in the PDF file is used; the rest (if any) are ignored.
 
 
 ⁇ Getting help

@@ -7,14 +7,14 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.5+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
-[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1324)](https://data.caltech.edu/records/1324)
+[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1334)](https://data.caltech.edu/records/1334)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
 
 
 ❡ Log of recent changes
 -----------------------
 
-_Version 1.1.0_: New options `-c` and `-r` added, allowing comparison of extracted text to expected (ground truth) text; see [the relevant section in this README file](#comparison-to-ground-truth-text) for more information. Also, the debug option `-@` now accepts an argument for where to send the debug output trace; the behavior change of `-@` is not backward compatible.  Finally, there are internal architectural and organizational changes.
+_Version 1.2.0_: This version fixes a bug in creating annotated results images, in which results from multiple services were overwritten on top of each other. It also fixes a bug with the Amazon interface that resulted in occasional random errors about `endpoint_resolver`. This version of Handprint also changes how output files are written; the new scheme uses the naming pattern `somefile.handprint.png` for the rescaled input image, `somefile.handprint-service.png` for the various service output results, and `somefile.handprint-all.png` for the summary grid image.  Handprint now also accepts PDF files as input.
 
 The file [CHANGES](CHANGES.md) contains a more complete change log, and includes information about previous releases.
 
@@ -45,7 +45,7 @@ The file [CHANGES](CHANGES.md) contains a more complete change log, and includes
 
 <img align="right" width="550px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/glaser-example-google.jpg">
 
-Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the performance of alternative services for [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.  Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/), and more.  Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, to visualize the results.  The image at right shows an example.
+Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the performance of alternative services for offline [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.  Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/), and more.  Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, to visualize the results.  The image at right shows an example.
 
 Handprint can work with individual images, directories of images, and URLs pointing to images on remote servers.  In addition to producing annotated images as output, it can output the raw results from an HTR service as JSON and text files.  Handprint can use multiple processor threads for parallel execution.
 
@@ -104,7 +104,7 @@ handprint -a microsoft myazurecredentials.json
 
 Credentials for using a Google service account need to be stored in a JSON file that contains many fields.  The overall format looks like this:
 
-```
+```json
 {
   "type": "service_account",
   "project_id": "theid",
@@ -221,7 +221,7 @@ The individual results, as well as individual annotated images corresponding to 
 
 Handprint supports comparing the output of HTR services to expected output (i.e., ground truth) using the option `-c` (or `/c` on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:
 
-* The file containing the expected results should be named `.gt.txt`, with a base name identical to the image file.  For example, an image file named `somefile.jpg` should have a corresponding text file `somefile.gt.txt`.
+* The file containing the expected results should be named `.gt.txt`, with a base name identical to the image file.  For example, an image file named `somefile.jpg` should have a corresponding text file `somefile.gt.txt`.  (This is a convention used by some other tools such as [ocropy](https://github.com/tmbdev/ocropy/wiki/Working-with-Ground-Truth).)
 * The ground-truth text file should be located in the same directory as the input image file.
 * The text should be line oriented, with each line representing a line of text in the image.
 * The text should be plain text only.  No Unicode or binary encodings.  (This limitation comes from the HTR services, which &ndash; as of this writing &ndash; return results in plain text format.)
@@ -249,7 +249,7 @@ Handprint attempts to cope with possibly-missing text in the HTR results by matc
 The following is an example of a tab-separated file produced using `-c`.  This example shows a case where two lines were missing entirely from the HTR results; for those lines, the number of errors equals the length of the ground-truth text lines and the CER is 100%.
 
 <p align="center">
-<img width="60%" src=".graphics/example-tsv-file.png">
+<img width="60%" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/example-tsv-file.png">
 </p>
 
 
@@ -352,13 +352,15 @@ The following table summarizes all the command line options available. (Note: on
 ⬥ &nbsp; To write to the console, use the character `-` as the value of _OUT_; otherwise, _OUT_ must be the name of a file where the output should be written.
 
 
-⚑ Known issues and limitations
--------------------------------
+☹︎ Known issues and limitations
+------------------------------
 
 Here are some known limitations in the current version of Handprint:
 
 * The Amazon Rekognition API will return [at most 50 words in an image](https://docs.aws.amazon.com/rekognition/latest/dg/limits.html).
+* The Microsoft Azure API will only detect a maximum of [300 lines of text per page](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/concept-recognizing-text).
 * Some services have different file size restrictions depending on the format of the file, but Handprint always uses the same limit for all files for a given service.  This is a code simplification.
+* When the input is a PDF file, only the first image in the PDF file is used; the rest (if any) are ignored.
 
 
 ⁇ Getting help

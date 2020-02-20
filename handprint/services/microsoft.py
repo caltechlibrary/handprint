@@ -3,6 +3,18 @@ microsoft.py: interface to Microsoft text recognition network service
 
 This code was originally based on the sample provided by Microsoft at
 https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts/python-hand-text
+
+Authors
+-------
+
+Michael Hucka <mhucka@caltech.edu> -- Caltech Library
+
+Copyright
+---------
+
+Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+is open-source software released under a 3-clause BSD license.  Please see the
+file "LICENSE" for more information.
 '''
 
 import os

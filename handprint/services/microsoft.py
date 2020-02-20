@@ -175,7 +175,8 @@ class MicrosoftTR(TextRecognition):
 
         boxes = []
         for chunk in lines:
-            boxes.append(TextBox(boundingBox = chunk['boundingBox'], text = chunk['text']))
+            for word in chunk['words']:
+                boxes.append(TextBox(boundingBox = word['boundingBox'], text = word['text']))
 
         # Put it all together.
         return TRResult(path = path, data = analysis, text = full_text,

@@ -1,6 +1,11 @@
 Change log for Handprint
 ========================
 
+Version 1.2.1
+--------------
+
+* Fix Microsoft output in the annotated images to be word-based, rather than line-based, to be the same as for the other services.
+
 Version 1.2.0
 --------------
 

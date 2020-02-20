@@ -14,7 +14,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 ❡ Log of recent changes
 -----------------------
 
-_Version 1.2.1_: This release fixes an inconsistency (compared to other Handprint output) in the way that Microsoft's text recognition service results are drawn on annotated images.
+_Version 1.2.2_: This release fixes an inconsistency (compared to other Handprint output) in the way that Microsoft's text recognition service results are drawn on annotated images.  The copyright year in source files has also been updated.
 
 _Version 1.2.0_: This version fixes a bug in creating annotated results images, in which results from multiple services were overwritten on top of each other. It also fixes a bug with the Amazon interface that resulted in occasional random errors about `endpoint_resolver`. This version of Handprint also changes how output files are written; the new scheme uses the naming pattern `somefile.handprint.png` for the rescaled input image, `somefile.handprint-service.png` for the various service output results, and `somefile.handprint-all.png` for the summary grid image.  Handprint now also accepts PDF files as input.
 
@@ -380,7 +380,7 @@ I would be happy to receive your help and participation with enhancing Handprint
 ⧴ License
 ---------
 
-Copyright (C) 2018&ndash;2019, Caltech.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
+Copyright (C) 2018&ndash;2020, Caltech.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
 
 
 ☺︎ Authors and history

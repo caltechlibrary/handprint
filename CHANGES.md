@@ -1,6 +1,11 @@
 Change log for Handprint
 ========================
 
+Version 1.2.2
+--------------
+
+* Update copyright year in various source files.
+
 Version 1.2.1
 --------------
 

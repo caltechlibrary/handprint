@@ -73,7 +73,7 @@ python3 -m pip install handprint --user --upgrade
 
 As an alternative to getting it from PyPI, you can instruct `pip` to install Handprint directly from the GitHub repository:
 ```sh
-python3 -m pip install git+https@github.com:caltechlibrary/handprint.git --user --upgrade
+python3 -m pip install git+https://github.com/caltechlibrary/handprint.git --user --upgrade
 ```
 
 

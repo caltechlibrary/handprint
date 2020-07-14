@@ -7,6 +7,7 @@ from   http.client import responses as http_responses
 import requests
 from   requests.packages.urllib3.exceptions import InsecureRequestWarning
 from   time import sleep
+import socket
 import ssl
 import urllib
 from   urllib import request
@@ -28,7 +29,7 @@ _MAX_RECURSIVE_CALLS = 10
 encountering a network error before they stop and give up.'''
 
 _MAX_FAILURES = 3
-'''Maximum number of network failures before we give up.'''
+'''Maximum number of consecutive failures before pause and try another round.'''
 
 _MAX_RETRIES = 5
 '''Maximum number of times we back off and try again.  This also affects the
@@ -38,17 +39,24 @@ maximum wait time that will be reached after repeated retries.'''
 # Main functions.
 # .............................................................................
 
-def network_available():
-    '''Return True if it appears we have a network connection, False if not.'''
-    r = None
+def network_available(address = "8.8.8.8", port = 53, timeout = 5):
+    '''Return True if it appears we have a network connection, False if not.
+    By default, this attempts to contact one of the Google DNS servers (as a
+    plain TCP connection, not as an actual DNS lookup).  Argument 'address'
+    and 'port' can be used to test a different server address and port.  The
+    socket connection is attempted for 'timeout' seconds.
+    '''
+    # Portions of this code are based on the answer by user "7h3rAm" posted to
+    # Stack Overflow here: https://stackoverflow.com/a/33117579/743730
     try:
-        r = urllib.request.urlopen("http://www.google.com")
+        if __debug__: log('testing if we have a working network')
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((address, port))
+        if __debug__: log('we have a network connection')
         return True
-    except Exception:
-        if __debug__: log('could not connect to https://www.google.com')
-        return False
-    if r:
-        r.close()
+    except socket.error as ex:
+        if __debug__: log('could not connect to 8.8.8.8: {}', str(ex))
+    return False
 
 
 def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
@@ -74,24 +82,24 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
                 else:
                     method = requests.get if get_or_post == 'get' else requests.post
                 response = method(url, timeout = timeout, verify = False, **kwargs)
-                if __debug__: log('received {} bytes', len(response.content))
+                if __debug__: log('response received')
                 return response
         except Exception as ex:
             # Problem might be transient.  Don't quit right away.
-            if __debug__: log('exception: {}', str(ex))
             failures += 1
+            if __debug__: log('exception (failure #{}): {}', failures, str(ex))
             # Record the first error we get, not the subsequent ones, because
             # in the case of network outages, the subsequent ones will be
             # about being unable to reconnect and not the original problem.
             if not error:
                 error = ex
         if failures >= _MAX_FAILURES:
-            # Try pause & continue, in case of transient network issues.
+            # Pause with exponential back-off, reset failure count & try again.
             if retries < _MAX_RETRIES:
                 retries += 1
-                if __debug__: log('pausing because of consecutive failures')
-                sleep(60 * retries)
                 failures = 0
+                if __debug__: log('pausing because of consecutive failures')
+                sleep(10 * retries * retries)
             else:
                 # We've already paused & restarted once.
                 raise error
@@ -151,7 +159,7 @@ def download(url, user, password, local_destination, recursing = 0):
         # Code 202 = Accepted, "received but not yet acted upon."
         sleep(1)                        # Sleep a short time and try again.
         recursing += 1
-        if __debug__: log('Calling download() recursively for http code 202')
+        if __debug__: log('calling download() recursively for http code 202')
         download(url, user, password, local_destination, recursing)
     elif 200 <= code < 400:
         # This started as code in https://stackoverflow.com/a/13137873/743730
@@ -159,9 +167,10 @@ def download(url, user, password, local_destination, recursing = 0):
         # file always ended up zero-length.  I couldn't figure out why.
         with open(local_destination, 'wb') as f:
             for chunk in req.iter_content(chunk_size = 1024):
-                if chunk:
-                    f.write(chunk)
+                f.write(chunk)
         req.close()
+        size = stat(local_destination).st_size
+        if __debug__: log('wrote {} bytes to file {}', size, local_destination)
     elif code in [401, 402, 403, 407, 451, 511]:
         raise AuthFailure(addurl('Access is forbidden'))
     elif code in [404, 410]:
@@ -193,13 +202,16 @@ def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwar
 
     If keyword 'polling' is True, certain statuses like 404 are ignored and
     the response is returned; otherwise, they are considered errors.
+
+    This method hands allow_redirects = True to the underlying Python requests
+    network call.
     '''
     def addurl(text):
         return (text + ' for {}').format(url)
 
     req = None
     try:
-        req = timed_request(get_or_post, url, session, **kwargs)
+        req = timed_request(get_or_post, url, session, allow_redirects = True, **kwargs)
     except requests.exceptions.ConnectionError as ex:
         if recursing >= _MAX_RECURSIVE_CALLS:
             return (req, NetworkFailure(addurl('Too many connection errors')))
@@ -235,7 +247,7 @@ def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwar
     code = req.status_code
     error = None
     if code == 400:
-        error = RequestError('Server rejected the request')
+        error = ServiceFailure('Server rejected the request')
     elif code in [401, 402, 403, 407, 451, 511]:
         error = AuthFailure(addurl('Access is forbidden'))
     elif code in [404, 410] and not polling:

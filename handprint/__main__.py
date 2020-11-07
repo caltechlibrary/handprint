@@ -41,6 +41,7 @@ import sys
 from   sys import exit as exit
 
 import handprint
+from   handprint import print_version
 from handprint.cpus import available_cpus
 from handprint.credentials import Credentials
 from handprint.debug import set_debug, log

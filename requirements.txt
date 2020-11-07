@@ -20,6 +20,7 @@ psutil>=5.6.3
 PyMuPDF>=1.16.0
 requests>=2.19.1
 setuptools>=39.1.0
+sidetrack>=1.2.0
 StringDist>=1.0.9
 termcolor>=1.1.0
 textdistance>=4.1.5

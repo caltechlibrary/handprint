@@ -18,6 +18,7 @@ import io
 import matplotlib
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+from   matplotlib.patches import Rectangle
 import numpy as np
 import os
 from   os import path
@@ -58,8 +59,19 @@ import warnings
 # switch not only the backend, but also the output format to PNG (which is
 # a format that Cairo does write) in order to make it all work.
 #
+# Update 2020-11-07: using the Cairo backend now causes matplotlib to produce
+# a warning in the function annotated_image() in this file: "UserWarning:
+# Starting a Matplotlib GUI outside of the main thread will likely fail."
+# The thing is, it still worked (it's not actually being used interactively).
+# Nevertheless, I tried switching the back end to PDF and it went away.  It
+# occurs to me that if there was threading issue, it might also explain why I
+# was experiencing the behavior noted above with the Agg renderer.  In my
+# defense, the reason I didn't try this before is that it's not clear that
+# one *can* produce PNG output even when the backend is set to PDF. The
+# Matplotlib documentation doesn't make that obvious at all.
+
 try:
-    plt.switch_backend('cairo')
+    plt.switch_backend('pdf')
 except:
     pass
 

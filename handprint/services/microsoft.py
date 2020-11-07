@@ -65,11 +65,9 @@ class MicrosoftTR(TextRecognition):
 
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
-        # https://cloud.google.com/vision/docs/supported-files
-        # Google Cloud Vision API docs state that images can't exceed 20 MB
-        # but the JSON request size limit is 10 MB.  We hit the 10 MB limit
-        # even though we're using the Google API library, which I guess must
-        # be transferring JSON under the hood.
+        # Microsoft Azure documentation states the file size limit for
+        # prediction is 4 MB in the free tier.
+        # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/concept-recognizing-text
         return 4*1024*1024
 
 
@@ -77,7 +75,7 @@ class MicrosoftTR(TextRecognition):
         '''Maximum image size as a tuple of pixel numbers: (width, height).'''
         # For OCR, max image dimensions are 4200 x 4200.
         # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home
-        return (4200, 4200)
+        return (10000, 10000)
 
 
     # General scheme of things:
@@ -104,9 +102,7 @@ class MicrosoftTR(TextRecognition):
         if error:
             return error
 
-        base_url = 'https://westus.api.cognitive.microsoft.com/vision/v2.0/'
-        url = base_url + 'recognizeText'
-        params  = {'mode': 'Handwritten'}
+        url = 'https://westus.api.cognitive.microsoft.com/vision/v3.0/read/analyze'
         headers = {'Ocp-Apim-Subscription-Key': self._credentials,
                    'Content-Type': 'application/octet-stream'}
 
@@ -115,7 +111,7 @@ class MicrosoftTR(TextRecognition):
         # text is ready to be retrieved.
 
         if __debug__: log('sending file to MS cloud service')
-        response, error = net('post', url, headers = headers, params = params, data = image)
+        response, error = net('post', url, headers = headers, data = image)
         if isinstance(error, NetworkFailure):
             if __debug__: log('network exception: {}', str(error))
             return TRResult(path = path, data = {}, text = '', error = str(error))
@@ -166,20 +162,36 @@ class MicrosoftTR(TextRecognition):
             # else should be done except keep going.
             if response.text:
                 analysis = response.json()
-                if 'recognitionResult' in analysis:
-                    poll = False
-                if 'status' in analysis and analysis['status'] == 'Failed':
-                    poll = False
+                if 'status' in analysis:
+                    if analysis['status'] in ('notStarted', 'running'):
+                        if __debug__: log('Microsoft still processing image')
+                        poll = True
+                    elif analysis['status'] == 'succeeded':
+                        if __debug__: log('Microsoft returned success code')
+                        poll = False
+                    elif analysis['status'] == 'failed':
+                        text = 'Microsoft analysis failed'
+                        return TRResult(path = path, data = {}, text = '', error = text)
+                    else:
+                        text = 'Error: Microsoft returned unexpected result'
+                        return TRResult(path = path, data = {}, text = '', error = text)
+                else:
+                    # No status key in JSON results means something's wrong.
+                    text = 'Error: Microsoft results not in expected format'
+                    return TRResult(path = path, data = {}, text = '', error = text)
             else:
                 if __debug__: log('received empty result from Microsoft.')
-        if __debug__: log('results received.')
 
+        if __debug__: log('results received.')
         # Have to extract the text into a single string.
         full_text = ''
-        if 'recognitionResult' in analysis:
-            lines = analysis['recognitionResult']['lines']
-            sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
-            full_text = '\n'.join(x['text'] for x in sorted_lines)
+        if 'analyzeResult' in analysis:
+            results = analysis['analyzeResult']
+            if 'readResults' in results:
+                # We only return the 1st page.  FIXME: should check if > 1.
+                lines = results['readResults'][0]['lines']
+                sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
+                full_text = '\n'.join(x['text'] for x in sorted_lines)
 
         # Create our particular box structure for annotations.  The Microsoft
         # structure is like this: data['recognitionResult']['lines'] contains

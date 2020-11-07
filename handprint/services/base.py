@@ -16,9 +16,9 @@ file "LICENSE" for more information.
 
 from collections import namedtuple
 import imagesize
+from   sidetrack import log
 
 import handprint
-from handprint.debug import log
 from handprint.files import readable
 
 

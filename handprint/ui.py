@@ -22,10 +22,10 @@ file "LICENSE" for more information.
 import getpass
 import os
 import os.path as path
+from   sidetrack import log
 import sys
 from   time import sleep
 
-from .debug import log
 from .exceptions import *
 from .files import readable
 from .styled import Styled, unstyled

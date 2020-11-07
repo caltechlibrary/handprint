@@ -16,9 +16,8 @@ file "LICENSE" for more information.
 
 import os
 import re
+from   sidetrack import log
 import subprocess
-
-from handprint.debug import log
 
 
 # Main functions.

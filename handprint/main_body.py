@@ -16,11 +16,11 @@ file "LICENSE" for more information.
 
 import os
 from   os import path
+from   sidetrack import log
 import sys
 
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
-from handprint.debug import set_debug, log
 from handprint.exceptions import *
 from handprint.files import filename_extension, filename_basename
 from handprint.files import files_in_directory, filter_by_extensions

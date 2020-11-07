@@ -18,13 +18,13 @@ import io
 import os
 from   os import path
 import re
+from   sidetrack import log
 import shutil
 import sys
 import subprocess
 import webbrowser
 
 import handprint
-from handprint.debug import log
 
 
 # Constants.

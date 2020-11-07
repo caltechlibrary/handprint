@@ -40,11 +40,13 @@ import plac
 import sys
 from   sys import exit as exit
 
+if __debug__:
+    from sidetrack import set_debug, log, logr
+
 import handprint
 from   handprint import print_version
 from handprint.cpus import available_cpus
 from handprint.credentials import Credentials
-from handprint.debug import set_debug, log
 from handprint.exceptions import *
 from handprint.files import filename_extension, files_in_directory, is_url
 from handprint.files import readable, writable
@@ -324,7 +326,7 @@ Command-line arguments summary
     # Preprocess arguments and handle early exits -----------------------------
 
     if debugging:
-        set_debug(True, debug)
+        set_debug(True, debug, extra = '%(threadName)s')
 
     if version:
         print_version()

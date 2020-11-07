@@ -7,6 +7,7 @@ from   http.client import responses as http_responses
 import requests
 from   requests.packages.urllib3.exceptions import InsecureRequestWarning
 from   time import sleep
+from   sidetrack import log
 import socket
 import ssl
 import urllib
@@ -15,7 +16,6 @@ import urllib3
 import warnings
 
 import handprint
-from   handprint.debug import log
 from   handprint.exceptions import *
 from   handprint.styled import styled
 from   handprint.ui import inform, alert, warn

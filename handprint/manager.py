@@ -24,6 +24,7 @@ import math
 import os
 from   os import path
 import shutil
+from   sidetrack import log
 
 import sys
 from   threading import Thread, Lock
@@ -34,7 +35,6 @@ import urllib
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.comparison import text_comparison
-from handprint.debug import log
 from handprint.exceptions import *
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path

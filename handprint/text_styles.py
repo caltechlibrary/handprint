@@ -16,8 +16,7 @@ file "LICENSE" for more information.
 
 import colorful
 from   os import path
-
-from .debug import log
+from   sidetrack import log
 
 # A missing load statement in colorful 0.53 (the currently-released version
 # as of 2019-08-29) means the COLORNAMES_COLOR palette was actually not

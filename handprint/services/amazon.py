@@ -18,6 +18,7 @@ import boto3
 import imagesize
 import os
 from   os import path
+from   sidetrack import log
 import sys
 from   time import sleep
 
@@ -26,7 +27,6 @@ from handprint.credentials.amazon_auth import AmazonCredentials
 from handprint.files import readable
 from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.exceptions import *
-from handprint.debug import log
 from handprint.network import net
 
 

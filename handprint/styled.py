@@ -16,11 +16,10 @@ file "LICENSE" for more information.
 
 
 import colorful
-from colorful.core import ColorfulString
+from   colorful.core import ColorfulString
+from   sidetrack import log
 
 colorful.use_256_ansi_colors()
-
-from .debug import log
 
 
 # Exported classes.

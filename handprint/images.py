@@ -23,6 +23,7 @@ import numpy as np
 import os
 from   os import path
 from   PIL import Image
+from   sidetrack import log
 import warnings
 
 # The following is needed for function annotated_image(...) in this file.
@@ -76,7 +77,6 @@ except:
     pass
 
 import handprint
-from handprint.debug import log
 from handprint.exceptions import *
 from handprint.files import relative, readable
 from handprint.files import filename_extension, filename_basename

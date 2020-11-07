@@ -35,7 +35,7 @@ file "LICENSE" for more information.
 '''
 
 import os
-from   os import path
+from   os import path, cpu_count
 import plac
 import sys
 from   sys import exit as exit
@@ -45,7 +45,6 @@ if __debug__:
 
 import handprint
 from   handprint import print_version
-from handprint.cpus import available_cpus
 from handprint.credentials import Credentials
 from handprint.exceptions import *
 from handprint.files import filename_extension, files_in_directory, is_url
@@ -373,7 +372,7 @@ Command-line arguments summary
     from_file  = None if from_file == 'F' else from_file
     output_dir = None if output_dir == 'O' else output_dir
     compare    = 'relaxed' if (compare and relaxed) else compare
-    threads    = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
+    threads    = int(max(1, cpu_count()/2 if threads == 'T' else int(threads)))
 
     # Do the real work --------------------------------------------------------
 

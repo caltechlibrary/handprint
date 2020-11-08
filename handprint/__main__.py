@@ -46,6 +46,7 @@ if __debug__:
 import handprint
 from handprint.credentials import Credentials
 from handprint.exceptions import *
+from handprint.exit_codes import ExitCode
 from handprint.files import filename_extension, files_in_directory, is_url
 from handprint.files import readable, writable
 from handprint.main_body import MainBody
@@ -307,6 +308,21 @@ debugger upon the occurrence of any errors.  The debug trace will be sent to
 the given destination, which can be '-' to indicate console output, or a file
 path to send the output to a file.
 
+Return values
+~~~~~~~~~~~~~
+
+This program exits with a return code of 0 if no problems are encountered.
+It returns a nonzero value otherwise. The following table lists the possible
+return values:
+
+    0 = success -- program completed normally
+    1 = the user interrupted the program's execution
+    2 = encountered a bad or missing value for an option
+    3 = no network detected -- cannot proceed
+    4 = file error -- encountered a problem with a file
+    5 = server error -- encountered a problem with a server
+    6 = an exception or fatal error occurred
+
 Command-line arguments summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 '''
@@ -325,42 +341,42 @@ Command-line arguments summary
 
     if version:
         print_version()
-        exit(0)
+        exit(int(ExitCode.success))
     if list:
         inform('Known services: {}', ', '.join(services_list()))
-        exit(0)
+        exit(int(ExitCode.success))
 
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
             alert('Unknown service: "{}". {}', service, hint)
-            exit(1)
+            exit(int(ExitCode.bad_arg))
         if not files or len(files) > 1:
             alert('Option {}a requires one file. {}', prefix, hint)
-            exit(1)
+            exit(int(ExitCode.bad_arg))
         creds_file = files[0]
         if not readable(creds_file):
             alert('File not readable: {}', creds_file)
-            exit(1)
+            exit(int(ExitCode.file_error))
         Credentials.save_credentials(service, creds_file)
         inform('Saved credentials for service "{}".', service)
-        exit(0)
+        exit(int(ExitCode.success))
     if no_grid and not extended and not compare:
         alert('{0}G without {0}e or {0}c produces no output. {1}', prefix, hint)
-        exit(1)
+        exit(int(ExitCode.bad_arg))
     if any(item.startswith('-') for item in files):
         alert('Unrecognized option in arguments. {}', hint)
-        exit(1)
+        exit(int(ExitCode.bad_arg))
     if not files and from_file == 'F':
         alert('Need images or URLs to have something to do. {}', hint)
-        exit(1)
+        exit(int(ExitCode.bad_arg))
     if relaxed and not compare:
         warn('Option {0}r without {0}c has no effect. {1}', prefix, hint)
 
     services = services_list() if services == 'S' else services.lower().split(',')
     if not all(s in services_list() for s in services):
         alert('"{}" is not a known services. {}', services, hint)
-        exit(1)
+        exit(int(ExitCode.bad_arg))
 
     base_name  = 'document' if base_name == 'B' else base_name
     from_file  = None if from_file == 'F' else from_file
@@ -379,7 +395,7 @@ Command-line arguments summary
     except (KeyboardInterrupt, UserCancelled) as ex:
         if __debug__: log('received {}', sys.exc_info()[0].__name__)
         inform('Quitting.')
-        exit(0)
+        exit(int(ExitCode.success))
     except Exception as ex:
         if debugging:
             import traceback
@@ -387,7 +403,7 @@ Command-line arguments summary
             import pdb; pdb.set_trace()
         else:
             alert(str(ex))
-            exit(2)
+            exit(int(ExitCode.exception))
     inform('Done.')
 
 

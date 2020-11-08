@@ -20,18 +20,36 @@ file "LICENSE" for more information.
 '''
 
 import getpass
-import os
-import os.path as path
-from   sidetrack import log
+from   queue import Queue
+from   rich import box
+from   rich.box import HEAVY
+from   rich.console import Console
+from   rich.panel import Panel
+from   rich.style import Style
+from   rich.theme import Theme
+import shutil
 import sys
-from   time import sleep
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 from .exceptions import *
-from .files import readable
-from .styled import Styled, unstyled
 
 
-# Exported functions
+# Constants.
+# .............................................................................
+
+_CLI_THEME = Theme({
+    'info'        : 'green3',
+    'warn'        : 'orange1',
+    'warning'     : 'orange1',
+    'alert'       : 'red',
+    'alert_fatal' : 'bold red',
+    'fatal'       : 'bold red',
+})
+
+
+# Exported functions.
 # .............................................................................
 # These methods get an instance of the UI by themselves and do not require
 # callers to do it.  They are meant to be used largely like basic functions
@@ -43,9 +61,6 @@ def inform(text, *args):
     args are values to use in those placeholders.
     '''
     ui = UI.instance()
-    if not ui.use_color():
-        text = unstyled(text)
-        args = [unstyled(x) for x in args]
     ui.inform(text, *args)
 
 
@@ -56,9 +71,6 @@ def warn(text, *args):
     alert(...) method instead.)
     '''
     ui = UI.instance()
-    if not ui.use_color():
-        text = unstyled(text)
-        args = [unstyled(x) for x in args]
     ui.warn(text, *args)
 
 
@@ -67,9 +79,6 @@ def alert(text, *args):
     there is a problem that will prevent normal execution.
     '''
     ui = UI.instance()
-    if not ui.use_color():
-        text = unstyled(text)
-        args = [unstyled(x) for x in args]
     ui.alert(text, *args)
 
 
@@ -84,9 +93,6 @@ def alert_fatal(text, *args, **kwargs):
     application can regain control and exit.
     '''
     ui = UI.instance()
-    if not ui.use_color():
-        text = unstyled(text)
-        args = [unstyled(x) for x in args]
     ui.alert_fatal(text, *args, **kwargs)
 
 
@@ -190,10 +196,14 @@ class UI(UIBase):
 
     __instance = None
 
-    def __new__(cls, name, subtitle, use_gui, use_color, be_quiet):
+    def __new__(cls, name, subtitle, use_gui = False, use_color = True, be_quiet = False):
         '''Return an instance of the appropriate user interface handler.'''
         if cls.__instance is None:
-            obj = GUI if use_gui else CLI
+            if use_gui:
+                from .gui import GUI
+                obj = GUI
+            else:
+                obj = CLI
             cls.__instance = obj(name, subtitle, use_gui, use_color, be_quiet)
         return cls.__instance
 
@@ -203,17 +213,44 @@ class UI(UIBase):
         return cls.__instance
 
 
-class CLI(UIBase, Styled):
+class CLI(UIBase):
     '''Command-line interface.'''
 
-    def __init__(self, name, subtitle, use_gui, use_color, be_quiet):
+
+    def __init__(self, name, subtitle,
+                 use_gui = False, use_color = True, be_quiet = False):
         UIBase.__init__(self, name, subtitle, use_gui, use_color, be_quiet)
-        Styled.__init__(self, apply_styling = not use_gui, use_color = use_color)
+        if __debug__: log('initializing CLI')
+        self._started = False
+
+        # If another thread was eager to send messages before we finished
+        # initialization, messages will get queued up on this internal queue.
+        self._queue = Queue()
+
+        # Initialize output configuration.
+        self._console = Console(theme = _CLI_THEME,
+                                color_system = "auto" if use_color else None)
+
+        if not be_quiet:
+            # We need the plain_text version in any case, to calculate length.
+            plain_text = f'Welcome to {name}: {subtitle}'
+            fancy_text = f'Welcome to [bold chartreuse1]{name}[/]: {subtitle}'
+            text = fancy_text if self._use_color else plain_text
+            terminal_width = shutil.get_terminal_size().columns or 80
+            padding = (terminal_width - len(plain_text) - 2) // 2
+            # Queueing up this message now will make it the 1st thing printed.
+            self._print_or_queue(Panel(text, style = 'green3', box = HEAVY,
+                                       padding = (0, padding)), style = 'green3')
 
 
     def start(self):
         '''Start the user interface.'''
-        pass
+        if __debug__: log('starting CLI')
+        while not self._queue.empty():
+            (text, style) = self._queue.get()
+            self._console.print(text, style = style, highlight = False)
+            sys.stdout.flush()
+        self._started = True
 
 
     def stop(self):
@@ -221,23 +258,31 @@ class CLI(UIBase, Styled):
         pass
 
 
+    def _print_or_queue(self, text, style):
+        if self._started:
+            if __debug__: log(text)
+            self._console.print(text, style = style, highlight = False)
+        else:
+            if __debug__: log(f'queueing message "{text}"')
+            self._queue.put((text, style))
+
+
     def inform(self, text, *args):
         '''Print an informational message.'''
-        if __debug__: log(text, *args)
         if not self._be_quiet:
-            print(self.info_text(text, *args), flush = True)
+            self._print_or_queue(text.format(*args), 'info')
+        else:
+            if __debug__: log(text, *args)
 
 
     def warn(self, text, *args):
         '''Print a nonfatal, noncritical warning message.'''
-        if __debug__: log(text, *args)
-        print(self.warning_text(text, *args), flush = True)
+        self._print_or_queue(text.format(*args), style = 'warn')
 
 
     def alert(self, text, *args):
         '''Print a message reporting an error.'''
-        if __debug__: log(text, *args)
-        print(self.error_text(text, *args), flush = True)
+        self._print_or_queue(text.format(*args), style = 'alert')
 
 
     def alert_fatal(self, text, *args, **kwargs):
@@ -249,14 +294,13 @@ class CLI(UIBase, Styled):
         version, this method does not stop the user interface (because in the
         CLI case, there is nothing equivalent to a GUI to shut down).
         '''
-        if __debug__: log(text, *args)
         text += '\n' + kwargs['details'] if 'details' in kwargs else ''
-        print(self.fatal_text(text, *args), flush = True)
+        self._print_or_queue(text.format(*args), style = 'fatal')
 
 
     def confirm(self, question):
         '''Asks a yes/no question of the user, on the command line.'''
-        return input("{} (y/n) ".format(question)).startswith(('y', 'Y'))
+        return input(f'{question} (y/n) ').startswith(('y', 'Y'))
 
 
     def file_selection(self, operation_type, question, pattern):
@@ -269,7 +313,8 @@ class CLI(UIBase, Styled):
         whether the user cancelled the dialog.  If 'user' is provided, then
         this method offers that as a default for the user.  If both 'user'
         and 'pswd' are provided, both the user and password are offered as
-        defaults but the password is not shown to the user.
+        defaults but the password is not shown to the user.  If the user
+        responds with empty strings, the values returned are '' and not None.
         '''
         try:
             text = (prompt + ' [default: ' + user + ']: ') if user else (prompt + ': ')
@@ -281,16 +326,17 @@ class CLI(UIBase, Styled):
             input_pswd = password(text)
             if len(input_pswd) == 0:
                 input_pswd = pswd
-            return input_user, input_pswd, False
-        except KeyboardInterrupt:
+            final_user = '' if input_user is None else input_user
+            final_pswd = '' if input_pswd is None else input_pswd
+            return final_user, final_pswd, False
+        except (KeyboardInterrupt, UserCancelled):
             return user, pswd, True
 
 
-class GUI(UIBase, Styled):
+class GUI(UIBase):
     '''Graphical user interface.'''
     # Not used in Handprint.
     pass
-
 
 
 # Miscellaneous utilities

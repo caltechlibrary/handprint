@@ -16,8 +16,11 @@ file "LICENSE" for more information.
 
 import os
 from   os import path
-from   sidetrack import log
+import shutil
 import sys
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
@@ -28,7 +31,6 @@ from handprint.files import readable, writable, is_url
 from handprint.manager import Manager
 from handprint.network import network_available, disable_ssl_cert_check
 from handprint.services import ACCEPTED_FORMATS, services_list
-from handprint.styled import styled
 from handprint.ui import inform, alert, warn
 
 
@@ -92,12 +94,13 @@ class MainBody(object):
         if __debug__: log('initializing manager and starting processes')
         manager = Manager(services, threads, output_dir, make_grid, compare, extended)
         print_separators = num_targets > 1
+        rule = '─'*(shutil.get_terminal_size().columns or 80)
         for index, item in enumerate(targets, start = 1):
             if print_separators:
-                inform(styled('━'*70, 'dark'))
+                inform(rule)
             manager.run_services(item, index, base_name)
         if print_separators:
-            inform(styled('━'*70, 'dark'))
+            inform(rule)
 
 
     def targets_from_arguments(self, files, from_file):

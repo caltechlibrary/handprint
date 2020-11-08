@@ -17,7 +17,6 @@ import warnings
 
 import handprint
 from   handprint.exceptions import *
-from   handprint.styled import styled
 from   handprint.ui import inform, alert, warn
 
 

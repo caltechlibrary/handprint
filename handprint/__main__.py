@@ -44,7 +44,6 @@ if __debug__:
     from sidetrack import set_debug, log, logr
 
 import handprint
-from   handprint import print_version
 from handprint.credentials import Credentials
 from handprint.exceptions import *
 from handprint.files import filename_extension, files_in_directory, is_url
@@ -53,7 +52,6 @@ from handprint.main_body import MainBody
 from handprint.manager import Manager
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
-from handprint.styled import styled
 from handprint.ui import UI, inform, alert, warn
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
@@ -316,11 +314,9 @@ Command-line arguments summary
     # Initial setup -----------------------------------------------------------
 
     debugging = debug != 'OUT'
-    use_color = not no_color
     make_grid = not no_grid
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = '(Hint: use {}h for help.)'.format(prefix)
-    ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test', False, use_color, quiet)
 
     # Preprocess arguments and handle early exits -----------------------------
 
@@ -333,8 +329,6 @@ Command-line arguments summary
     if list:
         inform('Known services: {}', ', '.join(services_list()))
         exit(0)
-
-    print_intro(ui)
 
     if add_creds != 'A':
         service = add_creds.lower()
@@ -377,6 +371,9 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     try:
+        ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
+                use_color = not no_color, be_quiet = quiet)
+        ui.start()
         body = MainBody(base_name, extended, from_file, output_dir, threads)
         body.run(services, files, make_grid, compare)
     except (KeyboardInterrupt, UserCancelled) as ex:
@@ -406,21 +403,6 @@ def print_version():
     print('')
     print('Known services: {}'.format(', '.join(services_list())))
     print('Credentials are stored in {}'.format(Credentials.credentials_dir()))
-
-
-def print_intro(ui):
-    if ui.use_color():
-        cb = ['chartreuse', 'bold']
-        name = styled('Handprint', cb)
-        acronym = '{}written {}age {}ecognit{}o{} {}est'.format(
-            styled('Hand', cb), styled('p', cb), styled('r', cb),
-            styled('i', cb), styled('n', cb), styled('t', cb))
-    else:
-        name = 'Handprint'
-        acronym = 'HANDwritten Page RecognItioN Test'
-    inform('┏' + '━'*68 + '┓')
-    inform('┃    Welcome to {}, the {}!    ┃', name, acronym)
-    inform('┗' + '━'*68 + '┛')
 
 
 # Main entry point.

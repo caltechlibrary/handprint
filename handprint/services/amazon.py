@@ -138,7 +138,7 @@ class AmazonTextractTR(AmazonTR):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'lightGoldenrod4'
+        return 'light_goldenrod2'
 
 
     def result(self, file_path):
@@ -166,7 +166,7 @@ class AmazonRekognitionTR(AmazonTR):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'darkOrange3'
+        return 'dark_orange'
 
 
     def result(self, file_path):

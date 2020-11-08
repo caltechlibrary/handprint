@@ -45,7 +45,6 @@ from handprint.images import image_size, image_dimensions
 from handprint.images import reduced_image_size, reduced_image_dimensions
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
-from handprint.styled import styled
 from handprint.ui import inform, alert, warn
 
 
@@ -124,7 +123,7 @@ class Manager:
         # Shortcuts to make the code more readable.
         services = self._services
 
-        inform('Starting on {}', styled(item, 'white'))
+        inform(f'Starting on [white]{item}[/]')
         try:
             (item_file, item_fmt) = self._get(item, base_name, index)
             if not item_file:
@@ -239,9 +238,9 @@ class Manager:
         '''Send the "image" to the service named "service" and write output in
         directory "dest_dir".
         '''
-        service_name = styled(service.name(), service.name_color())
 
-        inform('Sending to {} and waiting for response ...', service_name)
+        service_name = f'[{service.name_color()}]{service.name()}[/]'
+        inform(f'Sending to {service_name} and waiting for response ...')
         last_time = timer()
         try:
             output = service.result(image.file)

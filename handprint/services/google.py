@@ -64,7 +64,7 @@ class GoogleTR(TextRecognition):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'deepSkyBlue1'
+        return 'deep_sky_blue1'
 
 
     def max_rate(self):

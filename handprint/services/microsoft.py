@@ -54,7 +54,7 @@ class MicrosoftTR(TextRecognition):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'lightBlue2'
+        return 'aquamarine1'
 
 
     def max_rate(self):

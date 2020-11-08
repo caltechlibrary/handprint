@@ -354,6 +354,21 @@ The following table summarizes all the command line options available. (Note: on
 ⬥ &nbsp; To write to the console, use the character `-` as the value of _OUT_; otherwise, _OUT_ must be the name of a file where the output should be written.
 
 
+### _Return values_
+
+This program exits with a return code of 0 if no problems are encountered.  It returns a nonzero value otherwise. The following table lists the possible return values:
+
+| Code | Meaning                                                  |
+|:----:|----------------------------------------------------------|
+| 0    | success &ndash; program completed normally               |
+| 1    | the user interrupted the program's execution             |
+| 2    | encountered a bad or missing value for an option         |
+| 3    | no network detected &ndash; cannot proceed               |
+| 4    | file error &ndash; encountered a problem with a file     |
+| 5    | server error &ndash; encountered a problem with a server |
+| 6    | an exception or fatal error occurred                     |
+
+
 ☹︎ Known issues and limitations
 ------------------------------
 

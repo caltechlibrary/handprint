@@ -29,6 +29,7 @@ from handprint.exceptions import *
 from handprint.files import filename_extension, filename_basename
 from handprint.files import files_in_directory, filter_by_extensions
 from handprint.files import readable, writable, is_url
+from handprint.interruptions import interrupted, raise_for_interrupts
 from handprint.manager import Manager
 from handprint.network import network_available, disable_ssl_cert_check
 from handprint.services import ACCEPTED_FORMATS, services_list
@@ -48,9 +49,27 @@ class MainBody(object):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-        # Expose an attribute "exception" that callers can use to find out if
-        # the thread finished normally or with an exception.
+        # We expose an attribute "exception" that callers can use to find out
+        # if the thread finished normally or with an exception.
         self.exception = None
+
+        # The manager object manages the process of manipulating images and
+        # sending them to the services.
+        self._manager = Manager(self.services, self.threads, self.output_dir,
+                                self.make_grid, self.compare, self.extended)
+
+        # On Windows, in Python 3.6+, ^C in a terminal window does not stop
+        # execution (at least in my environment).  The following function
+        # creates a closure with the worker object so that stop() can be called.
+        if sys.platform == "win32":
+            if __debug__: log('installing ctrl_handler for Windows')
+
+            def ctrl_handler(event, *args):
+                if __debug__: log('keyboard interrupt received')
+                self.stop()
+
+            import win32api
+            win32api.SetConsoleCtrlHandler(ctrl_handler, True)
 
 
     def run(self):
@@ -60,13 +79,28 @@ class MainBody(object):
         try:
             self._do_preflight()
             self._do_main_work()
-        except Exception as ex:
+        except (KeyboardInterrupt, UserCancelled) as ex:
+            if __debug__: log(f'got {type(ex).__name__}')
+            self.stop()
             self.exception = ex
+        except CannotProceed as ex:
+            if __debug__: log(f'got CannotProceed')
+            self.exception = (CannotProceed, ex)
+        except Exception as ex:
+            if __debug__: log(f'exception in main body: {str(ex)}')
+            self.exception = sys.exc_info()
+            alert_fatal(f'Error occurred during execution:', details = str(ex))
         if __debug__: log('finished MainBody')
 
 
     def stop(self):
-        pass
+        if __debug__: log('stopping ...')
+        # It's unclear to me whether ^C on Windows will cause ctrl_handler()
+        # to be called first or whether the KeyboardInterrupt catch in run()
+        # will be called first.  That's the reason for the next condition.
+        if not interrupted():
+            interrupt()
+            self._manager.stop_services()
 
 
     def _do_preflight(self):
@@ -112,14 +146,15 @@ class MainBody(object):
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
-        manager = Manager(self.services, self.threads, self.output_dir,
-                          self.make_grid, self.compare, self.extended)
         print_separators = num_targets > 1
         rule = '─'*(shutil.get_terminal_size().columns or 80)
         for index, item in enumerate(targets, start = 1):
+            # Check whether we've been interrupted before doing another item.
+            raise_for_interrupts()
+            # Process next item.
             if print_separators:
                 inform(rule)
-            manager.run_services(item, index, self.base_name)
+            self._manager.run_services(item, index, self.base_name)
         if print_separators:
             inform(rule)
 

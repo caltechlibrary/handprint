@@ -20,14 +20,14 @@ import os
 from   os import path
 from   sidetrack import log
 import sys
-from   time import sleep
 
 import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials
-from handprint.files import readable
-from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.exceptions import *
+from handprint.files import readable
+from handprint.interruptions import interrupted, raise_for_interrupts, wait
 from handprint.network import net
+from handprint.services.base import TextRecognition, TRResult, TextBox
 
 
 # Main class.
@@ -101,6 +101,7 @@ class AmazonTR(TextRecognition):
             if __debug__: log('calling Amazon API function')
             response = getattr(client, api_method)( **{ image_keyword : {'Bytes': image} })
             if __debug__: log('received {} blocks', len(response[response_key]))
+            raise_for_interrupts()
             full_text = ''
             boxes = []
             width, height = imagesize.get(file_path)

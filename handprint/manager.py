@@ -28,7 +28,6 @@ from   sidetrack import log
 
 import sys
 from   threading import Thread, Lock
-import time
 from   timeit import default_timer as timer
 import urllib
 
@@ -43,6 +42,7 @@ from handprint.files import delete_existing
 from handprint.images import converted_image, annotated_image, create_image_grid
 from handprint.images import image_size, image_dimensions
 from handprint.images import reduced_image_size, reduced_image_dimensions
+from handprint.interruptions import interrupt, raise_for_interrupts
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
 from handprint.ui import inform, alert, warn
@@ -114,6 +114,14 @@ class Manager:
         if __debug__: log(f'max_size = {self._max_size}')
         if __debug__: log(f'max_dimensions = {self._max_dimensions}')
 
+        # An unfortunate feature of Python's thread handling is that threads
+        # don't get interrupt signals: if the user hits ^C, the parent thread
+        # has to do something to interrupt the child threads deliberately.
+        # We can't do that unless we keep a pointer to the executor and share
+        # it between methods in this class.  Thus, the need for the following:
+        self._executor = None
+        self._senders = []
+
 
     def run_services(self, item, index, base_name):
         '''Run all requested services on the image indicated by "item", using
@@ -145,8 +153,12 @@ class Manager:
                 # For 1 thread, avoid thread pool to make debugging easier.
                 results = [self._send(image, s) for s in services]
             else:
-                with ThreadPoolExecutor(max_workers = self._num_threads) as tpe:
-                    results = list(tpe.map(self._send, repeat(image), iter(services)))
+                self._executor = ThreadPoolExecutor(max_workers = self._num_threads,
+                                                    thread_name_prefix = 'ServiceThread')
+                for service in services:
+                    future = self._executor.submit(self._send, image, service)
+                    self._senders.append(future)
+                results = [future.result() for future in self._senders]
 
             # If a service failed for some reason (e.g., a network glitch), we
             # get no result back.  Remove empty results & go on with the rest.
@@ -169,11 +181,26 @@ class Manager:
 
             inform(f'Done with {relative(item)}')
         except (KeyboardInterrupt, UserCancelled) as ex:
-            warn('Interrupted')
+            interrupt()
+            warn('Interrupted – waiting for network connections to close ...')
+            self.stop_services()
             raise
         except Exception as ex:
             alert('Stopping due to a problem')
             raise
+
+
+    def stop_services(self):
+        if self._executor:
+            if __debug__: log('stopping sender threads')
+            for sender_future in self._senders:
+                if sender_future.cancel():
+                    if __debug__: log(f'succeeded in cancelling {sender_future}')
+                else:
+                    if __debug__: log(f'unable to cancel {sender_future}')
+            if __debug__: log('issuing shutdown to thread pool executor')
+            self._executor.shutdown()
+            if __debug__: log('shutdown completed')
 
 
     def _get(self, item, base_name, index):
@@ -239,6 +266,7 @@ class Manager:
         directory "dest_dir".
         '''
 
+        raise_for_interrupts()
         service_name = f'[{service.name_color()}]{service.name()}[/]'
         inform(f'Sending to {service_name} and waiting for response ...')
         last_time = timer()
@@ -250,13 +278,15 @@ class Manager:
             time_passed = timer() - last_time
             if time_passed < 1/service.max_rate():
                 warn(f'Pausing {service_name} due to rate limits')
-                time.sleep(1/service.max_rate() - time_passed)
-                # FIXME resend after pause
+                wait(1/service.max_rate() - time_passed)
+                warn(f'Continuing {service_name}')
+                return self._send(image, service)
         if output.error:
             alert(f'{service_name} failed: {output.error}')
             warn(f'No result from {service_name} for {relative(image.file)}')
             return None
 
+        raise_for_interrupts()
         inform(f'Got result from {service_name}.')
         file_name   = path.basename(image.file)
         base_path   = path.join(image.dest_dir, file_name)
@@ -288,6 +318,29 @@ class Manager:
             else:
                 warn(f'Skipping {service_name} comparison because {relative(gt_file)} not available')
         return Result(service, image, annot_path, report_path)
+
+
+    def _add_interrupt_handler(self):
+
+
+        # On Windows, in Python 3.6+, ^C in a terminal window does not stop
+        # execution (at least in my environment).  The following function
+        # creates a closure with the worker object so that stop() can be called.
+
+        if sys.platform == "win32":
+            if __debug__: log('installing ctrl_handler for Windows')
+
+            # This is defined here because we need the value of worker.ident.
+            def ctrl_handler(event, *args):
+                if __debug__: log('Keyboard interrupt received')
+                from stopit import async_raise
+                interrupt()
+                async_raise(worker.ident, UserCancelled)
+                worker.stop()
+
+            import win32api
+            win32api.SetConsoleCtrlHandler(ctrl_handler, True)
+
 
 
     def _normalized(self, orig_item, orig_fmt, item_file, dest_dir):

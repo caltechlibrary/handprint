@@ -29,8 +29,9 @@ from   sidetrack import log
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
-from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.exceptions import *
+from handprint.interruptions import interrupted, raise_for_interrupts
+from handprint.services.base import TextRecognition, TRResult, TextBox
 
 
 # Main class.
@@ -122,6 +123,7 @@ class GoogleTR(TextRecognition):
             # Iterate over the known API calls and store each result.
             result = dict.fromkeys(self._known_features)
             for feature in self._known_features:
+                raise_for_interrupts()
                 if __debug__: log('sending image to Google for {} ...', feature)
                 response = getattr(client, feature)(image = image, image_context = context)
                 if __debug__: log('received result.')
@@ -138,6 +140,7 @@ class GoogleTR(TextRecognition):
             #
             # https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#Block
 
+            raise_for_interrupts()
             full_text = ''
             boxes = []
             if 'fullTextAnnotation' in result['document_text_detection']:

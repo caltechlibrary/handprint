@@ -21,13 +21,13 @@ import os
 from   os import path
 from   sidetrack import log
 import sys
-from   time import sleep
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
-from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.exceptions import *
+from handprint.interruptions import interrupted, raise_for_interrupts, wait
 from handprint.network import net
+from handprint.services.base import TextRecognition, TRResult, TextBox
 
 
 # Main class.
@@ -122,7 +122,7 @@ class MicrosoftTR(TextRecognition):
             if 'Retry-After' in response.headers:
                 sleep_time = int(response.headers['Retry-After'])
             if __debug__: log('sleeping for {} s and retrying', sleep_time)
-            sleep(sleep_time)
+            wait(sleep_time)
             return self.result(path)    # Recursive invocation
         elif error:
             raise error
@@ -137,10 +137,11 @@ class MicrosoftTR(TextRecognition):
         analysis = {}
         poll = True
         while poll:
+            raise_for_interrupts()
             # I never have seen results returned in 1 second, and meanwhile
             # the repeated polling counts against your rate limit.  So, wait
             # for 2 s to reduce the number of calls.
-            sleep(2)
+            wait(2)
             response, error = net('get', polling_url, polling = True, headers = headers)
             if isinstance(error, NetworkFailure):
                 if __debug__: log('network exception: {}', str(error))
@@ -153,7 +154,7 @@ class MicrosoftTR(TextRecognition):
                 if 'Retry-After' in response.headers:
                     sleep_time = int(response.headers['Retry-After'])
                 if __debug__: log('sleeping for {} s and retrying', sleep_time)
-                sleep(sleep_time)
+                wait(sleep_time)
             elif error:
                 raise error
 

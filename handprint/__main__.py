@@ -51,8 +51,8 @@ from handprint.exceptions import *
 from handprint.exit_codes import ExitCode
 from handprint.files import filename_extension, files_in_directory, is_url
 from handprint.files import readable, writable
+from handprint.interruptions import interrupt, interrupted
 from handprint.main_body import MainBody
-from handprint.manager import Manager
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
 from handprint.ui import UI, inform, alert, alert_fatal, warn
@@ -385,7 +385,7 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     if __debug__: log('='*8 + f' started {timestamp()} ' + '='*8)
-    ui = manager = exception = None
+    ui = body = exception = None
     try:
         ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
                 use_color = not no_color, be_quiet = quiet)
@@ -405,6 +405,8 @@ Command-line arguments summary
     except (KeyboardInterrupt, UserCancelled) as ex:
         if __debug__: log('received {}', sys.exc_info()[0].__name__)
         alert('Quit received; shutting down ...')
+        interrupt()
+        body.stop()
         exception = sys.exc_info()
     except Exception as ex:
         exception = sys.exc_info()
@@ -416,10 +418,9 @@ Command-line arguments summary
         if type(exception) == CannotProceed:
             exit_code = exception.args[0]
         elif type(exception) in [KeyboardInterrupt, UserCancelled]:
-            if __debug__: log(f'received {exception[1].__class__.__name__}')
+            if __debug__: log(f'received {exception.__class__.__name__}')
             exit_code = ExitCode.user_interrupt
         else:
-            alert_fatal(f'A fatal error occurred: {exception}')
             if __debug__:
                 from traceback import format_tb
                 msg = str(exception)

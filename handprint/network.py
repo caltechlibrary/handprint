@@ -18,6 +18,7 @@ import warnings
 
 import handprint
 from   handprint.exceptions import *
+from   handprint.interruptions import wait, interrupted
 from   handprint.ui import inform, alert, warn
 
 
@@ -68,7 +69,7 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
     failures = 0
     retries = 0
     error = None
-    while failures < _MAX_FAILURES:
+    while failures < _MAX_FAILURES and not interrupted():
         try:
             with warnings.catch_warnings():
                 # The underlying urllib3 library used by the Python requests
@@ -84,6 +85,9 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
                 response = method(url, timeout = timeout, verify = False, **kwargs)
                 if __debug__: log('response received')
                 return response
+        except (KeyboardInterrupt, UserCancelled) as ex:
+            if __debug__: log(f'network {method} interrupted by {str(ex)}')
+            raise
         except Exception as ex:
             # Problem might be transient.  Don't quit right away.
             failures += 1
@@ -99,10 +103,16 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
                 retries += 1
                 failures = 0
                 if __debug__: log('pausing because of consecutive failures')
-                sleep(10 * retries * retries)
+                wait(10 * retries * retries)
             else:
                 # We've already paused & restarted once.
                 raise error
+    if interrupted():
+        if __debug__: log('interrupted -- raising UserCancelled')
+        raise UserCancelled(f'Network request has been interrupted for {url}')
+    else:
+        # In theory, we should never reach this point.  If we do, then:
+        raise InternalError(f'Unexpected case in timed_request for {url}')
 
 
 def download_file(url, output_file, user = None, pswd = None):
@@ -138,7 +148,7 @@ def download(url, user, password, local_destination, recursing = 0):
         elif (isinstance(arg0, urllib3.exceptions.ProtocolError)
               and arg0.args and isinstance(args0.args[1], ConnectionResetError)):
             if __debug__: log('download() got ConnectionResetError; will recurse')
-            sleep(1)                    # Sleep a short time and try again.
+            wait(1)                    # Sleep a short time and try again.
             recursing += 1
             download(url, user, password, local_destination, recursing)
         else:
@@ -157,7 +167,7 @@ def download(url, user, password, local_destination, recursing = 0):
     code = req.status_code
     if code == 202:
         # Code 202 = Accepted, "received but not yet acted upon."
-        sleep(1)                        # Sleep a short time and try again.
+        wait(1)                        # Sleep a short time and try again.
         recursing += 1
         if __debug__: log('calling download() recursively for http code 202')
         download(url, user, password, local_destination, recursing)
@@ -228,7 +238,7 @@ def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwar
         elif (isinstance(arg0, urllib3.exceptions.ProtocolError)
               and arg0.args and isinstance(args0.args[1], ConnectionResetError)):
             if __debug__: log('net() got ConnectionResetError; will recurse')
-            sleep(1)                    # Sleep a short time and try again.
+            wait(1)                    # Sleep a short time and try again.
             return net(get_or_post, url, session, polling, recursing + 1, **kwargs)
         else:
             return (req, NetworkFailure(str(ex)))
@@ -260,7 +270,7 @@ def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwar
         if recursing < _MAX_RECURSIVE_CALLS:
             pause = 5 * (recursing + 1)   # +1 b/c we start with recursing = 0.
             if __debug__: log(f'rate limit hit -- sleeping {pause}')
-            sleep(pause)                  # 5 s, then 10 s, then 15 s, etc.
+            wait(pause)                  # 5 s, then 10 s, then 15 s, etc.
             return net(get_or_post, url, session, polling, recursing + 1, **kwargs)
         error = RateLimitExceeded('Server blocking further requests due to rate limits')
     elif code == 503:

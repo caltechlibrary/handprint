@@ -24,6 +24,7 @@ if __debug__:
 
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
+from handprint.credentials import Credentials
 from handprint.exceptions import *
 from handprint.files import filename_extension, filename_basename
 from handprint.files import files_in_directory, filter_by_extensions
@@ -31,7 +32,7 @@ from handprint.files import readable, writable, is_url
 from handprint.manager import Manager
 from handprint.network import network_available, disable_ssl_cert_check
 from handprint.services import ACCEPTED_FORMATS, services_list
-from handprint.ui import inform, alert, warn
+from handprint.ui import inform, alert, alert_fatal, warn
 
 
 # Exported classes.
@@ -40,76 +41,96 @@ from handprint.ui import inform, alert, warn
 class MainBody(object):
     '''Main body for Handprint.'''
 
-    def __init__(self, base_name, extended, from_file, output_dir, threads):
-        '''Initialize internal state and prepare for running services.'''
+    def __init__(self, **kwargs):
+        '''Initialize internal state.'''
+
+        # Assign parameters to self to make them available within this object.
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+        # Expose an attribute "exception" that callers can use to find out if
+        # the thread finished normally or with an exception.
+        self.exception = None
+
+
+    def run(self):
+        '''Run the main body.'''
+
+        if __debug__: log('running MainBody')
+        try:
+            self._do_preflight()
+            self._do_main_work()
+        except Exception as ex:
+            self.exception = ex
+        if __debug__: log('finished MainBody')
+
+
+    def stop(self):
+        pass
+
+
+    def _do_preflight(self):
+        '''Check the option values given by the user, and do other prep.'''
 
         if not network_available():
-            raise ServiceFailure('No network.')
+            alert_fatal('No network connection.')
+            raise CannotProceed(ExitCode.no_network)
 
-        if from_file:
-            if not path.exists(from_file):
-                raise RuntimeError('File not found: {}'.format(from_file))
-            if not readable(from_file):
-                raise RuntimeError('File not readable: {}'.format(from_file))
+        if self.from_file:
+            if not path.exists(self.from_file):
+                alert_fatal('File not found: {}'.format(self.from_file))
+                raise CannotProceed(ExitCode.bad_arg)
+            if not readable(self.from_file):
+                alert_fatal('File not readable: {}'.format(self.from_file))
+                raise CannotProceed(ExitCode.file_error)
 
-        if output_dir:
-            if path.isdir(output_dir):
-                if not writable(output_dir):
-                    raise RuntimeError('Directory not writable: {}'.format(output_dir))
+        if self.output_dir:
+            if path.isdir(self.output_dir):
+                if not writable(self.output_dir):
+                    alert_fatal('Directory not writable: {}'.format(self.output_dir))
+                    raise CannotProceed(ExitCode.file_error)
             else:
-                os.mkdir(output_dir)
-                if __debug__: log('created output_dir directory {}', output_dir)
-
-        self._base_name  = base_name
-        self._extended   = extended
-        self._from_file  = from_file
-        self._output_dir = output_dir
-        self._threads    = threads
+                os.mkdir(self.output_dir)
+                if __debug__: log('created output_dir directory {}', self.output_dir)
 
 
-    def run(self, services, files, make_grid, compare):
-        '''Run service(s) on files.'''
-
-        # Set shortcut variables for better code readability below.
-        base_name  = self._base_name
-        extended   = self._extended
-        from_file  = self._from_file
-        output_dir = self._output_dir
-        threads    = self._threads
-
+    def _do_main_work(self):
         # Gather up some things and get prepared.
-        targets = self.targets_from_arguments(files, from_file)
+        targets = self.targets_from_arguments()
         if not targets:
-            raise RuntimeError('No images to process; quitting.')
+            alert_fatal('No images to process; quitting.')
+            raise CannotProceed(ExitCode.bad_arg)
         num_targets = len(targets)
 
         inform('Will apply {} service{} ({}) to {} image{}.',
-               len(services), 's' if len(services) > 1 else '',
-               ', '.join(services), num_targets, 's' if num_targets > 1 else '')
-        if self._extended:
+               len(self.services), 's' if len(self.services) > 1 else '',
+               ', '.join(self.services), num_targets, 's' if num_targets > 1 else '')
+        if self.extended:
             inform('Will save extended results.')
-        inform('Will use up to {} process threads.', threads)
+        inform('Will use up to {} process threads.', self.threads)
+        inform(f'Will use credentials stored in {Credentials.credentials_dir()}/.')
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
-        manager = Manager(services, threads, output_dir, make_grid, compare, extended)
+        manager = Manager(self.services, self.threads, self.output_dir,
+                          self.make_grid, self.compare, self.extended)
         print_separators = num_targets > 1
         rule = '─'*(shutil.get_terminal_size().columns or 80)
         for index, item in enumerate(targets, start = 1):
             if print_separators:
                 inform(rule)
-            manager.run_services(item, index, base_name)
+            manager.run_services(item, index, self.base_name)
         if print_separators:
             inform(rule)
 
 
-    def targets_from_arguments(self, files, from_file):
+    def targets_from_arguments(self):
         targets = []
-        if from_file:
-            if __debug__: log('reading {}', from_file)
-            targets = filter(None, open(from_file).read().splitlines())
+        if self.from_file:
+            if __debug__: log('reading {}', self.from_file)
+            targets = filter(None, open(self.from_file).read().splitlines())
         else:
-            for item in files:
+            for item in self.files:
                 if is_url(item):
                     targets.append(item)
                 elif path.isfile(item) and filename_extension(item) in ACCEPTED_FORMATS:

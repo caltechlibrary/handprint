@@ -45,6 +45,7 @@ if __debug__:
 
 import handprint
 from handprint.credentials import Credentials
+from handprint.data_utils import timestamp, plural
 from handprint.exceptions import *
 from handprint.exit_codes import ExitCode
 from handprint.files import filename_extension, files_in_directory, is_url
@@ -53,7 +54,7 @@ from handprint.main_body import MainBody
 from handprint.manager import Manager
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
-from handprint.ui import UI, inform, alert, warn
+from handprint.ui import UI, inform, alert, alert_fatal, warn
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
 disable_ssl_cert_check()
@@ -329,15 +330,17 @@ Command-line arguments summary
 
     # Initial setup -----------------------------------------------------------
 
-    debugging = debug != 'OUT'
-    make_grid = not no_grid
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = '(Hint: use {}h for help.)'.format(prefix)
 
     # Preprocess arguments and handle early exits -----------------------------
 
-    if debugging:
+    if debug != 'OUT':
         set_debug(True, debug, extra = '%(threadName)s')
+        import faulthandler
+        faulthandler.enable()
+
+    # Handle arguments that involve deliberate exits.
 
     if version:
         print_version()
@@ -345,7 +348,6 @@ Command-line arguments summary
     if list:
         inform('Known services: {}', ', '.join(services_list()))
         exit(int(ExitCode.success))
-
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
@@ -361,50 +363,72 @@ Command-line arguments summary
         Credentials.save_credentials(service, creds_file)
         inform('Saved credentials for service "{}".', service)
         exit(int(ExitCode.success))
+
+    # Do sanity checks on some other arguments.
+
+    if services != 'S' and not all(s in services_list() for s in services):
+        alert_fatal('"{}" is not a known services. {}', services, hint)
+        exit(int(ExitCode.bad_arg))
     if no_grid and not extended and not compare:
-        alert('{0}G without {0}e or {0}c produces no output. {1}', prefix, hint)
+        alert_fatal('{0}G without {0}e or {0}c produces no output. {1}', prefix, hint)
         exit(int(ExitCode.bad_arg))
     if any(item.startswith('-') for item in files):
-        alert('Unrecognized option in arguments. {}', hint)
+        alert_fatal('Unrecognized option in arguments. {}', hint)
         exit(int(ExitCode.bad_arg))
     if not files and from_file == 'F':
-        alert('Need images or URLs to have something to do. {}', hint)
+        alert_fatal('Need images or URLs to have something to do. {}', hint)
         exit(int(ExitCode.bad_arg))
     if relaxed and not compare:
         warn('Option {0}r without {0}c has no effect. {1}', prefix, hint)
 
-    services = services_list() if services == 'S' else services.lower().split(',')
-    if not all(s in services_list() for s in services):
-        alert('"{}" is not a known services. {}', services, hint)
-        exit(int(ExitCode.bad_arg))
-
-    base_name  = 'document' if base_name == 'B' else base_name
-    from_file  = None if from_file == 'F' else from_file
-    output_dir = None if output_dir == 'O' else output_dir
-    compare    = 'relaxed' if (compare and relaxed) else compare
-    threads    = int(max(1, cpu_count()/2 if threads == 'T' else int(threads)))
-
     # Do the real work --------------------------------------------------------
 
+    if __debug__: log('='*8 + f' started {timestamp()} ' + '='*8)
+    ui = manager = exception = None
     try:
         ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
                 use_color = not no_color, be_quiet = quiet)
         ui.start()
-        body = MainBody(base_name, extended, from_file, output_dir, threads)
-        body.run(services, files, make_grid, compare)
+        body = MainBody(files      = files,
+                        from_file  = None if from_file == 'F' else from_file,
+                        output_dir = None if output_dir == 'O' else output_dir,
+                        add_creds  = None if add_creds == 'A' else add_creds,
+                        base_name  = 'document' if base_name == 'B' else base_name,
+                        make_grid  = not no_grid,
+                        extended   = extended,
+                        threads    = max(1, cpu_count()//2 if threads == 'T' else int(threads)),
+                        services   = services_list() if services == 'S' else services.lower().split(','),
+                        compare    = 'relaxed' if (compare and relaxed) else compare)
+        body.run()
+        exception = body.exception
     except (KeyboardInterrupt, UserCancelled) as ex:
         if __debug__: log('received {}', sys.exc_info()[0].__name__)
-        inform('Quitting.')
-        exit(int(ExitCode.success))
+        alert('Quit received; shutting down ...')
+        exception = sys.exc_info()
     except Exception as ex:
-        if debugging:
-            import traceback
-            alert('{}\n{}', str(ex), traceback.format_exc())
-            import pdb; pdb.set_trace()
+        exception = sys.exc_info()
+
+    # Try to deal with exceptions gracefully ----------------------------------
+
+    exit_code = ExitCode.success
+    if exception:
+        if type(exception) == CannotProceed:
+            exit_code = exception.args[0]
+        elif type(exception) in [KeyboardInterrupt, UserCancelled]:
+            if __debug__: log(f'received {exception[1].__class__.__name__}')
+            exit_code = ExitCode.user_interrupt
         else:
-            alert(str(ex))
-            exit(int(ExitCode.exception))
-    inform('Done.')
+            alert_fatal(f'A fatal error occurred: {exception}')
+            if __debug__:
+                from traceback import format_tb
+                msg = str(exception)
+                details = ''.join(format_tb(exception.__traceback__))
+                logr(f'Exception: {msg}\n{details}')
+            exit_code = ExitCode.exception
+    else:
+        inform('Done.')
+    if __debug__: log('_'*8 + f' stopped {timestamp()} ' + '_'*8)
+    exit(int(exit_code))
 
 
 # Helper functions.

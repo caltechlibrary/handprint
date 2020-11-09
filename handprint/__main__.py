@@ -44,6 +44,7 @@ if __debug__:
     from sidetrack import set_debug, log, logr
 
 import handprint
+from handprint import print_version
 from handprint.credentials import Credentials
 from handprint.data_utils import timestamp, plural
 from handprint.exceptions import *
@@ -429,20 +430,6 @@ Command-line arguments summary
         inform('Done.')
     if __debug__: log('_'*8 + f' stopped {timestamp()} ' + '_'*8)
     exit(int(exit_code))
-
-
-# Helper functions.
-# .............................................................................
-
-def print_version():
-    this_module = sys.modules[__package__]
-    print('{} version {}'.format(this_module.__name__, this_module.__version__))
-    print('Authors: {}'.format(this_module.__author__))
-    print('URL: {}'.format(this_module.__url__))
-    print('License: {}'.format(this_module.__license__))
-    print('')
-    print('Known services: {}'.format(', '.join(services_list())))
-    print('Credentials are stored in {}'.format(Credentials.credentials_dir()))
 
 
 # Main entry point.

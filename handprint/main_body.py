@@ -78,20 +78,20 @@ class MainBody(object):
 
         if self.from_file:
             if not path.exists(self.from_file):
-                alert_fatal('File not found: {}'.format(self.from_file))
+                alert_fatal(f'File not found: {self.from_file}')
                 raise CannotProceed(ExitCode.bad_arg)
             if not readable(self.from_file):
-                alert_fatal('File not readable: {}'.format(self.from_file))
+                alert_fatal(f'File not readable: {self.from_file}')
                 raise CannotProceed(ExitCode.file_error)
 
         if self.output_dir:
             if path.isdir(self.output_dir):
                 if not writable(self.output_dir):
-                    alert_fatal('Directory not writable: {}'.format(self.output_dir))
+                    alert_fatal(f'Directory not writable: {self.output_dir}')
                     raise CannotProceed(ExitCode.file_error)
             else:
                 os.mkdir(self.output_dir)
-                if __debug__: log('created output_dir directory {}', self.output_dir)
+                if __debug__: log(f'created output_dir directory {self.output_dir}')
 
 
     def _do_main_work(self):
@@ -107,7 +107,7 @@ class MainBody(object):
                ', '.join(self.services), num_targets, 's' if num_targets > 1 else '')
         if self.extended:
             inform('Will save extended results.')
-        inform('Will use up to {} process threads.', self.threads)
+        inform(f'Will use up to {self.threads} process threads.')
         inform(f'Will use credentials stored in {Credentials.credentials_dir()}/.')
 
         # Get to work.
@@ -127,7 +127,7 @@ class MainBody(object):
     def targets_from_arguments(self):
         targets = []
         if self.from_file:
-            if __debug__: log('reading {}', self.from_file)
+            if __debug__: log(f'reading {self.from_file}')
             targets = filter(None, open(self.from_file).read().splitlines())
         else:
             for item in self.files:
@@ -139,7 +139,7 @@ class MainBody(object):
                     # It's a directory, so look for files within.
                     targets += files_in_directory(item, extensions = ACCEPTED_FORMATS)
                 else:
-                    warn('"{}" not a file or directory', item)
+                    warn(f'"{item}" not a file or directory')
 
         # Filter files created in past runs.
         targets = filter(lambda name: '.handprint' not in name, targets)

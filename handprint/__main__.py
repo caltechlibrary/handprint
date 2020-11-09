@@ -332,7 +332,7 @@ Command-line arguments summary
     # Initial setup -----------------------------------------------------------
 
     prefix = '/' if sys.platform.startswith('win') else '-'
-    hint = '(Hint: use {}h for help.)'.format(prefix)
+    hint = f'(Hint: use {prefix}h for help.)'
 
     # Preprocess arguments and handle early exits -----------------------------
 
@@ -352,35 +352,35 @@ Command-line arguments summary
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
-            alert('Unknown service: "{}". {}', service, hint)
+            alert(f'Unknown service: "{service}". {hint}')
             exit(int(ExitCode.bad_arg))
         if not files or len(files) > 1:
-            alert('Option {}a requires one file. {}', prefix, hint)
+            alert(f'Option {prefix}a requires one file. {thing}')
             exit(int(ExitCode.bad_arg))
         creds_file = files[0]
         if not readable(creds_file):
-            alert('File not readable: {}', creds_file)
+            alert(f'File not readable: {creds_file}')
             exit(int(ExitCode.file_error))
         Credentials.save_credentials(service, creds_file)
-        inform('Saved credentials for service "{}".', service)
+        inform(f'Saved credentials for service "{service}".')
         exit(int(ExitCode.success))
 
     # Do sanity checks on some other arguments.
 
     if services != 'S' and not all(s in services_list() for s in services):
-        alert_fatal('"{}" is not a known services. {}', services, hint)
+        alert_fatal(f'"{services}" is not a known services. {hint}')
         exit(int(ExitCode.bad_arg))
     if no_grid and not extended and not compare:
-        alert_fatal('{0}G without {0}e or {0}c produces no output. {1}', prefix, hint)
+        alert_fatal(f'{prefix}G without {prefix}e or {prefix}c produces no output. {hint}')
         exit(int(ExitCode.bad_arg))
     if any(item.startswith('-') for item in files):
-        alert_fatal('Unrecognized option in arguments. {}', hint)
+        alert_fatal(f'Unrecognized option in arguments. {hint}')
         exit(int(ExitCode.bad_arg))
     if not files and from_file == 'F':
-        alert_fatal('Need images or URLs to have something to do. {}', hint)
+        alert_fatal(f'Need images or URLs to have something to do. {hint}')
         exit(int(ExitCode.bad_arg))
     if relaxed and not compare:
-        warn('Option {0}r without {0}c has no effect. {1}', prefix, hint)
+        warn(f'Option {prefix}r without {prefix}c has no effect. {hint}')
 
     # Do the real work --------------------------------------------------------
 

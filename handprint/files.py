@@ -93,7 +93,7 @@ def handprint_path():
             key = OpenKey(HKEY_LOCAL_MACHINE, _HANDPRINT_REG_PATH)
             value, regtype = QueryValueEx(key, 'Path')
             CloseKey(key)
-            if __debug__: log('path to windows installation: {}'.format(value))
+            if __debug__: log(f'path to windows installation: {value}')
             return value
         except WindowsError:
             # Kind of a problem. Punt and return a default value.
@@ -180,10 +180,10 @@ def relative(file):
 def make_dir(dir_path):
     '''Creates directory 'dir_path' (including intermediate directories).'''
     if path.isdir(dir_path):
-        if __debug__: log('reusing existing directory {}', dir_path)
+        if __debug__: log(f'reusing existing directory {dir_path}')
         return
     else:
-        if __debug__: log('creating directory {}', dir_path)
+        if __debug__: log(f'creating directory {dir_path}')
         # If this gets an exception, let it bubble up to caller.
         os.makedirs(dir_path)
 
@@ -196,14 +196,14 @@ def rename_existing(file):
         # If we fail, we just give up instead of throwing an exception.
         try:
             os.rename(f, backup)
-            if __debug__: log('renamed {} to {}', file, backup)
+            if __debug__: log(f'renamed {file} to {backup}')
         except:
             try:
                 delete_existing(backup)
                 os.rename(f, backup)
             except:
-                if __debug__: log('failed to delete {}', backup)
-                if __debug__: log('failed to rename {} to {}', file, backup)
+                if __debug__: log(f'failed to delete {backup}')
+                if __debug__: log(f'failed to rename {file} to {backup}')
 
     if path.exists(file):
         rename(file)
@@ -218,23 +218,23 @@ def delete_existing(file):
     '''Delete the given file.'''
     # Check if it's actually a directory.
     if path.isdir(file):
-        if __debug__: log('doing rmtree on directory {}', file)
+        if __debug__: log(f'doing rmtree on directory {file}')
         try:
             shutil.rmtree(file)
         except:
-            if __debug__: log('unable to rmtree {}; will try renaming', file)
+            if __debug__: log(f'unable to rmtree {file}; will try renaming')
             try:
                 rename_existing(file)
             except:
-                if __debug__: log('unable to rmtree or rename {}', file)
+                if __debug__: log(f'unable to rmtree or rename {file}')
     else:
-        if __debug__: log('doing os.remove on file {}', file)
+        if __debug__: log(f'doing os.remove on file {file}')
         os.remove(file)
 
 
 def copy_file(src, dst):
     '''Copy a file from "src" to "dst".'''
-    if __debug__: log('copying file {} to {}', src, dst)
+    if __debug__: log(f'copying file {src} to {dst}')
     try:
         shutil.copy2(src, dst, follow_symlinks = True)
     except:
@@ -245,7 +245,7 @@ def copy_file(src, dst):
 def open_file(file):
     '''Open document with default application in Python.'''
     # Code originally from https://stackoverflow.com/a/435669/743730
-    if __debug__: log('opening file {}', file)
+    if __debug__: log(f'opening file {file}')
     if sys.platform.startswith('darwin'):
         subprocess.call(('open', file))
     elif os.name == 'nt':
@@ -257,5 +257,5 @@ def open_file(file):
 def open_url(url):
     '''Open the given 'url' in a web browser using the current platform's
     default approach.'''
-    if __debug__: log('opening url {}', url)
+    if __debug__: log(f'opening url {url}')
     webbrowser.open(url)

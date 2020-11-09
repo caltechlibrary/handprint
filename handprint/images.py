@@ -132,16 +132,16 @@ def reduced_image_size(orig_file, dest_file, max_size):
         try:
             i_size = image_size(orig_file)
             if i_size <= max_size:
-                if __debug__: log('file already smaller than requested: {}', orig_file)
+                if __debug__: log(f'file already smaller than requested: {orig_file}')
                 return (orig_file, None)
             ratio = max_size/i_size
-            if __debug__: log('resize ratio = {}', ratio)
+            if __debug__: log(f'resize ratio = {ratio}')
             im = Image.open(orig_file)
             dims = im.size
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
-            if __debug__: log('resizing image to {}', new_dims)
+            if __debug__: log(f'resizing image to {new_dims}')
             resized = im.resize(new_dims, Image.HAMMING)
-            if __debug__: log('saving resized image to {}', dest_file)
+            if __debug__: log(f'saving resized image to {dest_file}')
             if orig_file == dest_file:
                 im.seek(0)
             resized.save(dest_file)
@@ -165,11 +165,11 @@ def reduced_image_dimensions(orig_file, dest_file, max_width, max_height):
             width_ratio = max_width/dims[0]
             length_ratio = max_height/dims[1]
             ratio = min(width_ratio, length_ratio)
-            if __debug__: log('rescale ratio = {}', ratio)
+            if __debug__: log(f'rescale ratio = {ratio}')
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
-            if __debug__: log('rescaling image to {}', new_dims)
+            if __debug__: log(f'rescaling image to {new_dims}')
             resized = im.resize(new_dims, Image.HAMMING)
-            if __debug__: log('saving re-dimensioned image to {}', dest_file)
+            if __debug__: log(f'saving re-dimensioned image to {dest_file}')
             if orig_file == dest_file:
                 im.seek(0)
             resized.save(dest_file)
@@ -194,18 +194,18 @@ def converted_image(orig_file, to_format, dest_file = None):
         doc = fitz.open(orig_file)
         if len(doc) >= 1:
             if len(doc) >= 2:
-                if __debug__: log('{} has > 1 images; using only 1st', orig_file)
+                if __debug__: log(f'{orig_file} has > 1 images; using only 1st')
             # FIXME: if there's more than 1 image, we could extra the rest.
             # Doing so will require some architectural changes first.
-            if __debug__: log('extracting 1st image from {}', dest_file)
+            if __debug__: log(f'extracting 1st image from {dest_file}')
             page = doc[0]
             pix = page.getPixmap(alpha = False)
-            if __debug__: log('writing {}', dest_file)
+            if __debug__: log(f'writing {dest_file}')
             pix.writeImage(dest_file, dest_format)
             return (dest_file, None)
         else:
-            if __debug__: log('fitz says there is no image image in {}', orig_file)
-            return (None, 'Cannot find an image inside {}'.format(orig_file))
+            if __debug__: log(f'fitz says there is no image image in {orig_file}')
+            return (None, f'Cannot find an image inside {orig_file}')
     else:
         # When converting images, PIL may issue a DecompressionBombWarning but
         # it's not a concern in our application.  Ignore it.
@@ -213,9 +213,9 @@ def converted_image(orig_file, to_format, dest_file = None):
             warnings.simplefilter('ignore')
             try:
                 im = Image.open(orig_file)
-                if __debug__: log('converting {} to RGB', orig_file)
+                if __debug__: log(f'converting {orig_file} to RGB')
                 im.convert('RGB')
-                if __debug__: log('saving converted image to {}', dest_file)
+                if __debug__: log(f'saving converted image to {dest_file}')
                 if orig_file == dest_file:
                     im.seek(0)
                 im.save(dest_file, dest_format)
@@ -232,13 +232,13 @@ def annotated_image(file, text_boxes, service):
     axes.get_yaxis().set_visible(False)
     axes.set_title(service_name, color = 'r', fontweight = 'bold', fontsize = 22)
 
-    if __debug__: log('reading image file for {}: {}', service_name, relative(file))
+    if __debug__: log(f'reading image file for {service_name}: {relative(file)}')
     img = mpimg.imread(file)
     axes.imshow(img, cmap = "gray")
 
     props = dict(facecolor = 'white', alpha = 0.7)
     if text_boxes:
-        if __debug__: log('adding {} annotations for {}', len(text_boxes), service_name)
+        if __debug__: log(f'adding {len(text_boxes)} annotations for {service_name}')
         polygons = [(item.boundingBox, item.text) for item in text_boxes]
         for polygon in polygons:
             vertices = [(polygon[0][i], polygon[0][i+1])
@@ -248,7 +248,7 @@ def annotated_image(file, text_boxes, service):
             text = polygon[1]
             plt.text(x, y, text, color = 'r', fontsize = 11, va = "top", bbox = props)
 
-    if __debug__: log('generating png for {} for {}', service_name, relative(file))
+    if __debug__: log(f'generating png for {service_name} for {relative(file)}')
     buf = io.BytesIO()
     fig.savefig(buf, format = 'png', dpi = 300, bbox_inches = 'tight', pad_inches = 0)
     buf.flush()

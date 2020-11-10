@@ -41,9 +41,7 @@ class GoogleTR(TextRecognition):
     # The following is based on the table of Google Cloud Vision features at
     # https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1p3beta1#type_1
     # as of 2018-10-25.
-    _known_features = ['face_detection', 'landmark_detection',
-                       'label_detection', 'text_detection',
-                       'document_text_detection', 'image_properties']
+    _known_features = ['document_text_detection']
 
 
     def init_credentials(self):

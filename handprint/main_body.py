@@ -58,10 +58,6 @@ class MainBody(object):
         self._manager = Manager(self.services, self.threads, self.output_dir,
                                 self.make_grid, self.compare, self.extended)
 
-
-    def run(self):
-        '''Run the main body.'''
-
         # On Windows, in Python 3.6+, ^C in a terminal window does not stop
         # execution (at least in my environment).  The following function
         # creates a closure with the worker object so that stop() can be called.
@@ -77,6 +73,10 @@ class MainBody(object):
 
             import win32api
             win32api.SetConsoleCtrlHandler(ctrl_handler, True)
+
+
+    def run(self):
+        '''Run the main body.'''
 
         if __debug__: log('running MainBody')
         try:

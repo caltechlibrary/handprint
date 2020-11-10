@@ -26,6 +26,7 @@ import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.credentials import Credentials
 from handprint.exceptions import *
+from handprint.exit_codes import ExitCode
 from handprint.files import filename_extension, filename_basename
 from handprint.files import files_in_directory, filter_by_extensions
 from handprint.files import readable, writable, is_url
@@ -88,10 +89,7 @@ class MainBody(object):
             warn('Interrupted.')
             interrupt()
             self.stop()
-            self.exception = ex
-        except CannotProceed as ex:
-            if __debug__: log(f'got CannotProceed')
-            self.exception = (CannotProceed, ex)
+            self.exception = sys.exc_info()
         except Exception as ex:
             if __debug__: log(f'exception in main body: {str(ex)}')
             self.exception = sys.exc_info()

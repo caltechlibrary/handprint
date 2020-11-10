@@ -1,15 +1,32 @@
 Change log for Handprint
 ========================
 
+Version 1.3.0
+--------------
+
+* Handprint now requires Python version 3.6 or later.
+* Updated `handprint/services/microsoft.py` to work with Azure API v. 3.0.
+* Changed and expanded the possible exit codes returned by Handprint. (Please see the docs for more info.)
+* Changed Google interface to retrieve _only_ document text results instead of all possible results, for better efficiency.
+* Improved handling of `^C` interrupts from the command line.
+* Added signal catcher to drop Handprint into `pdb` upon receiving `SIGUSER`.
+* Fixed warning about Matlplotlib GUIs and threading in `images.py`.
+* Switched to the use of [Sidetrack](https://github.com/caltechlibrary/sidetrack) for debug logging.
+* Switched to the use of [Rich](https://github.com/willmcgugan/rich) for terminal output
+* Various internal code updates and refactoring.
+
+
 Version 1.2.2
 --------------
 
-* Update copyright year in various source files.
+* Updated copyright year in various source files.
+
 
 Version 1.2.1
 --------------
 
-* Fix Microsoft output in the annotated images to be word-based, rather than line-based, to be the same as for the other services.
+* Fixed Microsoft output in the annotated images to be word-based, rather than line-based, to be the same as for the other services.
+
 
 Version 1.2.0
 --------------

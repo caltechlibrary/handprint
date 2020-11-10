@@ -163,6 +163,9 @@ class Manager:
         # If a service failed for some reason (e.g., a network glitch), we
         # get no result back.  Remove empty results & go on with the rest.
         results = [x for x in results if x is not None]
+        if not results:
+            warn(f'Nothing to do for {item}')
+            return
 
         # Create grid file if requested.
         if self._make_grid:
@@ -272,7 +275,9 @@ class Manager:
                 warn(f'Continuing {service_name}')
                 return self._send(image, service)
         if output.error:
-            alert(f'{service_name} failed: {output.error}')
+            # Sanitize the error string in case it contains '{' characters.
+            msg = output.error.replace('{', '{{{{').replace('}', '}}}}')
+            alert(f'{service_name} failed: {msg}')
             warn(f'No result from {service_name} for {relative(image.file)}')
             return None
 

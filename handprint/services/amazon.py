@@ -1,5 +1,17 @@
 '''
 amazon.py: interface to Amazon network services Rekognition and Textract
+
+Authors
+-------
+
+Michael Hucka <mhucka@caltech.edu> -- Caltech Library
+
+Copyright
+---------
+
+Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+is open-source software released under a 3-clause BSD license.  Please see the
+file "LICENSE" for more information.
 '''
 
 import boto3
@@ -7,15 +19,17 @@ import imagesize
 import os
 from   os import path
 import sys
-from   time import sleep
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials
-from handprint.files import readable
-from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.exceptions import *
-from handprint.debug import log
+from handprint.files import readable
+from handprint.interruptions import interrupted, raise_for_interrupts, wait
 from handprint.network import net
+from handprint.services.base import TextRecognition, TRResult, TextBox
 
 
 # Main class.
@@ -89,6 +103,7 @@ class AmazonTR(TextRecognition):
             if __debug__: log('calling Amazon API function')
             response = getattr(client, api_method)( **{ image_keyword : {'Bytes': image} })
             if __debug__: log('received {} blocks', len(response[response_key]))
+            raise_for_interrupts()
             full_text = ''
             boxes = []
             width, height = imagesize.get(file_path)
@@ -126,7 +141,7 @@ class AmazonTextractTR(AmazonTR):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'lightGoldenrod4'
+        return 'light_goldenrod2'
 
 
     def result(self, file_path):
@@ -154,7 +169,7 @@ class AmazonRekognitionTR(AmazonTR):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'darkOrange3'
+        return 'dark_orange'
 
 
     def result(self, file_path):

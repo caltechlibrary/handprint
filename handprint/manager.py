@@ -9,7 +9,7 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018-2019 by the California Institute of Technology.  This code
+Copyright (c) 2018-2020 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
@@ -24,17 +24,19 @@ import math
 import os
 from   os import path
 import shutil
-
+import signal
 import sys
+import threading
 from   threading import Thread, Lock
-import time
 from   timeit import default_timer as timer
 import urllib
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.comparison import text_comparison
-from handprint.debug import log
 from handprint.exceptions import *
 from handprint.files import filename_basename, filename_extension, relative
 from handprint.files import files_in_directory, alt_extension, handprint_path
@@ -43,9 +45,9 @@ from handprint.files import delete_existing
 from handprint.images import converted_image, annotated_image, create_image_grid
 from handprint.images import image_size, image_dimensions
 from handprint.images import reduced_image_size, reduced_image_dimensions
+from handprint.interruptions import interrupt, raise_for_interrupts
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
-from handprint.styled import styled
 from handprint.ui import inform, alert, warn
 
 
@@ -112,8 +114,14 @@ class Manager:
                                             min(max_height, service_max[1]))
                 else:
                     self._max_dimensions = service.max_dimensions()
-        if __debug__: log('max_size = {}', self._max_size)
-        if __debug__: log('max_dimensions = {}', self._max_dimensions)
+        if __debug__: log(f'max_size = {self._max_size}')
+        if __debug__: log(f'max_dimensions = {self._max_dimensions}')
+
+        # An unfortunate feature of Python's thread handling is that threads
+        # don't get interrupt signals: if the user hits ^C, the parent thread
+        # has to do something to interrupt the child threads deliberately.
+        # We can't do that unless we keep a pointer to the futures/subthreads.
+        self._senders = []
 
 
     def run_services(self, item, index, base_name):
@@ -124,57 +132,65 @@ class Manager:
         # Shortcuts to make the code more readable.
         services = self._services
 
-        inform('Starting on {}', styled(item, 'white'))
-        try:
-            (item_file, item_fmt) = self._get(item, base_name, index)
-            if not item_file:
-                return
+        inform(f'Starting on [white]{item}[/]')
+        (item_file, item_fmt) = self._get(item, base_name, index)
+        if not item_file:
+            return
 
-            dest_dir = self._output_dir if self._output_dir else path.dirname(item_file)
-            if not writable(dest_dir):
-                alert('Cannot write output in {}.', dest_dir)
-                return
+        dest_dir = self._output_dir if self._output_dir else path.dirname(item_file)
+        if not writable(dest_dir):
+            alert(f'Cannot write output in {dest_dir}.')
+            return
 
-            # Normalize input image to the lowest common denominator.
-            image = self._normalized(item, item_fmt, item_file, dest_dir)
-            if not image.file:
-                warn('Skipping {}', relative(item_file))
-                return
+        # Normalize input image to the lowest common denominator.
+        image = self._normalized(item, item_fmt, item_file, dest_dir)
+        if not image.file:
+            warn(f'Skipping {relative(item_file)}')
+            return
 
-            # Send the file to the services and get Result tuples back.
-            if self._num_threads == 1:
-                # For 1 thread, avoid thread pool to make debugging easier.
-                results = [self._send(image, s) for s in services]
+        # Send the file to the services and get Result tuples back.
+        if self._num_threads == 1:
+            # For 1 thread, avoid thread pool to make debugging easier.
+            results = [self._send(image, s) for s in services]
+        else:
+            executor = ThreadPoolExecutor(max_workers = self._num_threads,
+                                          thread_name_prefix = 'ServiceThread')
+            for service in services:
+                future = executor.submit(self._send, image, service)
+                self._senders.append(future)
+            results = [future.result() for future in self._senders]
+
+        # If a service failed for some reason (e.g., a network glitch), we
+        # get no result back.  Remove empty results & go on with the rest.
+        results = [x for x in results if x is not None]
+
+        # Create grid file if requested.
+        if self._make_grid:
+            base = path.basename(filename_basename(item_file))
+            grid_file = path.realpath(path.join(dest_dir, base + '.handprint-all.png'))
+            inform(f'Creating results grid image: {relative(grid_file)}')
+            all_results = [r.annotated for r in results]
+            width = math.ceil(math.sqrt(len(all_results)))
+            create_image_grid(all_results, grid_file, max_horizontal = width)
+
+        # Clean up after ourselves.
+        if not self._extended_results:
+            for file in set(image.temp_files | {r.annotated for r in results}):
+                if file and path.exists(file):
+                    delete_existing(file)
+
+        inform(f'Done with {relative(item)}')
+
+
+    def stop_services(self):
+        if __debug__: log('stopping sender threads')
+        # Doing cancel on the threads will not do anything if they are still
+        # running.  However, we should still do it.
+        for s in self._senders:
+            if s.cancel():
+                if __debug__: log(f'succeeded in cancelling {s}')
             else:
-                with ThreadPoolExecutor(max_workers = self._num_threads) as tpe:
-                    results = list(tpe.map(self._send, repeat(image), iter(services)))
-
-            # If a service failed for some reason (e.g., a network glitch), we
-            # get no result back.  Remove empty results & go on with the rest.
-            results = [x for x in results if x is not None]
-
-            # Create grid file if requested.
-            if self._make_grid:
-                base = path.basename(filename_basename(item_file))
-                grid_file = path.realpath(path.join(dest_dir, base + '.handprint-all.png'))
-                inform('Creating results grid image: {}', relative(grid_file))
-                all_results = [r.annotated for r in results]
-                width = math.ceil(math.sqrt(len(all_results)))
-                create_image_grid(all_results, grid_file, max_horizontal = width)
-
-            # Clean up after ourselves.
-            if not self._extended_results:
-                for file in set(image.temp_files | {r.annotated for r in results}):
-                    if file and path.exists(file):
-                        delete_existing(file)
-
-            inform('Done with {}', relative(item))
-        except (KeyboardInterrupt, UserCancelled) as ex:
-            warn('Interrupted')
-            raise
-        except Exception as ex:
-            alert('Stopping due to a problem')
-            raise
+                if __debug__: log(f'unable to cancel {s}')
 
 
     def _get(self, item, base_name, index):
@@ -185,17 +201,17 @@ class Manager:
         # the base_name.
         if is_url(item):
             # First make sure the URL actually points to an image.
-            if __debug__: log('testing if URL contains an image: {}', item)
+            if __debug__: log(f'testing if URL contains an image: {item}')
             try:
                 response = urllib.request.urlopen(item)
             except Exception as ex:
-                warn('Skipping URL due to error: {}', ex)
+                warn(f'Skipping URL due to error: {ex}')
                 return (None, None)
             if response.headers.get_content_maintype() != 'image':
-                warn('Did not find an image at {}', item)
+                warn(f'Did not find an image at {item}')
                 return (None, None)
             orig_fmt = response.headers.get_content_subtype()
-            base = '{}-{}'.format(base_name, index)
+            base = f'{base_name}-{index}'
             # If we weren't given an output dir, then for URLs, we have no
             # choice but to use the current dir to download the file.
             # Important: don't change self._output_dir because if other
@@ -204,21 +220,21 @@ class Manager:
                 output_dir = os.getcwd()
             file = path.realpath(path.join(output_dir, base + '.' + orig_fmt))
             if not download_file(item, file):
-                warn('Unable to download {}', item)
+                warn(f'Unable to download {item}')
                 return (None, None)
             url_file = path.realpath(path.join(output_dir, base + '.url'))
             with open(url_file, 'w') as f:
                 f.write(url_file_content(item))
-                inform('Wrote URL to {}', styled(relative(url_file), 'white_on_gray'))
+                inform(f'Wrote URL to [white on grey42]{relative(url_file)}[/]')
         else:
             file = path.realpath(path.join(os.getcwd(), item))
             orig_fmt = filename_extension(file)[1:]
 
         if not path.getsize(file) > 0:
-            warn('File has zero length: {}', relative(file))
+            warn(f'File has zero length: {relative(file)}')
             return (None, None)
 
-        if __debug__: log('{} has original format {}', relative(file), orig_fmt)
+        if __debug__: log(f'{relative(file)} has original format {orig_fmt}')
         return (file, orig_fmt)
 
 
@@ -239,57 +255,59 @@ class Manager:
         '''Send the "image" to the service named "service" and write output in
         directory "dest_dir".
         '''
-        service_name = styled(service.name(), service.name_color())
 
-        inform('Sending to {} and waiting for response ...', service_name)
+        raise_for_interrupts()
+        service_name = f'[{service.name_color()}]{service.name()}[/]'
+        inform(f'Sending to {service_name} and waiting for response ...')
         last_time = timer()
         try:
             output = service.result(image.file)
         except AuthFailure as ex:
-            raise AuthFailure('Unable to use {}: {}', service, ex)
+            raise AuthFailure(f'Unable to use {service}: {str(ex)}')
         except RateLimitExceeded as ex:
             time_passed = timer() - last_time
             if time_passed < 1/service.max_rate():
-                warn('Pausing {} due to rate limits', service_name)
-                time.sleep(1/service.max_rate() - time_passed)
-                # FIXME resend after pause
+                warn(f'Pausing {service_name} due to rate limits')
+                wait(1/service.max_rate() - time_passed)
+                warn(f'Continuing {service_name}')
+                return self._send(image, service)
         if output.error:
-            alert('{} failed: {}', service_name, output.error)
-            warn('No result from {} for {}', service_name, relative(image.file))
+            alert(f'{service_name} failed: {output.error}')
+            warn(f'No result from {service_name} for {relative(image.file)}')
             return None
 
-        inform('Got result from {}.', service_name)
+        raise_for_interrupts()
+        inform(f'Got result from {service_name}.')
         file_name   = path.basename(image.file)
         base_path   = path.join(image.dest_dir, file_name)
         annot_path  = None
         report_path = None
         if self._make_grid:
             annot_path = self._renamed(base_path, str(service), 'png')
-            inform('Creating annotated image for {}.', service_name)
+            inform(f'Creating annotated image for {service_name}.')
             with self._lock:
                 self._save(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = self._renamed(base_path, str(service), 'txt')
             json_file = self._renamed(base_path, str(service), 'json')
-            inform('Saving all data for {}.', service_name)
+            inform(f'Saving all data for {service_name}.')
             self._save(json.dumps(output.data), json_file)
-            inform('Saving extracted text for {}.', service_name)
+            inform(f'Saving extracted text for {service_name}.')
             self._save(output.text, txt_file)
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')
+            gt_path = relative(gt_file)
             report_path = self._renamed(image.item_file, str(service), 'tsv')
             relaxed = (self._compare == 'relaxed')
             if readable(gt_file) and nonempty(gt_file):
-                if __debug__: log('reading ground truth from {}', gt_file)
+                if __debug__: log(f'reading ground truth from {gt_file}')
                 gt_text = open(gt_file, 'r').read()
-                inform('Saving {} comparison to ground truth', service_name)
+                inform(f'Saving {service_name} comparison to ground truth')
                 self._save(text_comparison(output.text, gt_text, relaxed), report_path)
             elif not nonempty(gt_file):
-                warn('Skipping {} comparison because {} is empty',
-                     service_name, relative(gt_file))
+                warn(f'Skipping {service_name} comparison because {gt_path} is empty')
             else:
-                warn('Skipping {} comparison because {} not available',
-                     service_name, relative(gt_file))
+                warn(f'Skipping {service_name} comparison because {gt_path} not available')
         return Result(service, image, annot_path, report_path)
 
 
@@ -324,13 +342,13 @@ class Manager:
         basename = path.basename(filename_basename(file))
         new_file = path.join(dest_dir, basename + '.handprint.' + to_format)
         if path.exists(new_file):
-            inform('Using existing converted image in {}', relative(new_file))
+            inform(f'Using existing converted image in {relative(new_file)}')
             return new_file
         else:
-            inform('Converting to {} format: {}', to_format, relative(file))
+            inform(f'Converting to {to_format} format: {relative(file)}')
             (converted, error) = converted_image(file, to_format, new_file)
             if error:
-                alert('Failed to convert {}: {}', relative(file), error)
+                alert(f'Failed to convert {relative(file)}: {error}')
                 return None
             return converted
 
@@ -343,17 +361,17 @@ class Manager:
         new_file = file if name_tail in file else filename_basename(file) + name_tail
         if path.exists(new_file):
             if image_size(new_file) < self._max_size:
-                inform('Reusing resized image found in {}', relative(new_file))
+                inform(f'Reusing resized image found in {relative(new_file)}')
                 return new_file
             else:
                 # We found a ".handprint.ext" file, perhaps from a previous run,
                 # but for the current set of services, it's larger than allowed.
                 if __debug__: log('existing resized file larger than {}b: {}',
                                   humanize.intcomma(self._max_size), new_file)
-        inform('Size too large; reducing size: {}', relative(file))
+        inform(f'Size too large; reducing size: {relative(file)}')
         (resized, error) = reduced_image_size(file, new_file, self._max_size)
         if error:
-            alert('Failed to resize {}: {}', relative(file), error)
+            alert(f'Failed to resize {relative(file)}: {error}')
             return None
         return resized
 
@@ -366,17 +384,17 @@ class Manager:
         if path.exists(new_file) and readable(new_file):
             (image_width, image_height) = image_dimensions(new_file)
             if image_width < max_width and image_height < max_height:
-                inform('Using reduced image found in {}', relative(new_file))
+                inform(f'Using reduced image found in {relative(new_file)}')
                 return new_file
             else:
                 # We found a "-reduced" file, perhaps from a previous run, but
                 # for the current set of services, dimension are too large.
                 if __debug__: log('existing resized file larger than {}x{}: {}',
                                   max_width, max_height, new_file)
-        inform('Dimensions too large; reducing dimensions: {}', relative(file))
+        inform(f'Dimensions too large; reducing dimensions: {relative(file)}')
         (resized, error) = reduced_image_dimensions(file, new_file, max_width, max_height)
         if error:
-            alert('Failed to re-dimension {}: {}', relative(file), error)
+            alert(f'Failed to re-dimension {relative(file)}: {error}')
             return None
         return resized
 
@@ -384,19 +402,19 @@ class Manager:
     def _save(self, result, file):
         # First perform some sanity checks.
         if result is None:
-            warn('No data for {}', file)
+            warn(f'No data for {file}')
             return
         if isinstance(result, tuple):
             # Assumes 2 elements: data, and error
             (data, error) = result
             if error:
-                alert('Error: {}', error)
-                warn('Unable to write {}', file)
+                alert(f'Error: {error}')
+                warn(f'Unable to write {file}')
                 return
             else:
                 result = data
 
-        if __debug__: log('writing output to file {}', relative(file))
+        if __debug__: log(f'writing output to file {relative(file)}')
         if isinstance(result, str):
             with open(file, 'w') as f:
                 f.write(result)
@@ -411,13 +429,13 @@ class Manager:
     def _renamed(self, base_path, service_name, format):
         (root, ext) = path.splitext(base_path)
         if '.handprint' in root:
-            return '{}-{}.{}'.format(root, service_name, format)
+            return f'{root}-{service_name}.{format}'
         else:
-            return '{}.handprint-{}.{}'.format(root, service_name, format)
+            return f'{root}.handprint-{service_name}.{format}'
 
 
 # Helper functions.
 # ......................................................................
 
 def url_file_content(url):
-    return '[InternetShortcut]\nURL={}\n'.format(url)
+    return f'[InternetShortcut]\nURL={url}\n'

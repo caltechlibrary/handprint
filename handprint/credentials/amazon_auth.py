@@ -1,13 +1,25 @@
 '''
 amazon_auth.py: subclass of handprint.credentials.base
+
+Authors
+-------
+
+Michael Hucka <mhucka@caltech.edu> -- Caltech Library
+
+Copyright
+---------
+
+Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+is open-source software released under a 3-clause BSD license.  Please see the
+file "LICENSE" for more information.
 '''
 
 import json
 import os
 from   os import path
+from   sidetrack import log
 
 import handprint
-from handprint.debug import log
 from handprint.exceptions import *
 from handprint.files import readable
 

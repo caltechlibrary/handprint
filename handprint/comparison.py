@@ -9,19 +9,18 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2019 by the California Institute of Technology.  This code
+Copyright (c) 2019-2020 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-from collections import namedtuple
-from stringdist import levenshtein
+from collections  import namedtuple
+from stringdist   import levenshtein
 from textdistance import lcsseq
 # Shorten this name for easier reading in the code below.
 lcsseq_score = lcsseq.normalized_similarity
 
 import handprint
-from handprint.debug import log
 from handprint.exceptions import *
 
 

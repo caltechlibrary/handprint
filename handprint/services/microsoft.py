@@ -3,19 +3,33 @@ microsoft.py: interface to Microsoft text recognition network service
 
 This code was originally based on the sample provided by Microsoft at
 https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/quickstarts/python-hand-text
+
+Authors
+-------
+
+Michael Hucka <mhucka@caltech.edu> -- Caltech Library
+
+Copyright
+---------
+
+Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+is open-source software released under a 3-clause BSD license.  Please see the
+file "LICENSE" for more information.
 '''
 
 import os
 from   os import path
 import sys
-from   time import sleep
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
-from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.exceptions import *
-from handprint.debug import log
+from handprint.interruptions import interrupted, raise_for_interrupts, wait
 from handprint.network import net
+from handprint.services.base import TextRecognition, TRResult, TextBox
 
 
 # Main class.
@@ -42,7 +56,7 @@ class MicrosoftTR(TextRecognition):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'lightBlue2'
+        return 'aquamarine1'
 
 
     def max_rate(self):
@@ -53,11 +67,9 @@ class MicrosoftTR(TextRecognition):
 
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
-        # https://cloud.google.com/vision/docs/supported-files
-        # Google Cloud Vision API docs state that images can't exceed 20 MB
-        # but the JSON request size limit is 10 MB.  We hit the 10 MB limit
-        # even though we're using the Google API library, which I guess must
-        # be transferring JSON under the hood.
+        # Microsoft Azure documentation states the file size limit for
+        # prediction is 4 MB in the free tier.
+        # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/concept-recognizing-text
         return 4*1024*1024
 
 
@@ -65,7 +77,7 @@ class MicrosoftTR(TextRecognition):
         '''Maximum image size as a tuple of pixel numbers: (width, height).'''
         # For OCR, max image dimensions are 4200 x 4200.
         # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/home
-        return (4200, 4200)
+        return (10000, 10000)
 
 
     # General scheme of things:
@@ -92,9 +104,7 @@ class MicrosoftTR(TextRecognition):
         if error:
             return error
 
-        base_url = 'https://westus.api.cognitive.microsoft.com/vision/v2.0/'
-        url = base_url + 'recognizeText'
-        params  = {'mode': 'Handwritten'}
+        url = 'https://westus.api.cognitive.microsoft.com/vision/v3.0/read/analyze'
         headers = {'Ocp-Apim-Subscription-Key': self._credentials,
                    'Content-Type': 'application/octet-stream'}
 
@@ -103,7 +113,7 @@ class MicrosoftTR(TextRecognition):
         # text is ready to be retrieved.
 
         if __debug__: log('sending file to MS cloud service')
-        response, error = net('post', url, headers = headers, params = params, data = image)
+        response, error = net('post', url, headers = headers, data = image)
         if isinstance(error, NetworkFailure):
             if __debug__: log('network exception: {}', str(error))
             return TRResult(path = path, data = {}, text = '', error = str(error))
@@ -114,7 +124,7 @@ class MicrosoftTR(TextRecognition):
             if 'Retry-After' in response.headers:
                 sleep_time = int(response.headers['Retry-After'])
             if __debug__: log('sleeping for {} s and retrying', sleep_time)
-            sleep(sleep_time)
+            wait(sleep_time)
             return self.result(path)    # Recursive invocation
         elif error:
             raise error
@@ -129,10 +139,11 @@ class MicrosoftTR(TextRecognition):
         analysis = {}
         poll = True
         while poll:
+            raise_for_interrupts()
             # I never have seen results returned in 1 second, and meanwhile
             # the repeated polling counts against your rate limit.  So, wait
             # for 2 s to reduce the number of calls.
-            sleep(2)
+            wait(2)
             response, error = net('get', polling_url, polling = True, headers = headers)
             if isinstance(error, NetworkFailure):
                 if __debug__: log('network exception: {}', str(error))
@@ -145,7 +156,7 @@ class MicrosoftTR(TextRecognition):
                 if 'Retry-After' in response.headers:
                     sleep_time = int(response.headers['Retry-After'])
                 if __debug__: log('sleeping for {} s and retrying', sleep_time)
-                sleep(sleep_time)
+                wait(sleep_time)
             elif error:
                 raise error
 
@@ -154,20 +165,36 @@ class MicrosoftTR(TextRecognition):
             # else should be done except keep going.
             if response.text:
                 analysis = response.json()
-                if 'recognitionResult' in analysis:
-                    poll = False
-                if 'status' in analysis and analysis['status'] == 'Failed':
-                    poll = False
+                if 'status' in analysis:
+                    if analysis['status'] in ('notStarted', 'running'):
+                        if __debug__: log('Microsoft still processing image')
+                        poll = True
+                    elif analysis['status'] == 'succeeded':
+                        if __debug__: log('Microsoft returned success code')
+                        poll = False
+                    elif analysis['status'] == 'failed':
+                        text = 'Microsoft analysis failed'
+                        return TRResult(path = path, data = {}, text = '', error = text)
+                    else:
+                        text = 'Error: Microsoft returned unexpected result'
+                        return TRResult(path = path, data = {}, text = '', error = text)
+                else:
+                    # No status key in JSON results means something's wrong.
+                    text = 'Error: Microsoft results not in expected format'
+                    return TRResult(path = path, data = {}, text = '', error = text)
             else:
                 if __debug__: log('received empty result from Microsoft.')
-        if __debug__: log('results received.')
 
+        if __debug__: log('results received.')
         # Have to extract the text into a single string.
         full_text = ''
-        if 'recognitionResult' in analysis:
-            lines = analysis['recognitionResult']['lines']
-            sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
-            full_text = '\n'.join(x['text'] for x in sorted_lines)
+        if 'analyzeResult' in analysis:
+            results = analysis['analyzeResult']
+            if 'readResults' in results:
+                # We only return the 1st page.  FIXME: should check if > 1.
+                lines = results['readResults'][0]['lines']
+                sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
+                full_text = '\n'.join(x['text'] for x in sorted_lines)
 
         # Create our particular box structure for annotations.  The Microsoft
         # structure is like this: data['recognitionResult']['lines'] contains

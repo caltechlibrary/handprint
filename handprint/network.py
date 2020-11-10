@@ -4,19 +4,23 @@ network.py: miscellaneous network utilities for Handprint.
 
 import http.client
 from   http.client import responses as http_responses
+import os
 import requests
 from   requests.packages.urllib3.exceptions import InsecureRequestWarning
 from   time import sleep
+import socket
 import ssl
 import urllib
 from   urllib import request
 import urllib3
 import warnings
 
+if __debug__:
+    from sidetrack import set_debug, log, logr
+
 import handprint
-from   handprint.debug import log
 from   handprint.exceptions import *
-from   handprint.styled import styled
+from   handprint.interruptions import wait, interrupted
 from   handprint.ui import inform, alert, warn
 
 
@@ -28,7 +32,7 @@ _MAX_RECURSIVE_CALLS = 10
 encountering a network error before they stop and give up.'''
 
 _MAX_FAILURES = 3
-'''Maximum number of network failures before we give up.'''
+'''Maximum number of consecutive failures before pause and try another round.'''
 
 _MAX_RETRIES = 5
 '''Maximum number of times we back off and try again.  This also affects the
@@ -38,17 +42,24 @@ maximum wait time that will be reached after repeated retries.'''
 # Main functions.
 # .............................................................................
 
-def network_available():
-    '''Return True if it appears we have a network connection, False if not.'''
-    r = None
+def network_available(address = "8.8.8.8", port = 53, timeout = 5):
+    '''Return True if it appears we have a network connection, False if not.
+    By default, this attempts to contact one of the Google DNS servers (as a
+    plain TCP connection, not as an actual DNS lookup).  Argument 'address'
+    and 'port' can be used to test a different server address and port.  The
+    socket connection is attempted for 'timeout' seconds.
+    '''
+    # Portions of this code are based on the answer by user "7h3rAm" posted to
+    # Stack Overflow here: https://stackoverflow.com/a/33117579/743730
     try:
-        r = urllib.request.urlopen("http://www.google.com")
+        if __debug__: log('testing if we have a working network')
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((address, port))
+        if __debug__: log('we have a network connection')
         return True
-    except Exception:
-        if __debug__: log('could not connect to https://www.google.com')
-        return False
-    if r:
-        r.close()
+    except socket.error as ex:
+        if __debug__: log(f'could not connect to 8.8.8.8: {str(ex)}')
+    return False
 
 
 def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
@@ -60,7 +71,7 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
     failures = 0
     retries = 0
     error = None
-    while failures < _MAX_FAILURES:
+    while failures < _MAX_FAILURES and not interrupted():
         try:
             with warnings.catch_warnings():
                 # The underlying urllib3 library used by the Python requests
@@ -68,49 +79,58 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
                 # We don't care here.  See also this for a discussion:
                 # https://github.com/kennethreitz/requests/issues/2214
                 warnings.simplefilter("ignore", InsecureRequestWarning)
-                if __debug__: log('doing http {} on {}', get_or_post, url)
+                if __debug__: log(f'doing http {get_or_post} on {url}')
                 if session:
                     method = getattr(session, get_or_post)
                 else:
                     method = requests.get if get_or_post == 'get' else requests.post
                 response = method(url, timeout = timeout, verify = False, **kwargs)
-                if __debug__: log('received {} bytes', len(response.content))
+                if __debug__: log('response received')
                 return response
+        except (KeyboardInterrupt, UserCancelled) as ex:
+            if __debug__: log(f'network {method} interrupted by {str(ex)}')
+            raise
         except Exception as ex:
             # Problem might be transient.  Don't quit right away.
-            if __debug__: log('exception: {}', str(ex))
             failures += 1
+            if __debug__: log(f'exception (failure #{failures}): {str(ex)}')
             # Record the first error we get, not the subsequent ones, because
             # in the case of network outages, the subsequent ones will be
             # about being unable to reconnect and not the original problem.
             if not error:
                 error = ex
         if failures >= _MAX_FAILURES:
-            # Try pause & continue, in case of transient network issues.
+            # Pause with exponential back-off, reset failure count & try again.
             if retries < _MAX_RETRIES:
                 retries += 1
-                if __debug__: log('pausing because of consecutive failures')
-                sleep(60 * retries)
                 failures = 0
+                if __debug__: log('pausing because of consecutive failures')
+                wait(10 * retries * retries)
             else:
                 # We've already paused & restarted once.
                 raise error
+    if interrupted():
+        if __debug__: log('interrupted -- raising UserCancelled')
+        raise UserCancelled(f'Network request has been interrupted for {url}')
+    else:
+        # In theory, we should never reach this point.  If we do, then:
+        raise InternalError(f'Unexpected case in timed_request for {url}')
 
 
 def download_file(url, output_file, user = None, pswd = None):
-    inform('Downloading {}', url)
+    inform(f'Downloading {url}')
     try:
         download(url, user, pswd, output_file)
         return True
     except (NoContent, ServiceFailure, AuthFailure) as ex:
-        alert('{}', str(ex))
+        alert(str(ex))
     return False
 
 
 def download(url, user, password, local_destination, recursing = 0):
     '''Download the 'url' to the file 'local_destination'.'''
     def addurl(text):
-        return (text + ' for {}').format(url)
+        return f'{text} for {url}'
 
     try:
         req = timed_request('get', url, stream = True, auth = (user, password))
@@ -130,7 +150,7 @@ def download(url, user, password, local_destination, recursing = 0):
         elif (isinstance(arg0, urllib3.exceptions.ProtocolError)
               and arg0.args and isinstance(args0.args[1], ConnectionResetError)):
             if __debug__: log('download() got ConnectionResetError; will recurse')
-            sleep(1)                    # Sleep a short time and try again.
+            wait(1)                    # Sleep a short time and try again.
             recursing += 1
             download(url, user, password, local_destination, recursing)
         else:
@@ -149,9 +169,9 @@ def download(url, user, password, local_destination, recursing = 0):
     code = req.status_code
     if code == 202:
         # Code 202 = Accepted, "received but not yet acted upon."
-        sleep(1)                        # Sleep a short time and try again.
+        wait(1)                        # Sleep a short time and try again.
         recursing += 1
-        if __debug__: log('Calling download() recursively for http code 202')
+        if __debug__: log('calling download() recursively for http code 202')
         download(url, user, password, local_destination, recursing)
     elif 200 <= code < 400:
         # This started as code in https://stackoverflow.com/a/13137873/743730
@@ -159,15 +179,16 @@ def download(url, user, password, local_destination, recursing = 0):
         # file always ended up zero-length.  I couldn't figure out why.
         with open(local_destination, 'wb') as f:
             for chunk in req.iter_content(chunk_size = 1024):
-                if chunk:
-                    f.write(chunk)
+                f.write(chunk)
         req.close()
+        size = os.stat(local_destination).st_size
+        if __debug__: log(f'wrote {size} bytes to file {local_destination}')
     elif code in [401, 402, 403, 407, 451, 511]:
         raise AuthFailure(addurl('Access is forbidden'))
     elif code in [404, 410]:
         raise NoContent(addurl('No content found'))
     elif code in [405, 406, 409, 411, 412, 414, 417, 428, 431, 505, 510]:
-        raise InternalError(addurl('Server returned code {}'.format(code)))
+        raise InternalError(addurl(f'Server returned code {code}'))
     elif code in [415, 416]:
         raise ServiceFailure(addurl('Server rejected the request'))
     elif code == 429:
@@ -175,9 +196,9 @@ def download(url, user, password, local_destination, recursing = 0):
     elif code == 503:
         raise ServiceFailure('Server is unavailable -- try again later')
     elif code in [500, 501, 502, 506, 507, 508]:
-        raise ServiceFailure(addurl('Internal server error (HTTP code {})'.format(code)))
+        raise ServiceFailure(addurl(f'Internal server error (HTTP code {code})'))
     else:
-        raise NetworkFailure('Unable to resolve {}'.format(url))
+        raise NetworkFailure(f'Unable to resolve {url}')
 
 
 def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwargs):
@@ -193,13 +214,16 @@ def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwar
 
     If keyword 'polling' is True, certain statuses like 404 are ignored and
     the response is returned; otherwise, they are considered errors.
+
+    This method hands allow_redirects = True to the underlying Python requests
+    network call.
     '''
     def addurl(text):
-        return (text + ' for {}').format(url)
+        return f'{text} for {url}'
 
     req = None
     try:
-        req = timed_request(get_or_post, url, session, **kwargs)
+        req = timed_request(get_or_post, url, session, allow_redirects = True, **kwargs)
     except requests.exceptions.ConnectionError as ex:
         if recursing >= _MAX_RECURSIVE_CALLS:
             return (req, NetworkFailure(addurl('Too many connection errors')))
@@ -216,7 +240,7 @@ def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwar
         elif (isinstance(arg0, urllib3.exceptions.ProtocolError)
               and arg0.args and isinstance(args0.args[1], ConnectionResetError)):
             if __debug__: log('net() got ConnectionResetError; will recurse')
-            sleep(1)                    # Sleep a short time and try again.
+            wait(1)                    # Sleep a short time and try again.
             return net(get_or_post, url, session, polling, recursing + 1, **kwargs)
         else:
             return (req, NetworkFailure(str(ex)))
@@ -235,28 +259,28 @@ def net(get_or_post, url, session = None, polling = False, recursing = 0, **kwar
     code = req.status_code
     error = None
     if code == 400:
-        error = RequestError('Server rejected the request')
+        error = ServiceFailure('Server rejected the request')
     elif code in [401, 402, 403, 407, 451, 511]:
         error = AuthFailure(addurl('Access is forbidden'))
     elif code in [404, 410] and not polling:
         error = NoContent(addurl("No content found"))
     elif code in [405, 406, 409, 411, 412, 414, 417, 428, 431, 505, 510]:
-        error = InternalError(addurl('Server returned code {}'.format(code)))
+        error = InternalError(addurl(f'Server returned code {code}'))
     elif code in [415, 416]:
         error = ServiceFailure(addurl('Server rejected the request'))
     elif code == 429:
         if recursing < _MAX_RECURSIVE_CALLS:
             pause = 5 * (recursing + 1)   # +1 b/c we start with recursing = 0.
-            if __debug__: log('rate limit hit -- sleeping {}', pause)
-            sleep(pause)                  # 5 s, then 10 s, then 15 s, etc.
+            if __debug__: log(f'rate limit hit -- sleeping {pause}')
+            wait(pause)                  # 5 s, then 10 s, then 15 s, etc.
             return net(get_or_post, url, session, polling, recursing + 1, **kwargs)
         error = RateLimitExceeded('Server blocking further requests due to rate limits')
     elif code == 503:
         error = ServiceFailure('Server is unavailable -- try again later')
     elif code in [500, 501, 502, 506, 507, 508]:
-        error = ServiceFailure('Dimensions server error (HTTP code {})'.format(code))
+        error = ServiceFailure(f'Dimensions server error (HTTP code {code})')
     elif not (200 <= code < 400):
-        error = NetworkFailure("Unable to resolve {}".format(url))
+        error = NetworkFailure(f'Unable to resolve {url}')
     return (req, error)
 
 

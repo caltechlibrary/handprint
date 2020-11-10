@@ -1,12 +1,26 @@
 '''
-tr/base.py: base class definition for text recognition systems.
+base.py: base class definition for text recognition systems.
+
+Authors
+-------
+
+Michael Hucka <mhucka@caltech.edu> -- Caltech Library
+
+Copyright
+---------
+
+Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+is open-source software released under a 3-clause BSD license.  Please see the
+file "LICENSE" for more information.
 '''
 
 from collections import namedtuple
 import imagesize
 
+if __debug__:
+    from sidetrack import set_debug, log, logr
+
 import handprint
-from handprint.debug import log
 from handprint.files import readable
 
 

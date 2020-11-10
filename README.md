@@ -5,7 +5,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 
 [![Latest release](https://img.shields.io/github/v/release/caltechlibrary/handprint.svg?style=flat-square&color=b44e88&label=Latest%20release)](https://github.com/caltechlibrary/handprint/releases)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
-[![Python](https://img.shields.io/badge/Python-3.5+-brightgreen.svg?style=flat-square)](http://shields.io)
+[![Python](https://img.shields.io/badge/Python-3.6+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
 [![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1373)](https://data.caltech.edu/records/1373)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
@@ -322,7 +322,7 @@ Handprint produces color-coded diagnostic output as it runs, by default.  Howeve
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
 
-If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing, and will also invoke [`pdb`](https://docs.python.org/library/pdb.html) upon the occurrence of any errors.  The trace will be written to the given destination, which can be a dash character (`-`) to indicate console output, or a file path.  *Important*: some Python version/platform combinations crash if `pdb` is invoked in a process thread &ndash; which is likely to happen if you are debugging the execution of Handprint. Consequently, to avoid this risk, **always use `-t 1` when debugging** to make Handprint use only one thread.
+If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing. The debug trace will be sent to the given destination, which can be `-` to indicate console output, or a file path to send the output to a file.  Handprint will also install a signal handler that responds to signal `SIGUSR1`; if the signal is sent to the running process, it will drop Handprint into the `pdb` debugger.  _Note_: It's best to use `-t 1` when attempting to use a debugger because otherwise subthreads will continue running even if the main thread is interrupted.
 
 If given the `-V` option (`/V` on Windows), this program will print the version and other information, and exit without doing anything else.
 
@@ -352,6 +352,26 @@ The following table summarizes all the command line options available. (Note: on
 
 ⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpg`, `document-1.handprint-google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.<br>
 ⬥ &nbsp; To write to the console, use the character `-` as the value of _OUT_; otherwise, _OUT_ must be the name of a file where the output should be written.
+
+
+### _Return values_
+
+This program exits with a return code of 0 if no problems are encountered.  It returns a nonzero value otherwise. The following table lists the possible return values:
+
+| Code | Meaning                                                  |
+|:----:|----------------------------------------------------------|
+| 0    | success &ndash; program completed normally               |
+| 1    | the user interrupted the program's execution             |
+| 2    | encountered a bad or missing value for an option         |
+| 3    | no network detected &ndash; cannot proceed               |
+| 4    | file error &ndash; encountered a problem with a file     |
+| 5    | server error &ndash; encountered a problem with a server |
+| 6    | an exception or fatal error occurred                     |
+
+
+### _Additional notes_
+
+The debug logging functionality is implemented using [Sidetrack](https://github.com/caltechlibrary/sidetrack) and all calls to the debug code are conditionalized on the Python symbol `__debug__`.  It is carefully written so that you can cause the calls to be _optimized out completely_ if your run Python with [optimization turned on](https://docs.python.org/3/using/cmdline.html#cmdoption-o) (e.g., using the `-O` command-line option).
 
 
 ☹︎ Known issues and limitations
@@ -399,6 +419,7 @@ Handprint benefitted from feedback from several people, notably from Tommy Keswi
 Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Handprint with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
+* [boltons](https://github.com/mahmoud/boltons/) &ndash; package of miscellaneous Python utilities
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
 * [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
 * [colored](https://gitlab.com/dslackw/colored) &ndash; library for color and formatting in terminal
@@ -411,6 +432,7 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
 * [numpy](https://numpy.org) &ndash; package for scientific computing in Python
 * [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library
+* [rich](https://rich.readthedocs.io/en/latest/) &ndash; library for writing styled text to the terminal
 * [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
 * [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python

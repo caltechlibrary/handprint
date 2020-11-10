@@ -17,9 +17,9 @@ file "LICENSE" for more information.
 import json
 import os
 from   os import path
+from   sidetrack import log
 
 import handprint
-from handprint.debug import log
 from handprint.exceptions import *
 from handprint.files import readable
 

@@ -26,11 +26,14 @@ from google.cloud.vision import types
 from google.protobuf.json_format import MessageToDict
 import json
 
+if __debug__:
+    from sidetrack import set_debug, log, logr
+
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
-from handprint.services.base import TextRecognition, TRResult, TextBox
 from handprint.exceptions import *
-from handprint.debug import log
+from handprint.interruptions import interrupted, raise_for_interrupts
+from handprint.services.base import TextRecognition, TRResult, TextBox
 
 
 # Main class.
@@ -40,9 +43,7 @@ class GoogleTR(TextRecognition):
     # The following is based on the table of Google Cloud Vision features at
     # https://cloud.google.com/vision/docs/reference/rpc/google.cloud.vision.v1p3beta1#type_1
     # as of 2018-10-25.
-    _known_features = ['face_detection', 'landmark_detection',
-                       'label_detection', 'text_detection',
-                       'document_text_detection', 'image_properties']
+    _known_features = ['document_text_detection']
 
 
     def init_credentials(self):
@@ -64,7 +65,7 @@ class GoogleTR(TextRecognition):
     def name_color(self):
         '''Returns a color code for this service.  See the color definitions
         in messages.py.'''
-        return 'deepSkyBlue1'
+        return 'deep_sky_blue1'
 
 
     def max_rate(self):
@@ -122,6 +123,7 @@ class GoogleTR(TextRecognition):
             # Iterate over the known API calls and store each result.
             result = dict.fromkeys(self._known_features)
             for feature in self._known_features:
+                raise_for_interrupts()
                 if __debug__: log('sending image to Google for {} ...', feature)
                 response = getattr(client, feature)(image = image, image_context = context)
                 if __debug__: log('received result.')
@@ -138,6 +140,7 @@ class GoogleTR(TextRecognition):
             #
             # https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#Block
 
+            raise_for_interrupts()
             full_text = ''
             boxes = []
             if 'fullTextAnnotation' in result['document_text_detection']:

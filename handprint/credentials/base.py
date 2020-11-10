@@ -17,9 +17,9 @@ file "LICENSE" for more information.
 from appdirs import user_config_dir
 import os
 from   os import path
+from   sidetrack import log
 
 import handprint
-from handprint.debug import log
 from handprint.files import make_dir, copy_file
 
 from .credentials_files import credentials_filename

@@ -34,25 +34,30 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   boltons.debugutils import pdb_on_signal
 import os
-from   os import path
+from   os import path, cpu_count
 import plac
+import signal
 import sys
 from   sys import exit as exit
 
+if __debug__:
+    from sidetrack import set_debug, log, logr
+
 import handprint
-from handprint.cpus import available_cpus
+from handprint import print_version
 from handprint.credentials import Credentials
-from handprint.debug import set_debug, log
+from handprint.data_utils import timestamp, plural
 from handprint.exceptions import *
+from handprint.exit_codes import ExitCode
 from handprint.files import filename_extension, files_in_directory, is_url
 from handprint.files import readable, writable
+from handprint.interruptions import interrupt, interrupted
 from handprint.main_body import MainBody
-from handprint.manager import Manager
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
-from handprint.styled import styled
-from handprint.ui import UI, inform, alert, warn
+from handprint.ui import UI, inform, alert, alert_fatal, warn
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
 disable_ssl_cert_check()
@@ -302,10 +307,30 @@ If given the -V option (/V on Windows), this program will print the version
 and other information, and exit without doing anything else.
 
 If given the -@ argument (/@ on Windows), this program will output a detailed
-trace of what it is doing to the terminal window, and will also drop into a
-debugger upon the occurrence of any errors.  The debug trace will be sent to
-the given destination, which can be '-' to indicate console output, or a file
-path to send the output to a file.
+trace of what it is doing.  The debug trace will be sent to the given
+destination, which can be '-' to indicate console output, or a file path to
+send the output to a file.
+
+When -@ (or /@ on Windows) has been given, Handprint installs a signal handler
+on signal SIGUSR1 that will drop Handprint into the pdb debugger if the signal
+is sent to the running process.  It's best to use -t 1 when attempting to use
+a debugger because the subthreads will not stop running if the signal is sent.
+
+
+Return values
+~~~~~~~~~~~~~
+
+This program exits with a return code of 0 if no problems are encountered.
+It returns a nonzero value otherwise. The following table lists the possible
+return values:
+
+    0 = success -- program completed normally
+    1 = the user interrupted the program's execution
+    2 = encountered a bad or missing value for an option
+    3 = no network detected -- cannot proceed
+    4 = file error -- encountered a problem with a file
+    5 = server error -- encountered a problem with a server
+    6 = an exception or fatal error occurred
 
 Command-line arguments summary
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -313,112 +338,111 @@ Command-line arguments summary
 
     # Initial setup -----------------------------------------------------------
 
-    debugging = debug != 'OUT'
-    use_color = not no_color
-    make_grid = not no_grid
     prefix = '/' if sys.platform.startswith('win') else '-'
-    hint = '(Hint: use {}h for help.)'.format(prefix)
-    ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test', False, use_color, quiet)
+    hint = f'(Hint: use {prefix}h for help.)'
 
     # Preprocess arguments and handle early exits -----------------------------
 
-    if debugging:
-        set_debug(True, debug)
+    if debug != 'OUT':
+        if __debug__: set_debug(True, debug, extra = '%(threadName)s')
+        import faulthandler
+        faulthandler.enable()
+        pdb_on_signal(signal.SIGUSR1)
+
+    # Handle arguments that involve deliberate exits.
 
     if version:
         print_version()
-        exit(0)
+        exit(int(ExitCode.success))
     if list:
         inform('Known services: {}', ', '.join(services_list()))
-        exit(0)
-
-    print_intro(ui)
-
+        exit(int(ExitCode.success))
     if add_creds != 'A':
         service = add_creds.lower()
         if service not in services_list():
-            alert('Unknown service: "{}". {}', service, hint)
-            exit(1)
+            alert(f'Unknown service: "{service}". {hint}')
+            exit(int(ExitCode.bad_arg))
         if not files or len(files) > 1:
-            alert('Option {}a requires one file. {}', prefix, hint)
-            exit(1)
+            alert(f'Option {prefix}a requires one file. {thing}')
+            exit(int(ExitCode.bad_arg))
         creds_file = files[0]
         if not readable(creds_file):
-            alert('File not readable: {}', creds_file)
-            exit(1)
+            alert(f'File not readable: {creds_file}')
+            exit(int(ExitCode.file_error))
         Credentials.save_credentials(service, creds_file)
-        inform('Saved credentials for service "{}".', service)
-        exit(0)
+        inform(f'Saved credentials for service "{service}".')
+        exit(int(ExitCode.success))
+
+    # Do sanity checks on some other arguments.
+
+    if services != 'S' and not all(s in services_list() for s in services):
+        alert_fatal(f'"{services}" is not a known services. {hint}')
+        exit(int(ExitCode.bad_arg))
     if no_grid and not extended and not compare:
-        alert('{0}G without {0}e or {0}c produces no output. {1}', prefix, hint)
-        exit(1)
+        alert_fatal(f'{prefix}G without {prefix}e or {prefix}c produces no output. {hint}')
+        exit(int(ExitCode.bad_arg))
     if any(item.startswith('-') for item in files):
-        alert('Unrecognized option in arguments. {}', hint)
-        exit(1)
+        alert_fatal(f'Unrecognized option in arguments. {hint}')
+        exit(int(ExitCode.bad_arg))
     if not files and from_file == 'F':
-        alert('Need images or URLs to have something to do. {}', hint)
-        exit(1)
+        alert_fatal(f'Need images or URLs to have something to do. {hint}')
+        exit(int(ExitCode.bad_arg))
     if relaxed and not compare:
-        warn('Option {0}r without {0}c has no effect. {1}', prefix, hint)
-
-    services = services_list() if services == 'S' else services.lower().split(',')
-    if not all(s in services_list() for s in services):
-        alert('"{}" is not a known services. {}', services, hint)
-        exit(1)
-
-    base_name  = 'document' if base_name == 'B' else base_name
-    from_file  = None if from_file == 'F' else from_file
-    output_dir = None if output_dir == 'O' else output_dir
-    compare    = 'relaxed' if (compare and relaxed) else compare
-    threads    = int(max(1, available_cpus()/2 if threads == 'T' else int(threads)))
+        warn(f'Option {prefix}r without {prefix}c has no effect. {hint}')
 
     # Do the real work --------------------------------------------------------
 
+    if __debug__: log('='*8 + f' started {timestamp()} ' + '='*8)
+    ui = body = exception = None
     try:
-        body = MainBody(base_name, extended, from_file, output_dir, threads)
-        body.run(services, files, make_grid, compare)
+        ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
+                use_color = not no_color, be_quiet = quiet)
+        ui.start()
+        body = MainBody(files      = files,
+                        from_file  = None if from_file == 'F' else from_file,
+                        output_dir = None if output_dir == 'O' else output_dir,
+                        add_creds  = None if add_creds == 'A' else add_creds,
+                        base_name  = 'document' if base_name == 'B' else base_name,
+                        make_grid  = not no_grid,
+                        extended   = extended,
+                        threads    = max(1, cpu_count()//2 if threads == 'T' else int(threads)),
+                        services   = services_list() if services == 'S' else services.lower().split(','),
+                        compare    = 'relaxed' if (compare and relaxed) else compare)
+        body.run()
+        exception = body.exception
     except (KeyboardInterrupt, UserCancelled) as ex:
         if __debug__: log('received {}', sys.exc_info()[0].__name__)
-        inform('Quitting.')
-        exit(0)
+        alert('Quit received; shutting down ...')
+        interrupt()
+        body.stop()
+        exception = sys.exc_info()
     except Exception as ex:
-        if debugging:
-            import traceback
-            alert('{}\n{}', str(ex), traceback.format_exc())
-            import pdb; pdb.set_trace()
+        exception = sys.exc_info()
+
+    # Try to deal with exceptions gracefully ----------------------------------
+
+    exit_code = ExitCode.success
+    if exception:
+        if type(exception) == CannotProceed:
+            exit_code = exception.args[0]
+        elif type(exception) in [KeyboardInterrupt, UserCancelled]:
+            if __debug__: log(f'received {exception.__class__.__name__}')
+            exit_code = ExitCode.user_interrupt
         else:
-            alert(str(ex))
-            exit(2)
-    inform('Done.')
-
-
-# Helper functions.
-# .............................................................................
-
-def print_version():
-    this_module = sys.modules[__package__]
-    print('{} version {}'.format(this_module.__name__, this_module.__version__))
-    print('Authors: {}'.format(this_module.__author__))
-    print('URL: {}'.format(this_module.__url__))
-    print('License: {}'.format(this_module.__license__))
-    print('')
-    print('Known services: {}'.format(', '.join(services_list())))
-    print('Credentials are stored in {}'.format(Credentials.credentials_dir()))
-
-
-def print_intro(ui):
-    if ui.use_color():
-        cb = ['chartreuse', 'bold']
-        name = styled('Handprint', cb)
-        acronym = '{}written {}age {}ecognit{}o{} {}est'.format(
-            styled('Hand', cb), styled('p', cb), styled('r', cb),
-            styled('i', cb), styled('n', cb), styled('t', cb))
+            if __debug__:
+                from traceback import format_exception
+                msg = str(exception[1])
+                details = ''.join(format_exception(*exception))
+                alert_fatal(f'Error: {msg}')
+                logr(f'Exception: {msg}\n{details}')
+            exit_code = ExitCode.exception
     else:
-        name = 'Handprint'
-        acronym = 'HANDwritten Page RecognItioN Test'
-    inform('┏' + '━'*68 + '┓')
-    inform('┃    Welcome to {}, the {}!    ┃', name, acronym)
-    inform('┗' + '━'*68 + '┛')
+        inform('Done.')
+    if __debug__: log('_'*8 + f' stopped {timestamp()} ' + '_'*8)
+    if exit_code == ExitCode.user_interrupt:
+        os._exit(int(exit_code))
+    else:
+        exit(int(exit_code))
 
 
 # Main entry point.

@@ -378,6 +378,7 @@ Command-line arguments summary
 
     # Do sanity checks on some other arguments.
 
+    services = services_list() if services == 'S' else services.lower().split(',')
     if services != 'S' and not all(s in services_list() for s in services):
         alert_fatal(f'"{services}" is not a known services. {hint}')
         exit(int(ExitCode.bad_arg))
@@ -405,8 +406,8 @@ Command-line arguments summary
                         base_name  = 'document' if base_name == 'B' else base_name,
                         make_grid  = not no_grid,
                         extended   = extended,
+                        services   = services,
                         threads    = max(1, cpu_count()//2 if threads == 'T' else int(threads)),
-                        services   = services_list() if services == 'S' else services.lower().split(','),
                         compare    = 'relaxed' if (compare and relaxed) else compare)
         body.run()
         exception = body.exception

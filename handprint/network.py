@@ -8,13 +8,15 @@ import os
 import requests
 from   requests.packages.urllib3.exceptions import InsecureRequestWarning
 from   time import sleep
-from   sidetrack import log
 import socket
 import ssl
 import urllib
 from   urllib import request
 import urllib3
 import warnings
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from   handprint.exceptions import *

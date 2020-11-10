@@ -18,8 +18,10 @@ import boto3
 import imagesize
 import os
 from   os import path
-from   sidetrack import log
 import sys
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials

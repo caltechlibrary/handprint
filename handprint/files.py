@@ -18,12 +18,14 @@ import io
 import os
 from   os import path
 import re
-from   sidetrack import log
 import shutil
 import sys
 import subprocess
 import tempfile
 import webbrowser
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 

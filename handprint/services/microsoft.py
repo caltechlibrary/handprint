@@ -19,8 +19,10 @@ file "LICENSE" for more information.
 
 import os
 from   os import path
-from   sidetrack import log
 import sys
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials

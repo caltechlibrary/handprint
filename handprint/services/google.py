@@ -25,7 +25,9 @@ from google.cloud.vision import enums
 from google.cloud.vision import types
 from google.protobuf.json_format import MessageToDict
 import json
-from   sidetrack import log
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials

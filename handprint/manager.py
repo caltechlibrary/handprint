@@ -24,14 +24,15 @@ import math
 import os
 from   os import path
 import shutil
-from   sidetrack import log
 import signal
-
 import sys
 import threading
 from   threading import Thread, Lock
 from   timeit import default_timer as timer
 import urllib
+
+if __debug__:
+    from sidetrack import set_debug, log, logr
 
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT

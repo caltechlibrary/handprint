@@ -344,7 +344,7 @@ Command-line arguments summary
     # Preprocess arguments and handle early exits -----------------------------
 
     if debug != 'OUT':
-        set_debug(True, debug, extra = '%(threadName)s')
+        if __debug__: set_debug(True, debug, extra = '%(threadName)s')
         import faulthandler
         faulthandler.enable()
         pdb_on_signal(signal.SIGUSR1)

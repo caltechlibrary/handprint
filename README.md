@@ -322,7 +322,7 @@ Handprint produces color-coded diagnostic output as it runs, by default.  Howeve
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
 
-If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing, and will also invoke [`pdb`](https://docs.python.org/library/pdb.html) upon the occurrence of any errors.  The trace will be written to the given destination, which can be a dash character (`-`) to indicate console output, or a file path.  *Important*: some Python version/platform combinations crash if `pdb` is invoked in a process thread &ndash; which is likely to happen if you are debugging the execution of Handprint. Consequently, to avoid this risk, **always use `-t 1` when debugging** to make Handprint use only one thread.
+If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing. The debug trace will be sent to the given destination, which can be `-` to indicate console output, or a file path to send the output to a file.  Handprint will also install a signal handler that responds to signal `SIGUSR1`; if the signal is sent to the running process, it will drop Handprint into the `pdb` debugger.  _Note_: It's best to use `-t 1` when attempting to use a debugger because otherwise subthreads will continue running even if the main thread is interrupted.
 
 If given the `-V` option (`/V` on Windows), this program will print the version and other information, and exit without doing anything else.
 
@@ -367,6 +367,11 @@ This program exits with a return code of 0 if no problems are encountered.  It r
 | 4    | file error &ndash; encountered a problem with a file     |
 | 5    | server error &ndash; encountered a problem with a server |
 | 6    | an exception or fatal error occurred                     |
+
+
+### _Additional notes_
+
+The debug logging functionality is implemented using [Sidetrack](https://github.com/caltechlibrary/sidetrack) and all calls to the debug code are conditionalized on the Python symbol `__debug__`.  It is carefully written so that you can cause the calls to be _optimized out completely_ if your run Python with [optimization turned on](https://docs.python.org/3/using/cmdline.html#cmdoption-o) (e.g., using the `-O` command-line option).
 
 
 ☹︎ Known issues and limitations
@@ -414,6 +419,7 @@ Handprint benefitted from feedback from several people, notably from Tommy Keswi
 Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Handprint with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
+* [boltons](https://github.com/mahmoud/boltons/) &ndash; package of miscellaneous Python utilities
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
 * [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
 * [colored](https://gitlab.com/dslackw/colored) &ndash; library for color and formatting in terminal
@@ -426,6 +432,7 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
 * [numpy](https://numpy.org) &ndash; package for scientific computing in Python
 * [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library
+* [rich](https://rich.readthedocs.io/en/latest/) &ndash; library for writing styled text to the terminal
 * [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
 * [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python

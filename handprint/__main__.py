@@ -426,18 +426,18 @@ Command-line arguments summary
 
     exit_code = ExitCode.success
     if exception:
-        if type(exception) == CannotProceed:
-            exit_code = exception.args[0]
-        elif type(exception) in [KeyboardInterrupt, UserCancelled]:
+        if exception[0] == CannotProceed:
+            exit_code = exception[1].args[0]
+        elif exception[0] in [KeyboardInterrupt, UserCancelled]:
             if __debug__: log(f'received {exception.__class__.__name__}')
             exit_code = ExitCode.user_interrupt
         else:
             msg = str(exception[1])
-            alert_fatal(f'Encountered an error: {msg}')
+            alert_fatal(f'Encountered error {exception[0].__name__}: {msg}')
             exit_code = ExitCode.exception
             if __debug__:
                 from traceback import format_exception
-                details = ''.join(format_exception(*exception))
+                details = ''.join(format_exception(exception))
                 logr(f'Exception: {msg}\n{details}')
     else:
         inform('Done.')

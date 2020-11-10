@@ -350,7 +350,9 @@ Command-line arguments summary
         if __debug__: set_debug(True, debug, extra = '%(threadName)s')
         import faulthandler
         faulthandler.enable()
-        pdb_on_signal(signal.SIGUSR1)
+        if not sys.platform.startswith('win'):
+            # Even with a different signal, I can't get this to work on Win.
+            pdb_on_signal(signal.SIGUSR1)
 
     # Handle arguments that involve deliberate exits.
 
@@ -430,13 +432,13 @@ Command-line arguments summary
             if __debug__: log(f'received {exception.__class__.__name__}')
             exit_code = ExitCode.user_interrupt
         else:
+            msg = str(exception[1])
+            alert_fatal(f'Encountered an error: {msg}')
+            exit_code = ExitCode.exception
             if __debug__:
                 from traceback import format_exception
-                msg = str(exception[1])
                 details = ''.join(format_exception(*exception))
-                alert_fatal(f'Error: {msg}')
                 logr(f'Exception: {msg}\n{details}')
-            exit_code = ExitCode.exception
     else:
         inform('Done.')
     if __debug__: log('_'*8 + f' stopped {timestamp()} ' + '_'*8)

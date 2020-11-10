@@ -95,7 +95,6 @@ class MainBody(object):
         except Exception as ex:
             if __debug__: log(f'exception in main body: {str(ex)}')
             self.exception = sys.exc_info()
-            alert_fatal(f'Error occurred during execution:', details = str(ex))
         if __debug__: log('finished MainBody')
 
 

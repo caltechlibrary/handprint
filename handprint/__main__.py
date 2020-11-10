@@ -37,6 +37,7 @@ file "LICENSE" for more information.
 import os
 from   os import path, cpu_count
 import plac
+import signal
 import sys
 from   sys import exit as exit
 
@@ -422,15 +423,19 @@ Command-line arguments summary
             exit_code = ExitCode.user_interrupt
         else:
             if __debug__:
-                from traceback import format_tb
-                msg = str(exception)
-                details = ''.join(format_tb(exception.__traceback__))
+                from traceback import format_exception
+                msg = str(exception[1])
+                details = ''.join(format_exception(*exception))
+                alert_fatal(f'Error: {msg}')
                 logr(f'Exception: {msg}\n{details}')
             exit_code = ExitCode.exception
     else:
         inform('Done.')
     if __debug__: log('_'*8 + f' stopped {timestamp()} ' + '_'*8)
-    exit(int(exit_code))
+    if exit_code == ExitCode.user_interrupt:
+        os._exit(int(exit_code))
+    else:
+        exit(int(exit_code))
 
 
 # Main entry point.

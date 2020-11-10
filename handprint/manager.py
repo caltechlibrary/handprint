@@ -25,8 +25,10 @@ import os
 from   os import path
 import shutil
 from   sidetrack import log
+import signal
 
 import sys
+import threading
 from   threading import Thread, Lock
 from   timeit import default_timer as timer
 import urllib
@@ -117,9 +119,7 @@ class Manager:
         # An unfortunate feature of Python's thread handling is that threads
         # don't get interrupt signals: if the user hits ^C, the parent thread
         # has to do something to interrupt the child threads deliberately.
-        # We can't do that unless we keep a pointer to the executor and share
-        # it between methods in this class.  Thus, the need for the following:
-        self._executor = None
+        # We can't do that unless we keep a pointer to the futures/subthreads.
         self._senders = []
 
 
@@ -132,75 +132,64 @@ class Manager:
         services = self._services
 
         inform(f'Starting on [white]{item}[/]')
-        try:
-            (item_file, item_fmt) = self._get(item, base_name, index)
-            if not item_file:
-                return
+        (item_file, item_fmt) = self._get(item, base_name, index)
+        if not item_file:
+            return
 
-            dest_dir = self._output_dir if self._output_dir else path.dirname(item_file)
-            if not writable(dest_dir):
-                alert(f'Cannot write output in {dest_dir}.')
-                return
+        dest_dir = self._output_dir if self._output_dir else path.dirname(item_file)
+        if not writable(dest_dir):
+            alert(f'Cannot write output in {dest_dir}.')
+            return
 
-            # Normalize input image to the lowest common denominator.
-            image = self._normalized(item, item_fmt, item_file, dest_dir)
-            if not image.file:
-                warn(f'Skipping {relative(item_file)}')
-                return
+        # Normalize input image to the lowest common denominator.
+        image = self._normalized(item, item_fmt, item_file, dest_dir)
+        if not image.file:
+            warn(f'Skipping {relative(item_file)}')
+            return
 
-            # Send the file to the services and get Result tuples back.
-            if self._num_threads == 1:
-                # For 1 thread, avoid thread pool to make debugging easier.
-                results = [self._send(image, s) for s in services]
-            else:
-                self._executor = ThreadPoolExecutor(max_workers = self._num_threads,
-                                                    thread_name_prefix = 'ServiceThread')
-                for service in services:
-                    future = self._executor.submit(self._send, image, service)
-                    self._senders.append(future)
-                results = [future.result() for future in self._senders]
+        # Send the file to the services and get Result tuples back.
+        if self._num_threads == 1:
+            # For 1 thread, avoid thread pool to make debugging easier.
+            results = [self._send(image, s) for s in services]
+        else:
+            executor = ThreadPoolExecutor(max_workers = self._num_threads,
+                                          thread_name_prefix = 'ServiceThread')
+            for service in services:
+                future = executor.submit(self._send, image, service)
+                self._senders.append(future)
+            results = [future.result() for future in self._senders]
 
-            # If a service failed for some reason (e.g., a network glitch), we
-            # get no result back.  Remove empty results & go on with the rest.
-            results = [x for x in results if x is not None]
+        # If a service failed for some reason (e.g., a network glitch), we
+        # get no result back.  Remove empty results & go on with the rest.
+        results = [x for x in results if x is not None]
 
-            # Create grid file if requested.
-            if self._make_grid:
-                base = path.basename(filename_basename(item_file))
-                grid_file = path.realpath(path.join(dest_dir, base + '.handprint-all.png'))
-                inform(f'Creating results grid image: {relative(grid_file)}')
-                all_results = [r.annotated for r in results]
-                width = math.ceil(math.sqrt(len(all_results)))
-                create_image_grid(all_results, grid_file, max_horizontal = width)
+        # Create grid file if requested.
+        if self._make_grid:
+            base = path.basename(filename_basename(item_file))
+            grid_file = path.realpath(path.join(dest_dir, base + '.handprint-all.png'))
+            inform(f'Creating results grid image: {relative(grid_file)}')
+            all_results = [r.annotated for r in results]
+            width = math.ceil(math.sqrt(len(all_results)))
+            create_image_grid(all_results, grid_file, max_horizontal = width)
 
-            # Clean up after ourselves.
-            if not self._extended_results:
-                for file in set(image.temp_files | {r.annotated for r in results}):
-                    if file and path.exists(file):
-                        delete_existing(file)
+        # Clean up after ourselves.
+        if not self._extended_results:
+            for file in set(image.temp_files | {r.annotated for r in results}):
+                if file and path.exists(file):
+                    delete_existing(file)
 
-            inform(f'Done with {relative(item)}')
-        except (KeyboardInterrupt, UserCancelled) as ex:
-            interrupt()
-            warn('Interrupted – waiting for network connections to close ...')
-            self.stop_services()
-            raise
-        except Exception as ex:
-            alert('Stopping due to a problem')
-            raise
+        inform(f'Done with {relative(item)}')
 
 
     def stop_services(self):
-        if self._executor:
-            if __debug__: log('stopping sender threads')
-            for sender_future in self._senders:
-                if sender_future.cancel():
-                    if __debug__: log(f'succeeded in cancelling {sender_future}')
-                else:
-                    if __debug__: log(f'unable to cancel {sender_future}')
-            if __debug__: log('issuing shutdown to thread pool executor')
-            self._executor.shutdown()
-            if __debug__: log('shutdown completed')
+        if __debug__: log('stopping sender threads')
+        # Doing cancel on the threads will not do anything if they are still
+        # running.  However, we should still do it.
+        for s in self._senders:
+            if s.cancel():
+                if __debug__: log(f'succeeded in cancelling {s}')
+            else:
+                if __debug__: log(f'unable to cancel {s}')
 
 
     def _get(self, item, base_name, index):
@@ -306,6 +295,7 @@ class Manager:
             self._save(output.text, txt_file)
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')
+            gt_path = relative(gt_file)
             report_path = self._renamed(image.item_file, str(service), 'tsv')
             relaxed = (self._compare == 'relaxed')
             if readable(gt_file) and nonempty(gt_file):
@@ -314,33 +304,10 @@ class Manager:
                 inform(f'Saving {service_name} comparison to ground truth')
                 self._save(text_comparison(output.text, gt_text, relaxed), report_path)
             elif not nonempty(gt_file):
-                warn(f'Skipping {service_name} comparison because {relative(gt_file)} is empty')
+                warn(f'Skipping {service_name} comparison because {gt_path} is empty')
             else:
-                warn(f'Skipping {service_name} comparison because {relative(gt_file)} not available')
+                warn(f'Skipping {service_name} comparison because {gt_path} not available')
         return Result(service, image, annot_path, report_path)
-
-
-    def _add_interrupt_handler(self):
-
-
-        # On Windows, in Python 3.6+, ^C in a terminal window does not stop
-        # execution (at least in my environment).  The following function
-        # creates a closure with the worker object so that stop() can be called.
-
-        if sys.platform == "win32":
-            if __debug__: log('installing ctrl_handler for Windows')
-
-            # This is defined here because we need the value of worker.ident.
-            def ctrl_handler(event, *args):
-                if __debug__: log('Keyboard interrupt received')
-                from stopit import async_raise
-                interrupt()
-                async_raise(worker.ident, UserCancelled)
-                worker.stop()
-
-            import win32api
-            win32api.SetConsoleCtrlHandler(ctrl_handler, True)
-
 
 
     def _normalized(self, orig_item, orig_fmt, item_file, dest_dir):

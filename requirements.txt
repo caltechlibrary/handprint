@@ -1,4 +1,5 @@
 appdirs                  >= 1.4.3
+boltons                  >= 20.2.0
 boto3                    >= 1.10.0
 colorful                 >= 0.5.1
 google-api-core          >= 1.14.2

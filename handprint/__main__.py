@@ -340,6 +340,9 @@ Command-line arguments summary
 
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = f'(Hint: use {prefix}h for help.)'
+    ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
+            use_color = not no_color, be_quiet = quiet)
+    ui.start()
 
     # Preprocess arguments and handle early exits -----------------------------
 
@@ -393,11 +396,8 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     if __debug__: log('='*8 + f' started {timestamp()} ' + '='*8)
-    ui = body = exception = None
+    body = exception = None
     try:
-        ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
-                use_color = not no_color, be_quiet = quiet)
-        ui.start()
         body = MainBody(files      = files,
                         from_file  = None if from_file == 'F' else from_file,
                         output_dir = None if output_dir == 'O' else output_dir,

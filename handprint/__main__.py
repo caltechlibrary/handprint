@@ -430,6 +430,7 @@ Command-line arguments summary
             exit_code = exception[1].args[0]
         elif exception[0] in [KeyboardInterrupt, UserCancelled]:
             if __debug__: log(f'received {exception.__class__.__name__}')
+            warn('Interrupted.')
             exit_code = ExitCode.user_interrupt
         else:
             msg = str(exception[1])

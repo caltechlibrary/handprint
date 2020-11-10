@@ -86,7 +86,6 @@ class MainBody(object):
         except (KeyboardInterrupt, UserCancelled) as ex:
             # This is the place where we land when Handprint receives a ^C.
             if __debug__: log(f'got {type(ex).__name__}')
-            warn('Interrupted.')
             interrupt()
             self.stop()
             self.exception = sys.exc_info()

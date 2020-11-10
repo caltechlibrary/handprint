@@ -34,6 +34,7 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   boltons.debugutils import pdb_on_signal
 import os
 from   os import path, cpu_count
 import plac
@@ -306,10 +307,15 @@ If given the -V option (/V on Windows), this program will print the version
 and other information, and exit without doing anything else.
 
 If given the -@ argument (/@ on Windows), this program will output a detailed
-trace of what it is doing to the terminal window, and will also drop into a
-debugger upon the occurrence of any errors.  The debug trace will be sent to
-the given destination, which can be '-' to indicate console output, or a file
-path to send the output to a file.
+trace of what it is doing.  The debug trace will be sent to the given
+destination, which can be '-' to indicate console output, or a file path to
+send the output to a file.
+
+When -@ (or /@ on Windows) has been given, Handprint installs a signal handler
+on signal SIGUSR1 that will drop Handprint into the pdb debugger if the signal
+is sent to the running process.  It's best to use -t 1 when attempting to use
+a debugger because the subthreads will not stop running if the signal is sent.
+
 
 Return values
 ~~~~~~~~~~~~~
@@ -341,6 +347,7 @@ Command-line arguments summary
         set_debug(True, debug, extra = '%(threadName)s')
         import faulthandler
         faulthandler.enable()
+        pdb_on_signal(signal.SIGUSR1)
 
     # Handle arguments that involve deliberate exits.
 

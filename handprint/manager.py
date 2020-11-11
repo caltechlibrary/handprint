@@ -149,6 +149,7 @@ class Manager:
             return
 
         # Send the file to the services and get Result tuples back.
+        self._senders = []
         if self._num_threads == 1:
             # For 1 thread, avoid thread pool to make debugging easier.
             results = [self._send(image, s) for s in services]

@@ -5,12 +5,15 @@ Version 1.3.0
 --------------
 
 * Handprint now requires Python version 3.6 or later.
+* Fixed issue [#19](https://github.com/caltechlibrary/handprint/issues/19), which caused Handprint to fail to produce any output images if both `-e` and `-G` were given.
+* Fixed warning about Matlplotlib GUIs and threading in `images.py`.
+* Fixed macOS Mojave compatibility (issue [#16](https://github.com/caltechlibrary/handprint/issues/16).
 * Updated `handprint/services/microsoft.py` to work with Azure API v. 3.0.
+* Updated Microsoft credentials code to allow the endpoint URI to be supplied.
 * Changed and expanded the possible exit codes returned by Handprint. (Please see the docs for more info.)
 * Changed Google interface to retrieve _only_ document text results instead of all possible results, for better efficiency.
 * Improved handling of `^C` interrupts from the command line.
 * Added signal catcher to drop Handprint into `pdb` upon receiving `SIGUSER`.
-* Fixed warning about Matlplotlib GUIs and threading in `images.py`.
 * Switched to the use of [Sidetrack](https://github.com/caltechlibrary/sidetrack) for debug logging.
 * Switched to the use of [Rich](https://github.com/willmcgugan/rich) for terminal output
 * Various internal code updates and refactoring.

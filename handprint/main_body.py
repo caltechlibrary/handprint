@@ -26,6 +26,7 @@ import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.credentials import Credentials
 from handprint.exceptions import *
+from handprint.exit_codes import ExitCode
 from handprint.files import filename_extension, filename_basename
 from handprint.files import files_in_directory, filter_by_extensions
 from handprint.files import readable, writable, is_url
@@ -58,10 +59,6 @@ class MainBody(object):
         self._manager = Manager(self.services, self.threads, self.output_dir,
                                 self.make_grid, self.compare, self.extended)
 
-
-    def run(self):
-        '''Run the main body.'''
-
         # On Windows, in Python 3.6+, ^C in a terminal window does not stop
         # execution (at least in my environment).  The following function
         # creates a closure with the worker object so that stop() can be called.
@@ -78,6 +75,10 @@ class MainBody(object):
             import win32api
             win32api.SetConsoleCtrlHandler(ctrl_handler, True)
 
+
+    def run(self):
+        '''Run the main body.'''
+
         if __debug__: log('running MainBody')
         try:
             self._do_preflight()
@@ -85,17 +86,12 @@ class MainBody(object):
         except (KeyboardInterrupt, UserCancelled) as ex:
             # This is the place where we land when Handprint receives a ^C.
             if __debug__: log(f'got {type(ex).__name__}')
-            warn('Interrupted.')
             interrupt()
             self.stop()
-            self.exception = ex
-        except CannotProceed as ex:
-            if __debug__: log(f'got CannotProceed')
-            self.exception = (CannotProceed, ex)
+            self.exception = sys.exc_info()
         except Exception as ex:
             if __debug__: log(f'exception in main body: {str(ex)}')
             self.exception = sys.exc_info()
-            alert_fatal(f'Error occurred during execution:', details = str(ex))
         if __debug__: log('finished MainBody')
 
 

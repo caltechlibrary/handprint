@@ -21,8 +21,6 @@ from os import path
 import google
 from google.cloud import vision_v1p3beta1 as gv
 from google.api_core.exceptions import PermissionDenied
-from google.cloud.vision import enums
-from google.cloud.vision import types
 from google.protobuf.json_format import MessageToDict
 import json
 

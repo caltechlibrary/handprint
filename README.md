@@ -14,9 +14,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 ❡ Log of recent changes
 -----------------------
 
-_Version 1.2.2_: This release fixes an inconsistency (compared to other Handprint output) in the way that Microsoft's text recognition service results are drawn on annotated images.  The copyright year in source files has also been updated.
-
-_Version 1.2.0_: This version fixes a bug in creating annotated results images, in which results from multiple services were overwritten on top of each other. It also fixes a bug with the Amazon interface that resulted in occasional random errors about `endpoint_resolver`. This version of Handprint also changes how output files are written; the new scheme uses the naming pattern `somefile.handprint.png` for the rescaled input image, `somefile.handprint-service.png` for the various service output results, and `somefile.handprint-all.png` for the summary grid image.  Handprint now also accepts PDF files as input.
+_Version 1.3.0_: This release brings a number of changes: (1) it now requires Python version 3.6 at minimum; (2) the Microsoft service interface now uses Azure API v3.0; (3) the Microsoft credentials scheme now allows you to change the endpoint URI; (4) the Google service interface now only gets the document text results instead of all possible results; (5) the possible program exit codes have changed slightly; and (6) interruption via <kbd>^C</kbd> should work better now.  Some bugs have been fixed and internals have been (hopefully) improved.
 
 The file [CHANGES](CHANGES.md) contains a more complete change log, and includes information about previous releases.
 
@@ -89,15 +87,18 @@ _SERVICENAME_ must be one of the service names printed by running `handprint -l`
 
 #### Microsoft
 
-Microsoft's approach to credentials in Azure involves the use of [subscription keys](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/vision-api-how-to-topics/howtosubscribe).  The format of the credentials file for Handprint just needs to contain a single field:
+Microsoft's approach to credentials in Azure involves the use of [subscription keys](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/vision-api-how-to-topics/howtosubscribe).  The format of the credentials file for Handprint needs to contain two fields:
 
 ```json
 {
- "subscription_key": "YOURKEYHERE"
+ "subscription_key": "YOURKEYHERE",
+ "endpoint": "https://ENDPOINT"
 }
 ```
 
-The value of "YOURKEYHERE" will be a string such as `"18de248475134eb49ae4a4e94b93461c"`.  To obtain a key, visit [https://portal.azure.com](https://portal.azure.com) and sign in using your account login.  (Note: you will need to turn off browser security plugins such as Ad&nbsp;Block and uMatrix if you have them, or else the site will not work.)  Once you are authenticated to the Azure portal, you can create credentials for using Azure's machine-learning services. Some notes about this can be found in the [Handprint project Wiki pages on GitHub](https://github.com/caltechlibrary/handprint/wiki/Getting-Microsoft-Azure-credentials).  Once you have obtained a key, use a text editor to create a JSON file in the simple format shown above, save that file somewhere on your computer (for the sake of this example, assume it is `myazurecredentials.json`), and use the command discussed above to make Handprint copy the credentials file:
+The value `"YOURKEYHERE"` will be a string such as `"18de248475134eb49ae4a4e94b93461c"`, and it will be associated with an endpoint URI such as `"https://westus.api.cognitive.microsoft.com"`.  To obtain a key and the corresponding endpoint URI, visit [https://portal.azure.com](https://portal.azure.com) and sign in using your account login.  (Note: you will need to turn off browser security plugins such as Ad&nbsp;Block and uMatrix if you have them, or else the site will not work.)  Once you are authenticated to the Azure portal, you can create credentials for using Azure's machine-learning services.  Some notes all about this can be found in the [Handprint project Wiki pages on GitHub](https://github.com/caltechlibrary/handprint/wiki/Getting-Microsoft-Azure-credentials).
+
+Once you have obtained both a key and an endpoint URI, use a text editor to create a JSON file in the simple format shown above, save that file somewhere on your computer (for the sake of this example, assume it is `myazurecredentials.json`), and use the command discussed above to make Handprint copy the credentials file:
 ```sh
 handprint -a microsoft myazurecredentials.json
 ```
@@ -322,7 +323,7 @@ Handprint produces color-coded diagnostic output as it runs, by default.  Howeve
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
 
-If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing. The debug trace will be sent to the given destination, which can be `-` to indicate console output, or a file path to send the output to a file.  Handprint will also install a signal handler that responds to signal `SIGUSR1`; if the signal is sent to the running process, it will drop Handprint into the `pdb` debugger.  _Note_: It's best to use `-t 1` when attempting to use a debugger because otherwise subthreads will continue running even if the main thread is interrupted.
+If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing.  The debug trace will be sent to the given destination, which can be `-` to indicate console output, or a file path to send the output to a file.  On non-Windows platforms, Handprint will also install a signal handler that responds to signal `SIGUSR1`; if the signal is sent to the running process, it will drop Handprint into the `pdb` debugger.  _Note_: It's best to use `-t 1` when attempting to use a debugger because otherwise subthreads will continue running even if the main thread is interrupted.
 
 If given the `-V` option (`/V` on Windows), this program will print the version and other information, and exit without doing anything else.
 
@@ -418,11 +419,13 @@ Handprint benefitted from feedback from several people, notably from Tommy Keswi
 
 Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Handprint with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
+* [aenum](https://pypi.org/project/aenum/) &ndash; advanced enumerations for Python
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
 * [boltons](https://github.com/mahmoud/boltons/) &ndash; package of miscellaneous Python utilities
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
 * [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
 * [colored](https://gitlab.com/dslackw/colored) &ndash; library for color and formatting in terminal
+* [dateparser](https://pypi.org/project/dateparser/) &ndash; parse dates in almost any string format
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
 * [halo](https://github.com/ManrajGrover/halo) &ndash; busy-spinners for Python command-line programs
 * [humanize](https://github.com/jmoiron/humanize) &ndash; make numbers more easily readable by humans

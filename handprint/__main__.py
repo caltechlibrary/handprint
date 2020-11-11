@@ -340,6 +340,9 @@ Command-line arguments summary
 
     prefix = '/' if sys.platform.startswith('win') else '-'
     hint = f'(Hint: use {prefix}h for help.)'
+    ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
+            use_color = not no_color, be_quiet = quiet)
+    ui.start()
 
     # Preprocess arguments and handle early exits -----------------------------
 
@@ -347,7 +350,9 @@ Command-line arguments summary
         if __debug__: set_debug(True, debug, extra = '%(threadName)s')
         import faulthandler
         faulthandler.enable()
-        pdb_on_signal(signal.SIGUSR1)
+        if not sys.platform.startswith('win'):
+            # Even with a different signal, I can't get this to work on Win.
+            pdb_on_signal(signal.SIGUSR1)
 
     # Handle arguments that involve deliberate exits.
 
@@ -375,6 +380,7 @@ Command-line arguments summary
 
     # Do sanity checks on some other arguments.
 
+    services = services_list() if services == 'S' else services.lower().split(',')
     if services != 'S' and not all(s in services_list() for s in services):
         alert_fatal(f'"{services}" is not a known services. {hint}')
         exit(int(ExitCode.bad_arg))
@@ -393,11 +399,8 @@ Command-line arguments summary
     # Do the real work --------------------------------------------------------
 
     if __debug__: log('='*8 + f' started {timestamp()} ' + '='*8)
-    ui = body = exception = None
+    body = exception = None
     try:
-        ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
-                use_color = not no_color, be_quiet = quiet)
-        ui.start()
         body = MainBody(files      = files,
                         from_file  = None if from_file == 'F' else from_file,
                         output_dir = None if output_dir == 'O' else output_dir,
@@ -405,8 +408,8 @@ Command-line arguments summary
                         base_name  = 'document' if base_name == 'B' else base_name,
                         make_grid  = not no_grid,
                         extended   = extended,
+                        services   = services,
                         threads    = max(1, cpu_count()//2 if threads == 'T' else int(threads)),
-                        services   = services_list() if services == 'S' else services.lower().split(','),
                         compare    = 'relaxed' if (compare and relaxed) else compare)
         body.run()
         exception = body.exception
@@ -423,19 +426,20 @@ Command-line arguments summary
 
     exit_code = ExitCode.success
     if exception:
-        if type(exception) == CannotProceed:
-            exit_code = exception.args[0]
-        elif type(exception) in [KeyboardInterrupt, UserCancelled]:
+        if exception[0] == CannotProceed:
+            exit_code = exception[1].args[0]
+        elif exception[0] in [KeyboardInterrupt, UserCancelled]:
             if __debug__: log(f'received {exception.__class__.__name__}')
+            warn('Interrupted.')
             exit_code = ExitCode.user_interrupt
         else:
+            msg = str(exception[1])
+            alert_fatal(f'Encountered error {exception[0].__name__}: {msg}')
+            exit_code = ExitCode.exception
             if __debug__:
                 from traceback import format_exception
-                msg = str(exception[1])
-                details = ''.join(format_exception(*exception))
-                alert_fatal(f'Error: {msg}')
+                details = ''.join(format_exception(exception))
                 logr(f'Exception: {msg}\n{details}')
-            exit_code = ExitCode.exception
     else:
         inform('Done.')
     if __debug__: log('_'*8 + f' stopped {timestamp()} ' + '_'*8)

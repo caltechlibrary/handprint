@@ -149,6 +149,7 @@ class Manager:
             return
 
         # Send the file to the services and get Result tuples back.
+        self._senders = []
         if self._num_threads == 1:
             # For 1 thread, avoid thread pool to make debugging easier.
             results = [self._send(image, s) for s in services]
@@ -163,6 +164,9 @@ class Manager:
         # If a service failed for some reason (e.g., a network glitch), we
         # get no result back.  Remove empty results & go on with the rest.
         results = [x for x in results if x is not None]
+        if not results:
+            warn(f'Nothing to do for {item}')
+            return
 
         # Create grid file if requested.
         if self._make_grid:
@@ -202,8 +206,10 @@ class Manager:
         if is_url(item):
             # First make sure the URL actually points to an image.
             if __debug__: log(f'testing if URL contains an image: {item}')
+            headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)'}
             try:
-                response = urllib.request.urlopen(item)
+                request = urllib.request.Request(item, None, headers)
+                response = urllib.request.urlopen(request)
             except Exception as ex:
                 warn(f'Skipping URL due to error: {ex}')
                 return (None, None)
@@ -256,7 +262,6 @@ class Manager:
         directory "dest_dir".
         '''
 
-        raise_for_interrupts()
         service_name = f'[{service.name_color()}]{service.name()}[/]'
         inform(f'Sending to {service_name} and waiting for response ...')
         last_time = timer()
@@ -272,21 +277,21 @@ class Manager:
                 warn(f'Continuing {service_name}')
                 return self._send(image, service)
         if output.error:
-            alert(f'{service_name} failed: {output.error}')
+            # Sanitize the error string in case it contains '{' characters.
+            msg = output.error.replace('{', '{{{{').replace('}', '}}}}')
+            alert(f'{service_name} failed: {msg}')
             warn(f'No result from {service_name} for {relative(image.file)}')
             return None
-
-        raise_for_interrupts()
         inform(f'Got result from {service_name}.')
+        raise_for_interrupts()
+
+        inform(f'Creating annotated image for {service_name}.')
         file_name   = path.basename(image.file)
         base_path   = path.join(image.dest_dir, file_name)
-        annot_path  = None
+        annot_path  = self._renamed(base_path, str(service), 'png')
         report_path = None
-        if self._make_grid:
-            annot_path = self._renamed(base_path, str(service), 'png')
-            inform(f'Creating annotated image for {service_name}.')
-            with self._lock:
-                self._save(annotated_image(image.file, output.boxes, service), annot_path)
+        with self._lock:
+            self._save(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = self._renamed(base_path, str(service), 'txt')
             json_file = self._renamed(base_path, str(service), 'json')

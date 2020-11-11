@@ -206,8 +206,10 @@ class Manager:
         if is_url(item):
             # First make sure the URL actually points to an image.
             if __debug__: log(f'testing if URL contains an image: {item}')
+            headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64)'}
             try:
-                response = urllib.request.urlopen(item)
+                request = urllib.request.Request(item, None, headers)
+                response = urllib.request.urlopen(request)
             except Exception as ex:
                 warn(f'Skipping URL due to error: {ex}')
                 return (None, None)

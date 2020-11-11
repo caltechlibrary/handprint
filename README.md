@@ -419,11 +419,13 @@ Handprint benefitted from feedback from several people, notably from Tommy Keswi
 
 Handprint makes use of numerous open-source packages, without which it would have been effectively impossible to develop Handprint with the resources we had.  I want to acknowledge this debt.  In alphabetical order, the packages are:
 
+* [aenum](https://pypi.org/project/aenum/) &ndash; advanced enumerations for Python
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
 * [boltons](https://github.com/mahmoud/boltons/) &ndash; package of miscellaneous Python utilities
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
 * [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
 * [colored](https://gitlab.com/dslackw/colored) &ndash; library for color and formatting in terminal
+* [dateparser](https://pypi.org/project/dateparser/) &ndash; parse dates in almost any string format
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
 * [halo](https://github.com/ManrajGrover/halo) &ndash; busy-spinners for Python command-line programs
 * [humanize](https://github.com/jmoiron/humanize) &ndash; make numbers more easily readable by humans

@@ -6,6 +6,7 @@ Version 1.3.0
 
 * Handprint now requires Python version 3.6 or later.
 * Updated `handprint/services/microsoft.py` to work with Azure API v. 3.0.
+* Updated Microsoft credentials code to allow the endpoint URI to be supplied.
 * Changed and expanded the possible exit codes returned by Handprint. (Please see the docs for more info.)
 * Changed Google interface to retrieve _only_ document text results instead of all possible results, for better efficiency.
 * Improved handling of `^C` interrupts from the command line.

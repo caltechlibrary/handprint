@@ -27,6 +27,12 @@ from .base import Credentials
 from .credentials_files import credentials_filename
 
 
+# Constants.
+# .............................................................................
+
+_DEFAULT_ENDPOINT = 'https://westus.api.cognitive.microsoft.com'
+
+
 # Main class.
 # .............................................................................
 
@@ -42,7 +48,15 @@ class MicrosoftCredentials(Credentials):
         try:
             with open(cfile, 'r') as file:
                 creds = json.load(file)
-                self.credentials = creds['subscription_key']
+                if 'endpoint' in creds:
+                    endpoint = creds['endpoint'].rstrip('/')
+                    if not endpoint.startswith('http'):
+                        endpoint = 'https://' + endpoint
+                else:
+                    if __debug__: log('endpoint not found; using default')
+                    endpoint = _DEFAULT_ENDPOINT
+                creds['endpoint'] = endpoint
+                self.credentials = creds
         except Exception as ex:
             raise AuthFailure(
                 'Unable to parse Microsoft exceptions file: {}'.format(str(ex)))

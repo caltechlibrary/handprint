@@ -104,8 +104,10 @@ class MicrosoftTR(TextRecognition):
         if error:
             return error
 
-        url = 'https://westus.api.cognitive.microsoft.com/vision/v3.0/read/analyze'
-        headers = {'Ocp-Apim-Subscription-Key': self._credentials,
+        key = self._credentials['subscription_key']
+        endpoint = self._credentials['endpoint']
+        url = f'{endpoint}/vision/v3.0/read/analyze'
+        headers = {'Ocp-Apim-Subscription-Key': key,
                    'Content-Type': 'application/octet-stream'}
 
         # The Microsoft API for extracting text requires two phases: one call

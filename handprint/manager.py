@@ -259,7 +259,6 @@ class Manager:
         directory "dest_dir".
         '''
 
-        raise_for_interrupts()
         service_name = f'[{service.name_color()}]{service.name()}[/]'
         inform(f'Sending to {service_name} and waiting for response ...')
         last_time = timer()
@@ -280,18 +279,16 @@ class Manager:
             alert(f'{service_name} failed: {msg}')
             warn(f'No result from {service_name} for {relative(image.file)}')
             return None
-
-        raise_for_interrupts()
         inform(f'Got result from {service_name}.')
+        raise_for_interrupts()
+
+        inform(f'Creating annotated image for {service_name}.')
         file_name   = path.basename(image.file)
         base_path   = path.join(image.dest_dir, file_name)
-        annot_path  = None
+        annot_path  = self._renamed(base_path, str(service), 'png')
         report_path = None
-        if self._make_grid:
-            annot_path = self._renamed(base_path, str(service), 'png')
-            inform(f'Creating annotated image for {service_name}.')
-            with self._lock:
-                self._save(annotated_image(image.file, output.boxes, service), annot_path)
+        with self._lock:
+            self._save(annotated_image(image.file, output.boxes, service), annot_path)
         if self._extended_results:
             txt_file  = self._renamed(base_path, str(service), 'txt')
             json_file = self._renamed(base_path, str(service), 'json')

@@ -19,7 +19,7 @@ import math
 import os
 from os import path
 import google
-from google.cloud import vision_v1p3beta1 as gv
+from google.cloud import vision as gv
 from google.api_core.exceptions import PermissionDenied
 from google.protobuf.json_format import MessageToDict
 import json
@@ -113,55 +113,37 @@ class GoogleTR(TextRecognition):
             return error
 
         try:
-            if __debug__: log('building Google vision API object')
-            client  = gv.ImageAnnotatorClient()
-            image   = gv.types.Image(content = image)
-            context = gv.types.ImageContext(language_hints = ['en-t-i0-handwrit'])
-
-            # Iterate over the known API calls and store each result.
-            result = dict.fromkeys(self._known_features)
-            for feature in self._known_features:
-                raise_for_interrupts()
-                if __debug__: log('sending image to Google for {} ...', feature)
-                response = getattr(client, feature)(image = image, image_context = context)
-                if __debug__: log('received result.')
-                result[feature] = MessageToDict(response)
-
-            # Extract text and bounding boxes into our format.
-            # Their structure looks like this:
-            #
-            # result['document_text_detection']['fullTextAnnotation']['pages'][0]['blocks'][0].keys()
-            #   --> dict_keys(['boundingBox', 'confidence', 'paragraphs', 'blockType'])
-            #
-            # result['document_text_detection']['fullTextAnnotation']['pages'][0]['blocks'][0]['paragraphs'][0].keys()
-            #   --> dict_keys(['boundingBox', 'words', 'confidence'])
-            #
-            # https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#Block
+            if __debug__: log(f'building Google vision API object for {path}')
+            client   = gv.ImageAnnotatorClient()
+            document = gv.Image(content = image)
+            if __debug__: log(f'sending image to Google for {path} ...')
+            response = client.document_text_detection(document)
+            if __debug__: log(f'received result from Google for {path}')
 
             raise_for_interrupts()
             full_text = ''
             boxes = []
-            if 'fullTextAnnotation' in result['document_text_detection']:
-                fta = result['document_text_detection']['fullTextAnnotation']
-                full_text = fta['text']
-                for block in fta['pages'][0]['blocks']:
-                    for para in block['paragraphs']:
-                        for word in para['words']:
-                            text = ''
-                            for symbol in word['symbols']:
-                                text += symbol['text']
-                            bb = word['boundingBox']['vertices']
-                            corners = corner_list(bb)
-                            if corners:
-                                boxes.append(TextBox(boundingBox = corners,
-                                                     text = text))
-                            else:
-                                # Something is wrong with the vertex list.
-                                # Skip it and continue.
-                                if __debug__: log('bad bb for {}: {}', text, bb)
+            # See this page for more information about the structure:
+            # https://cloud.google.com/vision/docs/handwriting#python
+            if len(response.full_text_annotation.pages) > 1:
+                warn('More than one page received from Google; using only first.')
+            for block in response.full_text_annotation.pages[0].blocks:
+                for para in block.paragraphs:
+                    corners = corner_list(para.bounding_box.vertices)
+                    for word in para.words:
+                        text = ''
+                        for symbol in word.symbols:
+                            text += symbol.text
+                        corners = corner_list(word.bounding_box.vertices)
+                        if corners:
+                            boxes.append(TextBox(boundingBox = corners, text = text))
+                        else:
+                            # Something is wrong with the vertex list.
+                            # Skip it and continue.
+                            if __debug__: log('bad bb for {}: {}', text, bb)
 
-            return TRResult(path = path, data = result, boxes = boxes,
-                            text = full_text, error = None)
+            return TRResult(path = path, data = json_from_response(response),
+                            boxes = boxes, text = full_text, error = None)
         except google.api_core.exceptions.PermissionDenied as ex:
             text = 'Authentication failure for Google service -- {}'.format(ex)
             raise AuthFailure(text)
@@ -187,15 +169,31 @@ class GoogleTR(TextRecognition):
 # [{'x': 2493}, {'x': 2538, 'y': 1}, {'x': 2535, 'y': 154}, {'x': 2490, 'y': 153}]
 # So, we have to test to make sure both 'x' and 'y' keys are in every vertex.
 
-def corner_list(bb_json):
-    '''Takes a boundingBox value from Google vision's JSON output and returns
+def corner_list(vertices):
+    '''Takes a boundingBox value from Google Vision's output and returns
     a condensed version, in the form [x y x y x y x y], with the first x, y
     pair representing the upper left corner.'''
     corners = []
-    for index in [0, 1, 2, 3]:
-        if 'x' in bb_json[index] and 'y' in bb_json[index]:
-            corners.append(bb_json[index]['x'])
-            corners.append(bb_json[index]['y'])
-        else:
-            return []
+    if len(vertices) < 4:
+        return []
+    for vertex in vertices:
+        corners.append(vertex.x)
+        corners.append(vertex.y)
     return corners
+
+
+# In more recent versions of googleapis-common-protos, MessageToDict is no
+# longer directly available as it was before.  See this GitHub issue answer:
+# https://github.com/googleapis/python-memcache/issues/19#issuecomment-708516816
+# The following builds on an answer by user Tobiasz Kędzierski given at
+# https://github.com/googleapis/python-memcache/issues/19#issuecomment-709628506
+
+def dict_from_response(response):
+    if isinstance(response, google.cloud.vision_v1.types.image_annotator.AnnotateImageResponse):
+        return response.__class__.to_dict(response)
+    else:
+        return MessageToDict(response)
+
+
+def json_from_response(response):
+    return json.dumps(dict_from_response(response))

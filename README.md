@@ -14,9 +14,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies 
 ❡ Log of recent changes
 -----------------------
 
-_Version 1.3.0_: This release brings a number of changes: (1) it now requires Python version 3.6 at minimum; (2) the Microsoft service interface now uses Azure API v3.0; (3) the Microsoft credentials scheme now allows you to change the endpoint URI; (4) the Google service interface now only gets the document text results instead of all possible results; (5) the possible program exit codes have changed slightly; and (6) interruption via <kbd>^C</kbd> should work better now.  Some bugs have been fixed and internals have been (hopefully) improved.
-
-The file [CHANGES](CHANGES.md) contains a more complete change log, and includes information about previous releases.
+_Version 1.4.0_: This release does not change the user interface or functionality, but this is more than a patch release because it changes the minimum required versions of many Python packages and uses newer Google API libraries.  A few bugs have been fixed as well.  The file [CHANGES](CHANGES.md) contains a more complete change log, and includes information about previous releases.
 
 § Table of Contents
 -----------------

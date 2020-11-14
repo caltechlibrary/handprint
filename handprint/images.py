@@ -19,6 +19,7 @@ import matplotlib
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from   matplotlib.patches import Rectangle
+
 import numpy as np
 import os
 from   os import path
@@ -248,7 +249,7 @@ def annotated_image(file, text_boxes, service):
             x = max(0, vertices[0][0] - 4)
             y = max(0, vertices[0][1] - 8)
             text = polygon[1]
-            plt.text(x, y, text, color = 'r', fontsize = 11, va = "top", bbox = props)
+            plt.text(x, y, text, color = 'r', fontsize = 11, va = "center", bbox = props)
 
     if __debug__: log(f'generating png for {service_name} for {relative(file)}')
     buf = io.BytesIO()

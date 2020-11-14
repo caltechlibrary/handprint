@@ -423,27 +423,26 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
 * [boltons](https://github.com/mahmoud/boltons/) &ndash; package of miscellaneous Python utilities
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
-* [colorama](https://github.com/tartley/colorama) &ndash; makes ANSI escape character sequences work under MS Windows terminals
-* [colored](https://gitlab.com/dslackw/colored) &ndash; library for color and formatting in terminal
 * [dateparser](https://pypi.org/project/dateparser/) &ndash; parse dates in almost any string format
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
-* [halo](https://github.com/ManrajGrover/halo) &ndash; busy-spinners for Python command-line programs
+* [grpcio](https://grpc.io) &ndash; open-source RPC framework
 * [humanize](https://github.com/jmoiron/humanize) &ndash; make numbers more easily readable by humans
-* [httplib2](https://github.com/httplib2/httplib2) &ndash; a comprehensive HTTP client library
 * [imagesize](https://github.com/shibukawa/imagesize_py) &ndash; determine the dimensions of an image
 * [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
 * [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
 * [numpy](https://numpy.org) &ndash; package for scientific computing in Python
-* [oauth2client](https://github.com/googleapis/oauth2client) &ndash; Google OAuth 2.0 library
 * [rich](https://rich.readthedocs.io/en/latest/) &ndash; library for writing styled text to the terminal
 * [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
 * [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python
+* [PyMuPDF](https://github.com/pymupdf/PyMuPDF) &ndash; Python bindings for the MuPDF rendering library
 * [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
+* [sidetrack](https://github.com/caltechlibrary/sidetrack) &ndash; simple debug logging/tracing package
 * [StringDist](https://github.com/obulkin/string-dist) &ndash; library for calculating string distances
 * [textdistance](https://github.com/orsinium/textdistance) &ndash; compute distances between text sequences
-* [termcolor](https://pypi.org/project/termcolor/) &ndash; ANSI color formatting for output in terminal
+* [urllib3](https://github.com/urllib3/urllib3) &ndash; Python HTTP library
+* [wheel](https://pypi.org/project/wheel/) &ndash; setuptools extension for building wheels
 
 Finally, I am grateful for computing &amp; institutional resources made available by the California Institute of Technology.
     

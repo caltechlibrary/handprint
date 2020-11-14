@@ -32,6 +32,7 @@ TRResult.__doc__ = '''Results of invoking a text recognition service.
   'path' is the file path or URL of the item in question
   'data' is the full data result as a Python dict (or {} in case of error)
   'text' is the extracted text as a string (or '' in case of error)
+  'boxes' is a list of text boxes
   'error' is None if no error occurred, or the text of any error messages
 '''
 

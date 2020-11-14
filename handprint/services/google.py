@@ -114,10 +114,11 @@ class GoogleTR(TextRecognition):
 
         try:
             if __debug__: log(f'building Google vision API object for {path}')
-            client   = gv.ImageAnnotatorClient()
-            document = gv.Image(content = image)
+            client  = gv.ImageAnnotatorClient()
+            context = gv.ImageContext(language_hints = ['en-t-i0-handwrit'])
+            img     = gv.Image(content = image)
             if __debug__: log(f'sending image to Google for {path} ...')
-            response = client.document_text_detection(document)
+            response = client.document_text_detection(image = img, image_context = context)
             if __debug__: log(f'received result from Google for {path}')
 
             raise_for_interrupts()

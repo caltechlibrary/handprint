@@ -1,6 +1,18 @@
 Change log for Handprint
 ========================
 
+Version 1.4.0
+--------------
+
+This release does not change the user interface or functionality, but this is more than a patch release because it changes the minimum required versions of many Python packages and uses newer Google API libraries.
+
+* Fixed compatibility between Handprint and more recent versions of the Google API libraries.  **The previous versions of the Google API are no longer supported by Handprint**.
+* Fixed a bug in the main routine causing an error when trying to print exceptions.
+* Fixed a bug in catching errors in the Microsoft interface.
+* Update [`requirements.txt`](requirements.txt) to remove no-longer used packages and update minimum version numbers.
+* Update [`README.md`](README.md) to acknowledge the Python dependencies actually being used now.
+
+
 Version 1.3.0
 --------------
 

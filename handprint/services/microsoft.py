@@ -149,7 +149,8 @@ class MicrosoftTR(TextRecognition):
             response, error = net('get', polling_url, polling = True, headers = headers)
             if isinstance(error, NetworkFailure):
                 if __debug__: log('network exception: {}', str(error))
-                return TRResult(path = path, data = {}, text = '', error = str(error))
+                return TRResult(path = path, data = {}, text = '',
+                                boxes = [], error = str(error))
             elif isinstance(error, RateLimitExceeded):
                 # Pause to let the server reset its timers.  It seems that MS
                 # doesn't send back a Retry-After header when rated limited
@@ -176,14 +177,17 @@ class MicrosoftTR(TextRecognition):
                         poll = False
                     elif analysis['status'] == 'failed':
                         text = 'Microsoft analysis failed'
-                        return TRResult(path = path, data = {}, text = '', error = text)
+                        return TRResult(path = path, data = {}, text = '',
+                                        boxes = [], error = text)
                     else:
                         text = 'Error: Microsoft returned unexpected result'
-                        return TRResult(path = path, data = {}, text = '', error = text)
+                        return TRResult(path = path, data = {}, text = '',
+                                        boxes = [], error = text)
                 else:
                     # No status key in JSON results means something's wrong.
                     text = 'Error: Microsoft results not in expected format'
-                    return TRResult(path = path, data = {}, text = '', error = text)
+                    return TRResult(path = path, data = {}, text = '',
+                                    boxes = [], error = text)
             else:
                 if __debug__: log('received empty result from Microsoft.')
 

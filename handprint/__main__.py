@@ -438,7 +438,7 @@ Command-line arguments summary
             exit_code = ExitCode.exception
             if __debug__:
                 from traceback import format_exception
-                details = ''.join(format_exception(exception))
+                details = ''.join(format_exception(*exception))
                 logr(f'Exception: {msg}\n{details}')
     else:
         inform('Done.')

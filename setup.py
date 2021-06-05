@@ -12,15 +12,17 @@
 # =============================================================================
 
 import os
-from   os import path
+from   os.path import exists, join, abspath, dirname
 from   setuptools import setup
 
-here = path.abspath(path.dirname(__file__))
+here = abspath(dirname(__file__))
 
-with open(path.join(here, 'requirements.txt')) as f:
-    reqs = f.read().rstrip().splitlines()
+requirements = []
+if exists(join(here, 'requirements.txt')):
+    with open(join(here, 'requirements.txt')) as f:
+        requirements = f.read().rstrip().splitlines()
 
 setup(
     setup_requires = ['wheel'],
-    install_requires = reqs,
+    install_requires = requirements,
 )

@@ -80,3 +80,4 @@ dist
 *.amazon-textract.png
 *.microsoft.png
 *.google.png
+*.bak

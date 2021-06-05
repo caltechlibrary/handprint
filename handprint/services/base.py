@@ -62,14 +62,18 @@ class TextRecognition(object):
 
 
     def __eq__(self, other):
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        else:
-            return not self.name() < other.name() and not other.name() < self.name()
+        if isinstance(other, type(self)):
+            return self.__dict__ == other.__dict__
+        return NotImplemented
 
 
     def __ne__(self, other):
-        return not __eq__(self, other)
+        # Based on lengthy Stack Overflow answer by user "Maggyero" posted on
+        # 2018-06-02 at https://stackoverflow.com/a/50661674/743730
+        eq = self.__eq__(other)
+        if eq is not NotImplemented:
+            return not eq
+        return NotImplemented
 
 
     def __lt__(self, other):
@@ -77,24 +81,21 @@ class TextRecognition(object):
 
 
     def __gt__(self, other):
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        else:
+        if isinstance(other, type(self)):
             return other.name() < self.name()
+        return NotImplemented
 
 
     def __le__(self, other):
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        else:
+        if isinstance(other, type(self)):
             return not other.name() < self.name()
+        return NotImplemented
 
 
     def __ge__(self, other):
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        else:
+        if isinstance(other, type(self)):
             return not self.name() < other.name()
+        return NotImplemented
 
 
     def init_credentials(self):

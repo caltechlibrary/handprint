@@ -1,7 +1,15 @@
-aenum                    >= 2.2.3
-appdirs                  >= 1.4.3
-boltons                  >= 20.2.0
-boto3                    >= 1.10.0
+# =============================================================================
+# @file    requirements.txt
+# @brief   Python dependencies for DIBS
+# @created 2018-10-23
+# @license Please see the file named LICENSE in the project directory
+# @website https://github.com/caltechlibrary/handprint
+# =============================================================================
+
+aenum                    >= 2.2.4
+appdirs                  >= 1.4.4
+boltons                  >= 20.2.1
+boto3                    >= 1.16.17
 dateparser               >= 1.0.0
 google-api-core          >= 1.23.0
 google-api-python-client >= 1.12.5
@@ -10,20 +18,20 @@ google-auth-httplib2     >= 0.0.4
 google-cloud             >= 0.34.0
 google-cloud-vision      >= 2.0.0
 googleapis-common-protos >= 1.52.0
-grpcio                   >= 1.29.0
-humanize                 >= 3.0.0
-imagesize                >= 1.1.0
-matplotlib               >= 3.3.0
-numpy                    >= 1.17.2
-Pillow                   >= 8.0.0
-plac                     >= 1.2.0
-psutil                   >= 5.6.3
-PyMuPDF                  >= 1.16.0
+grpcio                   >= 1.33.2
+humanize                 >= 3.5.0
+imagesize                >= 1.2.0
+matplotlib               >= 3.3.3
+numpy                    >= 1.19.4
+Pillow                   >= 8.0.1
+plac                     >= 1.3.3
+psutil                   >= 5.7.3
+PyMuPDF                  >= 1.18.3
 requests                 >= 2.25.0
-rich                     >= 9.0.0
-setuptools               >= 39.1.0
-sidetrack                >= 1.2.0
+rich                     >= 10.1.0
+setuptools               >= 52.1.0
+sidetrack                >= 1.4.0
 StringDist               >= 1.0.9
-textdistance             >= 4.1.5
+textdistance             >= 4.2.0
 urllib3                  == 1.26.5
-wheel                    >= 0.33.6
+wheel                    >= 0.36.2

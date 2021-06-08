@@ -35,6 +35,10 @@ file "LICENSE" for more information.
 '''
 
 from   boltons.debugutils import pdb_on_signal
+from   commonpy.data_utils import timestamp
+from   commonpy.file_utils import filename_extension, files_in_directory
+from   commonpy.file_utils import readable, writable
+from   commonpy.interrupt import config_interrupt, interrupt, interrupted
 import os
 from   os import path, cpu_count
 import plac
@@ -48,12 +52,8 @@ if __debug__:
 import handprint
 from handprint import print_version
 from handprint.credentials import Credentials
-from handprint.data_utils import timestamp, plural
 from handprint.exceptions import *
 from handprint.exit_codes import ExitCode
-from handprint.files import filename_extension, files_in_directory, is_url
-from handprint.files import readable, writable
-from handprint.interruptions import interrupt, interrupted
 from handprint.main_body import MainBody
 from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
@@ -368,7 +368,7 @@ Command-line arguments summary
             alert(f'Unknown service: "{service}". {hint}')
             exit(int(ExitCode.bad_arg))
         if not files or len(files) > 1:
-            alert(f'Option {prefix}a requires one file. {thing}')
+            alert(f'Option {prefix}a requires one file. {hint}')
             exit(int(ExitCode.bad_arg))
         creds_file = files[0]
         if not readable(creds_file):
@@ -382,13 +382,14 @@ Command-line arguments summary
 
     services = services_list() if services == 'S' else services.lower().split(',')
     if services != 'S' and not all(s in services_list() for s in services):
-        alert_fatal(f'"{services}" is not a known services. {hint}')
+        alert_fatal(f'"{services}" is/are not known services. {hint}')
         exit(int(ExitCode.bad_arg))
     if no_grid and not extended and not compare:
         alert_fatal(f'{prefix}G without {prefix}e or {prefix}c produces no output. {hint}')
         exit(int(ExitCode.bad_arg))
     if any(item.startswith('-') for item in files):
-        alert_fatal(f'Unrecognized option in arguments. {hint}')
+        bad = next(item for item in files if item.startswith('-'))
+        alert_fatal(f'Unrecognized option "{bad}" in arguments. {hint}')
         exit(int(ExitCode.bad_arg))
     if not files and from_file == 'F':
         alert_fatal(f'Need images or URLs to have something to do. {hint}')
@@ -411,14 +412,9 @@ Command-line arguments summary
                         services   = services,
                         threads    = max(1, cpu_count()//2 if threads == 'T' else int(threads)),
                         compare    = 'relaxed' if (compare and relaxed) else compare)
+        config_interrupt(body.stop, UserCancelled(ExitCode.user_interrupt))
         body.run()
         exception = body.exception
-    except (KeyboardInterrupt, UserCancelled) as ex:
-        if __debug__: log('received {}', sys.exc_info()[0].__name__)
-        alert('Quit received; shutting down ...')
-        interrupt()
-        body.stop()
-        exception = sys.exc_info()
     except Exception as ex:
         exception = sys.exc_info()
 
@@ -442,8 +438,13 @@ Command-line arguments summary
                 logr(f'Exception: {msg}\n{details}')
     else:
         inform('Done.')
+
+    # And exit ----------------------------------------------------------------
+
     if __debug__: log('_'*8 + f' stopped {timestamp()} ' + '_'*8)
     if exit_code == ExitCode.user_interrupt:
+        # This is a sledgehammer, but it kills everything, including ongoing
+        # network get/post. I have not found a more reliable way to interrupt.
         os._exit(int(exit_code))
     else:
         exit(int(exit_code))

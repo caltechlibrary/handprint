@@ -1,6 +1,6 @@
 # =============================================================================
 # @file    requirements.txt
-# @brief   Python dependencies for DIBS
+# @brief   Python dependencies for Handprint
 # @created 2018-10-23
 # @license Please see the file named LICENSE in the project directory
 # @website https://github.com/caltechlibrary/handprint
@@ -10,6 +10,7 @@ aenum                    >= 2.2.4
 appdirs                  >= 1.4.4
 boltons                  >= 20.2.1
 boto3                    >= 1.16.17
+commonpy                 >= 1.3.5
 dateparser               >= 1.0.0
 google-api-core          >= 1.23.0
 google-api-python-client >= 1.12.5
@@ -34,4 +35,5 @@ sidetrack                >= 1.4.0
 StringDist               >= 1.0.9
 textdistance             >= 4.2.0
 urllib3                  == 1.26.5
+validator-collection     >= 1.5.0
 wheel                    >= 0.36.2

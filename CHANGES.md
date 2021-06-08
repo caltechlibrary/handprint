@@ -1,8 +1,19 @@
-Change log for Handprint
-========================
+# Change log for Handprint
 
-Version 1.4.0
---------------
+## Version 1.5.0
+
+Changes in this release:
+
+* The default branch on GitHub has been changed from `master` to `main`. **If you have clones or forks of this repo**, please see GitHub's [instructions for updating a local clone after a branch name change](https://docs.github.com/en/github/administering-a-repository/managing-branches-in-your-repository/renaming-a-branch#updating-a-local-clone-after-a-branch-name-changes).
+* Most dependencies in [`requirements.txt`](requirements.txt) have been updated to the latest versions.
+* Fixed issue #21: Dependabot security warning for `urllib3` package.
+* Fixed issue #24: use CommonPy functions instead of keeping separate versions of the same functions. Internally, a number of common utility functions originally written in part for Handprint have been moved to a separate new Python package, [Commonpy](https://github.com/caltechlibrary/commonpy), and the Handprint code has been refactored to use the package instead of its own copies of the functions.
+* Fixed problems in the implementation of the base class for handrecognition services.
+* Various minor internal code cleanups have been made.
+* The copyright year has been updated.
+
+
+## Version 1.4.0
 
 This release does not change the user interface or functionality, but this is more than a patch release because it changes the minimum required versions of many Python packages and uses newer Google API libraries.
 
@@ -13,8 +24,7 @@ This release does not change the user interface or functionality, but this is mo
 * Update [`README.md`](README.md) to acknowledge the Python dependencies actually being used now.
 
 
-Version 1.3.0
---------------
+## Version 1.3.0
 
 * Handprint now requires Python version 3.6 or later.
 * Fixed issue [#19](https://github.com/caltechlibrary/handprint/issues/19), which caused Handprint to fail to produce any output images if both `-e` and `-G` were given.
@@ -31,20 +41,17 @@ Version 1.3.0
 * Various internal code updates and refactoring.
 
 
-Version 1.2.2
---------------
+## Version 1.2.2
 
 * Updated copyright year in various source files.
 
 
-Version 1.2.1
---------------
+## Version 1.2.1
 
 * Fixed Microsoft output in the annotated images to be word-based, rather than line-based, to be the same as for the other services.
 
 
-Version 1.2.0
---------------
+## Version 1.2.0
 
 * Two bugs related to running with multiple threads (the default) are hopefully fixed in this version:
   * Sometimes the annotated image generated from a given service would have the results from another service also written over it.  This was inconsistent and intermittent, and the exact cause is still unclear, but this version of Handprint implements a workaround that hopefully stops this from happening.
@@ -60,8 +67,7 @@ Handprint will only extract the first image in the PDF file.
 * A few more bugs have been fixed.
 
 
-Version 1.1.0
---------------
+## Version 1.1.0
 
 * Improve installation instructions and avoid telling people to use `sudo`.
 * Add facility to compare extracted text to a ground truth file. This is enabled using the command-line option `-c`. See the README file or help text for more details.
@@ -72,27 +78,23 @@ Version 1.1.0
 * Add some missing package imports.
 
 
-Version 1.0.3
---------------
+## Version 1.0.3
 
 * Fix an internal bug getting the credentials file for Amazon services.
 
 
-Version 1.0.2
---------------
+## Version 1.0.2
 
 * Fix [issue #9](https://github.com/caltechlibrary/handprint/issues/9): credentials files are not saved in expected location.
 * Edit the `README.md` file.
 
 
-Version 1.0.1
---------------
+## Version 1.0.1
 
 This version adds instructions for installing from PyPI and fixes a bug writing files downloaded from URLs.
 
 
-Version 1.0.0
---------------
+## Version 1.0.0
 
 This release provides a great many changes over the previous versions of Handprint.  The behavior and implementation have all changed in various ways, and collectively this marks the first version that can fairly be called version 1.0.0.
 
@@ -114,41 +116,35 @@ The following are some of the notable changes in this release:
 * Added code of conduct and contributor guidelines to the repository.
 
 
-Version 0.9.0
--------------
+## Version 0.9.0
 
 * **Backward-incompatible change**: command-line option `-m` is now `-s` and "methods" are now known as "services", to avoid conflicting interpretations of what a "method" is in the context of software.  Internal object classes have likewise been changed.
 * Refactor some internal network code.
 * Add a number of additional images for testing.
 
 
-Version 0.8.2
--------------
+## Version 0.8.2
 
 * Fix internal bug in file download code.
 * Start separate file [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) for the change log.
 
 
-Version 0.8.1
--------------
+## Version 0.8.1
 
 * Detect and handle when the Google API returns a badly-formed bounding box.
 * Skip files previously generated by the annotation feature of Handprint.
 
 
-Version 0.8.0
--------------
+## Version 0.8.0
 
 Handprint now generates annotated images by default; they display the extracted text overlaid on the input images.
 
 
-Version 0.7.5
--------------
+## Version 0.7.5
 
 Separate chunks of text in Microsoft output using newlines, rather than spaces, to make the results more comparable to what Google produces.
 
 
-Version 0.7.4
--------------
+## Version 0.7.4
 
 This version improves efficiency by iterating over files/URLs first and then over methods, so that files do not get repeatedly downloaded each time a different method is used.  It also works around some network compatibility problems in different environments, and finally, adds a number of fixes.

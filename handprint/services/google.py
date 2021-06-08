@@ -14,10 +14,10 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   commonpy.interrupt import raise_for_interrupts
 import io
 import math
 import os
-from os import path
 import google
 from google.cloud import vision as gv
 from google.api_core.exceptions import PermissionDenied
@@ -30,7 +30,6 @@ if __debug__:
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
 from handprint.exceptions import *
-from handprint.interruptions import interrupted, raise_for_interrupts
 from handprint.services.base import TextRecognition, TRResult, TextBox
 
 

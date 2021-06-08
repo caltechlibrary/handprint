@@ -14,14 +14,12 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-from collections import namedtuple
+from   collections import namedtuple
+from   commonpy.file_utils import readable
 import imagesize
 
 if __debug__:
     from sidetrack import set_debug, log, logr
-
-import handprint
-from handprint.files import readable
 
 
 # Named tuple definitions.

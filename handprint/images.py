@@ -14,6 +14,8 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   commonpy.file_utils import relative, readable
+from   commonpy.file_utils import filename_extension, filename_basename
 import io
 import matplotlib
 import matplotlib.image as mpimg
@@ -81,8 +83,6 @@ except:
 
 import handprint
 from handprint.exceptions import *
-from handprint.files import relative, readable
-from handprint.files import filename_extension, filename_basename
 
 
 # Main functions.

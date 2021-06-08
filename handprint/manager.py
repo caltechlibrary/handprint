@@ -15,6 +15,11 @@ file "LICENSE" for more information.
 '''
 
 from   collections import namedtuple
+from   commonpy.interrupt import raise_for_interrupts, wait
+from   commonpy.file_utils import filename_basename, filename_extension, relative
+from   commonpy.file_utils import files_in_directory, alt_extension
+from   commonpy.file_utils import readable, writable, nonempty
+from   commonpy.file_utils import delete_existing
 from   concurrent.futures import ThreadPoolExecutor
 import humanize
 import io
@@ -30,6 +35,7 @@ import threading
 from   threading import Thread, Lock
 from   timeit import default_timer as timer
 import urllib
+from   validator_collection.checkers import is_url
 
 if __debug__:
     from sidetrack import set_debug, log, logr
@@ -38,14 +44,9 @@ import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.comparison import text_comparison
 from handprint.exceptions import *
-from handprint.files import filename_basename, filename_extension, relative
-from handprint.files import files_in_directory, alt_extension, handprint_path
-from handprint.files import readable, writable, nonempty, is_url
-from handprint.files import delete_existing
 from handprint.images import converted_image, annotated_image, create_image_grid
 from handprint.images import image_size, image_dimensions
 from handprint.images import reduced_image_size, reduced_image_dimensions
-from handprint.interruptions import interrupt, raise_for_interrupts
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
 from handprint.ui import inform, alert, warn

@@ -17,8 +17,8 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   commonpy.interrupt import raise_for_interrupts, wait
 import os
-from   os import path
 import sys
 
 if __debug__:
@@ -27,7 +27,6 @@ if __debug__:
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
 from handprint.exceptions import *
-from handprint.interruptions import interrupted, raise_for_interrupts, wait
 from handprint.network import net
 from handprint.services.base import TextRecognition, TRResult, TextBox
 

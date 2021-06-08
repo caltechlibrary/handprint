@@ -399,7 +399,7 @@ I would be happy to receive your help and participation with enhancing Handprint
 ⧴ License
 ---------
 
-Copyright (C) 2018&ndash;2020, Caltech.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
+Software produced by the Caltech Library is Copyright © 2021 California Institute of Technology.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
 
 
 ☺︎ Authors and history
@@ -429,7 +429,7 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
 * [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
 * [numpy](https://numpy.org) &ndash; package for scientific computing in Python
-* [rich](https://rich.readthedocs.io/en/latest/) &ndash; library for writing styled text to the terminal
+* [Rich](https://rich.readthedocs.io/en/latest/) &ndash; library for writing styled text to the terminal
 * [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
 * [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python

@@ -227,8 +227,8 @@ def converted_image(orig_file, to_format, dest_file = None):
                 return (None, str(ex))
 
 
-def annotated_image(file, text_boxes, service, color = 'r'):
-    service_name = service.name()
+def annotated_image(file, text_boxes, service, color = 'r', shift = '0,0'):
+    service_name = service.name().title()
 
     fig, axes = plt.subplots(nrows = 1, ncols = 1, figsize = (20, 20))
     axes.get_xaxis().set_visible(False)
@@ -239,15 +239,22 @@ def annotated_image(file, text_boxes, service, color = 'r'):
     img = mpimg.imread(file)
     axes.imshow(img, cmap = "gray")
 
-    props = dict(facecolor = 'white', alpha = 0.7)
+    shift = shift.strip('()" \\\\').split(',')
+    if len(shift) == 2:
+        try:
+            x_shift, y_shift = int(shift[0]), int(shift[1])
+        except ValueError:
+            x_shift, y_shift = 0, 0
+
+    props = dict(facecolor = 'white', alpha = 0.6)
     if text_boxes:
         if __debug__: log(f'adding {len(text_boxes)} annotations for {service_name}')
         polygons = [(item.boundingBox, item.text) for item in text_boxes]
         for polygon in polygons:
             vertices = [(polygon[0][i], polygon[0][i+1])
                         for i in range(0, len(polygon[0]), 2)]
-            x = max(0, vertices[0][0] - 4)
-            y = max(0, vertices[0][1] - 8)
+            x = max(0, vertices[0][0] - x_shift)
+            y = max(0, vertices[0][1] - y_shift)
             text = polygon[1]
             plt.text(x, y, text, color = color, fontsize = 11,
                      va = "center", bbox = props)

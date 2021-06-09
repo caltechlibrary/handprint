@@ -82,6 +82,7 @@ disable_ssl_cert_check()
     threads    = ('number of threads to use (default: #cores/2)',      'option', 't'),
     version    = ('print version info and exit',                       'flag',   'V'),
     text_color = ('use color "X" for text annotations (default: red)', 'option', 'x'),
+    text_shift = ('shift text annotations by x,y (default: 0,0)',      'option', 'z'),
     debug      = ('write detailed trace to "OUT" ("-" means console)', 'option', '@'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
@@ -89,7 +90,8 @@ disable_ssl_cert_check()
 def main(add_creds = 'A', base_name = 'B', no_color = False, compare = False,
          extended = False, from_file = 'F', no_grid = False, list = False,
          output_dir = 'O', quiet = False, relaxed = False, services = 'S',
-         threads = 'T', version = False, text_color = 'X', debug = 'OUT', *files):
+         threads = 'T', version = False, text_color = 'X', text_shift = 'Z',
+         debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -301,9 +303,16 @@ number.
 
 To change the color of the text annotations overlayed over the input image,
 you can use the option -x (or /x on Windows).  You can use hex color codes
-such as "#ff0000" (make sure to enclose the value with quotes, or the shell
-will interpret the pound sign as a comment character), or X11/CSS4 color names
-with no spaces such as "purple" or "darkgreen".
+such as "#ff0000" or X11/CSS4 color names with no spaces such as "purple"
+or "darkgreen".  If you use a hex value, make sure to enclose the value with
+quotes, or the shell will interpret the pound sign as a comment character.
+
+To change the position of the text annotations overlayed over the input image,
+you can use the option -z (or /z on Windows).  This takes two numbers separated
+by a comma in the form x,y.  Positive numbers move the text down and to the
+right of the default position.  The default shift is 0,0, which leaves it at
+the positions returned by the services; this position turns out to be slightly
+above the original text in the image for all the services tried so far.
 
 If given the -q option (/q on Windows), Handprint will not print its usual
 informational messages while it is working.  It will only print messages
@@ -417,6 +426,7 @@ Command-line arguments summary
                         add_creds  = None if add_creds == 'A' else add_creds,
                         base_name  = 'document' if base_name == 'B' else base_name,
                         text_color = 'red' if text_color == 'X' else text_color,
+                        text_shift = '0,0' if text_shift == 'Z' else text_shift,
                         make_grid  = not no_grid,
                         extended   = extended,
                         services   = services,

@@ -107,16 +107,18 @@ class AmazonTR(TextRecognition):
             boxes = []
             width, height = imagesize.get(file_path)
             for block in response[response_key]:
-                if value_key in block and block[value_key] == "WORD":
+                if value_key not in block:
+                    continue
+                if block[value_key] == "WORD":
                     text = block[block_key]
-                    full_text += (text + ' ')
                     corners = corner_list(block['Geometry']['Polygon'], width, height)
                     if corners:
                         boxes.append(TextBox(boundingBox = corners, text = text))
                     else:
                         # Something's wrong with the vertex list. Skip & continue.
                         if __debug__: log('bad bb for {}: {}', text, bb)
-
+                elif block[value_key] == "LINE":
+                    full_text += block['Text'] + '\n'
             return TRResult(path = file_path, data = response, boxes = boxes,
                             text = full_text, error = None)
         except KeyboardInterrupt as ex:

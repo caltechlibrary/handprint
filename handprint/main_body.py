@@ -58,7 +58,8 @@ class MainBody(object):
         # The manager object manages the process of manipulating images and
         # sending them to the services.
         self._manager = Manager(self.services, self.threads, self.output_dir,
-                                self.make_grid, self.compare, self.extended)
+                                self.make_grid, self.compare, self.extended,
+                                self.text_color)
 
 
     def run(self):

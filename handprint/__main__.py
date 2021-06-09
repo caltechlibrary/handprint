@@ -69,11 +69,11 @@ disable_ssl_cert_check()
 @plac.annotations(
     add_creds  = ('add credentials file for service "A"',              'option', 'a'),
     base_name  = ('use base name "B" to name downloaded images',       'option', 'b'),
+    no_color   = ('do not colorize output printed to the terminal',    'flag',   'C'),
     compare    = ('compare text results to ground truth files',        'flag',   'c'),
-    no_color   = ('do not color-code terminal output',                 'flag',   'C'),
     extended   = ('produce extended results (text file, JSON data)',   'flag',   'e'),
     from_file  = ('read list of images or URLs from file "F"',         'option', 'f'),
-    no_grid    = ('do not create all-results grid image',              'flag',   'G'),
+    no_grid    = ('do not create an all-results grid image',           'flag',   'G'),
     list       = ('print list of known services',                      'flag',   'l'),
     output_dir = ('write output to directory "O"',                     'option', 'o'),
     quiet      = ('only print important messages while working',       'flag',   'q'),
@@ -81,14 +81,15 @@ disable_ssl_cert_check()
     services   = ('invoke HTR/OCR service "S" (default: "all")',       'option', 's'),
     threads    = ('number of threads to use (default: #cores/2)',      'option', 't'),
     version    = ('print version info and exit',                       'flag',   'V'),
+    text_color = ('use color "X" for text annotations (default: red)', 'option', 'x'),
     debug      = ('write detailed trace to "OUT" ("-" means console)', 'option', '@'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
 
-def main(add_creds = 'A', base_name = 'B', compare = False, no_color = False,
+def main(add_creds = 'A', base_name = 'B', no_color = False, compare = False,
          extended = False, from_file = 'F', no_grid = False, list = False,
          output_dir = 'O', quiet = False, relaxed = False, services = 'S',
-         threads = 'T', version = False, debug = 'OUT', *files):
+         threads = 'T', version = False, text_color = 'X', debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -178,10 +179,12 @@ Visual display of recognition results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After gathering the results of each service for a given input, Handprint will
-create a single compound image consisting of all the annotated results images
-arranged in a grid.  This is intended to make it easier to compare the
-results of multiple services against each other.  To skip the creation of the
-results grid, use the -G option (/G on Windows).  The grid image will be named
+create a single compound image consisting of the results for each service
+(displayed as text overlayed over the original input image) arranged in a grid,
+with titles showing which output corresponds to which service.  This is
+intended to make it easier to compare the results of multiple services against
+each other.  To skip the creation of the results grid, use the -G option
+(/G on Windows).  The grid image have a name with the following pattern:
 
   somefile.handprint-all.png
 
@@ -296,6 +299,12 @@ it is running on.  (E.g., if your computer has 4 cores, it will by default use
 at most 2 threads.)  The option -t (/t on Windows) can be used to change this
 number.
 
+To change the color of the text annotations overlayed over the input image,
+you can use the option -x (or /x on Windows).  You can use hex color codes
+such as "#ff0000" (make sure to enclose the value with quotes, or the shell
+will interpret the pound sign as a comment character), or X11/CSS4 color names
+with no spaces such as "purple" or "darkgreen".
+
 If given the -q option (/q on Windows), Handprint will not print its usual
 informational messages while it is working.  It will only print messages
 for warnings or errors.  By default messages printed by Handprint are also
@@ -407,6 +416,7 @@ Command-line arguments summary
                         output_dir = None if output_dir == 'O' else output_dir,
                         add_creds  = None if add_creds == 'A' else add_creds,
                         base_name  = 'document' if base_name == 'B' else base_name,
+                        text_color = 'red' if text_color == 'X' else text_color,
                         make_grid  = not no_grid,
                         extended   = extended,
                         services   = services,

@@ -227,13 +227,13 @@ def converted_image(orig_file, to_format, dest_file = None):
                 return (None, str(ex))
 
 
-def annotated_image(file, text_boxes, service):
+def annotated_image(file, text_boxes, service, color = 'r'):
     service_name = service.name()
 
     fig, axes = plt.subplots(nrows = 1, ncols = 1, figsize = (20, 20))
     axes.get_xaxis().set_visible(False)
     axes.get_yaxis().set_visible(False)
-    axes.set_title(service_name, color = 'r', fontweight = 'bold', fontsize = 22)
+    axes.set_title(service_name, color = color, fontweight = 'bold', fontsize = 22)
 
     if __debug__: log(f'reading image file for {service_name}: {relative(file)}')
     img = mpimg.imread(file)
@@ -249,7 +249,8 @@ def annotated_image(file, text_boxes, service):
             x = max(0, vertices[0][0] - 4)
             y = max(0, vertices[0][1] - 8)
             text = polygon[1]
-            plt.text(x, y, text, color = 'r', fontsize = 11, va = "center", bbox = props)
+            plt.text(x, y, text, color = color, fontsize = 11,
+                     va = "center", bbox = props)
 
     if __debug__: log(f'generating png for {service_name} for {relative(file)}')
     buf = io.BytesIO()

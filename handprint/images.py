@@ -239,6 +239,18 @@ def annotated_image(file, text_boxes, service, color = 'r', shift = '0,0'):
     img = mpimg.imread(file)
     axes.imshow(img, cmap = "gray")
 
+    # The way this positions the annotations is as follows. Each word
+    # annotation in the output is placed such that the LOWER left corner of
+    # the annotation is at the position of the UPPER left corner of the
+    # bounding box returned by the service; this has the effect of putting
+    # the annotation above the original word in the input image.  For example,
+    # if the word in the image is _whatever_, the bounding box returned by
+    # the service will enclose most of _whatever_, and the upper left corner
+    # of that bounding box will be somewhere above the letter _w_. Then, the
+    # default position starts with a boxed "whatever", and the lower left
+    # corner of that box will be placed at that point above the letter _w_.
+    # The shift parameter moves it according to x,y offsets.
+
     shift = shift.strip('()" \\\\').split(',')
     if len(shift) == 2:
         try:

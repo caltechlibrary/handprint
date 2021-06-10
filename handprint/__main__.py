@@ -310,9 +310,12 @@ quotes, or the shell will interpret the pound sign as a comment character.
 To change the position of the text annotations overlayed over the input image,
 you can use the option -z (or /z on Windows).  This takes two numbers separated
 by a comma in the form x,y.  Positive numbers move the text down and to the
-right of the default position.  The default shift is 0,0, which leaves it at
-the positions returned by the services; this position turns out to be slightly
-above the original text in the image for all the services tried so far.
+right of the default position.  The default position of each word in the
+annotated output is such that the lower left corner of the annotation is at the
+position of the upper left corner of the bounding box returned by the service;
+this has the effect of putting the annotation near, but above, the location of
+the (actual) word in the input image.  Using the shift option allows you to
+move the annotation if desired.
 
 If given the -q option (/q on Windows), Handprint will not print its usual
 informational messages while it is working.  It will only print messages

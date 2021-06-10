@@ -189,15 +189,15 @@ class AmazonRekognitionTR(AmazonTR):
 # .............................................................................
 
 def corner_list(polygon, width, height):
-    '''Takes a boundingBox value from Google vision's JSON output and returns
+    '''Takes a boundingBox value from Amazon's JSON output and returns
     a condensed version, in the form [x y x y x y x y], with the first x, y
     pair representing the upper left corner.'''
     corners = []
-    for index in [0, 1, 2, 3]:
-        if 'X' in polygon[index] and 'Y' in polygon[index]:
+    for poly_corner in polygon:
+        if 'X' in poly_corner and 'Y' in poly_corner:
             # Results  are in percentages of the image.  Convert to pixels.
-            corners.append(int(round(polygon[index]['X'] * width)))
-            corners.append(int(round(polygon[index]['Y'] * height)))
+            corners.append(int(round(poly_corner['X'] * width)))
+            corners.append(int(round(poly_corner['Y'] * height)))
         else:
             return []
     return corners

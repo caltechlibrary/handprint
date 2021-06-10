@@ -162,7 +162,7 @@ class GoogleTR(TextRecognition):
                             # Something is wrong with the vertex list.
                             # Skip it and continue.
                             if __debug__: log('bad bb for {}: {}', text, bb)
-            return TRResult(path = path, data = json_from_response(response),
+            return TRResult(path = path, data = dict_from_response(response),
                             boxes = boxes, text = full_text, error = None)
         except google.api_core.exceptions.PermissionDenied as ex:
             text = 'Authentication failure for Google service -- {}'.format(ex)

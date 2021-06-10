@@ -20,6 +20,7 @@ import math
 import os
 import google
 from google.cloud import vision as gv
+from google.cloud.vision_v1.types.text_annotation import TextAnnotation
 from google.api_core.exceptions import PermissionDenied
 from google.protobuf.json_format import MessageToDict
 import json
@@ -31,6 +32,20 @@ import handprint
 from handprint.credentials.google_auth import GoogleCredentials
 from handprint.exceptions import *
 from handprint.services.base import TextRecognition, TRResult, TextBox
+
+
+# Internal shortcuts.
+# .............................................................................
+
+# See the following page for the meanings of these symbols:
+# https://googleapis.github.io/google-cloud-dotnet/docs/Google.Cloud.Vision.V1/api/Google.Cloud.Vision.V1.TextAnnotation.Types.DetectedBreak.Types.BreakType.html
+
+EOL_SURE_SPACE = TextAnnotation.DetectedBreak.BreakType.EOL_SURE_SPACE
+HYPHEN         = TextAnnotation.DetectedBreak.BreakType.HYPHEN
+LINE_BREAK     = TextAnnotation.DetectedBreak.BreakType.LINE_BREAK
+SPACE          = TextAnnotation.DetectedBreak.BreakType.SPACE
+SURE_SPACE     = TextAnnotation.DetectedBreak.BreakType.SURE_SPACE
+UNKNOWN        = TextAnnotation.DetectedBreak.BreakType.UNKNOWN
 
 
 # Main class.
@@ -134,6 +149,12 @@ class GoogleTR(TextRecognition):
                         text = ''
                         for symbol in word.symbols:
                             text += symbol.text
+                            full_text += symbol.text
+                            break_type = symbol.property.detected_break.type_
+                            if break_type in [SPACE, SURE_SPACE]:
+                                full_text += ' '
+                            elif break_type in [EOL_SURE_SPACE, LINE_BREAK]:
+                                full_text += '\n'
                         corners = corner_list(word.bounding_box.vertices)
                         if corners:
                             boxes.append(TextBox(boundingBox = corners, text = text))
@@ -141,7 +162,6 @@ class GoogleTR(TextRecognition):
                             # Something is wrong with the vertex list.
                             # Skip it and continue.
                             if __debug__: log('bad bb for {}: {}', text, bb)
-
             return TRResult(path = path, data = json_from_response(response),
                             boxes = boxes, text = full_text, error = None)
         except google.api_core.exceptions.PermissionDenied as ex:

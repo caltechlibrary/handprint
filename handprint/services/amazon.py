@@ -97,8 +97,8 @@ class AmazonTR(TextRecognition):
         try:
             session = boto3.session.Session()
             client = session.client(variant, region_name = creds['region_name'],
-                                  aws_access_key_id = creds['aws_access_key_id'],
-                                  aws_secret_access_key = creds['aws_secret_access_key'])
+                                    aws_access_key_id = creds['aws_access_key_id'],
+                                    aws_secret_access_key = creds['aws_secret_access_key'])
             if __debug__: log('calling Amazon API function')
             response = getattr(client, api_method)( **{ image_keyword : {'Bytes': image} })
             if __debug__: log('received {} blocks', len(response[response_key]))
@@ -118,7 +118,10 @@ class AmazonTR(TextRecognition):
                         # Something's wrong with the vertex list. Skip & continue.
                         if __debug__: log('bad bb for {}: {}', text, bb)
                 elif block[value_key] == "LINE":
-                    full_text += block['Text'] + '\n'
+                    if 'Text' in block:
+                        full_text += block['Text'] + '\n'
+                    elif 'DetectedText' in block:
+                        full_text += block['DetectedText'] + '\n'
             return TRResult(path = file_path, data = response, boxes = boxes,
                             text = full_text, error = None)
         except KeyboardInterrupt as ex:

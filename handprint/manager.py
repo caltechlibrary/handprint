@@ -301,7 +301,8 @@ class Manager:
             txt_file  = self._renamed(base_path, str(service), 'txt')
             json_file = self._renamed(base_path, str(service), 'json')
             inform(f'Saving all data for {service_name}.')
-            self._save(json.dumps(output.data), json_file)
+            raw_json = json.dumps(output.data, sort_keys = True, indent = 2)
+            self._save(raw_json, json_file)
             inform(f'Saving extracted text for {service_name}.')
             self._save(output.text, txt_file)
         if self._compare:

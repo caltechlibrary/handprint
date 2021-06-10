@@ -19,8 +19,7 @@ import io
 import math
 import os
 import google
-from google.cloud import vision as gv
-from google.cloud.vision_v1.types.text_annotation import TextAnnotation
+from google.cloud import vision_v1 as gv
 from google.api_core.exceptions import PermissionDenied
 from google.protobuf.json_format import MessageToDict
 import json
@@ -115,7 +114,10 @@ class GoogleTR(TextRecognition):
         try:
             if __debug__: log(f'building Google vision API object for {path}')
             client  = gv.ImageAnnotatorClient()
-            context = gv.ImageContext(language_hints = ['en-t-i0-handwrit'])
+            params  = gv.TextDetectionParams(
+                mapping = { 'enable_text_detection_confidence_score': True })
+            context = gv.ImageContext(language_hints = ['en-t-i0-handwrit'],
+                                      text_detection_params = params)
             img     = gv.Image(content = image)
             if __debug__: log(f'sending image to Google for {path} ...')
             response = client.document_text_detection(image = img, image_context = context)

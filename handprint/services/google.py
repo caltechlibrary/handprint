@@ -34,20 +34,6 @@ from handprint.exceptions import *
 from handprint.services.base import TextRecognition, TRResult, TextBox
 
 
-# Internal shortcuts.
-# .............................................................................
-
-# See the following page for the meanings of these symbols:
-# https://googleapis.github.io/google-cloud-dotnet/docs/Google.Cloud.Vision.V1/api/Google.Cloud.Vision.V1.TextAnnotation.Types.DetectedBreak.Types.BreakType.html
-
-EOL_SURE_SPACE = TextAnnotation.DetectedBreak.BreakType.EOL_SURE_SPACE
-HYPHEN         = TextAnnotation.DetectedBreak.BreakType.HYPHEN
-LINE_BREAK     = TextAnnotation.DetectedBreak.BreakType.LINE_BREAK
-SPACE          = TextAnnotation.DetectedBreak.BreakType.SPACE
-SURE_SPACE     = TextAnnotation.DetectedBreak.BreakType.SURE_SPACE
-UNKNOWN        = TextAnnotation.DetectedBreak.BreakType.UNKNOWN
-
-
 # Main class.
 # .............................................................................
 
@@ -136,7 +122,6 @@ class GoogleTR(TextRecognition):
             if __debug__: log(f'received result from Google for {path}')
 
             raise_for_interrupts()
-            full_text = ''
             boxes = []
             # See this page for more information about the structure:
             # https://cloud.google.com/vision/docs/handwriting#python
@@ -149,12 +134,6 @@ class GoogleTR(TextRecognition):
                         text = ''
                         for symbol in word.symbols:
                             text += symbol.text
-                            full_text += symbol.text
-                            break_type = symbol.property.detected_break.type_
-                            if break_type in [SPACE, SURE_SPACE]:
-                                full_text += ' '
-                            elif break_type in [EOL_SURE_SPACE, LINE_BREAK]:
-                                full_text += '\n'
                         corners = corner_list(word.bounding_box.vertices)
                         if corners:
                             boxes.append(TextBox(boundingBox = corners, text = text))
@@ -162,6 +141,7 @@ class GoogleTR(TextRecognition):
                             # Something is wrong with the vertex list.
                             # Skip it and continue.
                             if __debug__: log('bad bb for {}: {}', text, bb)
+            full_text = response.full_text_annotation.text
             return TRResult(path = path, data = dict_from_response(response),
                             boxes = boxes, text = full_text, error = None)
         except google.api_core.exceptions.PermissionDenied as ex:

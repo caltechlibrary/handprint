@@ -67,9 +67,10 @@ class MicrosoftTR(TextRecognition):
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
         # Microsoft Azure documentation states the file size limit for
-        # prediction is 4 MB in the free tier.
+        # prediction is 6 MB in the free tier, but if I send a file over 5 MB
+        # it fails.  I think their real limit is 5 MB.
         # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/concept-recognizing-text
-        return 4*1024*1024
+        return 5*1024*1024
 
 
     def max_dimensions(self):
@@ -152,7 +153,7 @@ class MicrosoftTR(TextRecognition):
                                 boxes = [], error = str(error))
             elif isinstance(error, RateLimitExceeded):
                 # Pause to let the server reset its timers.  It seems that MS
-                # doesn't send back a Retry-After header when rated limited
+                # doesn't send back a Retry-After header when rate-limited
                 # during polling, but I'm going to check it anyway, in case.
                 sleep_time = 30
                 if 'Retry-After' in response.headers:

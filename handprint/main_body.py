@@ -118,7 +118,8 @@ class MainBody(object):
                ', '.join(self.services), num_targets, 's' if num_targets > 1 else '')
         if self.extended:
             inform('Will save extended results.')
-        inform(f'Will use up to {self.threads} process threads.')
+        num_threads = min(self.threads, len(self.services))
+        inform(f'Will use up to {num_threads} process threads.')
         inform(f'Will use credentials stored in {Credentials.credentials_dir()}/.')
 
         # Get to work.

@@ -67,31 +67,31 @@ disable_ssl_cert_check()
 # .............................................................................
 
 @plac.annotations(
-    add_creds  = ('add credentials file for service "A"',                 'option', 'a'),
-    base_name  = ('use base name "B" to name downloaded images',          'option', 'b'),
-    text_color = ('use color "C" for text annotations (default: red)',    'option', 'C'),
-    compare    = ('compare text results to ground truth files',           'flag',   'c'),
-    extended   = ('produce extended results (text file, JSON data)',      'flag',   'e'),
-    from_file  = ('read list of images or URLs from file "F"',            'option', 'f'),
-    no_grid    = ('do not create an all-results grid image',              'flag',   'G'),
-    list       = ('print list of known services',                         'flag',   'l'),
-    output_dir = ('write output to directory "O"',                        'option', 'o'),
-    position   = ('shift position of text annotations by x,y (see help)', 'option', 'p'),
-    quiet      = ('only print important messages while working',          'flag',   'q'),
-    relaxed    = ('make --compare use more relaxed criteria',             'flag',   'r'),
-    services   = ('invoke HTR/OCR service "S" (default: "all")',          'option', 's'),
-    threads    = ('number of threads to use (default: #cores/2)',         'option', 't'),
-    version    = ('print version info and exit',                          'flag',   'V'),
-    no_color   = ('do not colorize output printed to the terminal',       'flag',   'Z'),
-    debug      = ('write detailed trace to "OUT" ("-" means console)',    'option', '@'),
+    add_creds  = ('add credentials file for service "A"',                'option', 'a'),
+    base_name  = ('use base name "B" to name downloaded images',         'option', 'b'),
+    color_text = ('use color "C" for text annotations (default: red)',   'option', 'C'),
+    compare    = ('compare text results to ground truth files',          'flag',   'c'),
+    extended   = ('produce extended results (text file, JSON data)',     'flag',   'e'),
+    from_file  = ('read list of images or URLs from file "F"',           'option', 'f'),
+    no_grid    = ('do not create an all-results grid image',             'flag',   'G'),
+    list       = ('print list of known services',                        'flag',   'l'),
+    move_text  = ('move position of text annotations by x,y (see help)', 'option', 'm'),
+    output_dir = ('write output to directory "O"',                       'option', 'o'),
+    quiet      = ('only print important messages while working',         'flag',   'q'),
+    relaxed    = ('make --compare use more relaxed criteria',            'flag',   'r'),
+    services   = ('invoke HTR/OCR service "S" (default: "all")',         'option', 's'),
+    threads    = ('number of threads to use (default: #cores/2)',        'option', 't'),
+    version    = ('print version info and exit',                         'flag',   'V'),
+    no_color   = ('do not colorize output printed to the terminal',      'flag',   'Z'),
+    debug      = ('write detailed trace to "OUT" ("-" means console)',   'option', '@'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
 
-def main(add_creds = 'A', base_name = 'B', text_color = 'C', no_color = False,
+def main(add_creds = 'A', base_name = 'B', color_text = 'C',
          compare = False, extended = False, from_file = 'F', no_grid = False,
-         list = False, output_dir = 'O', quiet = False, relaxed = False,
-         position = 'P', services = 'S', threads = 'T', version = False,
-         debug = 'OUT', *files):
+         list = False, move_text = 'M', output_dir = 'O', quiet = False,
+         relaxed = False, services = 'S', threads = 'T', version = False,
+         no_color = False, debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -299,7 +299,7 @@ or "darkgreen".  If you use a hex value, make sure to enclose the value with
 quotes, or the shell will interpret the pound sign as a comment character.
 
 To change the position of the text annotations overlayed over the input image,
-you can use the option -p (or /p on Windows).  This takes two numbers separated
+you can use the option -S (or /S on Windows).  This takes two numbers separated
 by a comma in the form x,y.  Positive numbers move the text down and to the
 right of the default position.  The default position of each word in the
 annotated output is such that the lower left corner of the annotation is at the
@@ -425,8 +425,8 @@ Command-line arguments summary
                         output_dir = None if output_dir == 'O' else output_dir,
                         add_creds  = None if add_creds == 'A' else add_creds,
                         base_name  = 'document' if base_name == 'B' else base_name,
-                        text_color = 'red' if text_color == 'C' else text_color,
-                        text_shift = '0,0' if position == 'P' else position,
+                        text_color = 'red' if color_text == 'C' else color_text,
+                        text_shift = '0,0' if move_text == 'M' else move_text,
                         make_grid  = not no_grid,
                         extended   = extended,
                         services   = services,

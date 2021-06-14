@@ -425,7 +425,7 @@ Command-line arguments summary
                         output_dir = None if output_dir == 'O' else output_dir,
                         add_creds  = None if add_creds == 'A' else add_creds,
                         base_name  = 'document' if base_name == 'B' else base_name,
-                        text_color = 'red' if color_text == 'C' else color_text,
+                        text_color = 'red' if color_text == 'C' else color_text.lower(),
                         text_shift = '0,0' if move_text == 'M' else move_text,
                         make_grid  = not no_grid,
                         extended   = extended,

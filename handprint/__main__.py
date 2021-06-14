@@ -67,30 +67,30 @@ disable_ssl_cert_check()
 # .............................................................................
 
 @plac.annotations(
-    add_creds  = ('add credentials file for service "A"',              'option', 'a'),
-    base_name  = ('use base name "B" to name downloaded images',       'option', 'b'),
-    no_color   = ('do not colorize output printed to the terminal',    'flag',   'C'),
-    compare    = ('compare text results to ground truth files',        'flag',   'c'),
-    extended   = ('produce extended results (text file, JSON data)',   'flag',   'e'),
-    from_file  = ('read list of images or URLs from file "F"',         'option', 'f'),
-    no_grid    = ('do not create an all-results grid image',           'flag',   'G'),
-    list       = ('print list of known services',                      'flag',   'l'),
-    output_dir = ('write output to directory "O"',                     'option', 'o'),
-    quiet      = ('only print important messages while working',       'flag',   'q'),
-    relaxed    = ('make --compare use more relaxed criteria',          'flag',   'r'),
-    services   = ('invoke HTR/OCR service "S" (default: "all")',       'option', 's'),
-    threads    = ('number of threads to use (default: #cores/2)',      'option', 't'),
-    version    = ('print version info and exit',                       'flag',   'V'),
-    text_color = ('use color "X" for text annotations (default: red)', 'option', 'x'),
-    text_shift = ('shift text annotations by x,y (default: 0,0)',      'option', 'z'),
-    debug      = ('write detailed trace to "OUT" ("-" means console)', 'option', '@'),
+    add_creds  = ('add credentials file for service "A"',                 'option', 'a'),
+    base_name  = ('use base name "B" to name downloaded images',          'option', 'b'),
+    text_color = ('use color "C" for text annotations (default: red)',    'option', 'C'),
+    compare    = ('compare text results to ground truth files',           'flag',   'c'),
+    extended   = ('produce extended results (text file, JSON data)',      'flag',   'e'),
+    from_file  = ('read list of images or URLs from file "F"',            'option', 'f'),
+    no_grid    = ('do not create an all-results grid image',              'flag',   'G'),
+    list       = ('print list of known services',                         'flag',   'l'),
+    output_dir = ('write output to directory "O"',                        'option', 'o'),
+    position   = ('shift position of text annotations by x,y (see help)', 'option', 'p'),
+    quiet      = ('only print important messages while working',          'flag',   'q'),
+    relaxed    = ('make --compare use more relaxed criteria',             'flag',   'r'),
+    services   = ('invoke HTR/OCR service "S" (default: "all")',          'option', 's'),
+    threads    = ('number of threads to use (default: #cores/2)',         'option', 't'),
+    version    = ('print version info and exit',                          'flag',   'V'),
+    no_color   = ('do not colorize output printed to the terminal',       'flag',   'Z'),
+    debug      = ('write detailed trace to "OUT" ("-" means console)',    'option', '@'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
 
-def main(add_creds = 'A', base_name = 'B', no_color = False, compare = False,
-         extended = False, from_file = 'F', no_grid = False, list = False,
-         output_dir = 'O', quiet = False, relaxed = False, services = 'S',
-         threads = 'T', version = False, text_color = 'X', text_shift = 'Z',
+def main(add_creds = 'A', base_name = 'B', text_color = 'C', no_color = False,
+         compare = False, extended = False, from_file = 'F', no_grid = False,
+         list = False, output_dir = 'O', quiet = False, relaxed = False,
+         position = 'P', services = 'S', threads = 'T', version = False,
          debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
@@ -295,20 +295,14 @@ appropriately.
 Additional command-line arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Handprint will send files to the different services in parallel, using a
-number of process threads equal to 1/2 of the number of cores on the computer
-it is running on.  (E.g., if your computer has 4 cores, it will by default use
-at most 2 threads.)  The option -t (/t on Windows) can be used to change this
-number.
-
 To change the color of the text annotations overlayed over the input image,
-you can use the option -x (or /x on Windows).  You can use hex color codes
+you can use the option -C (or /C on Windows).  You can use hex color codes
 such as "#ff0000" or X11/CSS4 color names with no spaces such as "purple"
 or "darkgreen".  If you use a hex value, make sure to enclose the value with
 quotes, or the shell will interpret the pound sign as a comment character.
 
 To change the position of the text annotations overlayed over the input image,
-you can use the option -z (or /z on Windows).  This takes two numbers separated
+you can use the option -p (or /p on Windows).  This takes two numbers separated
 by a comma in the form x,y.  Positive numbers move the text down and to the
 right of the default position.  The default position of each word in the
 annotated output is such that the lower left corner of the annotation is at the
@@ -317,15 +311,18 @@ this has the effect of putting the annotation near, but above, the location of
 the (actual) word in the input image.  Using the shift option allows you to
 move the annotation if desired.
 
+Handprint will send files to the different services in parallel, using a
+number of process threads equal to 1/2 of the number of cores on the computer
+it is running on.  (E.g., if your computer has 4 cores, it will by default use
+at most 2 threads.)  The option -t (/t on Windows) can be used to change this
+number.
+
 If given the -q option (/q on Windows), Handprint will not print its usual
 informational messages while it is working.  It will only print messages
 for warnings or errors.  By default messages printed by Handprint are also
-color-coded.  If given the option -C (/C on Windows), Handprint will not color
+color-coded.  If given the option -Z (/Z on Windows), Handprint will not color
 the text of messages it prints.  (This latter option is useful when running
 Handprint within subshells inside other environments such as Emacs.)
-
-If given the -V option (/V on Windows), this program will print the version
-and other information, and exit without doing anything else.
 
 If given the -@ argument (/@ on Windows), this program will output a detailed
 trace of what it is doing.  The debug trace will be sent to the given
@@ -336,6 +333,9 @@ When -@ (or /@ on Windows) has been given, Handprint installs a signal handler
 on signal SIGUSR1 that will drop Handprint into the pdb debugger if the signal
 is sent to the running process.  It's best to use -t 1 when attempting to use
 a debugger because the subthreads will not stop running if the signal is sent.
+
+If given the -V option (/V on Windows), this program will print the version
+and other information, and exit without doing anything else.
 
 
 Return values
@@ -428,8 +428,8 @@ Command-line arguments summary
                         output_dir = None if output_dir == 'O' else output_dir,
                         add_creds  = None if add_creds == 'A' else add_creds,
                         base_name  = 'document' if base_name == 'B' else base_name,
-                        text_color = 'red' if text_color == 'X' else text_color,
-                        text_shift = '0,0' if text_shift == 'Z' else text_shift,
+                        text_color = 'red' if text_color == 'C' else text_color,
+                        text_shift = '0,0' if position == 'P' else position,
                         make_grid  = not no_grid,
                         extended   = extended,
                         services   = services,

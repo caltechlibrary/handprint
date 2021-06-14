@@ -140,17 +140,24 @@ The image paths or URLs can be supplied in any of the following ways:
 
 If given URLs, Handprint will first download the images found at the URLs to
 a local directory indicated by the option -o (/o on Windows).  Handprint can
-accept input images in JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF formats.  To
-make the results from different services more easily comparable, Handprint
+accept input images in JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF formats.
+
+To make the results from different services more easily comparable, Handprint
 will always convert all input images to the same format (PNG) no matter if
 some services may accept other formats; it will also resize input images to
 the smallest size accepted by any of the services invoked if an image exceeds
 that size.  (For example, if service A accepts files up to 10 MB in size and
 service B accepts files up to 5 MB, all input images will be resized to 5 MB
 before sending them to A and B, even if A could accept a higher-resolution
-image.)  In addition, a limitation of Handprint's current PDF support is that
-only the first image in a PDF file is read -- if a PDF file contains
-more than one image, the remaining images are ignored.
+image.)  Finally, if the input contains more than one page (e.g., in a PDF
+file), Handprint will only use the first page and ignore the remaining pages.
+
+Be aware that resizing images to the lowest common size means that the text
+recognition results returned by some services may be different than if the
+original full-size input image had been sent to that service.  If your images
+the smallest size (currently 5 MB) when converted to PNG, then you may wish
+to compare the results of using multiple services at once versus using the
+services one at a time.
 
 The default action is to run all known services.  The option -s (/s on
 Windows) can be used to select only one service or a list of services
@@ -210,16 +217,6 @@ The files will written to the directory indicated by -o, or (if -o is not
 used) the directory where "somefile" is located.  When -o is not used and
 the input images are given as URLs, then the files are written to the current
 working directory instead.
-
-If an image is too large for any of the services invoked, then Handprint will
-resize it prior to sending the image to any of the services (as noted above).
-It will write the reduced image to a file named "FILENAME.handprint.EXT", where
-"FILENAME" is the original file name and "EXT" is the file extension.  This
-file is normally deleted, unless you use the -e option (/e on Windows)
-mentioned above, in which case you will find this additional file in the same
-location as the others:
-
-  somefile.handprint.png
 
 When the inputs are URLs, Handprint must download a copy of the image located
 at the network address (because it is not possible to write the results in

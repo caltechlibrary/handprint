@@ -185,6 +185,12 @@ class Manager:
             for file in set(image.temp_files | {r.annotated for r in results}):
                 if file and path.exists(file):
                     delete_existing(file)
+        if image.file != image.item_file:
+            # Delete the resized file.  While it would help efficiency to
+            # reuse it on subsequent runs, the risk is that those runs might
+            # target different services and would end up using a different-
+            # sized image than if we sized it appropriately for _this_ run.
+            delete_existing(image.file)
 
         inform(f'Done with {relative(item)}')
 

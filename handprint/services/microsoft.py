@@ -106,7 +106,7 @@ class MicrosoftTR(TextRecognition):
 
         key = self._credentials['subscription_key']
         endpoint = self._credentials['endpoint']
-        url = f'{endpoint}/vision/v3.0/read/analyze'
+        url = f'{endpoint}/vision/v3.2/read/analyze'
         headers = {'Ocp-Apim-Subscription-Key': key,
                    'Content-Type': 'application/octet-stream'}
 

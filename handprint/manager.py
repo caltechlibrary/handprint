@@ -9,7 +9,7 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+Copyright (c) 2018-2021 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
@@ -185,7 +185,7 @@ class Manager:
             for file in set(image.temp_files | {r.annotated for r in results}):
                 if file and path.exists(file):
                     delete_existing(file)
-        if image.file != image.item_file:
+        elif image.file != image.item_file:
             # Delete the resized file.  While it would help efficiency to
             # reuse it on subsequent runs, the risk is that those runs might
             # target different services and would end up using a different-

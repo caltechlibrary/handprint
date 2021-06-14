@@ -54,8 +54,8 @@ class AmazonTR(TextRecognition):
 
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
-        # https://docs.aws.amazon.com/textract/latest/dg/limits.html
-        return 5*1024*1024
+        # https://docs.aws.amazon.com/textract/latest/dg/textract-dg.pdf#limits
+        return 10*1024*1024
 
 
     def max_dimensions(self):

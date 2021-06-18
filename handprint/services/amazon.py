@@ -28,7 +28,7 @@ import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials
 from handprint.exceptions import *
 from handprint.network import net
-from handprint.services.base import TextRecognition, TRResult, TextBox
+from handprint.services.base import TextRecognition, TRResult, Box
 
 
 # Main class.
@@ -109,15 +109,17 @@ class AmazonTR(TextRecognition):
             for block in response[response_key]:
                 if value_key not in block:
                     continue
-                if block[value_key] == "WORD":
+                kind = block[value_key].lower()
+                if kind in ['word', 'line']:
                     text = block[block_key]
                     corners = corner_list(block['Geometry']['Polygon'], width, height)
                     if corners:
-                        boxes.append(TextBox(boundingBox = corners, text = text))
+                        boxes.append(Box(kind = kind, bb = corners, text = text,
+                                         score = block['Confidence'] / 100))
                     else:
                         # Something's wrong with the vertex list. Skip & continue.
                         if __debug__: log('bad bb for {}: {}', text, bb)
-                elif block[value_key] == "LINE":
+                if kind == "line":
                     if 'Text' in block:
                         full_text += block['Text'] + '\n'
                     elif 'DetectedText' in block:

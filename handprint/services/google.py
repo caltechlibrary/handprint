@@ -30,7 +30,7 @@ if __debug__:
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
 from handprint.exceptions import *
-from handprint.services.base import TextRecognition, TRResult, TextBox
+from handprint.services.base import TextRecognition, TRResult, Box
 
 
 # Main class.
@@ -132,13 +132,16 @@ class GoogleTR(TextRecognition):
             for block in response.full_text_annotation.pages[0].blocks:
                 for para in block.paragraphs:
                     corners = corner_list(para.bounding_box.vertices)
+                    boxes.append(Box(bb = corners, kind = 'para', text = '',
+                                     score = para.confidence))
                     for word in para.words:
                         text = ''
                         for symbol in word.symbols:
                             text += symbol.text
                         corners = corner_list(word.bounding_box.vertices)
                         if corners:
-                            boxes.append(TextBox(boundingBox = corners, text = text))
+                            boxes.append(Box(bb = corners, kind = 'word',
+                                             text = text, score = para.confidence))
                         else:
                             # Something is wrong with the vertex list.
                             # Skip it and continue.

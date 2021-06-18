@@ -2,13 +2,28 @@
 
 ## Version 1.5.0
 
-Changes in this release:
+This version contains many additions and some important bugs in the extended output (i.e., using the `-e` flag) for Google and Amazon. If you use Handprint, you should definitely update to this version.
+
+All changes in this release:
 
 * The default branch on GitHub has been changed from `master` to `main`. **If you have clones or forks of this repo**, please see GitHub's [instructions for updating a local clone after a branch name change](https://docs.github.com/en/github/administering-a-repository/managing-branches-in-your-repository/renaming-a-branch#updating-a-local-clone-after-a-branch-name-changes).
-* Most dependencies in [`requirements.txt`](requirements.txt) have been updated to the latest versions.
-* Fixed issue #21: Dependabot security warning for `urllib3` package.
+* The styling of text annotations has changed: the text boxes overlaid on images no longer have borders, so that they are easier to read, especially when bounding boxes are displayed using the `-d` option (see below).
+* A new command-line option, `-d` (short for `--display`), lets users choose to display the bounding boxes of text, lines, and paragraphs (if the service supports these), in addition to or instead of the recognized text.
+* A new command-line option, `-n` (short for `--confidence`), allows users to apply a threshold to the confidence values returned for individual results, such that only results having confidence scores above a given value are shown in the output.
+* A new command-line option, `-m`, (short for `--text-move`) lets users to adjust the position of the text annotations overlaid on input images. This takes two numbers separated by a comma in the form `x,y`.  Positive numbers move the text rightward and upward compared to the default position.
+* A new command-line option, `-x`, (short for `--text-color`) allows users change the color of the text annotations overlaid on input images.
+* A new command-line option, `-z`, (short for `--text-size`) lets users change the font size of the text annotations overlaid on input images.
+* The extended data (via option `-e`) from Google now includes the confidence scores enabled using the option [`enable_text_detection_confidence_score`](https://googleapis.github.io/google-cloud-dotnet/docs/Google.Cloud.Vision.V1/api/Google.Cloud.Vision.V1.TextDetectionParams.html) in the Google Vision API.
+* Handprint no longer leaves resized versions of input images when the `-e` option is being used.  Previously, images of the form `somefile.handprint.png` were left around for `somefile.png` so that subsequent runs were saved the time of resizing the image (if resizing was needed).  However, this meant that subsequent runs would reuse the image even if the chosen destination services were different than in the run that produced the resized image, which meant that the subsequent runs might be using an unnecessarily small version of the image.  To eliminate this risk, Handprint now deletes the resized image, even though this means repeated runs on the same image may require repeated resizing operations.
+* Fixed issue #27: the Google JSON output was not proper JSON.
+* Fixed issue #26: the extended output for Amazon services was one long line instead of being split into lines as is done for the other services. This now works.
+* Fixed issue #25: the extended output for Google in Handprint version 1.4.0 produced an empty text file. It now produces text.
 * Fixed issue #24: use CommonPy functions instead of keeping separate versions of the same functions. Internally, a number of common utility functions originally written in part for Handprint have been moved to a separate new Python package, [Commonpy](https://github.com/caltechlibrary/commonpy), and the Handprint code has been refactored to use the package instead of its own copies of the functions.
-* Fixed problems in the implementation of the base class for handrecognition services.
+* Fixed issue #23: updated service adapters to use the latest API versions of the services (specifically for the Microsoft API).
+* Fixed issue #21: fixed Dependabot security warning for the `urllib3` package.
+* Fixed issue #3: Microsoft API sometimes returned HTTP code 400; I rewrote the Handprint adapter code to handle errors more carefully and bubble up any unhandled errors so that users can see what they are.
+* Fixed problems in the implementation of the base class for handwritten recognition services.
+* Most dependencies in [`requirements.txt`](requirements.txt) have been updated to the latest versions, and some new dependencies have been added.
 * Various minor internal code cleanups have been made.
 * The copyright year has been updated.
 

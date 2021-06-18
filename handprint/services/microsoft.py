@@ -18,6 +18,8 @@ file "LICENSE" for more information.
 '''
 
 from   commonpy.interrupt import raise_for_interrupts, wait
+from   commonpy.file_utils import relative
+import json
 import os
 import sys
 
@@ -28,7 +30,7 @@ import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
 from handprint.exceptions import *
 from handprint.network import net
-from handprint.services.base import TextRecognition, TRResult, TextBox
+from handprint.services.base import TextRecognition, TRResult, Box
 
 
 # Main class.
@@ -67,10 +69,9 @@ class MicrosoftTR(TextRecognition):
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
         # Microsoft Azure documentation states the file size limit for
-        # prediction is 6 MB in the free tier, but if I send a file over 5 MB
-        # it fails.  I think their real limit is 5 MB.
-        # https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/concept-recognizing-text
-        return 5*1024*1024
+        # prediction is 6 MB in the free tier, but the real limit is 4 MB,
+        # which you will discover if you try to use something larger than 4 MB.
+        return 4*1024*1024
 
 
     def max_dimensions(self):
@@ -104,102 +105,74 @@ class MicrosoftTR(TextRecognition):
         if error:
             return error
 
-        key = self._credentials['subscription_key']
         endpoint = self._credentials['endpoint']
+        key = self._credentials['subscription_key']
         url = f'{endpoint}/vision/v3.2/read/analyze'
         headers = {'Ocp-Apim-Subscription-Key': key,
                    'Content-Type': 'application/octet-stream'}
 
-        # The Microsoft API for extracting text requires two phases: one call
-        # to submit the image for processing, then polling to wait until the
-        # text is ready to be retrieved.
+        # The Microsoft API requires 2 phases: first submit the image for
+        # processing, then wait & poll until the text is ready to be retrieved.
 
-        if __debug__: log('sending file to MS cloud service')
-        response, error = net('post', url, headers = headers, data = image)
-        if isinstance(error, NetworkFailure):
-            if __debug__: log('network exception: {}', str(error))
-            return TRResult(path = path, data = {}, text = '', error = str(error))
-        elif isinstance(error, RateLimitExceeded):
-            # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits
-            # The headers should have a Retry-After number in seconds.
-            sleep_time = 30
-            if 'Retry-After' in response.headers:
-                sleep_time = int(response.headers['Retry-After'])
-            if __debug__: log('sleeping for {} s and retrying', sleep_time)
-            wait(sleep_time)
-            return self.result(path)    # Recursive invocation
-        elif error:
-            raise error
+        if __debug__: log(f'contacting Microsoft for {relative(path)}')
+        response = self._net('post', url, headers, image)
+        if isinstance(response, tuple):
+            return response             # If get back a tuple, it's an error.
 
         if 'Operation-Location' in response.headers:
-            polling_url = response.headers['Operation-Location']
+            poll_url = response.headers['Operation-Location']
         else:
             if __debug__: log('no operation-location in response headers')
             raise ServiceFailure('Unexpected response from Microsoft server')
-
         if __debug__: log('polling MS for results ...')
         analysis = {}
         poll = True
         while poll:
             raise_for_interrupts()
-            # I never have seen results returned in 1 second, and meanwhile
-            # the repeated polling counts against your rate limit.  So, wait
-            # for 2 s to reduce the number of calls.
+            # Have never seen results returned in 1 s, and meanwhile, polling
+            # still counts against our rate limit.  Wait 2 s to reduce calls.
             wait(2)
-            response, error = net('get', polling_url, polling = True, headers = headers)
-            if isinstance(error, NetworkFailure):
-                if __debug__: log('network exception: {}', str(error))
-                return TRResult(path = path, data = {}, text = '',
-                                boxes = [], error = str(error))
-            elif isinstance(error, RateLimitExceeded):
-                # Pause to let the server reset its timers.  It seems that MS
-                # doesn't send back a Retry-After header when rate-limited
-                # during polling, but I'm going to check it anyway, in case.
-                sleep_time = 30
-                if 'Retry-After' in response.headers:
-                    sleep_time = int(response.headers['Retry-After'])
-                if __debug__: log('sleeping for {} s and retrying', sleep_time)
-                wait(sleep_time)
-            elif error:
-                raise error
+            response = self._net('get', poll_url, headers = headers, polling = True)
+            if isinstance(response, tuple):
+                return response         # If get back a tuple, it's an error.
 
-            # Sometimes the response comes back without content.  I don't know
-            # if that's a bug in the Azure system or not.  It's not clear what
-            # else should be done except keep going.
-            if response.text:
-                analysis = response.json()
-                if 'status' in analysis:
-                    if analysis['status'] in ('notStarted', 'running'):
-                        if __debug__: log('Microsoft still processing image')
-                        poll = True
-                    elif analysis['status'] == 'succeeded':
-                        if __debug__: log('Microsoft returned success code')
-                        poll = False
-                    elif analysis['status'] == 'failed':
+            # Sometimes the response has no content.  I don't know why.
+            # It's not clear what else can be done except to keep trying.
+            if not response.text:
+                if __debug__: log('received empty result from Microsoft.')
+                continue
+
+            analysis = response.json()
+            if 'status' in analysis:
+                if analysis['status'] in ('notStarted', 'running'):
+                    if __debug__: log('Microsoft still processing image')
+                    poll = True
+                elif analysis['status'] == 'succeeded':
+                    if __debug__: log('Microsoft returned success code')
+                    poll = False
+                else:
+                    if analysis['status'] == 'failed':
                         text = 'Microsoft analysis failed'
-                        return TRResult(path = path, data = {}, text = '',
-                                        boxes = [], error = text)
                     else:
                         text = 'Error: Microsoft returned unexpected result'
-                        return TRResult(path = path, data = {}, text = '',
-                                        boxes = [], error = text)
-                else:
-                    # No status key in JSON results means something's wrong.
-                    text = 'Error: Microsoft results not in expected format'
                     return TRResult(path = path, data = {}, text = '',
                                     boxes = [], error = text)
             else:
-                if __debug__: log('received empty result from Microsoft.')
+                # No status key in JSON results means something's wrong.
+                text = 'Error: Microsoft results not in expected format'
+                return TRResult(path = path, data = {}, text = '',
+                                boxes = [], error = text)
 
-        if __debug__: log('results received.')
-        # Have to extract the text into a single string.
+        if __debug__: log(f'results received from Microsoft for {relative(path)}')
+        lines = []
         full_text = ''
         if 'analyzeResult' in analysis:
             results = analysis['analyzeResult']
             if 'readResults' in results:
                 # We only return the 1st page.  FIXME: should check if > 1.
                 lines = results['readResults'][0]['lines']
-                sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1], x['boundingBox'][0]))
+                sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1],
+                                                              x['boundingBox'][0]))
                 full_text = '\n'.join(x['text'] for x in sorted_lines)
 
         # Create our particular box structure for annotations.  The Microsoft
@@ -207,10 +180,50 @@ class MicrosoftTR(TextRecognition):
         # a list of dict with keys 'words', 'boundingBox', and 'text'.
 
         boxes = []
-        for chunk in lines:
-            for word in chunk['words']:
-                boxes.append(TextBox(boundingBox = word['boundingBox'], text = word['text']))
+        for line in lines:
+            # Microsoft doesn't put confidence scores on the lines.
+            boxes.append(Box(kind = 'line', bb = line['boundingBox'], text = '',
+                             score = 1.0))
+            for word in line['words']:
+                boxes.append(Box(kind = 'word', bb = word['boundingBox'],
+                                 text = word['text'], score = word['confidence']))
 
         # Put it all together.
         return TRResult(path = path, data = analysis, text = full_text,
                         boxes = boxes, error = None)
+
+
+    def _net(self, get_or_post, url, headers, data = None, polling = False):
+        response, error = net(get_or_post, url, headers = headers,
+                              data = data, polling = polling)
+        if isinstance(error, NetworkFailure):
+            if __debug__: log('network exception: {}', str(error))
+            return TRResult(path = path, data = {}, text = '', error = str(error))
+        elif isinstance(error, RateLimitExceeded):
+            # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits
+            # The headers have a Retry-After number in seconds in some cases
+            # but not others, so we default to something just in case.
+            sleep_time = 20
+            if 'Retry-After' in response.headers:
+                sleep_time = int(response.headers['Retry-After'])
+            if __debug__: log('sleeping for {} s and retrying', sleep_time)
+            wait(sleep_time)
+            return self._net(get_or_post, url, headers, data, polling) # Recurse
+        elif error:
+            if isinstance(error, ServiceFailure):
+                # If it was an error generated by the Microsoft service, there
+                # will be additional details in the response.  Check for it.
+                try:
+                    json_response = response.json()
+                    if json_response and json_response.get('error', None):
+                        error = json_response['error']
+                        if 'code' in error:
+                            code = error['code']
+                            message = error['message']
+                            raise ServiceFailure('Microsoft returned error code '
+                                                 + code + ' -- ' + message)
+                except:
+                    pass
+            raise error
+        else:
+            return response

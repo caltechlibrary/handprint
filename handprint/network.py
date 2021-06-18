@@ -2,6 +2,7 @@
 network.py: miscellaneous network utilities for Handprint.
 '''
 
+from   commonpy.interrupt import interrupted, wait
 import http.client
 from   http.client import responses as http_responses
 import os
@@ -20,7 +21,6 @@ if __debug__:
 
 import handprint
 from   handprint.exceptions import *
-from   handprint.interruptions import wait, interrupted
 from   handprint.ui import inform, alert, warn
 
 

@@ -15,7 +15,8 @@ PROGRAMS_NEEDED = curl gh git jq sed
 TEST := $(foreach p,$(PROGRAMS_NEEDED),\
 	  $(if $(shell which $(p)),_,$(error Cannot find program "$(p)")))
 
-# Gather values that we need further below.
+
+# Gather values that we need ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 $(info Gathering data -- this takes a few moments ...)
 
@@ -39,7 +40,8 @@ tmp_file  := $(shell mktemp /tmp/release-notes-$(name).XXXXXX)
 
 $(info Gathering data ... Done.)
 
-# The main action is "make release".
+
+# make release ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 release: | test-branch release-on-github print-instructions
 
@@ -63,7 +65,8 @@ edited := codemeta.json $(init_file)
 
 check-in-updated-files:;
 	git add $(edited)
-	git diff-index --quiet HEAD $(edited) || git commit -m"Update version" $(edited)
+	git diff-index --quiet HEAD $(edited) || \
+	    git commit -m"Update stored version number" $(edited)
 
 release-on-github: | update-init-file update-codemeta-file check-in-updated-files
 	git push -v --all
@@ -80,7 +83,7 @@ print-instructions:;
 	$(info ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓)
 	$(info ┃ Next steps:                                                        ┃)
 	$(info ┃ 1. Visit https://github.com/$(repo)/releases )
-	$(info ┃ 2. Double-check the draft release, and click "Publish" if ready    ┃)
+	$(info ┃ 2. Double-check the release                                        ┃)
 	$(info ┃ 3. Wait a few seconds to let web services do their work            ┃)
 	$(info ┃ 4. Run "make update-doi" to update the DOI in README.md            ┃)
 	$(info ┃ 5. Run "make create-dist" and check the distribution for problems  ┃)
@@ -91,23 +94,39 @@ print-instructions:;
 	@echo ""
 
 update-doi: 
-	sed -i .bak -e 's|DOI-.*-blue|DOI-$(doi)-blue|' README.md
-	sed -i .bak -e 's|caltech.edu/records/[0-9]\{1,\}|caltech.edu/records/$(doi_tail)|' README.md
+	sed -i .bak -e 's|/api/record/[0-9]\{1,\}|/api/record/$(doi_tail)|' README.md
+	sed -i .bak -e 's|edu/records/[0-9]\{1,\}|edu/records/$(doi_tail)|' README.md
 	git add README.md
-	git diff-index --quiet HEAD README.md || git commit -m"Update DOI" README.md && git push -v --all
+	git diff-index --quiet HEAD README.md || \
+	    (git commit -m"Update DOI" README.md && git push -v --all)
 
 create-dist: clean
 	python3 setup.py sdist bdist_wheel
 	python3 -m twine check dist/*
 
 test-pypi: create-dist
-	python3 -m twine upload --verbose --repository-url https://test.pypi.org/legacy/ dist/*
+	python3 -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*
 
 pypi: create-dist
-	python3 -m twine upload --verbose dist/*
+	python3 -m twine upload dist/*
 
-clean:;
-	-rm -rf dist build $(name).egg-info
+
+# Cleanup and miscellaneous directives ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+clean: clean-dist clean-build clean-release clean-other
+
+clean-dist:;
+	-rm -fr dist/$(name) dist/$(name)-$(version).tar.gz \
+	    dist/$(name)-$(version)-py3-none-any.whl __pycache__ .eggs
+
+clean-build:;
+	-rm -rf build
+
+clean-release:;
+	-rm -rf $(name).egg-info codemeta.json.bak $(init_file).bak README.md.bak
+
+clean-other:;
+	-rm -fr $(name)/__pycache__
 
 .PHONY: release release-on-github update-init-file update-codemeta-file \
 	print-instructions create-dist clean test-pypi pypi

@@ -9,15 +9,19 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+Copyright (c) 2018-2021 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   commonpy.interrupt import raise_for_interrupts
+from   commonpy.file_utils import filename_extension, filename_basename
+from   commonpy.file_utils import files_in_directory, readable, writable
 import os
 from   os import path
 import shutil
 import sys
+from   validator_collection.checkers import is_url
 
 if __debug__:
     from sidetrack import set_debug, log, logr
@@ -27,10 +31,6 @@ from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.credentials import Credentials
 from handprint.exceptions import *
 from handprint.exit_codes import ExitCode
-from handprint.files import filename_extension, filename_basename
-from handprint.files import files_in_directory, filter_by_extensions
-from handprint.files import readable, writable, is_url
-from handprint.interruptions import interrupt, interrupted, raise_for_interrupts
 from handprint.manager import Manager
 from handprint.network import network_available, disable_ssl_cert_check
 from handprint.services import ACCEPTED_FORMATS, services_list
@@ -48,6 +48,7 @@ class MainBody(object):
 
         # Assign parameters to self to make them available within this object.
         for key, value in kwargs.items():
+            if __debug__: log(f'parameter value self.{key} = {value}')
             setattr(self, key, value)
 
         # We expose an attribute "exception" that callers can use to find out
@@ -57,23 +58,9 @@ class MainBody(object):
         # The manager object manages the process of manipulating images and
         # sending them to the services.
         self._manager = Manager(self.services, self.threads, self.output_dir,
-                                self.make_grid, self.compare, self.extended)
-
-        # On Windows, in Python 3.6+, ^C in a terminal window does not stop
-        # execution (at least in my environment).  The following function
-        # creates a closure with the worker object so that stop() can be called.
-        if sys.platform == "win32":
-            if __debug__: log('installing ctrl_handler for Windows')
-
-            # This is defined here because we need the value of worker.ident.
-            def ctrl_handler(event, *args):
-                if __debug__: log('Keyboard interrupt received')
-                warn('Received ^C.')
-                interrupt()
-                self.stop()
-
-            import win32api
-            win32api.SetConsoleCtrlHandler(ctrl_handler, True)
+                                self.make_grid, self.compare, self.extended,
+                                self.text_size, self.text_color, self.text_shift,
+                                self.display, self.confidence)
 
 
     def run(self):
@@ -83,12 +70,6 @@ class MainBody(object):
         try:
             self._do_preflight()
             self._do_main_work()
-        except (KeyboardInterrupt, UserCancelled) as ex:
-            # This is the place where we land when Handprint receives a ^C.
-            if __debug__: log(f'got {type(ex).__name__}')
-            interrupt()
-            self.stop()
-            self.exception = sys.exc_info()
         except Exception as ex:
             if __debug__: log(f'exception in main body: {str(ex)}')
             self.exception = sys.exc_info()
@@ -138,7 +119,8 @@ class MainBody(object):
                ', '.join(self.services), num_targets, 's' if num_targets > 1 else '')
         if self.extended:
             inform('Will save extended results.')
-        inform(f'Will use up to {self.threads} process threads.')
+        num_threads = min(self.threads, len(self.services))
+        inform(f'Will use up to {num_threads} process threads.')
         inform(f'Will use credentials stored in {Credentials.credentials_dir()}/.')
 
         # Get to work.

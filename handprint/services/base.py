@@ -9,19 +9,17 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+Copyright (c) 2018-2021 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-from collections import namedtuple
+from   collections import namedtuple
+from   commonpy.file_utils import readable
 import imagesize
 
 if __debug__:
     from sidetrack import set_debug, log, logr
-
-import handprint
-from handprint.files import readable
 
 
 # Named tuple definitions.
@@ -36,10 +34,12 @@ TRResult.__doc__ = '''Results of invoking a text recognition service.
   'error' is None if no error occurred, or the text of any error messages
 '''
 
-TextBox = namedtuple('TextBox', 'text boundingBox')
-TextBox.__doc__ = '''Representation of a single bounding box and text therein.
-  'box' is the bounding box, as XY coordinates of corners starting with u.l.
-  'text' is the text
+Box = namedtuple('Box', 'kind bb text score')
+Box.__doc__ = '''Representation of a single box, possibly containing text.
+  'kind' is the type; this can be "word", "line", "paragraph".
+  'bb' is the bounding box, as XY coordinates of corners starting with u.l.
+  'text' is text (when the box contains text).
+  'score' is the confidence score given to this item by the service.
 '''
 
 

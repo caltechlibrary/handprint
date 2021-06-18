@@ -9,17 +9,17 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+Copyright (c) 2018-2021 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   commonpy.interrupt import raise_for_interrupts
 import io
 import math
 import os
-from os import path
 import google
-from google.cloud import vision as gv
+from google.cloud import vision_v1 as gv
 from google.api_core.exceptions import PermissionDenied
 from google.protobuf.json_format import MessageToDict
 import json
@@ -30,8 +30,7 @@ if __debug__:
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials
 from handprint.exceptions import *
-from handprint.interruptions import interrupted, raise_for_interrupts
-from handprint.services.base import TextRecognition, TRResult, TextBox
+from handprint.services.base import TextRecognition, TRResult, Box
 
 
 # Main class.
@@ -115,14 +114,16 @@ class GoogleTR(TextRecognition):
         try:
             if __debug__: log(f'building Google vision API object for {path}')
             client  = gv.ImageAnnotatorClient()
-            context = gv.ImageContext(language_hints = ['en-t-i0-handwrit'])
+            params  = gv.TextDetectionParams(
+                mapping = { 'enable_text_detection_confidence_score': True })
+            context = gv.ImageContext(language_hints = ['en-t-i0-handwrit'],
+                                      text_detection_params = params)
             img     = gv.Image(content = image)
             if __debug__: log(f'sending image to Google for {path} ...')
             response = client.document_text_detection(image = img, image_context = context)
             if __debug__: log(f'received result from Google for {path}')
 
             raise_for_interrupts()
-            full_text = ''
             boxes = []
             # See this page for more information about the structure:
             # https://cloud.google.com/vision/docs/handwriting#python
@@ -131,19 +132,22 @@ class GoogleTR(TextRecognition):
             for block in response.full_text_annotation.pages[0].blocks:
                 for para in block.paragraphs:
                     corners = corner_list(para.bounding_box.vertices)
+                    boxes.append(Box(bb = corners, kind = 'para', text = '',
+                                     score = para.confidence))
                     for word in para.words:
                         text = ''
                         for symbol in word.symbols:
                             text += symbol.text
                         corners = corner_list(word.bounding_box.vertices)
                         if corners:
-                            boxes.append(TextBox(boundingBox = corners, text = text))
+                            boxes.append(Box(bb = corners, kind = 'word',
+                                             text = text, score = para.confidence))
                         else:
                             # Something is wrong with the vertex list.
                             # Skip it and continue.
                             if __debug__: log('bad bb for {}: {}', text, bb)
-
-            return TRResult(path = path, data = json_from_response(response),
+            full_text = response.full_text_annotation.text
+            return TRResult(path = path, data = dict_from_response(response),
                             boxes = boxes, text = full_text, error = None)
         except google.api_core.exceptions.PermissionDenied as ex:
             text = 'Authentication failure for Google service -- {}'.format(ex)

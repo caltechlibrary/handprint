@@ -9,11 +9,12 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+Copyright (c) 2018-2021 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   commonpy.file_utils import readable
 import json
 import os
 from   os import path
@@ -21,7 +22,6 @@ from   sidetrack import log
 
 import handprint
 from handprint.exceptions import *
-from handprint.files import readable
 
 from .base import Credentials
 from .credentials_files import credentials_filename

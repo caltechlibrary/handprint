@@ -1,0 +1,5512 @@
+{
+  "analyzeResult": {
+    "readResults": [
+      {
+        "angle": -0.0262,
+        "height": 1792,
+        "lines": [
+          {
+            "boundingBox": [
+              253,
+              174,
+              1349,
+              174,
+              1349,
+              215,
+              253,
+              216
+            ],
+            "text": "is the experimental approach, though some theoretical",
+            "words": [
+              {
+                "boundingBox": [
+                  254,
+                  174,
+                  303,
+                  175,
+                  303,
+                  216,
+                  254,
+                  216
+                ],
+                "confidence": 0.982,
+                "text": "is"
+              },
+              {
+                "boundingBox": [
+                  311,
+                  175,
+                  387,
+                  176,
+                  387,
+                  216,
+                  311,
+                  216
+                ],
+                "confidence": 0.981,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  401,
+                  176,
+                  647,
+                  178,
+                  648,
+                  217,
+                  400,
+                  216
+                ],
+                "confidence": 0.939,
+                "text": "experimental"
+              },
+              {
+                "boundingBox": [
+                  669,
+                  178,
+                  856,
+                  178,
+                  857,
+                  217,
+                  669,
+                  217
+                ],
+                "confidence": 0.839,
+                "text": "approach,"
+              },
+              {
+                "boundingBox": [
+                  864,
+                  178,
+                  1002,
+                  178,
+                  1004,
+                  216,
+                  865,
+                  217
+                ],
+                "confidence": 0.981,
+                "text": "though"
+              },
+              {
+                "boundingBox": [
+                  1026,
+                  178,
+                  1140,
+                  177,
+                  1142,
+                  215,
+                  1028,
+                  216
+                ],
+                "confidence": 0.983,
+                "text": "some"
+              },
+              {
+                "boundingBox": [
+                  1156,
+                  177,
+                  1346,
+                  175,
+                  1349,
+                  214,
+                  1159,
+                  215
+                ],
+                "confidence": 0.832,
+                "text": "theoretical"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              252,
+              224,
+              365,
+              224,
+              365,
+              255,
+              252,
+              255
+            ],
+            "text": "issues",
+            "words": [
+              {
+                "boundingBox": [
+                  254,
+                  224,
+                  365,
+                  225,
+                  365,
+                  255,
+                  253,
+                  255
+                ],
+                "confidence": 0.981,
+                "text": "issues"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              386,
+              218,
+              915,
+              220,
+              915,
+              258,
+              386,
+              254
+            ],
+            "text": "are probably still cloudy .",
+            "words": [
+              {
+                "boundingBox": [
+                  396,
+                  224,
+                  458,
+                  221,
+                  456,
+                  254,
+                  395,
+                  252
+                ],
+                "confidence": 0.956,
+                "text": "are"
+              },
+              {
+                "boundingBox": [
+                  485,
+                  221,
+                  646,
+                  219,
+                  645,
+                  257,
+                  484,
+                  254
+                ],
+                "confidence": 0.981,
+                "text": "probably"
+              },
+              {
+                "boundingBox": [
+                  685,
+                  219,
+                  770,
+                  220,
+                  769,
+                  258,
+                  684,
+                  257
+                ],
+                "confidence": 0.98,
+                "text": "still"
+              },
+              {
+                "boundingBox": [
+                  793,
+                  220,
+                  889,
+                  223,
+                  888,
+                  258,
+                  791,
+                  258
+                ],
+                "confidence": 0.887,
+                "text": "cloudy"
+              },
+              {
+                "boundingBox": [
+                  895,
+                  224,
+                  915,
+                  224,
+                  913,
+                  258,
+                  893,
+                  258
+                ],
+                "confidence": 0.981,
+                "text": "."
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              371,
+              257,
+              1355,
+              256,
+              1355,
+              297,
+              371,
+              298
+            ],
+            "text": "In biology my knowledge is weaker still, but I",
+            "words": [
+              {
+                "boundingBox": [
+                  391,
+                  259,
+                  454,
+                  260,
+                  451,
+                  297,
+                  389,
+                  297
+                ],
+                "confidence": 0.985,
+                "text": "In"
+              },
+              {
+                "boundingBox": [
+                  479,
+                  260,
+                  612,
+                  261,
+                  610,
+                  297,
+                  477,
+                  297
+                ],
+                "confidence": 0.949,
+                "text": "biology"
+              },
+              {
+                "boundingBox": [
+                  637,
+                  261,
+                  697,
+                  261,
+                  695,
+                  297,
+                  635,
+                  297
+                ],
+                "confidence": 0.985,
+                "text": "my"
+              },
+              {
+                "boundingBox": [
+                  722,
+                  261,
+                  915,
+                  261,
+                  913,
+                  298,
+                  720,
+                  298
+                ],
+                "confidence": 0.962,
+                "text": "knowledge"
+              },
+              {
+                "boundingBox": [
+                  925,
+                  261,
+                  985,
+                  260,
+                  984,
+                  298,
+                  923,
+                  298
+                ],
+                "confidence": 0.981,
+                "text": "is"
+              },
+              {
+                "boundingBox": [
+                  997,
+                  260,
+                  1133,
+                  259,
+                  1132,
+                  298,
+                  996,
+                  298
+                ],
+                "confidence": 0.979,
+                "text": "weaker"
+              },
+              {
+                "boundingBox": [
+                  1140,
+                  259,
+                  1238,
+                  258,
+                  1237,
+                  298,
+                  1139,
+                  298
+                ],
+                "confidence": 0.943,
+                "text": "still,"
+              },
+              {
+                "boundingBox": [
+                  1245,
+                  258,
+                  1321,
+                  257,
+                  1320,
+                  298,
+                  1245,
+                  298
+                ],
+                "confidence": 0.986,
+                "text": "but"
+              },
+              {
+                "boundingBox": [
+                  1331,
+                  257,
+                  1356,
+                  256,
+                  1355,
+                  298,
+                  1330,
+                  298
+                ],
+                "confidence": 0.986,
+                "text": "I"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              246,
+              300,
+              703,
+              299,
+              703,
+              333,
+              246,
+              335
+            ],
+            "text": "must nevertheless outline",
+            "words": [
+              {
+                "boundingBox": [
+                  267,
+                  303,
+                  344,
+                  301,
+                  344,
+                  334,
+                  267,
+                  333
+                ],
+                "confidence": 0.982,
+                "text": "must"
+              },
+              {
+                "boundingBox": [
+                  363,
+                  301,
+                  550,
+                  300,
+                  550,
+                  335,
+                  363,
+                  335
+                ],
+                "confidence": 0.933,
+                "text": "nevertheless"
+              },
+              {
+                "boundingBox": [
+                  582,
+                  300,
+                  704,
+                  301,
+                  704,
+                  331,
+                  582,
+                  334
+                ],
+                "confidence": 0.979,
+                "text": "outline"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              707,
+              306,
+              1062,
+              303,
+              1062,
+              336,
+              707,
+              341
+            ],
+            "text": "my present views .",
+            "words": [
+              {
+                "boundingBox": [
+                  737,
+                  306,
+                  793,
+                  305,
+                  793,
+                  341,
+                  737,
+                  341
+                ],
+                "confidence": 0.983,
+                "text": "my"
+              },
+              {
+                "boundingBox": [
+                  813,
+                  305,
+                  943,
+                  304,
+                  943,
+                  338,
+                  813,
+                  341
+                ],
+                "confidence": 0.957,
+                "text": "present"
+              },
+              {
+                "boundingBox": [
+                  965,
+                  304,
+                  1036,
+                  304,
+                  1037,
+                  335,
+                  966,
+                  338
+                ],
+                "confidence": 0.973,
+                "text": "views"
+              },
+              {
+                "boundingBox": [
+                  1043,
+                  304,
+                  1061,
+                  304,
+                  1062,
+                  334,
+                  1044,
+                  335
+                ],
+                "confidence": 0.955,
+                "text": "."
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              1063,
+              338,
+              1382,
+              334,
+              1383,
+              370,
+              1063,
+              373
+            ],
+            "text": "7 June 1962 2P",
+            "words": [
+              {
+                "boundingBox": [
+                  1069,
+                  339,
+                  1101,
+                  339,
+                  1101,
+                  372,
+                  1068,
+                  372
+                ],
+                "confidence": 0.986,
+                "text": "7"
+              },
+              {
+                "boundingBox": [
+                  1119,
+                  338,
+                  1210,
+                  338,
+                  1209,
+                  373,
+                  1118,
+                  373
+                ],
+                "confidence": 0.755,
+                "text": "June"
+              },
+              {
+                "boundingBox": [
+                  1216,
+                  337,
+                  1311,
+                  336,
+                  1312,
+                  372,
+                  1216,
+                  373
+                ],
+                "confidence": 0.906,
+                "text": "1962"
+              },
+              {
+                "boundingBox": [
+                  1343,
+                  336,
+                  1382,
+                  335,
+                  1383,
+                  370,
+                  1344,
+                  371
+                ],
+                "confidence": 0.69,
+                "text": "2P"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              370,
+              376,
+              1379,
+              378,
+              1379,
+              417,
+              370,
+              416
+            ],
+            "text": "Living things constitute a main influence on human",
+            "words": [
+              {
+                "boundingBox": [
+                  376,
+                  378,
+                  499,
+                  377,
+                  496,
+                  416,
+                  373,
+                  417
+                ],
+                "confidence": 0.913,
+                "text": "Living"
+              },
+              {
+                "boundingBox": [
+                  509,
+                  377,
+                  630,
+                  377,
+                  628,
+                  415,
+                  507,
+                  416
+                ],
+                "confidence": 0.858,
+                "text": "things"
+              },
+              {
+                "boundingBox": [
+                  637,
+                  377,
+                  827,
+                  377,
+                  826,
+                  415,
+                  636,
+                  415
+                ],
+                "confidence": 0.571,
+                "text": "constitute"
+              },
+              {
+                "boundingBox": [
+                  838,
+                  377,
+                  876,
+                  378,
+                  875,
+                  415,
+                  836,
+                  415
+                ],
+                "confidence": 0.559,
+                "text": "a"
+              },
+              {
+                "boundingBox": [
+                  894,
+                  378,
+                  987,
+                  379,
+                  986,
+                  414,
+                  893,
+                  415
+                ],
+                "confidence": 0.652,
+                "text": "main"
+              },
+              {
+                "boundingBox": [
+                  997,
+                  379,
+                  1182,
+                  381,
+                  1181,
+                  415,
+                  996,
+                  414
+                ],
+                "confidence": 0.559,
+                "text": "influence"
+              },
+              {
+                "boundingBox": [
+                  1197,
+                  381,
+                  1256,
+                  382,
+                  1256,
+                  415,
+                  1197,
+                  415
+                ],
+                "confidence": 0.681,
+                "text": "on"
+              },
+              {
+                "boundingBox": [
+                  1264,
+                  383,
+                  1379,
+                  385,
+                  1380,
+                  416,
+                  1264,
+                  415
+                ],
+                "confidence": 0.909,
+                "text": "human"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              249,
+              427,
+              529,
+              422,
+              530,
+              452,
+              249,
+              456
+            ],
+            "text": "expericate and",
+            "words": [
+              {
+                "boundingBox": [
+                  251,
+                  428,
+                  429,
+                  425,
+                  430,
+                  454,
+                  253,
+                  457
+                ],
+                "confidence": 0.682,
+                "text": "expericate"
+              },
+              {
+                "boundingBox": [
+                  455,
+                  424,
+                  530,
+                  422,
+                  530,
+                  452,
+                  456,
+                  454
+                ],
+                "confidence": 0.943,
+                "text": "and"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              553,
+              419,
+              1331,
+              418,
+              1331,
+              456,
+              553,
+              457
+            ],
+            "text": "represent systems of enormous complexity.",
+            "words": [
+              {
+                "boundingBox": [
+                  556,
+                  422,
+                  721,
+                  420,
+                  721,
+                  456,
+                  556,
+                  458
+                ],
+                "confidence": 0.643,
+                "text": "represent"
+              },
+              {
+                "boundingBox": [
+                  730,
+                  420,
+                  881,
+                  419,
+                  881,
+                  455,
+                  731,
+                  456
+                ],
+                "confidence": 0.825,
+                "text": "systems"
+              },
+              {
+                "boundingBox": [
+                  888,
+                  419,
+                  935,
+                  419,
+                  935,
+                  454,
+                  888,
+                  454
+                ],
+                "confidence": 0.69,
+                "text": "of"
+              },
+              {
+                "boundingBox": [
+                  942,
+                  419,
+                  1123,
+                  420,
+                  1124,
+                  455,
+                  943,
+                  454
+                ],
+                "confidence": 0.69,
+                "text": "enormous"
+              },
+              {
+                "boundingBox": [
+                  1133,
+                  420,
+                  1330,
+                  422,
+                  1331,
+                  456,
+                  1133,
+                  455
+                ],
+                "confidence": 0.644,
+                "text": "complexity."
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              377,
+              463,
+              539,
+              464,
+              538,
+              494,
+              376,
+              493
+            ],
+            "text": "Enormous",
+            "words": [
+              {
+                "boundingBox": [
+                  389,
+                  464,
+                  538,
+                  465,
+                  537,
+                  495,
+                  389,
+                  494
+                ],
+                "confidence": 0.949,
+                "text": "Enormous"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              543,
+              458,
+              1363,
+              459,
+              1363,
+              496,
+              543,
+              494
+            ],
+            "text": "complexity of organization is one of the",
+            "words": [
+              {
+                "boundingBox": [
+                  567,
+                  459,
+                  750,
+                  459,
+                  752,
+                  495,
+                  569,
+                  495
+                ],
+                "confidence": 0.965,
+                "text": "complexity"
+              },
+              {
+                "boundingBox": [
+                  762,
+                  459,
+                  815,
+                  459,
+                  816,
+                  495,
+                  764,
+                  495
+                ],
+                "confidence": 0.956,
+                "text": "of"
+              },
+              {
+                "boundingBox": [
+                  829,
+                  459,
+                  1079,
+                  459,
+                  1080,
+                  495,
+                  831,
+                  495
+                ],
+                "confidence": 0.971,
+                "text": "organization"
+              },
+              {
+                "boundingBox": [
+                  1093,
+                  459,
+                  1141,
+                  460,
+                  1142,
+                  495,
+                  1095,
+                  495
+                ],
+                "confidence": 0.986,
+                "text": "is"
+              },
+              {
+                "boundingBox": [
+                  1148,
+                  460,
+                  1223,
+                  460,
+                  1224,
+                  495,
+                  1150,
+                  495
+                ],
+                "confidence": 0.985,
+                "text": "one"
+              },
+              {
+                "boundingBox": [
+                  1230,
+                  460,
+                  1283,
+                  460,
+                  1284,
+                  495,
+                  1231,
+                  495
+                ],
+                "confidence": 0.944,
+                "text": "of"
+              },
+              {
+                "boundingBox": [
+                  1300,
+                  460,
+                  1362,
+                  461,
+                  1363,
+                  496,
+                  1301,
+                  495
+                ],
+                "confidence": 0.986,
+                "text": "the"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              254,
+              504,
+              340,
+              504,
+              340,
+              531,
+              254,
+              530
+            ],
+            "text": "main",
+            "words": [
+              {
+                "boundingBox": [
+                  271,
+                  505,
+                  339,
+                  505,
+                  340,
+                  531,
+                  272,
+                  531
+                ],
+                "confidence": 0.98,
+                "text": "main"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              371,
+              497,
+              1390,
+              499,
+              1390,
+              535,
+              371,
+              533
+            ],
+            "text": "features that set living things apart from inent ones.",
+            "words": [
+              {
+                "boundingBox": [
+                  383,
+                  499,
+                  529,
+                  498,
+                  529,
+                  533,
+                  383,
+                  532
+                ],
+                "confidence": 0.955,
+                "text": "features"
+              },
+              {
+                "boundingBox": [
+                  551,
+                  498,
+                  638,
+                  498,
+                  638,
+                  534,
+                  551,
+                  534
+                ],
+                "confidence": 0.98,
+                "text": "that"
+              },
+              {
+                "boundingBox": [
+                  657,
+                  498,
+                  705,
+                  498,
+                  705,
+                  534,
+                  657,
+                  534
+                ],
+                "confidence": 0.981,
+                "text": "set"
+              },
+              {
+                "boundingBox": [
+                  712,
+                  498,
+                  817,
+                  498,
+                  816,
+                  535,
+                  712,
+                  534
+                ],
+                "confidence": 0.981,
+                "text": "living"
+              },
+              {
+                "boundingBox": [
+                  836,
+                  498,
+                  950,
+                  498,
+                  949,
+                  535,
+                  836,
+                  535
+                ],
+                "confidence": 0.979,
+                "text": "things"
+              },
+              {
+                "boundingBox": [
+                  972,
+                  498,
+                  1083,
+                  499,
+                  1082,
+                  535,
+                  971,
+                  535
+                ],
+                "confidence": 0.953,
+                "text": "apart"
+              },
+              {
+                "boundingBox": [
+                  1111,
+                  499,
+                  1205,
+                  500,
+                  1204,
+                  535,
+                  1110,
+                  535
+                ],
+                "confidence": 0.984,
+                "text": "from"
+              },
+              {
+                "boundingBox": [
+                  1222,
+                  500,
+                  1316,
+                  501,
+                  1315,
+                  535,
+                  1221,
+                  535
+                ],
+                "confidence": 0.73,
+                "text": "inent"
+              },
+              {
+                "boundingBox": [
+                  1323,
+                  501,
+                  1390,
+                  501,
+                  1389,
+                  534,
+                  1321,
+                  535
+                ],
+                "confidence": 0.821,
+                "text": "ones."
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              257,
+              538,
+              1371,
+              538,
+              1371,
+              576,
+              257,
+              576
+            ],
+            "text": "As objects of scientific interest one is curious to know how",
+            "words": [
+              {
+                "boundingBox": [
+                  262,
+                  540,
+                  310,
+                  540,
+                  311,
+                  576,
+                  263,
+                  577
+                ],
+                "confidence": 0.986,
+                "text": "As"
+              },
+              {
+                "boundingBox": [
+                  325,
+                  540,
+                  453,
+                  539,
+                  453,
+                  574,
+                  325,
+                  576
+                ],
+                "confidence": 0.948,
+                "text": "objects"
+              },
+              {
+                "boundingBox": [
+                  465,
+                  539,
+                  518,
+                  539,
+                  518,
+                  573,
+                  465,
+                  574
+                ],
+                "confidence": 0.914,
+                "text": "of"
+              },
+              {
+                "boundingBox": [
+                  527,
+                  539,
+                  704,
+                  538,
+                  703,
+                  572,
+                  528,
+                  573
+                ],
+                "confidence": 0.653,
+                "text": "scientific"
+              },
+              {
+                "boundingBox": [
+                  711,
+                  538,
+                  839,
+                  538,
+                  838,
+                  572,
+                  711,
+                  572
+                ],
+                "confidence": 0.559,
+                "text": "interest"
+              },
+              {
+                "boundingBox": [
+                  846,
+                  539,
+                  909,
+                  539,
+                  908,
+                  572,
+                  846,
+                  572
+                ],
+                "confidence": 0.979,
+                "text": "one"
+              },
+              {
+                "boundingBox": [
+                  916,
+                  539,
+                  967,
+                  539,
+                  966,
+                  572,
+                  915,
+                  572
+                ],
+                "confidence": 0.981,
+                "text": "is"
+              },
+              {
+                "boundingBox": [
+                  974,
+                  539,
+                  1112,
+                  540,
+                  1111,
+                  573,
+                  973,
+                  572
+                ],
+                "confidence": 0.977,
+                "text": "curious"
+              },
+              {
+                "boundingBox": [
+                  1128,
+                  540,
+                  1179,
+                  540,
+                  1178,
+                  573,
+                  1127,
+                  573
+                ],
+                "confidence": 0.985,
+                "text": "to"
+              },
+              {
+                "boundingBox": [
+                  1194,
+                  540,
+                  1300,
+                  541,
+                  1298,
+                  575,
+                  1192,
+                  573
+                ],
+                "confidence": 0.981,
+                "text": "know"
+              },
+              {
+                "boundingBox": [
+                  1307,
+                  541,
+                  1370,
+                  542,
+                  1368,
+                  575,
+                  1306,
+                  575
+                ],
+                "confidence": 0.825,
+                "text": "how"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              255,
+              575,
+              1377,
+              576,
+              1377,
+              614,
+              255,
+              613
+            ],
+            "text": "living things originated , how dep developed into their present",
+            "words": [
+              {
+                "boundingBox": [
+                  256,
+                  579,
+                  355,
+                  578,
+                  355,
+                  614,
+                  256,
+                  614
+                ],
+                "confidence": 0.98,
+                "text": "living"
+              },
+              {
+                "boundingBox": [
+                  369,
+                  578,
+                  484,
+                  577,
+                  484,
+                  613,
+                  369,
+                  614
+                ],
+                "confidence": 0.98,
+                "text": "things"
+              },
+              {
+                "boundingBox": [
+                  493,
+                  577,
+                  656,
+                  576,
+                  655,
+                  613,
+                  493,
+                  613
+                ],
+                "confidence": 0.917,
+                "text": "originated"
+              },
+              {
+                "boundingBox": [
+                  662,
+                  576,
+                  696,
+                  576,
+                  696,
+                  613,
+                  662,
+                  613
+                ],
+                "confidence": 0.981,
+                "text": ","
+              },
+              {
+                "boundingBox": [
+                  707,
+                  576,
+                  789,
+                  576,
+                  788,
+                  613,
+                  707,
+                  613
+                ],
+                "confidence": 0.559,
+                "text": "how"
+              },
+              {
+                "boundingBox": [
+                  811,
+                  576,
+                  881,
+                  576,
+                  881,
+                  614,
+                  811,
+                  613
+                ],
+                "confidence": 0.746,
+                "text": "dep"
+              },
+              {
+                "boundingBox": [
+                  895,
+                  576,
+                  1048,
+                  577,
+                  1048,
+                  614,
+                  895,
+                  614
+                ],
+                "confidence": 0.978,
+                "text": "developed"
+              },
+              {
+                "boundingBox": [
+                  1059,
+                  577,
+                  1141,
+                  578,
+                  1141,
+                  614,
+                  1059,
+                  614
+                ],
+                "confidence": 0.982,
+                "text": "into"
+              },
+              {
+                "boundingBox": [
+                  1156,
+                  578,
+                  1253,
+                  579,
+                  1253,
+                  615,
+                  1156,
+                  614
+                ],
+                "confidence": 0.981,
+                "text": "their"
+              },
+              {
+                "boundingBox": [
+                  1265,
+                  579,
+                  1378,
+                  581,
+                  1378,
+                  615,
+                  1265,
+                  615
+                ],
+                "confidence": 0.753,
+                "text": "present"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              250,
+              617,
+              1381,
+              617,
+              1381,
+              656,
+              250,
+              656
+            ],
+            "text": "forms, and how they work. An attractive working hypothesis",
+            "words": [
+              {
+                "boundingBox": [
+                  253,
+                  622,
+                  374,
+                  620,
+                  374,
+                  655,
+                  252,
+                  655
+                ],
+                "confidence": 0.825,
+                "text": "forms,"
+              },
+              {
+                "boundingBox": [
+                  392,
+                  620,
+                  480,
+                  619,
+                  480,
+                  655,
+                  391,
+                  655
+                ],
+                "confidence": 0.981,
+                "text": "and"
+              },
+              {
+                "boundingBox": [
+                  507,
+                  619,
+                  577,
+                  618,
+                  577,
+                  655,
+                  506,
+                  655
+                ],
+                "confidence": 0.956,
+                "text": "how"
+              },
+              {
+                "boundingBox": [
+                  591,
+                  618,
+                  674,
+                  618,
+                  674,
+                  655,
+                  590,
+                  655
+                ],
+                "confidence": 0.943,
+                "text": "they"
+              },
+              {
+                "boundingBox": [
+                  701,
+                  618,
+                  807,
+                  618,
+                  806,
+                  655,
+                  700,
+                  655
+                ],
+                "confidence": 0.825,
+                "text": "work."
+              },
+              {
+                "boundingBox": [
+                  822,
+                  617,
+                  871,
+                  617,
+                  870,
+                  655,
+                  822,
+                  655
+                ],
+                "confidence": 0.974,
+                "text": "An"
+              },
+              {
+                "boundingBox": [
+                  888,
+                  617,
+                  1049,
+                  618,
+                  1049,
+                  655,
+                  888,
+                  655
+                ],
+                "confidence": 0.957,
+                "text": "attractive"
+              },
+              {
+                "boundingBox": [
+                  1076,
+                  618,
+                  1210,
+                  619,
+                  1210,
+                  656,
+                  1076,
+                  655
+                ],
+                "confidence": 0.98,
+                "text": "working"
+              },
+              {
+                "boundingBox": [
+                  1219,
+                  619,
+                  1380,
+                  621,
+                  1380,
+                  657,
+                  1219,
+                  656
+                ],
+                "confidence": 0.825,
+                "text": "hypothesis"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              251,
+              657,
+              1422,
+              659,
+              1422,
+              696,
+              251,
+              694
+            ],
+            "text": "is that they are only complex systems of physical components",
+            "words": [
+              {
+                "boundingBox": [
+                  253,
+                  657,
+                  295,
+                  657,
+                  293,
+                  695,
+                  251,
+                  695
+                ],
+                "confidence": 0.981,
+                "text": "is"
+              },
+              {
+                "boundingBox": [
+                  302,
+                  657,
+                  401,
+                  657,
+                  400,
+                  695,
+                  301,
+                  695
+                ],
+                "confidence": 0.983,
+                "text": "that"
+              },
+              {
+                "boundingBox": [
+                  423,
+                  657,
+                  512,
+                  657,
+                  511,
+                  695,
+                  422,
+                  695
+                ],
+                "confidence": 0.981,
+                "text": "they"
+              },
+              {
+                "boundingBox": [
+                  529,
+                  657,
+                  594,
+                  657,
+                  593,
+                  695,
+                  528,
+                  695
+                ],
+                "confidence": 0.985,
+                "text": "are"
+              },
+              {
+                "boundingBox": [
+                  608,
+                  657,
+                  700,
+                  657,
+                  699,
+                  695,
+                  608,
+                  695
+                ],
+                "confidence": 0.984,
+                "text": "only"
+              },
+              {
+                "boundingBox": [
+                  719,
+                  658,
+                  863,
+                  658,
+                  862,
+                  695,
+                  719,
+                  695
+                ],
+                "confidence": 0.941,
+                "text": "complex"
+              },
+              {
+                "boundingBox": [
+                  887,
+                  658,
+                  1033,
+                  659,
+                  1033,
+                  695,
+                  887,
+                  695
+                ],
+                "confidence": 0.952,
+                "text": "systems"
+              },
+              {
+                "boundingBox": [
+                  1040,
+                  659,
+                  1090,
+                  659,
+                  1090,
+                  695,
+                  1040,
+                  695
+                ],
+                "confidence": 0.957,
+                "text": "of"
+              },
+              {
+                "boundingBox": [
+                  1112,
+                  659,
+                  1262,
+                  660,
+                  1263,
+                  696,
+                  1112,
+                  696
+                ],
+                "confidence": 0.975,
+                "text": "physical"
+              },
+              {
+                "boundingBox": [
+                  1270,
+                  660,
+                  1420,
+                  662,
+                  1421,
+                  696,
+                  1270,
+                  696
+                ],
+                "confidence": 0.893,
+                "text": "components"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              246,
+              705,
+              402,
+              702,
+              402,
+              733,
+              247,
+              736
+            ],
+            "text": "governed",
+            "words": [
+              {
+                "boundingBox": [
+                  253,
+                  706,
+                  402,
+                  703,
+                  402,
+                  734,
+                  254,
+                  737
+                ],
+                "confidence": 0.559,
+                "text": "governed"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              417,
+              695,
+              1384,
+              700,
+              1384,
+              737,
+              416,
+              733
+            ],
+            "text": "by the laws of physics ( including chemistry ) , nothing",
+            "words": [
+              {
+                "boundingBox": [
+                  425,
+                  696,
+                  482,
+                  696,
+                  479,
+                  734,
+                  422,
+                  733
+                ],
+                "confidence": 0.985,
+                "text": "by"
+              },
+              {
+                "boundingBox": [
+                  499,
+                  696,
+                  556,
+                  697,
+                  553,
+                  734,
+                  496,
+                  734
+                ],
+                "confidence": 0.986,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  563,
+                  697,
+                  662,
+                  697,
+                  659,
+                  734,
+                  560,
+                  734
+                ],
+                "confidence": 0.981,
+                "text": "laws"
+              },
+              {
+                "boundingBox": [
+                  672,
+                  697,
+                  726,
+                  698,
+                  723,
+                  735,
+                  669,
+                  734
+                ],
+                "confidence": 0.98,
+                "text": "of"
+              },
+              {
+                "boundingBox": [
+                  738,
+                  698,
+                  866,
+                  698,
+                  864,
+                  735,
+                  735,
+                  735
+                ],
+                "confidence": 0.652,
+                "text": "physics"
+              },
+              {
+                "boundingBox": [
+                  878,
+                  698,
+                  883,
+                  698,
+                  881,
+                  735,
+                  876,
+                  735
+                ],
+                "confidence": 0.965,
+                "text": "("
+              },
+              {
+                "boundingBox": [
+                  891,
+                  698,
+                  1046,
+                  699,
+                  1044,
+                  736,
+                  889,
+                  735
+                ],
+                "confidence": 0.968,
+                "text": "including"
+              },
+              {
+                "boundingBox": [
+                  1063,
+                  699,
+                  1236,
+                  700,
+                  1234,
+                  737,
+                  1061,
+                  736
+                ],
+                "confidence": 0.827,
+                "text": "chemistry"
+              },
+              {
+                "boundingBox": [
+                  1243,
+                  700,
+                  1248,
+                  700,
+                  1247,
+                  737,
+                  1242,
+                  737
+                ],
+                "confidence": 0.986,
+                "text": ")"
+              },
+              {
+                "boundingBox": [
+                  1255,
+                  700,
+                  1273,
+                  700,
+                  1271,
+                  738,
+                  1254,
+                  737
+                ],
+                "confidence": 0.98,
+                "text": ","
+              },
+              {
+                "boundingBox": [
+                  1280,
+                  700,
+                  1383,
+                  700,
+                  1382,
+                  738,
+                  1279,
+                  738
+                ],
+                "confidence": 0.954,
+                "text": "nothing"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              249,
+              737,
+              1381,
+              736,
+              1382,
+              772,
+              250,
+              774
+            ],
+            "text": "more and nothing less . On the molecular level this view ha's",
+            "words": [
+              {
+                "boundingBox": [
+                  267,
+                  745,
+                  336,
+                  743,
+                  336,
+                  773,
+                  266,
+                  773
+                ],
+                "confidence": 0.955,
+                "text": "more"
+              },
+              {
+                "boundingBox": [
+                  365,
+                  743,
+                  433,
+                  741,
+                  433,
+                  774,
+                  365,
+                  773
+                ],
+                "confidence": 0.985,
+                "text": "and"
+              },
+              {
+                "boundingBox": [
+                  460,
+                  741,
+                  573,
+                  739,
+                  573,
+                  774,
+                  460,
+                  774
+                ],
+                "confidence": 0.826,
+                "text": "nothing"
+              },
+              {
+                "boundingBox": [
+                  590,
+                  739,
+                  637,
+                  738,
+                  637,
+                  774,
+                  590,
+                  774
+                ],
+                "confidence": 0.98,
+                "text": "less"
+              },
+              {
+                "boundingBox": [
+                  642,
+                  738,
+                  670,
+                  738,
+                  670,
+                  774,
+                  642,
+                  774
+                ],
+                "confidence": 0.981,
+                "text": "."
+              },
+              {
+                "boundingBox": [
+                  692,
+                  738,
+                  741,
+                  737,
+                  741,
+                  774,
+                  692,
+                  774
+                ],
+                "confidence": 0.986,
+                "text": "On"
+              },
+              {
+                "boundingBox": [
+                  763,
+                  737,
+                  821,
+                  737,
+                  821,
+                  774,
+                  763,
+                  774
+                ],
+                "confidence": 0.977,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  856,
+                  737,
+                  1004,
+                  737,
+                  1004,
+                  774,
+                  856,
+                  774
+                ],
+                "confidence": 0.95,
+                "text": "molecular"
+              },
+              {
+                "boundingBox": [
+                  1033,
+                  737,
+                  1124,
+                  737,
+                  1124,
+                  774,
+                  1033,
+                  774
+                ],
+                "confidence": 0.945,
+                "text": "level"
+              },
+              {
+                "boundingBox": [
+                  1139,
+                  737,
+                  1210,
+                  738,
+                  1210,
+                  774,
+                  1139,
+                  774
+                ],
+                "confidence": 0.978,
+                "text": "this"
+              },
+              {
+                "boundingBox": [
+                  1237,
+                  738,
+                  1314,
+                  739,
+                  1314,
+                  774,
+                  1238,
+                  774
+                ],
+                "confidence": 0.981,
+                "text": "view"
+              },
+              {
+                "boundingBox": [
+                  1325,
+                  739,
+                  1381,
+                  740,
+                  1382,
+                  773,
+                  1325,
+                  774
+                ],
+                "confidence": 0.567,
+                "text": "ha's"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              254,
+              779,
+              1384,
+              775,
+              1384,
+              812,
+              254,
+              814
+            ],
+            "text": "had great successes recently in molecular genetics. So far there",
+            "words": [
+              {
+                "boundingBox": [
+                  255,
+                  783,
+                  324,
+                  782,
+                  323,
+                  814,
+                  255,
+                  814
+                ],
+                "confidence": 0.981,
+                "text": "had"
+              },
+              {
+                "boundingBox": [
+                  338,
+                  782,
+                  425,
+                  781,
+                  424,
+                  814,
+                  337,
+                  814
+                ],
+                "confidence": 0.966,
+                "text": "great"
+              },
+              {
+                "boundingBox": [
+                  439,
+                  781,
+                  588,
+                  779,
+                  587,
+                  814,
+                  438,
+                  814
+                ],
+                "confidence": 0.942,
+                "text": "successes"
+              },
+              {
+                "boundingBox": [
+                  608,
+                  779,
+                  748,
+                  778,
+                  747,
+                  814,
+                  608,
+                  814
+                ],
+                "confidence": 0.978,
+                "text": "recently"
+              },
+              {
+                "boundingBox": [
+                  760,
+                  778,
+                  806,
+                  777,
+                  805,
+                  814,
+                  759,
+                  814
+                ],
+                "confidence": 0.981,
+                "text": "in"
+              },
+              {
+                "boundingBox": [
+                  830,
+                  777,
+                  996,
+                  776,
+                  995,
+                  814,
+                  829,
+                  814
+                ],
+                "confidence": 0.759,
+                "text": "molecular"
+              },
+              {
+                "boundingBox": [
+                  1014,
+                  776,
+                  1161,
+                  776,
+                  1160,
+                  814,
+                  1013,
+                  814
+                ],
+                "confidence": 0.739,
+                "text": "genetics."
+              },
+              {
+                "boundingBox": [
+                  1176,
+                  776,
+                  1214,
+                  776,
+                  1213,
+                  813,
+                  1174,
+                  813
+                ],
+                "confidence": 0.981,
+                "text": "So"
+              },
+              {
+                "boundingBox": [
+                  1220,
+                  776,
+                  1283,
+                  776,
+                  1281,
+                  813,
+                  1219,
+                  813
+                ],
+                "confidence": 0.777,
+                "text": "far"
+              },
+              {
+                "boundingBox": [
+                  1297,
+                  776,
+                  1383,
+                  776,
+                  1382,
+                  813,
+                  1295,
+                  813
+                ],
+                "confidence": 0.98,
+                "text": "there"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              250,
+              819,
+              1415,
+              817,
+              1415,
+              853,
+              250,
+              854
+            ],
+            "text": "has appeared no obstacle contradicting this hypothesis . It must",
+            "words": [
+              {
+                "boundingBox": [
+                  259,
+                  823,
+                  324,
+                  823,
+                  324,
+                  854,
+                  259,
+                  854
+                ],
+                "confidence": 0.981,
+                "text": "has"
+              },
+              {
+                "boundingBox": [
+                  352,
+                  822,
+                  493,
+                  821,
+                  493,
+                  854,
+                  352,
+                  854
+                ],
+                "confidence": 0.973,
+                "text": "appeared"
+              },
+              {
+                "boundingBox": [
+                  509,
+                  821,
+                  553,
+                  820,
+                  552,
+                  854,
+                  509,
+                  854
+                ],
+                "confidence": 0.981,
+                "text": "no"
+              },
+              {
+                "boundingBox": [
+                  574,
+                  820,
+                  713,
+                  819,
+                  713,
+                  854,
+                  574,
+                  854
+                ],
+                "confidence": 0.933,
+                "text": "obstacle"
+              },
+              {
+                "boundingBox": [
+                  741,
+                  819,
+                  969,
+                  818,
+                  969,
+                  854,
+                  741,
+                  854
+                ],
+                "confidence": 0.839,
+                "text": "contradicting"
+              },
+              {
+                "boundingBox": [
+                  987,
+                  818,
+                  1061,
+                  817,
+                  1060,
+                  854,
+                  987,
+                  854
+                ],
+                "confidence": 0.985,
+                "text": "this"
+              },
+              {
+                "boundingBox": [
+                  1084,
+                  817,
+                  1243,
+                  817,
+                  1243,
+                  854,
+                  1084,
+                  854
+                ],
+                "confidence": 0.893,
+                "text": "hypothesis"
+              },
+              {
+                "boundingBox": [
+                  1249,
+                  817,
+                  1279,
+                  817,
+                  1279,
+                  854,
+                  1249,
+                  854
+                ],
+                "confidence": 0.979,
+                "text": "."
+              },
+              {
+                "boundingBox": [
+                  1309,
+                  817,
+                  1352,
+                  818,
+                  1352,
+                  854,
+                  1308,
+                  854
+                ],
+                "confidence": 0.986,
+                "text": "It"
+              },
+              {
+                "boundingBox": [
+                  1360,
+                  818,
+                  1416,
+                  818,
+                  1416,
+                  854,
+                  1360,
+                  854
+                ],
+                "confidence": 0.968,
+                "text": "must"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              253,
+              857,
+              1297,
+              857,
+              1297,
+              895,
+              253,
+              896
+            ],
+            "text": "be admitted , however , that there are not many detailed",
+            "words": [
+              {
+                "boundingBox": [
+                  254,
+                  863,
+                  298,
+                  862,
+                  297,
+                  893,
+                  253,
+                  893
+                ],
+                "confidence": 0.985,
+                "text": "be"
+              },
+              {
+                "boundingBox": [
+                  317,
+                  862,
+                  457,
+                  860,
+                  456,
+                  893,
+                  316,
+                  893
+                ],
+                "confidence": 0.652,
+                "text": "admitted"
+              },
+              {
+                "boundingBox": [
+                  463,
+                  860,
+                  492,
+                  860,
+                  492,
+                  894,
+                  462,
+                  893
+                ],
+                "confidence": 0.981,
+                "text": ","
+              },
+              {
+                "boundingBox": [
+                  508,
+                  859,
+                  616,
+                  858,
+                  616,
+                  894,
+                  508,
+                  894
+                ],
+                "confidence": 0.889,
+                "text": "however"
+              },
+              {
+                "boundingBox": [
+                  622,
+                  858,
+                  654,
+                  858,
+                  653,
+                  894,
+                  622,
+                  894
+                ],
+                "confidence": 0.894,
+                "text": ","
+              },
+              {
+                "boundingBox": [
+                  670,
+                  858,
+                  754,
+                  858,
+                  754,
+                  894,
+                  669,
+                  894
+                ],
+                "confidence": 0.981,
+                "text": "that"
+              },
+              {
+                "boundingBox": [
+                  784,
+                  857,
+                  872,
+                  857,
+                  872,
+                  895,
+                  783,
+                  894
+                ],
+                "confidence": 0.796,
+                "text": "there"
+              },
+              {
+                "boundingBox": [
+                  880,
+                  857,
+                  943,
+                  857,
+                  943,
+                  895,
+                  880,
+                  895
+                ],
+                "confidence": 0.985,
+                "text": "are"
+              },
+              {
+                "boundingBox": [
+                  971,
+                  857,
+                  1034,
+                  857,
+                  1034,
+                  895,
+                  971,
+                  895
+                ],
+                "confidence": 0.982,
+                "text": "not"
+              },
+              {
+                "boundingBox": [
+                  1061,
+                  857,
+                  1156,
+                  858,
+                  1156,
+                  896,
+                  1061,
+                  895
+                ],
+                "confidence": 0.902,
+                "text": "many"
+              },
+              {
+                "boundingBox": [
+                  1175,
+                  858,
+                  1298,
+                  859,
+                  1298,
+                  896,
+                  1176,
+                  896
+                ],
+                "confidence": 0.917,
+                "text": "detailed"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              250,
+              896,
+              1304,
+              895,
+              1304,
+              933,
+              250,
+              934
+            ],
+            "text": "predictions of physics in biology that could furnish a",
+            "words": [
+              {
+                "boundingBox": [
+                  253,
+                  901,
+                  428,
+                  898,
+                  429,
+                  934,
+                  255,
+                  933
+                ],
+                "confidence": 0.943,
+                "text": "predictions"
+              },
+              {
+                "boundingBox": [
+                  449,
+                  898,
+                  497,
+                  898,
+                  498,
+                  934,
+                  450,
+                  934
+                ],
+                "confidence": 0.973,
+                "text": "of"
+              },
+              {
+                "boundingBox": [
+                  519,
+                  897,
+                  642,
+                  896,
+                  643,
+                  934,
+                  521,
+                  934
+                ],
+                "confidence": 0.694,
+                "text": "physics"
+              },
+              {
+                "boundingBox": [
+                  649,
+                  896,
+                  699,
+                  896,
+                  700,
+                  934,
+                  650,
+                  934
+                ],
+                "confidence": 0.981,
+                "text": "in"
+              },
+              {
+                "boundingBox": [
+                  726,
+                  896,
+                  855,
+                  896,
+                  856,
+                  934,
+                  727,
+                  934
+                ],
+                "confidence": 0.942,
+                "text": "biology"
+              },
+              {
+                "boundingBox": [
+                  884,
+                  896,
+                  974,
+                  896,
+                  974,
+                  934,
+                  885,
+                  934
+                ],
+                "confidence": 0.979,
+                "text": "that"
+              },
+              {
+                "boundingBox": [
+                  992,
+                  896,
+                  1099,
+                  896,
+                  1099,
+                  934,
+                  993,
+                  934
+                ],
+                "confidence": 0.984,
+                "text": "could"
+              },
+              {
+                "boundingBox": [
+                  1138,
+                  896,
+                  1272,
+                  897,
+                  1272,
+                  933,
+                  1139,
+                  934
+                ],
+                "confidence": 0.836,
+                "text": "furnish"
+              },
+              {
+                "boundingBox": [
+                  1278,
+                  897,
+                  1303,
+                  897,
+                  1303,
+                  933,
+                  1278,
+                  933
+                ],
+                "confidence": 0.985,
+                "text": "a"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              256,
+              938,
+              1391,
+              938,
+              1391,
+              974,
+              256,
+              974
+            ],
+            "text": "sensitive test ; some people feel that when such tests are",
+            "words": [
+              {
+                "boundingBox": [
+                  257,
+                  940,
+                  411,
+                  939,
+                  411,
+                  974,
+                  257,
+                  973
+                ],
+                "confidence": 0.652,
+                "text": "sensitive"
+              },
+              {
+                "boundingBox": [
+                  428,
+                  939,
+                  493,
+                  939,
+                  494,
+                  974,
+                  429,
+                  974
+                ],
+                "confidence": 0.943,
+                "text": "test"
+              },
+              {
+                "boundingBox": [
+                  500,
+                  939,
+                  528,
+                  939,
+                  529,
+                  974,
+                  500,
+                  974
+                ],
+                "confidence": 0.961,
+                "text": ";"
+              },
+              {
+                "boundingBox": [
+                  535,
+                  939,
+                  632,
+                  939,
+                  633,
+                  975,
+                  535,
+                  974
+                ],
+                "confidence": 0.982,
+                "text": "some"
+              },
+              {
+                "boundingBox": [
+                  652,
+                  939,
+                  765,
+                  938,
+                  766,
+                  975,
+                  653,
+                  975
+                ],
+                "confidence": 0.98,
+                "text": "people"
+              },
+              {
+                "boundingBox": [
+                  778,
+                  938,
+                  849,
+                  938,
+                  851,
+                  975,
+                  779,
+                  975
+                ],
+                "confidence": 0.751,
+                "text": "feel"
+              },
+              {
+                "boundingBox": [
+                  865,
+                  938,
+                  954,
+                  938,
+                  955,
+                  975,
+                  866,
+                  975
+                ],
+                "confidence": 0.982,
+                "text": "that"
+              },
+              {
+                "boundingBox": [
+                  980,
+                  938,
+                  1071,
+                  939,
+                  1073,
+                  975,
+                  981,
+                  975
+                ],
+                "confidence": 0.981,
+                "text": "when"
+              },
+              {
+                "boundingBox": [
+                  1097,
+                  939,
+                  1192,
+                  939,
+                  1195,
+                  975,
+                  1099,
+                  975
+                ],
+                "confidence": 0.981,
+                "text": "such"
+              },
+              {
+                "boundingBox": [
+                  1229,
+                  939,
+                  1323,
+                  939,
+                  1325,
+                  975,
+                  1232,
+                  975
+                ],
+                "confidence": 0.944,
+                "text": "tests"
+              },
+              {
+                "boundingBox": [
+                  1329,
+                  939,
+                  1388,
+                  940,
+                  1390,
+                  974,
+                  1332,
+                  975
+                ],
+                "confidence": 0.985,
+                "text": "are"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              252,
+              977,
+              1412,
+              977,
+              1412,
+              1014,
+              252,
+              1014
+            ],
+            "text": "made, biology will be found to require some new principle.",
+            "words": [
+              {
+                "boundingBox": [
+                  269,
+                  979,
+                  375,
+                  979,
+                  375,
+                  1015,
+                  269,
+                  1015
+                ],
+                "confidence": 0.933,
+                "text": "made,"
+              },
+              {
+                "boundingBox": [
+                  385,
+                  979,
+                  509,
+                  978,
+                  509,
+                  1015,
+                  384,
+                  1015
+                ],
+                "confidence": 0.944,
+                "text": "biology"
+              },
+              {
+                "boundingBox": [
+                  535,
+                  978,
+                  606,
+                  978,
+                  606,
+                  1015,
+                  535,
+                  1015
+                ],
+                "confidence": 0.981,
+                "text": "will"
+              },
+              {
+                "boundingBox": [
+                  620,
+                  978,
+                  663,
+                  978,
+                  662,
+                  1015,
+                  620,
+                  1015
+                ],
+                "confidence": 0.981,
+                "text": "be"
+              },
+              {
+                "boundingBox": [
+                  670,
+                  978,
+                  795,
+                  977,
+                  794,
+                  1015,
+                  669,
+                  1015
+                ],
+                "confidence": 0.724,
+                "text": "found"
+              },
+              {
+                "boundingBox": [
+                  832,
+                  977,
+                  879,
+                  977,
+                  879,
+                  1015,
+                  832,
+                  1015
+                ],
+                "confidence": 0.981,
+                "text": "to"
+              },
+              {
+                "boundingBox": [
+                  896,
+                  977,
+                  1035,
+                  978,
+                  1035,
+                  1015,
+                  896,
+                  1015
+                ],
+                "confidence": 0.755,
+                "text": "require"
+              },
+              {
+                "boundingBox": [
+                  1058,
+                  978,
+                  1157,
+                  978,
+                  1157,
+                  1014,
+                  1058,
+                  1015
+                ],
+                "confidence": 0.981,
+                "text": "some"
+              },
+              {
+                "boundingBox": [
+                  1176,
+                  978,
+                  1266,
+                  979,
+                  1265,
+                  1014,
+                  1176,
+                  1014
+                ],
+                "confidence": 0.974,
+                "text": "new"
+              },
+              {
+                "boundingBox": [
+                  1282,
+                  979,
+                  1412,
+                  980,
+                  1411,
+                  1014,
+                  1282,
+                  1014
+                ],
+                "confidence": 0.652,
+                "text": "principle."
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              252,
+              1017,
+              1305,
+              1016,
+              1305,
+              1054,
+              252,
+              1056
+            ],
+            "text": "not already present in physics, though not contradicting",
+            "words": [
+              {
+                "boundingBox": [
+                  254,
+                  1022,
+                  322,
+                  1021,
+                  323,
+                  1056,
+                  256,
+                  1056
+                ],
+                "confidence": 0.986,
+                "text": "not"
+              },
+              {
+                "boundingBox": [
+                  342,
+                  1020,
+                  474,
+                  1019,
+                  475,
+                  1056,
+                  343,
+                  1056
+                ],
+                "confidence": 0.938,
+                "text": "already"
+              },
+              {
+                "boundingBox": [
+                  499,
+                  1018,
+                  620,
+                  1017,
+                  620,
+                  1056,
+                  499,
+                  1056
+                ],
+                "confidence": 0.823,
+                "text": "present"
+              },
+              {
+                "boundingBox": [
+                  636,
+                  1017,
+                  690,
+                  1017,
+                  690,
+                  1055,
+                  636,
+                  1056
+                ],
+                "confidence": 0.984,
+                "text": "in"
+              },
+              {
+                "boundingBox": [
+                  710,
+                  1017,
+                  861,
+                  1016,
+                  860,
+                  1055,
+                  710,
+                  1055
+                ],
+                "confidence": 0.937,
+                "text": "physics,"
+              },
+              {
+                "boundingBox": [
+                  872,
+                  1016,
+                  996,
+                  1016,
+                  994,
+                  1055,
+                  871,
+                  1055
+                ],
+                "confidence": 0.983,
+                "text": "though"
+              },
+              {
+                "boundingBox": [
+                  1016,
+                  1016,
+                  1079,
+                  1016,
+                  1077,
+                  1055,
+                  1014,
+                  1055
+                ],
+                "confidence": 0.984,
+                "text": "not"
+              },
+              {
+                "boundingBox": [
+                  1090,
+                  1016,
+                  1306,
+                  1018,
+                  1302,
+                  1056,
+                  1088,
+                  1055
+                ],
+                "confidence": 0.825,
+                "text": "contradicting"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              249,
+              1057,
+              1331,
+              1058,
+              1331,
+              1096,
+              249,
+              1094
+            ],
+            "text": "physics . In the meantime one goes ontostudy the properties",
+            "words": [
+              {
+                "boundingBox": [
+                  250,
+                  1059,
+                  359,
+                  1059,
+                  363,
+                  1094,
+                  255,
+                  1094
+                ],
+                "confidence": 0.937,
+                "text": "physics"
+              },
+              {
+                "boundingBox": [
+                  366,
+                  1059,
+                  400,
+                  1058,
+                  405,
+                  1093,
+                  370,
+                  1093
+                ],
+                "confidence": 0.98,
+                "text": "."
+              },
+              {
+                "boundingBox": [
+                  410,
+                  1058,
+                  465,
+                  1058,
+                  469,
+                  1093,
+                  414,
+                  1093
+                ],
+                "confidence": 0.985,
+                "text": "In"
+              },
+              {
+                "boundingBox": [
+                  484,
+                  1058,
+                  551,
+                  1058,
+                  555,
+                  1093,
+                  488,
+                  1093
+                ],
+                "confidence": 0.981,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  570,
+                  1058,
+                  718,
+                  1058,
+                  721,
+                  1093,
+                  573,
+                  1093
+                ],
+                "confidence": 0.786,
+                "text": "meantime"
+              },
+              {
+                "boundingBox": [
+                  730,
+                  1058,
+                  797,
+                  1058,
+                  800,
+                  1093,
+                  733,
+                  1093
+                ],
+                "confidence": 0.985,
+                "text": "one"
+              },
+              {
+                "boundingBox": [
+                  813,
+                  1058,
+                  899,
+                  1058,
+                  901,
+                  1093,
+                  816,
+                  1093
+                ],
+                "confidence": 0.959,
+                "text": "goes"
+              },
+              {
+                "boundingBox": [
+                  913,
+                  1058,
+                  1087,
+                  1058,
+                  1088,
+                  1095,
+                  915,
+                  1093
+                ],
+                "confidence": 0.652,
+                "text": "ontostudy"
+              },
+              {
+                "boundingBox": [
+                  1099,
+                  1059,
+                  1166,
+                  1059,
+                  1167,
+                  1095,
+                  1100,
+                  1095
+                ],
+                "confidence": 0.98,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  1187,
+                  1059,
+                  1331,
+                  1060,
+                  1331,
+                  1097,
+                  1188,
+                  1096
+                ],
+                "confidence": 0.83,
+                "text": "properties"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              250,
+              1104,
+              313,
+              1081,
+              323,
+              1111,
+              257,
+              1133
+            ],
+            "text": "of",
+            "words": [
+              {
+                "boundingBox": [
+                  251,
+                  1102,
+                  297,
+                  1086,
+                  307,
+                  1116,
+                  261,
+                  1132
+                ],
+                "confidence": 0.69,
+                "text": "of"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              305,
+              1093,
+              1337,
+              1094,
+              1337,
+              1134,
+              305,
+              1133
+            ],
+            "text": "living things discovering one marvelous mechanism after",
+            "words": [
+              {
+                "boundingBox": [
+                  318,
+                  1093,
+                  419,
+                  1095,
+                  417,
+                  1134,
+                  316,
+                  1133
+                ],
+                "confidence": 0.978,
+                "text": "living"
+              },
+              {
+                "boundingBox": [
+                  427,
+                  1095,
+                  544,
+                  1097,
+                  542,
+                  1134,
+                  425,
+                  1134
+                ],
+                "confidence": 0.977,
+                "text": "things"
+              },
+              {
+                "boundingBox": [
+                  554,
+                  1097,
+                  730,
+                  1099,
+                  728,
+                  1134,
+                  553,
+                  1134
+                ],
+                "confidence": 0.973,
+                "text": "discovering"
+              },
+              {
+                "boundingBox": [
+                  738,
+                  1099,
+                  817,
+                  1099,
+                  816,
+                  1134,
+                  736,
+                  1134
+                ],
+                "confidence": 0.985,
+                "text": "one"
+              },
+              {
+                "boundingBox": [
+                  836,
+                  1100,
+                  1021,
+                  1099,
+                  1020,
+                  1134,
+                  834,
+                  1134
+                ],
+                "confidence": 0.78,
+                "text": "marvelous"
+              },
+              {
+                "boundingBox": [
+                  1040,
+                  1099,
+                  1234,
+                  1097,
+                  1233,
+                  1133,
+                  1039,
+                  1134
+                ],
+                "confidence": 0.885,
+                "text": "mechanism"
+              },
+              {
+                "boundingBox": [
+                  1250,
+                  1097,
+                  1337,
+                  1096,
+                  1337,
+                  1133,
+                  1249,
+                  1133
+                ],
+                "confidence": 0.983,
+                "text": "after"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              256,
+              1136,
+              1336,
+              1136,
+              1336,
+              1174,
+              256,
+              1174
+            ],
+            "text": "another in the complex mechanism that maintains the",
+            "words": [
+              {
+                "boundingBox": [
+                  261,
+                  1139,
+                  403,
+                  1138,
+                  403,
+                  1173,
+                  261,
+                  1173
+                ],
+                "confidence": 0.968,
+                "text": "another"
+              },
+              {
+                "boundingBox": [
+                  412,
+                  1138,
+                  463,
+                  1137,
+                  463,
+                  1174,
+                  412,
+                  1173
+                ],
+                "confidence": 0.986,
+                "text": "in"
+              },
+              {
+                "boundingBox": [
+                  470,
+                  1137,
+                  535,
+                  1137,
+                  535,
+                  1174,
+                  470,
+                  1174
+                ],
+                "confidence": 0.978,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  565,
+                  1137,
+                  715,
+                  1136,
+                  715,
+                  1174,
+                  564,
+                  1174
+                ],
+                "confidence": 0.69,
+                "text": "complex"
+              },
+              {
+                "boundingBox": [
+                  733,
+                  1136,
+                  928,
+                  1136,
+                  928,
+                  1174,
+                  733,
+                  1174
+                ],
+                "confidence": 0.93,
+                "text": "mechanism"
+              },
+              {
+                "boundingBox": [
+                  946,
+                  1136,
+                  1036,
+                  1136,
+                  1036,
+                  1175,
+                  946,
+                  1174
+                ],
+                "confidence": 0.98,
+                "text": "that"
+              },
+              {
+                "boundingBox": [
+                  1070,
+                  1136,
+                  1252,
+                  1137,
+                  1251,
+                  1175,
+                  1069,
+                  1175
+                ],
+                "confidence": 0.932,
+                "text": "maintains"
+              },
+              {
+                "boundingBox": [
+                  1279,
+                  1137,
+                  1335,
+                  1137,
+                  1334,
+                  1175,
+                  1278,
+                  1175
+                ],
+                "confidence": 0.98,
+                "text": "the"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              254,
+              1176,
+              1156,
+              1174,
+              1156,
+              1212,
+              254,
+              1214
+            ],
+            "text": "delicately balanced conditions for healthy life.",
+            "words": [
+              {
+                "boundingBox": [
+                  258,
+                  1178,
+                  434,
+                  1177,
+                  433,
+                  1214,
+                  257,
+                  1214
+                ],
+                "confidence": 0.943,
+                "text": "delicately"
+              },
+              {
+                "boundingBox": [
+                  446,
+                  1177,
+                  615,
+                  1176,
+                  614,
+                  1214,
+                  445,
+                  1214
+                ],
+                "confidence": 0.559,
+                "text": "balanced"
+              },
+              {
+                "boundingBox": [
+                  636,
+                  1176,
+                  834,
+                  1175,
+                  833,
+                  1214,
+                  636,
+                  1214
+                ],
+                "confidence": 0.91,
+                "text": "conditions"
+              },
+              {
+                "boundingBox": [
+                  844,
+                  1175,
+                  905,
+                  1175,
+                  905,
+                  1214,
+                  843,
+                  1214
+                ],
+                "confidence": 0.985,
+                "text": "for"
+              },
+              {
+                "boundingBox": [
+                  920,
+                  1175,
+                  1067,
+                  1174,
+                  1067,
+                  1214,
+                  919,
+                  1214
+                ],
+                "confidence": 0.955,
+                "text": "healthy"
+              },
+              {
+                "boundingBox": [
+                  1084,
+                  1174,
+                  1155,
+                  1174,
+                  1155,
+                  1213,
+                  1083,
+                  1213
+                ],
+                "confidence": 0.772,
+                "text": "life."
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              367,
+              1216,
+              1009,
+              1217,
+              1008,
+              1257,
+              367,
+              1255
+            ],
+            "text": "What are the questions that seem",
+            "words": [
+              {
+                "boundingBox": [
+                  382,
+                  1217,
+                  469,
+                  1216,
+                  468,
+                  1254,
+                  381,
+                  1250
+                ],
+                "confidence": 0.98,
+                "text": "What"
+              },
+              {
+                "boundingBox": [
+                  488,
+                  1216,
+                  562,
+                  1216,
+                  562,
+                  1256,
+                  487,
+                  1254
+                ],
+                "confidence": 0.98,
+                "text": "are"
+              },
+              {
+                "boundingBox": [
+                  571,
+                  1216,
+                  634,
+                  1216,
+                  634,
+                  1257,
+                  570,
+                  1256
+                ],
+                "confidence": 0.98,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  650,
+                  1216,
+                  807,
+                  1218,
+                  806,
+                  1256,
+                  649,
+                  1257
+                ],
+                "confidence": 0.973,
+                "text": "questions"
+              },
+              {
+                "boundingBox": [
+                  820,
+                  1218,
+                  905,
+                  1219,
+                  904,
+                  1254,
+                  819,
+                  1256
+                ],
+                "confidence": 0.984,
+                "text": "that"
+              },
+              {
+                "boundingBox": [
+                  920,
+                  1219,
+                  1009,
+                  1220,
+                  1009,
+                  1251,
+                  919,
+                  1254
+                ],
+                "confidence": 0.908,
+                "text": "seem"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              1015,
+              1211,
+              1375,
+              1212,
+              1375,
+              1256,
+              1015,
+              1253
+            ],
+            "text": "the most pivotal to",
+            "words": [
+              {
+                "boundingBox": [
+                  1030,
+                  1211,
+                  1104,
+                  1213,
+                  1105,
+                  1255,
+                  1031,
+                  1253
+                ],
+                "confidence": 0.986,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  1118,
+                  1213,
+                  1206,
+                  1213,
+                  1206,
+                  1256,
+                  1119,
+                  1255
+                ],
+                "confidence": 0.983,
+                "text": "most"
+              },
+              {
+                "boundingBox": [
+                  1220,
+                  1213,
+                  1328,
+                  1213,
+                  1327,
+                  1257,
+                  1220,
+                  1256
+                ],
+                "confidence": 0.913,
+                "text": "pivotal"
+              },
+              {
+                "boundingBox": [
+                  1336,
+                  1213,
+                  1375,
+                  1213,
+                  1373,
+                  1257,
+                  1335,
+                  1257
+                ],
+                "confidence": 0.986,
+                "text": "to"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              249,
+              1266,
+              327,
+              1257,
+              329,
+              1285,
+              250,
+              1292
+            ],
+            "text": "me ?",
+            "words": [
+              {
+                "boundingBox": [
+                  265,
+                  1266,
+                  304,
+                  1262,
+                  305,
+                  1288,
+                  265,
+                  1292
+                ],
+                "confidence": 0.924,
+                "text": "me"
+              },
+              {
+                "boundingBox": [
+                  310,
+                  1261,
+                  326,
+                  1258,
+                  327,
+                  1285,
+                  310,
+                  1287
+                ],
+                "confidence": 0.986,
+                "text": "?"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              351,
+              1291,
+              1196,
+              1295,
+              1196,
+              1335,
+              351,
+              1331
+            ],
+            "text": "1 ) How did the first living thing appear on earth?",
+            "words": [
+              {
+                "boundingBox": [
+                  351,
+                  1292,
+                  354,
+                  1292,
+                  354,
+                  1330,
+                  351,
+                  1330
+                ],
+                "confidence": 0.985,
+                "text": "1"
+              },
+              {
+                "boundingBox": [
+                  354,
+                  1292,
+                  379,
+                  1292,
+                  379,
+                  1331,
+                  354,
+                  1330
+                ],
+                "confidence": 0.973,
+                "text": ")"
+              },
+              {
+                "boundingBox": [
+                  387,
+                  1292,
+                  447,
+                  1292,
+                  448,
+                  1332,
+                  387,
+                  1331
+                ],
+                "confidence": 0.985,
+                "text": "How"
+              },
+              {
+                "boundingBox": [
+                  455,
+                  1292,
+                  511,
+                  1292,
+                  511,
+                  1333,
+                  455,
+                  1332
+                ],
+                "confidence": 0.981,
+                "text": "did"
+              },
+              {
+                "boundingBox": [
+                  519,
+                  1292,
+                  582,
+                  1292,
+                  582,
+                  1333,
+                  519,
+                  1333
+                ],
+                "confidence": 0.979,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  590,
+                  1292,
+                  673,
+                  1292,
+                  673,
+                  1334,
+                  590,
+                  1334
+                ],
+                "confidence": 0.979,
+                "text": "first"
+              },
+              {
+                "boundingBox": [
+                  681,
+                  1292,
+                  775,
+                  1293,
+                  774,
+                  1335,
+                  681,
+                  1334
+                ],
+                "confidence": 0.981,
+                "text": "living"
+              },
+              {
+                "boundingBox": [
+                  782,
+                  1293,
+                  876,
+                  1294,
+                  876,
+                  1335,
+                  782,
+                  1335
+                ],
+                "confidence": 0.98,
+                "text": "thing"
+              },
+              {
+                "boundingBox": [
+                  889,
+                  1294,
+                  1000,
+                  1295,
+                  1000,
+                  1334,
+                  888,
+                  1335
+                ],
+                "confidence": 0.977,
+                "text": "appear"
+              },
+              {
+                "boundingBox": [
+                  1008,
+                  1295,
+                  1066,
+                  1296,
+                  1066,
+                  1334,
+                  1007,
+                  1334
+                ],
+                "confidence": 0.959,
+                "text": "on"
+              },
+              {
+                "boundingBox": [
+                  1074,
+                  1296,
+                  1196,
+                  1298,
+                  1195,
+                  1332,
+                  1073,
+                  1334
+                ],
+                "confidence": 0.973,
+                "text": "earth?"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              340,
+              1338,
+              1244,
+              1337,
+              1244,
+              1373,
+              340,
+              1375
+            ],
+            "text": "2 ) Are there living things elsewhere in the universe ?",
+            "words": [
+              {
+                "boundingBox": [
+                  341,
+                  1339,
+                  350,
+                  1339,
+                  349,
+                  1374,
+                  340,
+                  1374
+                ],
+                "confidence": 0.943,
+                "text": "2"
+              },
+              {
+                "boundingBox": [
+                  357,
+                  1339,
+                  391,
+                  1339,
+                  391,
+                  1374,
+                  356,
+                  1374
+                ],
+                "confidence": 0.981,
+                "text": ")"
+              },
+              {
+                "boundingBox": [
+                  403,
+                  1339,
+                  456,
+                  1339,
+                  455,
+                  1374,
+                  402,
+                  1374
+                ],
+                "confidence": 0.95,
+                "text": "Are"
+              },
+              {
+                "boundingBox": [
+                  463,
+                  1339,
+                  562,
+                  1339,
+                  562,
+                  1375,
+                  462,
+                  1374
+                ],
+                "confidence": 0.98,
+                "text": "there"
+              },
+              {
+                "boundingBox": [
+                  569,
+                  1339,
+                  673,
+                  1339,
+                  673,
+                  1375,
+                  569,
+                  1375
+                ],
+                "confidence": 0.981,
+                "text": "living"
+              },
+              {
+                "boundingBox": [
+                  686,
+                  1339,
+                  797,
+                  1339,
+                  797,
+                  1375,
+                  686,
+                  1375
+                ],
+                "confidence": 0.965,
+                "text": "things"
+              },
+              {
+                "boundingBox": [
+                  818,
+                  1339,
+                  966,
+                  1339,
+                  966,
+                  1375,
+                  818,
+                  1375
+                ],
+                "confidence": 0.975,
+                "text": "elsewhere"
+              },
+              {
+                "boundingBox": [
+                  972,
+                  1339,
+                  1023,
+                  1338,
+                  1024,
+                  1374,
+                  973,
+                  1375
+                ],
+                "confidence": 0.981,
+                "text": "in"
+              },
+              {
+                "boundingBox": [
+                  1030,
+                  1338,
+                  1088,
+                  1338,
+                  1088,
+                  1374,
+                  1031,
+                  1374
+                ],
+                "confidence": 0.98,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  1095,
+                  1338,
+                  1208,
+                  1337,
+                  1208,
+                  1373,
+                  1095,
+                  1374
+                ],
+                "confidence": 0.831,
+                "text": "universe"
+              },
+              {
+                "boundingBox": [
+                  1215,
+                  1337,
+                  1242,
+                  1337,
+                  1243,
+                  1373,
+                  1215,
+                  1373
+                ],
+                "confidence": 0.985,
+                "text": "?"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              340,
+              1374,
+              1368,
+              1371,
+              1368,
+              1413,
+              340,
+              1415
+            ],
+            "text": "3 ) Is evolution a selection among undirected mutations ?",
+            "words": [
+              {
+                "boundingBox": [
+                  341,
+                  1378,
+                  349,
+                  1378,
+                  350,
+                  1412,
+                  341,
+                  1412
+                ],
+                "confidence": 0.986,
+                "text": "3"
+              },
+              {
+                "boundingBox": [
+                  356,
+                  1378,
+                  389,
+                  1378,
+                  390,
+                  1412,
+                  357,
+                  1412
+                ],
+                "confidence": 0.981,
+                "text": ")"
+              },
+              {
+                "boundingBox": [
+                  403,
+                  1379,
+                  458,
+                  1379,
+                  458,
+                  1413,
+                  403,
+                  1412
+                ],
+                "confidence": 0.985,
+                "text": "Is"
+              },
+              {
+                "boundingBox": [
+                  474,
+                  1379,
+                  616,
+                  1380,
+                  616,
+                  1414,
+                  474,
+                  1413
+                ],
+                "confidence": 0.949,
+                "text": "evolution"
+              },
+              {
+                "boundingBox": [
+                  629,
+                  1380,
+                  662,
+                  1380,
+                  662,
+                  1414,
+                  629,
+                  1414
+                ],
+                "confidence": 0.981,
+                "text": "a"
+              },
+              {
+                "boundingBox": [
+                  669,
+                  1380,
+                  813,
+                  1380,
+                  813,
+                  1415,
+                  669,
+                  1414
+                ],
+                "confidence": 0.961,
+                "text": "selection"
+              },
+              {
+                "boundingBox": [
+                  826,
+                  1380,
+                  953,
+                  1379,
+                  952,
+                  1415,
+                  826,
+                  1415
+                ],
+                "confidence": 0.919,
+                "text": "among"
+              },
+              {
+                "boundingBox": [
+                  984,
+                  1379,
+                  1165,
+                  1376,
+                  1164,
+                  1414,
+                  983,
+                  1415
+                ],
+                "confidence": 0.903,
+                "text": "undirected"
+              },
+              {
+                "boundingBox": [
+                  1192,
+                  1375,
+                  1338,
+                  1372,
+                  1337,
+                  1413,
+                  1191,
+                  1414
+                ],
+                "confidence": 0.969,
+                "text": "mutations"
+              },
+              {
+                "boundingBox": [
+                  1345,
+                  1372,
+                  1369,
+                  1371,
+                  1368,
+                  1413,
+                  1344,
+                  1413
+                ],
+                "confidence": 0.986,
+                "text": "?"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              340,
+              1417,
+              1395,
+              1419,
+              1395,
+              1455,
+              340,
+              1452
+            ],
+            "text": "4) Are favorable mutations propagated only within a species,",
+            "words": [
+              {
+                "boundingBox": [
+                  342,
+                  1418,
+                  385,
+                  1418,
+                  385,
+                  1452,
+                  343,
+                  1452
+                ],
+                "confidence": 0.976,
+                "text": "4)"
+              },
+              {
+                "boundingBox": [
+                  396,
+                  1418,
+                  450,
+                  1418,
+                  450,
+                  1452,
+                  397,
+                  1452
+                ],
+                "confidence": 0.985,
+                "text": "Are"
+              },
+              {
+                "boundingBox": [
+                  476,
+                  1418,
+                  628,
+                  1418,
+                  629,
+                  1453,
+                  477,
+                  1452
+                ],
+                "confidence": 0.934,
+                "text": "favorable"
+              },
+              {
+                "boundingBox": [
+                  657,
+                  1418,
+                  803,
+                  1418,
+                  803,
+                  1454,
+                  658,
+                  1453
+                ],
+                "confidence": 0.94,
+                "text": "mutations"
+              },
+              {
+                "boundingBox": [
+                  818,
+                  1418,
+                  1001,
+                  1419,
+                  1001,
+                  1455,
+                  818,
+                  1454
+                ],
+                "confidence": 0.888,
+                "text": "propagated"
+              },
+              {
+                "boundingBox": [
+                  1015,
+                  1419,
+                  1104,
+                  1419,
+                  1104,
+                  1455,
+                  1015,
+                  1455
+                ],
+                "confidence": 0.978,
+                "text": "only"
+              },
+              {
+                "boundingBox": [
+                  1129,
+                  1419,
+                  1245,
+                  1419,
+                  1245,
+                  1456,
+                  1128,
+                  1455
+                ],
+                "confidence": 0.739,
+                "text": "within"
+              },
+              {
+                "boundingBox": [
+                  1256,
+                  1419,
+                  1283,
+                  1419,
+                  1282,
+                  1456,
+                  1256,
+                  1456
+                ],
+                "confidence": 0.981,
+                "text": "a"
+              },
+              {
+                "boundingBox": [
+                  1290,
+                  1419,
+                  1395,
+                  1420,
+                  1394,
+                  1456,
+                  1289,
+                  1456
+                ],
+                "confidence": 0.913,
+                "text": "species,"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              386,
+              1458,
+              1383,
+              1455,
+              1383,
+              1491,
+              386,
+              1493
+            ],
+            "text": "or can one species \"learn\" genetic tricks from another",
+            "words": [
+              {
+                "boundingBox": [
+                  393,
+                  1463,
+                  438,
+                  1462,
+                  437,
+                  1491,
+                  392,
+                  1490
+                ],
+                "confidence": 0.986,
+                "text": "or"
+              },
+              {
+                "boundingBox": [
+                  456,
+                  1462,
+                  527,
+                  1460,
+                  526,
+                  1492,
+                  455,
+                  1491
+                ],
+                "confidence": 0.981,
+                "text": "can"
+              },
+              {
+                "boundingBox": [
+                  554,
+                  1460,
+                  608,
+                  1459,
+                  607,
+                  1492,
+                  553,
+                  1492
+                ],
+                "confidence": 0.973,
+                "text": "one"
+              },
+              {
+                "boundingBox": [
+                  637,
+                  1459,
+                  733,
+                  1458,
+                  732,
+                  1493,
+                  636,
+                  1493
+                ],
+                "confidence": 0.964,
+                "text": "species"
+              },
+              {
+                "boundingBox": [
+                  738,
+                  1458,
+                  865,
+                  1457,
+                  863,
+                  1493,
+                  737,
+                  1493
+                ],
+                "confidence": 0.69,
+                "text": "\"learn\""
+              },
+              {
+                "boundingBox": [
+                  885,
+                  1457,
+                  1010,
+                  1456,
+                  1008,
+                  1493,
+                  883,
+                  1493
+                ],
+                "confidence": 0.825,
+                "text": "genetic"
+              },
+              {
+                "boundingBox": [
+                  1022,
+                  1456,
+                  1131,
+                  1456,
+                  1129,
+                  1493,
+                  1021,
+                  1493
+                ],
+                "confidence": 0.974,
+                "text": "tricks"
+              },
+              {
+                "boundingBox": [
+                  1164,
+                  1456,
+                  1238,
+                  1456,
+                  1236,
+                  1492,
+                  1162,
+                  1493
+                ],
+                "confidence": 0.971,
+                "text": "from"
+              },
+              {
+                "boundingBox": [
+                  1254,
+                  1456,
+                  1382,
+                  1457,
+                  1380,
+                  1491,
+                  1252,
+                  1492
+                ],
+                "confidence": 0.978,
+                "text": "another"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              388,
+              1497,
+              1384,
+              1495,
+              1384,
+              1531,
+              388,
+              1534
+            ],
+            "text": "by analogues of bacterial transformation, transduction, and",
+            "words": [
+              {
+                "boundingBox": [
+                  390,
+                  1502,
+                  441,
+                  1501,
+                  441,
+                  1534,
+                  391,
+                  1534
+                ],
+                "confidence": 0.986,
+                "text": "by"
+              },
+              {
+                "boundingBox": [
+                  461,
+                  1501,
+                  606,
+                  1499,
+                  606,
+                  1534,
+                  462,
+                  1534
+                ],
+                "confidence": 0.786,
+                "text": "analogues"
+              },
+              {
+                "boundingBox": [
+                  612,
+                  1499,
+                  658,
+                  1498,
+                  658,
+                  1534,
+                  612,
+                  1534
+                ],
+                "confidence": 0.913,
+                "text": "of"
+              },
+              {
+                "boundingBox": [
+                  675,
+                  1498,
+                  825,
+                  1496,
+                  825,
+                  1533,
+                  675,
+                  1534
+                ],
+                "confidence": 0.95,
+                "text": "bacterial"
+              },
+              {
+                "boundingBox": [
+                  850,
+                  1496,
+                  1107,
+                  1495,
+                  1107,
+                  1533,
+                  850,
+                  1533
+                ],
+                "confidence": 0.559,
+                "text": "transformation,"
+              },
+              {
+                "boundingBox": [
+                  1113,
+                  1495,
+                  1322,
+                  1496,
+                  1322,
+                  1532,
+                  1113,
+                  1533
+                ],
+                "confidence": 0.748,
+                "text": "transduction,"
+              },
+              {
+                "boundingBox": [
+                  1329,
+                  1496,
+                  1385,
+                  1497,
+                  1385,
+                  1532,
+                  1328,
+                  1532
+                ],
+                "confidence": 0.981,
+                "text": "and"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              382,
+              1538,
+              1408,
+              1536,
+              1408,
+              1573,
+              382,
+              1574
+            ],
+            "text": "conjugation? Or even by cannibilization or eating other species?",
+            "words": [
+              {
+                "boundingBox": [
+                  384,
+                  1540,
+                  596,
+                  1539,
+                  595,
+                  1573,
+                  382,
+                  1574
+                ],
+                "confidence": 0.773,
+                "text": "conjugation?"
+              },
+              {
+                "boundingBox": [
+                  625,
+                  1538,
+                  661,
+                  1538,
+                  660,
+                  1573,
+                  624,
+                  1573
+                ],
+                "confidence": 0.804,
+                "text": "Or"
+              },
+              {
+                "boundingBox": [
+                  668,
+                  1538,
+                  739,
+                  1538,
+                  738,
+                  1573,
+                  666,
+                  1573
+                ],
+                "confidence": 0.98,
+                "text": "even"
+              },
+              {
+                "boundingBox": [
+                  746,
+                  1538,
+                  790,
+                  1538,
+                  789,
+                  1573,
+                  744,
+                  1573
+                ],
+                "confidence": 0.985,
+                "text": "by"
+              },
+              {
+                "boundingBox": [
+                  797,
+                  1538,
+                  1053,
+                  1537,
+                  1053,
+                  1573,
+                  796,
+                  1573
+                ],
+                "confidence": 0.74,
+                "text": "cannibilization"
+              },
+              {
+                "boundingBox": [
+                  1060,
+                  1537,
+                  1109,
+                  1537,
+                  1109,
+                  1573,
+                  1060,
+                  1573
+                ],
+                "confidence": 0.981,
+                "text": "or"
+              },
+              {
+                "boundingBox": [
+                  1123,
+                  1537,
+                  1207,
+                  1537,
+                  1207,
+                  1573,
+                  1122,
+                  1573
+                ],
+                "confidence": 0.825,
+                "text": "eating"
+              },
+              {
+                "boundingBox": [
+                  1214,
+                  1537,
+                  1283,
+                  1537,
+                  1283,
+                  1573,
+                  1214,
+                  1573
+                ],
+                "confidence": 0.983,
+                "text": "other"
+              },
+              {
+                "boundingBox": [
+                  1290,
+                  1537,
+                  1408,
+                  1537,
+                  1409,
+                  1574,
+                  1290,
+                  1573
+                ],
+                "confidence": 0.737,
+                "text": "species?"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              343,
+              1575,
+              1339,
+              1575,
+              1339,
+              1612,
+              343,
+              1612
+            ],
+            "text": "5 ) Are there any cases in which learned or otherwise",
+            "words": [
+              {
+                "boundingBox": [
+                  343,
+                  1576,
+                  345,
+                  1576,
+                  345,
+                  1609,
+                  343,
+                  1609
+                ],
+                "confidence": 0.981,
+                "text": "5"
+              },
+              {
+                "boundingBox": [
+                  352,
+                  1576,
+                  385,
+                  1576,
+                  385,
+                  1610,
+                  352,
+                  1609
+                ],
+                "confidence": 0.986,
+                "text": ")"
+              },
+              {
+                "boundingBox": [
+                  396,
+                  1576,
+                  449,
+                  1576,
+                  449,
+                  1611,
+                  396,
+                  1610
+                ],
+                "confidence": 0.98,
+                "text": "Are"
+              },
+              {
+                "boundingBox": [
+                  456,
+                  1576,
+                  546,
+                  1577,
+                  546,
+                  1612,
+                  456,
+                  1611
+                ],
+                "confidence": 0.978,
+                "text": "there"
+              },
+              {
+                "boundingBox": [
+                  566,
+                  1577,
+                  639,
+                  1577,
+                  639,
+                  1613,
+                  566,
+                  1612
+                ],
+                "confidence": 0.98,
+                "text": "any"
+              },
+              {
+                "boundingBox": [
+                  650,
+                  1577,
+                  747,
+                  1578,
+                  747,
+                  1613,
+                  650,
+                  1613
+                ],
+                "confidence": 0.979,
+                "text": "cases"
+              },
+              {
+                "boundingBox": [
+                  754,
+                  1578,
+                  805,
+                  1578,
+                  804,
+                  1613,
+                  753,
+                  1613
+                ],
+                "confidence": 0.975,
+                "text": "in"
+              },
+              {
+                "boundingBox": [
+                  836,
+                  1578,
+                  944,
+                  1578,
+                  943,
+                  1613,
+                  835,
+                  1613
+                ],
+                "confidence": 0.974,
+                "text": "which"
+              },
+              {
+                "boundingBox": [
+                  955,
+                  1578,
+                  1092,
+                  1577,
+                  1091,
+                  1613,
+                  954,
+                  1613
+                ],
+                "confidence": 0.977,
+                "text": "learned"
+              },
+              {
+                "boundingBox": [
+                  1098,
+                  1577,
+                  1151,
+                  1577,
+                  1150,
+                  1612,
+                  1097,
+                  1613
+                ],
+                "confidence": 0.981,
+                "text": "or"
+              },
+              {
+                "boundingBox": [
+                  1174,
+                  1577,
+                  1339,
+                  1576,
+                  1337,
+                  1610,
+                  1172,
+                  1612
+                ],
+                "confidence": 0.733,
+                "text": "otherwise"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              384,
+              1617,
+              1339,
+              1614,
+              1339,
+              1650,
+              384,
+              1653
+            ],
+            "text": "acquired characteristics become genetically built-in?",
+            "words": [
+              {
+                "boundingBox": [
+                  388,
+                  1621,
+                  551,
+                  1618,
+                  552,
+                  1653,
+                  389,
+                  1652
+                ],
+                "confidence": 0.861,
+                "text": "acquired"
+              },
+              {
+                "boundingBox": [
+                  572,
+                  1618,
+                  826,
+                  1615,
+                  825,
+                  1653,
+                  572,
+                  1653
+                ],
+                "confidence": 0.812,
+                "text": "characteristics"
+              },
+              {
+                "boundingBox": [
+                  848,
+                  1615,
+                  965,
+                  1615,
+                  964,
+                  1653,
+                  847,
+                  1653
+                ],
+                "confidence": 0.978,
+                "text": "become"
+              },
+              {
+                "boundingBox": [
+                  991,
+                  1615,
+                  1166,
+                  1615,
+                  1165,
+                  1652,
+                  990,
+                  1653
+                ],
+                "confidence": 0.662,
+                "text": "genetically"
+              },
+              {
+                "boundingBox": [
+                  1194,
+                  1615,
+                  1340,
+                  1615,
+                  1338,
+                  1650,
+                  1193,
+                  1652
+                ],
+                "confidence": 0.774,
+                "text": "built-in?"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              345,
+              1653,
+              1354,
+              1653,
+              1354,
+              1693,
+              345,
+              1690
+            ],
+            "text": "6 ) Do the known processes account quantitatively for the",
+            "words": [
+              {
+                "boundingBox": [
+                  346,
+                  1653,
+                  348,
+                  1653,
+                  348,
+                  1689,
+                  346,
+                  1689
+                ],
+                "confidence": 0.985,
+                "text": "6"
+              },
+              {
+                "boundingBox": [
+                  350,
+                  1653,
+                  385,
+                  1654,
+                  385,
+                  1689,
+                  351,
+                  1689
+                ],
+                "confidence": 0.912,
+                "text": ")"
+              },
+              {
+                "boundingBox": [
+                  392,
+                  1654,
+                  434,
+                  1655,
+                  434,
+                  1689,
+                  392,
+                  1689
+                ],
+                "confidence": 0.986,
+                "text": "Do"
+              },
+              {
+                "boundingBox": [
+                  441,
+                  1655,
+                  506,
+                  1657,
+                  506,
+                  1690,
+                  441,
+                  1690
+                ],
+                "confidence": 0.98,
+                "text": "the"
+              },
+              {
+                "boundingBox": [
+                  527,
+                  1657,
+                  643,
+                  1659,
+                  643,
+                  1691,
+                  527,
+                  1690
+                ],
+                "confidence": 0.979,
+                "text": "known"
+              },
+              {
+                "boundingBox": [
+                  660,
+                  1659,
+                  806,
+                  1660,
+                  806,
+                  1692,
+                  659,
+                  1691
+                ],
+                "confidence": 0.946,
+                "text": "processes"
+              },
+              {
+                "boundingBox": [
+                  827,
+                  1660,
+                  962,
+                  1659,
+                  961,
+                  1693,
+                  827,
+                  1692
+                ],
+                "confidence": 0.737,
+                "text": "account"
+              },
+              {
+                "boundingBox": [
+                  969,
+                  1659,
+                  1225,
+                  1656,
+                  1224,
+                  1693,
+                  968,
+                  1693
+                ],
+                "confidence": 0.693,
+                "text": "quantitatively"
+              },
+              {
+                "boundingBox": [
+                  1234,
+                  1656,
+                  1294,
+                  1655,
+                  1293,
+                  1693,
+                  1233,
+                  1693
+                ],
+                "confidence": 0.985,
+                "text": "for"
+              },
+              {
+                "boundingBox": [
+                  1301,
+                  1655,
+                  1355,
+                  1653,
+                  1354,
+                  1693,
+                  1300,
+                  1693
+                ],
+                "confidence": 0.981,
+                "text": "the"
+              }
+            ]
+          },
+          {
+            "boundingBox": [
+              393,
+              1693,
+              1115,
+              1691,
+              1115,
+              1728,
+              393,
+              1731
+            ],
+            "text": "rate at which evolution was proceeded ?",
+            "words": [
+              {
+                "boundingBox": [
+                  395,
+                  1696,
+                  469,
+                  1696,
+                  470,
+                  1729,
+                  396,
+                  1727
+                ],
+                "confidence": 0.652,
+                "text": "rate"
+              },
+              {
+                "boundingBox": [
+                  488,
+                  1696,
+                  535,
+                  1696,
+                  536,
+                  1729,
+                  489,
+                  1729
+                ],
+                "confidence": 0.981,
+                "text": "at"
+              },
+              {
+                "boundingBox": [
+                  572,
+                  1696,
+                  671,
+                  1696,
+                  672,
+                  1730,
+                  573,
+                  1730
+                ],
+                "confidence": 0.981,
+                "text": "which"
+              },
+              {
+                "boundingBox": [
+                  690,
+                  1696,
+                  845,
+                  1695,
+                  845,
+                  1730,
+                  691,
+                  1731
+                ],
+                "confidence": 0.973,
+                "text": "evolution"
+              },
+              {
+                "boundingBox": [
+                  871,
+                  1694,
+                  933,
+                  1694,
+                  933,
+                  1730,
+                  871,
+                  1730
+                ],
+                "confidence": 0.943,
+                "text": "was"
+              },
+              {
+                "boundingBox": [
+                  939,
+                  1694,
+                  1088,
+                  1692,
+                  1087,
+                  1728,
+                  939,
+                  1730
+                ],
+                "confidence": 0.91,
+                "text": "proceeded"
+              },
+              {
+                "boundingBox": [
+                  1094,
+                  1692,
+                  1114,
+                  1691,
+                  1114,
+                  1727,
+                  1094,
+                  1727
+                ],
+                "confidence": 0.986,
+                "text": "?"
+              }
+            ]
+          }
+        ],
+        "page": 1,
+        "unit": "pixel",
+        "width": 1459
+      }
+    ],
+    "version": "3.0.0"
+  },
+  "createdDateTime": "2021-06-10T01:22:09Z",
+  "lastUpdatedDateTime": "2021-06-10T01:22:11Z",
+  "status": "succeeded"
+}

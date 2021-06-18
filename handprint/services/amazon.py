@@ -9,15 +9,16 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+Copyright (c) 2018-2021 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
 import boto3
+from   commonpy.file_utils import readable
+from   commonpy.interrupt import raise_for_interrupts
 import imagesize
 import os
-from   os import path
 import sys
 
 if __debug__:
@@ -26,10 +27,8 @@ if __debug__:
 import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials
 from handprint.exceptions import *
-from handprint.files import readable
-from handprint.interruptions import interrupted, raise_for_interrupts, wait
 from handprint.network import net
-from handprint.services.base import TextRecognition, TRResult, TextBox
+from handprint.services.base import TextRecognition, TRResult, Box
 
 
 # Main class.
@@ -55,8 +54,8 @@ class AmazonTR(TextRecognition):
 
     def max_size(self):
         '''Returns the maximum size of an acceptable image, in bytes.'''
-        # https://docs.aws.amazon.com/textract/latest/dg/limits.html
-        return 5*1024*1024
+        # https://docs.aws.amazon.com/textract/latest/dg/textract-dg.pdf#limits
+        return 10*1024*1024
 
 
     def max_dimensions(self):
@@ -98,8 +97,8 @@ class AmazonTR(TextRecognition):
         try:
             session = boto3.session.Session()
             client = session.client(variant, region_name = creds['region_name'],
-                                  aws_access_key_id = creds['aws_access_key_id'],
-                                  aws_secret_access_key = creds['aws_secret_access_key'])
+                                    aws_access_key_id = creds['aws_access_key_id'],
+                                    aws_secret_access_key = creds['aws_secret_access_key'])
             if __debug__: log('calling Amazon API function')
             response = getattr(client, api_method)( **{ image_keyword : {'Bytes': image} })
             if __debug__: log('received {} blocks', len(response[response_key]))
@@ -108,16 +107,23 @@ class AmazonTR(TextRecognition):
             boxes = []
             width, height = imagesize.get(file_path)
             for block in response[response_key]:
-                if value_key in block and block[value_key] == "WORD":
+                if value_key not in block:
+                    continue
+                kind = block[value_key].lower()
+                if kind in ['word', 'line']:
                     text = block[block_key]
-                    full_text += (text + ' ')
                     corners = corner_list(block['Geometry']['Polygon'], width, height)
                     if corners:
-                        boxes.append(TextBox(boundingBox = corners, text = text))
+                        boxes.append(Box(kind = kind, bb = corners, text = text,
+                                         score = block['Confidence'] / 100))
                     else:
                         # Something's wrong with the vertex list. Skip & continue.
                         if __debug__: log('bad bb for {}: {}', text, bb)
-
+                if kind == "line":
+                    if 'Text' in block:
+                        full_text += block['Text'] + '\n'
+                    elif 'DetectedText' in block:
+                        full_text += block['DetectedText'] + '\n'
             return TRResult(path = file_path, data = response, boxes = boxes,
                             text = full_text, error = None)
         except KeyboardInterrupt as ex:
@@ -188,15 +194,15 @@ class AmazonRekognitionTR(AmazonTR):
 # .............................................................................
 
 def corner_list(polygon, width, height):
-    '''Takes a boundingBox value from Google vision's JSON output and returns
+    '''Takes a boundingBox value from Amazon's JSON output and returns
     a condensed version, in the form [x y x y x y x y], with the first x, y
     pair representing the upper left corner.'''
     corners = []
-    for index in [0, 1, 2, 3]:
-        if 'X' in polygon[index] and 'Y' in polygon[index]:
+    for poly_corner in polygon:
+        if 'X' in poly_corner and 'Y' in poly_corner:
             # Results  are in percentages of the image.  Convert to pixels.
-            corners.append(int(round(polygon[index]['X'] * width)))
-            corners.append(int(round(polygon[index]['Y'] * height)))
+            corners.append(int(round(poly_corner['X'] * width)))
+            corners.append(int(round(poly_corner['Y'] * height)))
         else:
             return []
     return corners

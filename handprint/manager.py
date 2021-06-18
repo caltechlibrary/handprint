@@ -9,12 +9,17 @@ Michael Hucka <mhucka@caltech.edu> -- Caltech Library
 Copyright
 ---------
 
-Copyright (c) 2018-2020 by the California Institute of Technology.  This code
+Copyright (c) 2018-2021 by the California Institute of Technology.  This code
 is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
 from   collections import namedtuple
+from   commonpy.interrupt import raise_for_interrupts, wait
+from   commonpy.file_utils import filename_basename, filename_extension, relative
+from   commonpy.file_utils import files_in_directory, alt_extension
+from   commonpy.file_utils import readable, writable, nonempty
+from   commonpy.file_utils import delete_existing
 from   concurrent.futures import ThreadPoolExecutor
 import humanize
 import io
@@ -30,6 +35,7 @@ import threading
 from   threading import Thread, Lock
 from   timeit import default_timer as timer
 import urllib
+from   validator_collection.checkers import is_url
 
 if __debug__:
     from sidetrack import set_debug, log, logr
@@ -38,14 +44,9 @@ import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.comparison import text_comparison
 from handprint.exceptions import *
-from handprint.files import filename_basename, filename_extension, relative
-from handprint.files import files_in_directory, alt_extension, handprint_path
-from handprint.files import readable, writable, nonempty, is_url
-from handprint.files import delete_existing
 from handprint.images import converted_image, annotated_image, create_image_grid
 from handprint.images import image_size, image_dimensions
 from handprint.images import reduced_image_size, reduced_image_dimensions
-from handprint.interruptions import interrupt, raise_for_interrupts
 from handprint.network import network_available, download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
 from handprint.ui import inform, alert, warn
@@ -80,7 +81,8 @@ class Manager:
     '''Manage invocation of services and creation of outputs.'''
 
     def __init__(self, service_names, num_threads, output_dir, make_grid,
-                 compare, extended):
+                 compare, extended, text_size, text_color, text_shift,
+                 display, confidence):
         '''Initialize manager for services.  This will also initialize the
         credentials for individual services.
         '''
@@ -89,6 +91,11 @@ class Manager:
         self._compare = compare
         self._output_dir = output_dir
         self._make_grid = make_grid
+        self._text_size = text_size
+        self._text_color = text_color
+        self._text_shift = text_shift
+        self._display = display
+        self._confidence = confidence
 
         self._services = []
         for service_name in service_names:
@@ -182,6 +189,12 @@ class Manager:
             for file in set(image.temp_files | {r.annotated for r in results}):
                 if file and path.exists(file):
                     delete_existing(file)
+        elif image.file != image.item_file:
+            # Delete the resized file.  While it would help efficiency to
+            # reuse it on subsequent runs, the risk is that those runs might
+            # target different services and would end up using a different-
+            # sized image than if we sized it appropriately for _this_ run.
+            delete_existing(image.file)
 
         inform(f'Done with {relative(item)}')
 
@@ -291,12 +304,16 @@ class Manager:
         annot_path  = self._renamed(base_path, str(service), 'png')
         report_path = None
         with self._lock:
-            self._save(annotated_image(image.file, output.boxes, service), annot_path)
+            img = annotated_image(image.file, output.boxes, service,
+                                  self._text_size, self._text_color, self._text_shift,
+                                  self._display, self._confidence)
+            self._save(img, annot_path)
         if self._extended_results:
             txt_file  = self._renamed(base_path, str(service), 'txt')
             json_file = self._renamed(base_path, str(service), 'json')
             inform(f'Saving all data for {service_name}.')
-            self._save(json.dumps(output.data), json_file)
+            raw_json = json.dumps(output.data, sort_keys = True, indent = 2)
+            self._save(raw_json, json_file)
             inform(f'Saving extracted text for {service_name}.')
             self._save(output.text, txt_file)
         if self._compare:

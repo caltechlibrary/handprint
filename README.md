@@ -1,23 +1,20 @@
-Handprint<img width="12%" align="right" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/noun_Hand_733265.png">
-=========
+# Handprint<img width="12%" align="right" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/noun_Hand_733265.png">
 
-The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ program applies HTR services to images of handwritten text and produces an annotated image (and optionally more) showing the text recognized.
+The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can generate images showing the results, compare the recognized text to expected text, and save the raw HTR results as JSON and text files.
 
 [![Latest release](https://img.shields.io/github/v/release/caltechlibrary/handprint.svg?style=flat-square&color=b44e88&label=Latest%20release)](https://github.com/caltechlibrary/handprint/releases)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
-[![Python](https://img.shields.io/badge/Python-3.6+-brightgreen.svg?style=flat-square)](http://shields.io)
+[![Python](https://img.shields.io/badge/Python-3.8+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
 [![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1669)](https://data.caltech.edu/records/1669)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
 
 
-❡ Log of recent changes
------------------------
+## ❡ Log of recent changes
 
-_Version 1.4.0_: This release does not change the user interface or functionality, but this is more than a patch release because it changes the minimum required versions of many Python packages and uses newer Google API libraries.  A few bugs have been fixed as well.  The file [CHANGES](CHANGES.md) contains a more complete change log, and includes information about previous releases.
+_Version 1.5.0_: This is a large update with many new features and bug fixes. Please see the file [`CHANGES.md`](CHANGES.md) for more information. If you use Handprint, **you should update to this version**.
 
-§ Table of Contents
------------------
+## § Table of Contents
 
 * [Introduction](#-introduction)
 * [Installation](#-installation)
@@ -26,11 +23,15 @@ _Version 1.4.0_: This release does not change the user interface or functionalit
 * [Usage](#︎-usage)
    * [Supported HTR/OCR services](#supported-htrocr-services)
    * [Input files and URLs](#input-files-and-urls)
-   * [Annotated output images](#annotated-output-images)
-   * [Extended results](#extended-results)
+   * [Selecting destination services](#selecting-destination-services)
+   * [Visual display of recognition results](#visual-display-of-recognition-results)
+   * [Annotation types](#annotation-types)
+   * [Thresholding by confidence](#thresholding-by-confidence)
    * [Comparison to ground truth text](#comparison-to-ground-truth-text)
+   * [Extended results](#extended-results)
    * [Other options](#other-options)
    * [Command line options summary](#command-line-options-summary)
+   * [Return values](#return-values)
 * [Known issues and limitations](#known-issues-and-limitations)
 * [Getting help](#-getting-help)
 * [Contributing](#-contributing)
@@ -38,38 +39,42 @@ _Version 1.4.0_: This release does not change the user interface or functionalit
 * [Authors and history](#-authors-and-history)
 * [Acknowledgments](#︎-acknowledgments)
 
-☞ Introduction
--------------
+<img align="right" width="480px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/glaser-example-google.jpg">
 
-<img align="right" width="550px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/glaser-example-google.jpg">
+## ☞ Introduction
 
-Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a small project to examine the performance of alternative services for offline [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.  Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/), and more.  Among other features, Handprint can generate versions of the input images with recognized text overlaid over them, to visualize the results.  The image at right shows an example.
+Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a tool for comparing alternative services for offline [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.
 
-Handprint can work with individual images, directories of images, and URLs pointing to images on remote servers.  In addition to producing annotated images as output, it can output the raw results from an HTR service as JSON and text files.  Handprint can use multiple processor threads for parallel execution.
+Handprint can generate images with recognized text overlaid over them to visualize the results.  The image at right shows an example.  Among other features, the software can also display bounding boxes, threshold results by confidence values, compare full-text results to expected/ground-truth results, and output the raw results from an HTR service as JSON and text files. It can work with individual images, directories of images, and URLs pointing to images on remote servers. Finally, Handprint can use multiple processor threads for parallel execution.
 
-✎ Installation and configuration
--------------------------------
+Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), and Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/).  The framework for connecting to services could be expanded to support others as well (and contributions are welcome!).
 
-The instructions below assume you have a Python interpreter installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system.
 
-Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft.  Installing Handprint requires a both installing a copy of Handprint on your computer and supplying your copy with credentials for accessing the cloud services you want to use.
+## ✎ Installation and configuration
+
+The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command and inspecting the results:
+```sh
+python3 --version
+```
+
+Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but does not include credentials for using the services.  To be able to use Handprint, you must **both** install a copy of Handprint on your computer **and** supply your copy with credentials for accessing the cloud services you want to use.
 
 
 ### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
 
 On **Linux**, **macOS**, and **Windows** operating systems, you should be able to install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have the `pip` package or are uncertain if you do, first run the following command in a terminal command line interpreter: 
-```
+```sh
 sudo python3 -m ensurepip
 ```
 
-Then, to install Handprint from the Python package repository, run the following command:
-```
-python3 -m pip install handprint --user --upgrade
+Then, to install or upgrade Handprint from the Python package repository, run the following command:
+```sh
+python3 -m pip install handprint --upgrade
 ```
 
-As an alternative to getting it from PyPI, you can instruct `pip` to install Handprint directly from the GitHub repository:
+As an alternative to getting it from PyPI, you can instruct `pip` to install or upgrade Handprint directly from the GitHub repository:
 ```sh
-python3 -m pip install git+https://github.com/caltechlibrary/handprint.git --user --upgrade
+python3 -m pip install git+https://github.com/caltechlibrary/handprint.git --upgrade
 ```
 
 
@@ -80,7 +85,7 @@ A one-time configuration step is needed for each cloud-based HTR service after y
 handprint -a SERVICENAME CREDENTIALSFILE.json
 ```
 
-_SERVICENAME_ must be one of the service names printed by running `handprint -l`, and `CREDENTIALSFILE.json` must have one of the formats discussed below.  When you run this command, Handprint will copy `CREDENTIALSFILE.json` to a private location, and thereafter uses the credentials to access _SERVICENAME_.  (The private location is different on different systems; for example, on macOS it is `~/Library/Application Support/Handprint/`.)  Examples are given below.
+_SERVICENAME_ must be one of the service names printed by running `handprint -l`, and `CREDENTIALSFILE.json` must have one of the formats discussed below.  When you run this command, Handprint copies `CREDENTIALSFILE.json` to a private location, and thereafter uses the credentials to access _SERVICENAME_.  (The private location is different on different systems; for example, on macOS it is `~/Library/Application Support/Handprint/`.)  Examples are given below.
 
 
 #### Microsoft
@@ -145,13 +150,12 @@ handprint -a amazon-rekognition myamazoncredentials.json
 ```
 
 
-▶︎ Usage
--------
+## ▶︎ Usage
 
 Handprint comes with a single command-line interface program called `handprint`.  Here is a screen cast to give a sense for what it's like to run Handprint. Click on the following image:
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/handprint-screencast.gif"><img src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/handprint-preview-image.png" alt="Screencast of simple Handprint demo"></a>
+  <a href="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/handprint-demo.gif"><img src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/handprint-preview-image.png" alt="Screencast of simple Handprint demo"></a>
 </p>
 
 The `handprint` command-line program should end up installed in a location where software is normally installed on your computer, if the installation steps described in the previous section proceed successfully.  Running Handprint from a terminal shell then should be as simple as running any other shell command on your system:
@@ -169,58 +173,108 @@ python3 -m handprint -h
 The `-h` option (`/h` on Windows) will make `handprint` display some help information and exit immediately.  To make Handprint do more, you can supply other arguments that instruct Handprint to process image files (or alternatively, URLs pointing to image files at a network location) and run text recognition algorithms on them, as explained below.
 
 
-### _Supported HTR/OCR services_
-
-Handprint can contact more than one cloud service for HTR.  You can use the `-l` option (`/l` on Windows) to make it display a list of the services currently implemented:
-
-```
-# handprint -l
-Known services: amazon-rekognition, amazon-textract, google, microsoft
-```
-
-By default, Handprint will run every known service in turn, creating annotated images to represent the results of each individual service.  To invoke only specific services, use the `-s` option (`/s` on Windows) followed by a service name or a list of names separated by commas (e.g., `google,microsoft`).  For example, the following command will save the results of invoking only Microsoft's text recognition service on a page from [Clara Barton's unpublished draft book "The Life of My Childhood"](https://picryl.com/media/clara-barton-papers-speeches-and-writings-file-1849-1947-books-the-life-of-71), available in Handprint's source directory:
-```csh
-handprint -s microsoft tests/images/public-domain/clara-barton-life-of-my-childhood-p90.jpg
-```
-
-Here is what that result looks like:
-<img src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/clara-barton-page.png" alt="Example of running Microsoft's service on a page from Clara Barton's unpublished draft book, The Life of My Childhood.">
-
-
 ### _Input files and URLs_
 
-After credentials are installed, running Handprint _without_ the `-a` option will invoke one or more services on files, directories of files, or URLs pointing to files.  More specifically, inputs can be supplied in any of the following ways:
+After credentials are installed, running Handprint _without_ the `-a` option will invoke one or more services on files, directories of files, or URLs pointing to files. Here is an example of running Handprint on a directory containing images:
+```sh
+handprint tests/data/caltech-archives/glaser/
+```
 
+Image paths or URLs can be supplied to Handprint in any of the following ways:
 * One or more directory paths or one or more image file paths on the local disk, which will be interpreted as images (either individually or in directories) to be processed
 * One or more URLs, which will be interpreted as network locations of image files to be processed
 * If given the `-f` option (`/f` on Windows), a file containing either image paths or image URLs to be processed
 
-Handprint considers each input path individually, and determines when an input is a URL based on whether the given path begins with letters followed by the characters `:/` followed by the rest of the path (e.g., `http://some/other/characters`).  If any of the input images are URLs, Handprint will first download the images found at the URLs to a directory indicated by the option `-o` (`/o` on Windows).  If a destination directory is not provided via `-o`, the current working directory where Handprint is running is used instead.
+Handprint assumes a path is a URL if it meets the test of [`is_url(...)`](https://validator-collection.readthedocs.io/en/latest/checkers.html?highlight=is_url#validator_collection.checkers.is_url) from the Python Validator Collection.  For every input given as a URL, Handprint will first download the image found at the URL to a directory indicated by the option `-o` (`/o` on Windows), or the current directory if option `-o` is not used.
 
-No matter whether files or URLs, each input should be a single image of a document page in which text should be recognized.  Handprint reads a number of common formats: JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF.  However, for simplicity and maximum compatibility with all cloud services, **Handprint always converts all input files to PNG** if they are not already in that format, before sending them to a service.  Handprint also resizes images if necessary, to the smallest size accepted by any of the services invoked if an image exceeds that size.  (For example, if service A accepts files up to 10 MB in size and service B accepts files up to 5 MB, all input images will be resized to 5 MB before sending them to A and B, even if A could accept a higher-resolution image.)  In addition, a limitation of Handprint's current PDF support is that only the first image in a PDF file is read &ndash; if a PDF file contains more than one image, the remaining images are ignored.
+No matter whether files or URLs, each input item should be a single image of a document page in which text should be recognized.  Handprint reads a number of common formats: JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF.  However, for simplicity and maximum compatibility with all cloud services, Handprint always **converts all input files to PNG** if they are not already in that format, no matter if a given service can accept other formats.  Handprint also **reduces the size of input images to the smallest size accepted by any of the services invoked** if an image exceeds that size.  (For example, when sending a file to services A and B at the same time, if service A accepts files up to 10 MB in size and service B accepts files up to 4 MB, Handprint will resize the file to 4 MB before sending it to _both_ A and B, even if A could accept a higher-resolution image.)  Finally, if the input contains more than one page (e.g., in a PDF file), **Handprint will only use the first page of the input** and ignore the remaining pages.
 
-Note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to store the URLs in a file in combination with the `-f` option (`/f` on Windows).
+Be aware that **downsizing images can change the text recognition results returned by some services** compared to the results obtained using the original full-size input image.  If your images are larger when converted to PNG than the smallest size accepted by one of the destination services (currently 4 MB, for Microsoft), then you may wish to compare the results of using multiple services at once versus one at a time (i.e., one destination at a time in separate invocations of Handprint).
+
+Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it's usually better to store the URLs in a file in combination with the `-f` option (`/f` on Windows).
 
 
-### _Annotated output images_
+### _Selecting destination services_
 
-By default, Handprint will create a single output file for each input file.  This file will be have the suffix `.handprint-all.png` and contain an annotated version of the results for each service invoked, tiled in a _N_&times;_N_ grid fashion to produce one (big) output image.  Here is a sample output image to illustrate:
+You can use the `-l` option (`/l` on Windows) to make it display a list of the services currently supported by Handprint:
 
+```sh
+# handprint -l
+Known services: amazon-rekognition, amazon-textract, google, microsoft
+```
+
+By default, Handprint will send images to all of the known services, creating annotated images to represent the results of each individual service.  To invoke only specific services, use the `-s` option (`/s` on Windows) followed by a service name or a list of names separated by commas (e.g., `google,microsoft`).  For example, the following command will invoke Microsoft's text recognition service on a page from [Clara Barton's unpublished draft book "The Life of My Childhood"](https://picryl.com/media/clara-barton-papers-speeches-and-writings-file-1849-1947-books-the-life-of-71), available in Handprint's source directory:
+```sh
+handprint -s microsoft tests/data/public-domain/images/clara-barton-life-of-my-childhood-p90.jpg
+```
+
+Here is the result of that command:
 <p align="center">
-<img src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/all-results-example.jpg" alt="Example annotated results output image">
+<img width="90%" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/clara-barton-page.jpg" alt="Example of running Microsoft's service on a page from Clara Barton's unpublished draft book, The Life of My Childhood.">
 </p>
 
-The 2&times;2 image above was produced by running the following command from the Handprint source directory:
+### _Visual display of recognition results_
+
+After gathering the results of each service for a given input, Handprint will create a single compound image consisting of the results for each service arranged in a _N_&times;_N_ grid.  This overview image is intended to make it easier to compare the results of multiple services against each other.  The grid image will have the suffix `.handprint-all.png`.  Here is a sample output image to illustrate:
+
+<p align="center">
+<img width="90%" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/all-results-example.png" alt="Example annotated results output image">
+</p>
+
+The 2&times;2 image above was produced by running the following command from the Handprint `tests/data/caltech-archives/glaser` directory:
 ```csh
-handprint tests/images/public-domain/H96566k.jpg
+handprint --text-size 20  "DAG_5_1_6 1952-1957 Notebook VI p2.jpg"
 ```
 
 The individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked (described in more detail below).  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
 
 
+### _Annotation types_
+
+Handprint produces copies of the input images overlaid with the recognition results received from the different services.  By default, it shows only the recognized text.  The option `-d` (`/d` on Windows) can be used to tell Handprint to display other results.  The recognized values are as follows:
+
+* `text`: display the text recognized in the image (default)
+* `bb`: display all bounding boxes returned by the service
+* `bb-word`: display the bounding boxes for words
+* `bb-line`: display the bounding boxes for lines
+* `bb-para`: display the bounding boxes for paragraphs
+
+Separate multiple values with a comma.  The option `bb` is a shorthand for the value `bb-word,bb-line,bb-para`.  As an example, the following command will show both the recognized text and the bounding boxes around words:
+```sh
+handprint -d text,bb-word  -s google  tests/data/public-domain/images/H96566k.jpg
+```
+
+And here is the output from that command:
+
+<p align="center">
+<img width="90%" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/google-bounding-box-example.png" alt="Example of bounding boxes">
+</p>
+
+Note that as of June 2021, the main services (Amazon, Google, Microsoft) do not all provide the same bounding box information in their results.  The following table summarizes what is available:
+
+| Service   | Word<br>bounding boxes | Line<br>bounding boxes | Paragraph<br>bounding boxes |
+|-----------|:----:|:----:|:---------:|
+| Amazon    |  Y   |  Y   |     -     |
+| Google    |  Y   |  -   |     Y     |
+| Microsoft |  Y   |  Y   |     -     |
+
+If a service does not provide a particular kind of bounding box, Handprint will not display that kind of 
+bounding box in the annotated output for that service.
+
+
+### _Thresholding by confidence_
+
+All of the services return confidence scores for items recognized in the input.  By default, Handprint will show all results no matter how low the confidence score.  The option `-n` (`/n` on Windows) can be used to threshold the results based on the confidence value for each item (text or bounding boxes).  The value provided as the argument to the option must be a floating point number between 0 and 1.0.  For example, the following command will make Handprint only show text that is rated with least 99.5% confidence:
+```sh
+handprint -n 0.995  somefile.png
+```
+
+Note that the **confidence values returned by the different services are not normalized against each other**.  What one service considers to be 80% confidence may not be what another service considers 80% confidence.  Handprint performs the thresholding against the raw scores returned by each service individually.
+
+
 ### _Comparison to ground truth text_
 
-Handprint supports comparing the output of HTR services to expected output (i.e., ground truth) using the option `-c` (or `/c` on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:
+Handprint offers the ability to compare the output of HTR services to expected output (i.e., ground truth) using the option `-c` (or `/c` on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:
 
 * The file containing the expected results should be named `.gt.txt`, with a base name identical to the image file.  For example, an image file named `somefile.jpg` should have a corresponding text file `somefile.gt.txt`.  (This is a convention used by some other tools such as [ocropy](https://github.com/tmbdev/ocropy/wiki/Working-with-Ground-Truth).)
 * The ground-truth text file should be located in the same directory as the input image file.
@@ -250,7 +304,7 @@ Handprint attempts to cope with possibly-missing text in the HTR results by matc
 The following is an example of a tab-separated file produced using `-c`.  This example shows a case where two lines were missing entirely from the HTR results; for those lines, the number of errors equals the length of the ground-truth text lines and the CER is 100%.
 
 <p align="center">
-<img width="60%" src="https://raw.githubusercontent.com/caltechlibrary/handprint/master/.graphics/example-tsv-file.png">
+<img width="60%" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/example-tsv-file.png">
 </p>
 
 
@@ -259,7 +313,6 @@ The following is an example of a tab-separated file produced using `-c`.  This e
 If the option `-e` (`/e` on Windows) is used, Handprint saves not only the overview image containing all the results, but also, individual annotated images for each service's results, the raw data (converted to a JSON file by Handprint), and the text extracted by the service.  These additional outputs will be written in files named after the original files with the addition of a string that indicates the service used.  For example, a file named `somefile.jpg` will produce
 
 ```
-somefile.handprint.png
 somefile.handprint-amazon-textract.png
 somefile.handprint-amazon-textract.json
 somefile.handprint-amazon-textract.txt
@@ -309,17 +362,18 @@ document-3.handprint-microsoft.txt
 
 The base name `document` can be changed using the `-b` option (`/b` on Windows).  For example, running Handprint with the option `-b einstein` will cause the outputs to be named `einstein-1.jpg`, `einstein-1.url`, etc.
 
-Finally, if an image is too large for any of the services invoked, then Handprint will resize it prior to sending the image to any of the services (as noted above).  It will write the reduced image to a file named `FILENAME.handprint.EXT`, where `FILENAME` is the original file name and `EXT` is the file extension.  This file is normally deleted, unless you use the `-e` option (`/e` on Windows) mentioned above, in which case you will find this additional file in the same location as the others:
-
-```
-document-1.handprint.png
-```
 
 ### _Other options_
 
-Handprint produces color-coded diagnostic output as it runs, by default.  However, some terminals or terminal configurations may make it hard to read the text with colors, so Handprint offers the `-C` option (`/C` on Windows) to turn off colored output.
+To move the position of the text annotations overlaid over the input image, you can use the option `-m` (or `/m` on Windows).  This takes two numbers separated by a comma in the form `x,y`.  Positive numbers move the text rightward and upward, respectively, relative to the default position.  The default position of each text annotation in the annotated output is such that the _left edge of the word_ starts at the location of the _upper left corner of the bounding box_ returned by the service; this has the effect of putting the annotation near, but above, the location of the (actual) word in the input image by default.  For example, if the word in the image is _strawberry_, the bounding box returned by the service will enclose _strawberry_, and the upper left corner of that bounding box will be somewhere above the letter _s_. Then, the default position of the text annotation will put the left edge of the word "strawberry" at that point above the letter _s_. Using the move-text option allows you to move the annotation if desired. A value such as `0,-5` will move it downward five pixels.
+
+To change the color of the text annotations overlaid over the input image, you can use the option `-x` (or `/x` on Windows).  You can use hex color codes such as `"#ff0000"` (make sure to enclose the value with quotes, or the shell will interpret the pound sign as a comment character), or X11/CSS4 color names with no spaces such as `purple` or `darkgreen`.
+
+To change the size of the text annotations overlaid over the input image, you can use the option `-z` (or `/z` on Windows).  The value is in units of points.  The default size is 12.
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
+
+If given the `-q` option (`/q` on Windows), Handprint will not print its usual informational messages while it is working.  It will only print messages for warnings or errors.  By default messages printed by Handprint are also color-coded.  If given the option `-Z` (`/Z` on Windows), Handprint will not color the text of messages it prints.  (This latter option is useful when running Handprint within subshells inside other environments such as Emacs.)
 
 If given the `-@` argument (`/@` on Windows), this program will output a detailed trace of what it is doing.  The debug trace will be sent to the given destination, which can be `-` to indicate console output, or a file path to send the output to a file.  On non-Windows platforms, Handprint will also install a signal handler that responds to signal `SIGUSR1`; if the signal is sent to the running process, it will drop Handprint into the `pdb` debugger.  _Note_: It's best to use `-t 1` when attempting to use a debugger because otherwise subthreads will continue running even if the main thread is interrupted.
 
@@ -330,26 +384,32 @@ If given the `-V` option (`/V` on Windows), this program will print the version 
 
 The following table summarizes all the command line options available. (Note: on Windows computers, `/` must be used as the prefix character instead of the `-` dash character):
 
-| Short&nbsp;&nbsp;&nbsp;&nbsp; | Long&nbsp;form | Meaning | Default |  |
-|------------------------------ |----------------|---------|---------|--|
-| `-a`_A_   | `--add-creds`_A_  | Add credentials for service _A_ and exit | | |
-| `-b`_B_   | `--base-name`_B_  | Write outputs to files named _B_-n | Use base names of image files | ⚑ |
-| `-c`      | `--compare`       | Compare to ground truth; also see `-r` | |
-| `-C`      | `--no-color`      | Don't color-code the output | Use colors in the terminal output |
-| `-e`      | `--extended`      | Produce extended results | Produce only results overview image | |
-| `-f`_F_   | `--from-file`_F_  | Read file names or URLs from file _F_ | Use names or URLs on command line |
-| `-G`      | `--no-grid`       | Don't produce results summary image | Produce an _N_&times;_N_ grid image| |
-| `-h`      | `--help`          | Display help text and exit | | |
-| `-l`      | `--list`          | Display known services and exit | | | 
-| `-o`_O_   | `--output`_O_     | Write outputs to directory _O_ | Directories where images are found | |
-| `-q`      | `--quiet`         | Don't print messages while working | Be chatty while working |
-| `-r`      | `--relaxed`       | Use looser criteria for `--compare` | |
-| `-s`_S_   | `--service`_S_    | Use recognition service _S_ | "all" | |
-| `-t`_T_   | `--threads`_T_    | Use _T_ number of threads | Use (#cores)/2 threads | |
-| `-V`      | `--version`       | Display program version info and exit | | |
-| `-@`_OUT_ | `--debug`_OUT_    | Debugging mode; write trace to _OUT_ | Normal mode | ⬥ |
+| Short&nbsp;&nbsp;&nbsp;&nbsp;   | Long&nbsp;form | Meaning | Default |  |
+|---------------------------------|----------------|---------|---------|--|
+| `-a`_A_   | `--add-creds`_A_    | Add credentials for service _A_ and exit | | |
+| `-b`_B_   | `--base-name`_B_    | Write outputs to files named _B_-n | Use base names of image files | ⚑ |
+| `-C`      | `--no-color`        | Don't color-code the output | Use colors in the terminal output |
+| `-c`      | `--compare`         | Compare to ground truth; see `-r` too | |
+| `-d`_D_   | `--display`_D_      | Display annotation types _D_ | Display text annotations | ★ |
+| `-e`      | `--extended`        | Produce extended results | Produce only the overview image | |
+| `-f`_F_   | `--from-file`_F_    | Read file names or URLs from file _F_ | Use what's given on command line |
+| `-G`      | `--no-grid`         | Don't produce results summary image | Produce an _N_&times;_N_ grid image| |
+| `-h`      | `--help`            | Display help text and exit | | |
+| `-l`      | `--list`            | Display known services and exit | | | 
+| `-m`_x,y_ | `--text-move`_x,y_  | Move each text annotation by x,y | `0,0` | |
+| `-n`_N_   | `--confidence`_N_   | Use confidence score threshold _N_ | `0` | |
+| `-o`_O_   | `--output`_O_       | Write outputs to directory _O_ | Directories where images are found | |
+| `-q`      | `--quiet`           | Don't print messages while working | Be chatty while working |
+| `-r`      | `--relaxed`         | Use looser criteria for `--compare` | |
+| `-s`_S_   | `--service`_S_      | Use recognition service _S_; see `-l` | Use all services | |
+| `-t`_T_   | `--threads`_T_      | Use _T_ number of threads | Use (#cores)/2 threads | |
+| `-V`      | `--version`         | Display program version info and exit | | |
+| `-x`_X_   | `--text-color`_X_   | Use color _X_ for text annotations | Red | |
+| `-z`_Z_   | `--text-size`_Z_    | Use font size _Z_ for text annotations | Use font size 12 | |
+| `-@`_OUT_ | `--debug`_OUT_      | Debugging mode; write trace to _OUT_ | Normal mode | ⬥ |
 
 ⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpg`, `document-1.handprint-google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.<br>
+★ &nbsp; The possible values of _D_ are: `text`, `bb`, `bb-word`, `bb-line`, `bb-para`. Multiple values must be separated with commas. The value `bb` is a shorthand for `bb-word,bb-line,bb-para`. The default is `text`.<br>
 ⬥ &nbsp; To write to the console, use the character `-` as the value of _OUT_; otherwise, _OUT_ must be the name of a file where the output should be written.
 
 
@@ -373,43 +433,37 @@ This program exits with a return code of 0 if no problems are encountered.  It r
 The debug logging functionality is implemented using [Sidetrack](https://github.com/caltechlibrary/sidetrack) and all calls to the debug code are conditionalized on the Python symbol `__debug__`.  It is carefully written so that you can cause the calls to be _optimized out completely_ if your run Python with [optimization turned on](https://docs.python.org/3/using/cmdline.html#cmdoption-o) (e.g., using the `-O` command-line option).
 
 
-☹︎ Known issues and limitations
-------------------------------
+## ☹︎ Known issues and limitations
 
 Here are some known limitations in the current version of Handprint:
 
+* If the input has multiple pages, only the first page/image is used; the rest (if any) are ignored.
 * The Amazon Rekognition API will return [at most 50 words in an image](https://docs.aws.amazon.com/rekognition/latest/dg/limits.html).
 * The Microsoft Azure API will only detect a maximum of [300 lines of text per page](https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/concept-recognizing-text).
 * Some services have different file size restrictions depending on the format of the file, but Handprint always uses the same limit for all files for a given service.  This is a code simplification.
-* When the input is a PDF file, only the first image in the PDF file is used; the rest (if any) are ignored.
 
 
-⁇ Getting help
--------------
+## ⁇ Getting help
 
 If you find an issue, please submit it in [the GitHub issue tracker](https://github.com/caltechlibrary/handprint/issues) for this repository.
 
 
-♬ Contributing
--------------
+## ♬ Contributing
 
 I would be happy to receive your help and participation with enhancing Handprint!  Please visit the [guidelines for contributing](CONTRIBUTING.md) for some tips on getting started.
 
 
-⧴ License
----------
+## ⧴ License
 
-Copyright (C) 2018&ndash;2020, Caltech.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
+Software produced by the Caltech Library is Copyright © 2021 California Institute of Technology.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
 
 
-☺︎ Authors and history
---------------------
+## ☺︎ Authors and history
 
 [Mike Hucka](https://github.com/mhucka) designed and implemented Handprint beginning in mid-2018.
 
 
-♡ Acknowledgments
------------------------
+## ♡ Acknowledgments
 
 The [vector artwork](https://thenounproject.com/search/?q=hand&i=733265) of a hand used as a logo for Handprint was created by [Kevin](https://thenounproject.com/kevn/) from the Noun Project.  It is licensed under the Creative Commons [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/) license.
 
@@ -421,7 +475,9 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
 * [boltons](https://github.com/mahmoud/boltons/) &ndash; package of miscellaneous Python utilities
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
+* [CommonPy](https://github.com/caltechlibrary/commonpy) &ndash; a collection of commonly-useful Python functions
 * [dateparser](https://pypi.org/project/dateparser/) &ndash; parse dates in almost any string format
+* [fastnumbers](https://github.com/SethMMorton/fastnumbers) &ndash; number testing and conversion functions
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
 * [grpcio](https://grpc.io) &ndash; open-source RPC framework
 * [humanize](https://github.com/jmoiron/humanize) &ndash; make numbers more easily readable by humans
@@ -429,17 +485,18 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [ipdb](https://github.com/gotcha/ipdb) &ndash; the IPython debugger
 * [matplotlib](https://matplotlib.org) &ndash; a Python 2-D plotting library
 * [numpy](https://numpy.org) &ndash; package for scientific computing in Python
-* [rich](https://rich.readthedocs.io/en/latest/) &ndash; library for writing styled text to the terminal
 * [Pillow](https://github.com/python-pillow/Pillow) &ndash; a fork of the Python Imaging Library
 * [plac](http://micheles.github.io/plac/) &ndash; a command line argument parser
 * [psutil](https://github.com/giampaolo/psutil) &ndash; cross-platform package for process and system monitoring in Python
 * [PyMuPDF](https://github.com/pymupdf/PyMuPDF) &ndash; Python bindings for the MuPDF rendering library
 * [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
+* [Rich](https://rich.readthedocs.io/en/latest/) &ndash; library for writing styled text to the terminal
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
 * [sidetrack](https://github.com/caltechlibrary/sidetrack) &ndash; simple debug logging/tracing package
 * [StringDist](https://github.com/obulkin/string-dist) &ndash; library for calculating string distances
 * [textdistance](https://github.com/orsinium/textdistance) &ndash; compute distances between text sequences
 * [urllib3](https://github.com/urllib3/urllib3) &ndash; Python HTTP library
+* [Validator Collection](https://github.com/insightindustry/validator-collection) &ndash; Python library of 60+ commonly-used validator functions
 * [wheel](https://pypi.org/project/wheel/) &ndash; setuptools extension for building wheels
 
 Finally, I am grateful for computing &amp; institutional resources made available by the California Institute of Technology.

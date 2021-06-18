@@ -260,7 +260,7 @@ def annotated_image(file, boxes, service, size = 12, color = 'r', shift = '0,0',
             show_bb = ['word', 'line', 'para']
         else:
             show_bb = set(flatten(d.split('-') for d in display)) - {'text', 'bb'}
-        if __debug__: log(f'will show {show_bb} bb for {relative(file)}')
+        if __debug__: log(f'will show {", ".join(show_bb)} bb for {relative(file)}')
 
         box_list = []
         for bb_type in show_bb:

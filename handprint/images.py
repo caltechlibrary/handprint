@@ -14,13 +14,14 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   boltons.iterutils import flatten
 from   commonpy.file_utils import relative, readable
 from   commonpy.file_utils import filename_extension, filename_basename
 import io
 import matplotlib
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-from   matplotlib.patches import Rectangle
+from   matplotlib.patches import Polygon
 
 import numpy as np
 import os
@@ -85,6 +86,18 @@ import handprint
 from handprint.exceptions import *
 
 
+# Internal constants.
+# .............................................................................
+
+_EDGE_COLOR = {'word': 'red',
+               'line': 'blue',
+               'para': 'green'}
+
+_Z_ORDER = {'word': 3,
+            'line': 2,
+            'para': 1}
+
+
 # Main functions.
 # .............................................................................
 
@@ -135,7 +148,7 @@ def reduced_image_size(orig_file, dest_file, max_size):
         try:
             i_size = image_size(orig_file)
             if i_size <= max_size:
-                if __debug__: log(f'file already smaller than requested: {orig_file}')
+                if __debug__: log(f'file already small: {relative(orig_file)}')
                 return (orig_file, None)
             ratio = max_size/i_size
             if __debug__: log(f'resize ratio = {ratio}')
@@ -144,7 +157,7 @@ def reduced_image_size(orig_file, dest_file, max_size):
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
             if __debug__: log(f'resizing image to {new_dims}')
             resized = im.resize(new_dims, Image.HAMMING)
-            if __debug__: log(f'saving resized image to {dest_file}')
+            if __debug__: log(f'saving resized image to {relative(dest_file)}')
             if orig_file == dest_file:
                 im.seek(0)
             resized.save(dest_file)
@@ -172,7 +185,7 @@ def reduced_image_dimensions(orig_file, dest_file, max_width, max_height):
             new_dims = (round(dims[0] * ratio), round(dims[1] * ratio))
             if __debug__: log(f'rescaling image to {new_dims}')
             resized = im.resize(new_dims, Image.HAMMING)
-            if __debug__: log(f'saving re-dimensioned image to {dest_file}')
+            if __debug__: log(f'saving re-dimensioned image to {relative(dest_file)}')
             if orig_file == dest_file:
                 im.seek(0)
             resized.save(dest_file)
@@ -200,15 +213,15 @@ def converted_image(orig_file, to_format, dest_file = None):
                 if __debug__: log(f'{orig_file} has > 1 images; using only 1st')
             # FIXME: if there's more than 1 image, we could extra the rest.
             # Doing so will require some architectural changes first.
-            if __debug__: log(f'extracting 1st image from {dest_file}')
+            if __debug__: log(f'extracting 1st image from {relative(dest_file)}')
             page = doc[0]
             pix = page.getPixmap(alpha = False)
-            if __debug__: log(f'writing {dest_file}')
+            if __debug__: log(f'writing {relative(dest_file)}')
             pix.writeImage(dest_file, dest_format)
             return (dest_file, None)
         else:
-            if __debug__: log(f'fitz says there is no image image in {orig_file}')
-            return (None, f'Cannot find an image inside {orig_file}')
+            if __debug__: log(f'fitz says there is no image image in {relative(orig_file)}')
+            return (None, f'Cannot find an image inside {relative(orig_file)}')
     else:
         # When converting images, PIL may issue a DecompressionBombWarning but
         # it's not a concern in our application.  Ignore it.
@@ -216,9 +229,9 @@ def converted_image(orig_file, to_format, dest_file = None):
             warnings.simplefilter('ignore')
             try:
                 im = Image.open(orig_file)
-                if __debug__: log(f'converting {orig_file} to RGB')
+                if __debug__: log(f'converting {relative(orig_file)} to RGB')
                 im.convert('RGB')
-                if __debug__: log(f'saving converted image to {dest_file}')
+                if __debug__: log(f'saving converted image to {relative(dest_file)}')
                 if orig_file == dest_file:
                     im.seek(0)
                 im.save(dest_file, dest_format)
@@ -227,53 +240,56 @@ def converted_image(orig_file, to_format, dest_file = None):
                 return (None, str(ex))
 
 
-def annotated_image(file, text_boxes, service, color = 'r', shift = '0,0'):
+def annotated_image(file, boxes, service, size = 12, color = 'r', shift = '0,0',
+                    display = ['text'], score_threshold = 0):
     service_name = service.name().title()
 
     fig, axes = plt.subplots(nrows = 1, ncols = 1, figsize = (20, 20))
     axes.get_xaxis().set_visible(False)
     axes.get_yaxis().set_visible(False)
-    axes.set_title(service_name, color = color, fontweight = 'bold', fontsize = 22)
+    axes.set_title(service_name, color = color, fontweight = 'bold', fontsize = 20)
 
     if __debug__: log(f'reading image file for {service_name}: {relative(file)}')
     img = mpimg.imread(file)
     axes.imshow(img, cmap = "gray")
 
-    # The way this positions the annotations is as follows. Each word
-    # annotation in the output is placed such that the LOWER left corner of
-    # the annotation is at the position of the UPPER left corner of the
-    # bounding box returned by the service; this has the effect of putting
-    # the annotation above the original word in the input image.  For example,
-    # if the word in the image is _whatever_, the bounding box returned by
-    # the service will enclose most of _whatever_, and the upper left corner
-    # of that bounding box will be somewhere above the letter _w_. Then, the
-    # default position starts with a boxed "whatever", and the lower left
-    # corner of that box will be placed at that point above the letter _w_.
-    # The shift parameter moves it according to x,y offsets.
+    boxes = [item for item in boxes if item.score >= score_threshold]
+    if __debug__: log(f'{len(boxes)} boxes pass threshold for {relative(file)}')
+    if boxes and any(d.startswith('bb') for d in display):
+        if 'bb' in display:             # If user indicated 'bb', it means all.
+            show_bb = ['word', 'line', 'para']
+        else:
+            show_bb = set(flatten(d.split('-') for d in display)) - {'text', 'bb'}
+        if __debug__: log(f'will show {show_bb} bb for {relative(file)}')
 
-    shift = shift.strip('()" \\\\').split(',')
-    if len(shift) == 2:
-        try:
-            x_shift, y_shift = int(shift[0]), int(shift[1])
-        except ValueError:
-            x_shift, y_shift = 0, 0
+        box_list = []
+        for bb_type in show_bb:
+            box_list += list(box for box in boxes if box.kind == bb_type)
+        for box in box_list:
+            vertices = [(box.bb[i], box.bb[i+1]) for i in range(0, len(box.bb), 2)]
+            poly = Polygon(vertices, facecolor = 'None', zorder = _Z_ORDER[box.kind],
+                           edgecolor = _EDGE_COLOR[box.kind])
+            axes.add_patch(poly)
 
-    props = dict(facecolor = 'white', alpha = 0.6)
-    if text_boxes:
-        if __debug__: log(f'adding {len(text_boxes)} annotations for {service_name}')
-        polygons = [(item.boundingBox, item.text) for item in text_boxes]
-        for polygon in polygons:
-            vertices = [(polygon[0][i], polygon[0][i+1])
-                        for i in range(0, len(polygon[0]), 2)]
-            x = max(0, vertices[0][0] - x_shift)
-            y = max(0, vertices[0][1] - y_shift)
-            text = polygon[1]
-            plt.text(x, y, text, color = color, fontsize = 11,
-                     va = "center", bbox = props)
+    if boxes and any(d == 'text' for d in display):
+        x_shift, y_shift = 0, 0
+        shift = shift.strip('()" \\\\').split(',')
+        if len(shift) == 2:
+            try:
+                x_shift, y_shift = int(shift[0]), int(shift[1])
+            except ValueError:
+                pass
+
+        props = {'facecolor': 'white', 'edgecolor': 'none', 'alpha': 0.8, 'pad': 1}
+        for box in filter(lambda item: item.kind == 'word', boxes):
+            x = max(0, box.bb[0] + x_shift)
+            y = max(0, box.bb[1] + y_shift)
+            plt.text(x, y, box.text, color = color, fontsize = size,
+                     va = "center", bbox = props, zorder = 10)
 
     if __debug__: log(f'generating png for {service_name} for {relative(file)}')
     buf = io.BytesIO()
-    fig.savefig(buf, format = 'png', dpi = 300, bbox_inches = 'tight', pad_inches = 0)
+    fig.savefig(buf, format = 'png', dpi = 300, bbox_inches = 'tight', pad_inches = 0.02)
     buf.flush()
     buf.seek(0)
     plt.close(fig)

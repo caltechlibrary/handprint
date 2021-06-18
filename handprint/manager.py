@@ -81,7 +81,8 @@ class Manager:
     '''Manage invocation of services and creation of outputs.'''
 
     def __init__(self, service_names, num_threads, output_dir, make_grid,
-                 compare, extended, text_color, text_shift):
+                 compare, extended, text_size, text_color, text_shift,
+                 display, confidence):
         '''Initialize manager for services.  This will also initialize the
         credentials for individual services.
         '''
@@ -90,8 +91,11 @@ class Manager:
         self._compare = compare
         self._output_dir = output_dir
         self._make_grid = make_grid
+        self._text_size = text_size
         self._text_color = text_color
         self._text_shift = text_shift
+        self._display = display
+        self._confidence = confidence
 
         self._services = []
         for service_name in service_names:
@@ -301,7 +305,8 @@ class Manager:
         report_path = None
         with self._lock:
             img = annotated_image(image.file, output.boxes, service,
-                                  self._text_color, self._text_shift)
+                                  self._text_size, self._text_color, self._text_shift,
+                                  self._display, self._confidence)
             self._save(img, annot_path)
         if self._extended_results:
             txt_file  = self._renamed(base_path, str(service), 'txt')

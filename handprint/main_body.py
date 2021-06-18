@@ -59,7 +59,8 @@ class MainBody(object):
         # sending them to the services.
         self._manager = Manager(self.services, self.threads, self.output_dir,
                                 self.make_grid, self.compare, self.extended,
-                                self.text_color, self.text_shift)
+                                self.text_size, self.text_color, self.text_shift,
+                                self.display, self.confidence)
 
 
     def run(self):

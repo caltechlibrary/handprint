@@ -39,6 +39,7 @@ from   commonpy.data_utils import timestamp
 from   commonpy.file_utils import filename_extension, files_in_directory
 from   commonpy.file_utils import readable, writable
 from   commonpy.interrupt import config_interrupt, interrupt, interrupted
+from   fastnumbers import fast_real, isreal, isint
 import os
 from   os import path, cpu_count
 import plac
@@ -67,31 +68,34 @@ disable_ssl_cert_check()
 # .............................................................................
 
 @plac.annotations(
-    add_creds  = ('add credentials file for service "A"',                'option', 'a'),
-    base_name  = ('use base name "B" to name downloaded images',         'option', 'b'),
-    color_text = ('use color "C" for text annotations (default: red)',   'option', 'C'),
-    compare    = ('compare text results to ground truth files',          'flag',   'c'),
-    extended   = ('produce extended results (text file, JSON data)',     'flag',   'e'),
-    from_file  = ('read list of images or URLs from file "F"',           'option', 'f'),
-    no_grid    = ('do not create an all-results grid image',             'flag',   'G'),
-    list       = ('print list of known services',                        'flag',   'l'),
-    move_text  = ('move position of text annotations by x,y (see help)', 'option', 'm'),
-    output_dir = ('write output to directory "O"',                       'option', 'o'),
-    quiet      = ('only print important messages while working',         'flag',   'q'),
-    relaxed    = ('make --compare use more relaxed criteria',            'flag',   'r'),
-    services   = ('invoke HTR/OCR service "S" (default: "all")',         'option', 's'),
-    threads    = ('number of threads to use (default: #cores/2)',        'option', 't'),
-    version    = ('print version info and exit',                         'flag',   'V'),
-    no_color   = ('do not colorize output printed to the terminal',      'flag',   'Z'),
-    debug      = ('write detailed trace to "OUT" ("-" means console)',   'option', '@'),
+    add_creds  = ('add credentials file for service "A"',                 'option', 'a'),
+    base_name  = ('use base name "B" to name downloaded images',          'option', 'b'),
+    no_color   = ('do not colorize output printed to the terminal',       'flag',   'C'),
+    compare    = ('compare text results to ground truth files',           'flag',   'c'),
+    display    = ('annotations to display (default: text)',               'option', 'd'),
+    extended   = ('produce extended results (text file, JSON data)',      'flag',   'e'),
+    from_file  = ('read list of images or URLs from file "F"',            'option', 'f'),
+    no_grid    = ('do not create an all-results grid image',              'flag',   'G'),
+    list       = ('print list of known services',                         'flag',   'l'),
+    text_move  = ('move position of text annotations by x,y (see help)',  'option', 'm'),
+    confidence = ('only keep results with confidence scores >= N',        'option', 'n'),
+    output_dir = ('write output to directory "O"',                        'option', 'o'),
+    quiet      = ('only print important messages while working',          'flag',   'q'),
+    relaxed    = ('make --compare use more relaxed criteria',             'flag',   'r'),
+    services   = ('invoke HTR/OCR service "S" (default: "all")',          'option', 's'),
+    threads    = ('number of threads to use (default: #cores/2)',         'option', 't'),
+    version    = ('print version info and exit',                          'flag',   'V'),
+    text_color = ('use color "X" for text annotations (default: red)',    'option', 'x'),
+    text_size  = ('use font size "Z" for text annotations (default: 10)', 'option', 'z'),
+    debug      = ('write detailed trace to "OUT" ("-" means console)',    'option', '@'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
 
-def main(add_creds = 'A', base_name = 'B', color_text = 'C',
-         compare = False, extended = False, from_file = 'F', no_grid = False,
-         list = False, move_text = 'M', output_dir = 'O', quiet = False,
-         relaxed = False, services = 'S', threads = 'T', version = False,
-         no_color = False, debug = 'OUT', *files):
+def main(add_creds = 'A', base_name = 'B', no_color = False, compare = False,
+         display = 'D', extended = False, from_file = 'F', no_grid = False,
+         list = False, text_move = 'M', confidence = 'N', output_dir = 'O',
+         quiet = False, relaxed = False, services = 'S', threads = 'T',
+         version = False, text_color = 'X', text_size = 'Z', debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -126,7 +130,11 @@ Basic usage
 
 After credentials are installed, running Handprint without the -a option will
 invoke one or more OCR/HTR services on files, directories of files, or URLs.
-The image paths or URLs can be supplied in any of the following ways:
+Here is an example of running Handprint on a directory containing images:
+
+  handprint tests/data/caltech-archives/glaser/
+
+Image paths or URLs can be supplied to Handprint in any of the following ways:
 
  a) one or more directory paths or one or more image file paths, which will
     be interpreted as images (either individually or in directories) to be
@@ -138,26 +146,36 @@ The image paths or URLs can be supplied in any of the following ways:
  c) if given the -f option (/f on Windows), a file containing either image
     paths or image URLs.
 
-If given URLs, Handprint will first download the images found at the URLs to
-a local directory indicated by the option -o (/o on Windows).  Handprint can
-accept input images in JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF formats.
+Note that providing URLs on the command line can be problematic due to how
+terminal shells interpret certain characters, and so when supplying URLs,
+it's usually better to store the URLs in a file and use the -f option.
+Regardless, when given URLs, Handprint will first download the images to a
+local directory indicated by the option -o (/o on Windows), or the current
+directory if option -o is not used.
 
-To make the results from different services more easily comparable, Handprint
-will always convert all input images to the same format (PNG) no matter if
-some services may accept other formats; it will also resize input images to
-the smallest size accepted by any of the services invoked if an image exceeds
-that size.  (For example, if service A accepts files up to 10 MB in size and
-service B accepts files up to 5 MB, all input images will be resized to 5 MB
-before sending them to A and B, even if A could accept a higher-resolution
+No matter whether files or URLs, each input should be a single image of a
+document page in which text should be recognized.  Handprint can accept input
+images in JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF formats. To make the
+results from different services more easily comparable, Handprint will always
+convert all input images to the same format (PNG) no matter if some services
+may accept other formats; it will also downsize input images to the smallest
+size accepted by any of the services invoked if an image exceeds that size.
+(For example, if service A accepts files up to 10 MB in size and service B
+accepts files up to 4 MB, all input images will be resized to 4 MB before
+sending them to both A and B, even if A could accept a higher- resolution
 image.)  Finally, if the input contains more than one page (e.g., in a PDF
-file), Handprint will only use the first page and ignore the remaining pages.
+file), Handprint will only use the first page and ignore the rest.
 
 Be aware that resizing images to the lowest common size means that the text
 recognition results returned by some services may be different than if the
 original full-size input image had been sent to that service.  If your images
-the smallest size (currently 5 MB) when converted to PNG, then you may wish
-to compare the results of using multiple services at once versus using the
-services one at a time.
+are larger (when converted to PNG) than the size threshold for some services
+(which is currently 4 MB when Microsoft is one of the destinations), then you
+may wish to compare the results of using multiple services at once versus
+using the services one at a time.
+
+Selecting destination services
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The default action is to run all known services.  The option -s (/s on
 Windows) can be used to select only one service or a list of services
@@ -166,34 +184,15 @@ instead.  Lists of services should be separated by commas; e.g.,
 it with the command-line flag -l (or /l on Windows), which will make Handprint
 print a list of the known services and exit immediately.
 
-When performing OCR/HTR on images, Handprint temporarily (unless the -e
-option is given -- see below) writes the results to new files that it creates
-either in the same directories as the original files, or (if given the -o
-option) the directory indicated by the -o option (/o on Windows).  The
-results will be written in files named after the original files with the
-addition of a string that indicates the service used.  For example, a file
-named "somefile.jpg" will result in
-
-  somefile.handprint-google.png
-  somefile.handprint-microsoft.png
-  somefile.handprint-amazon.png
-  ...
-
-and so on for each image and each service used.  THESE FILES ARE DELETED
-after the final results grid image is created, UNLESS the -e option (/e on
-Windows) is used to indicate that extended results should be produced; in that
-case, these individual annotated image files are kept.
-
 Visual display of recognition results
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 After gathering the results of each service for a given input, Handprint will
 create a single compound image consisting of the results for each service
-(displayed as text overlayed over the original input image) arranged in a grid,
-with titles showing which output corresponds to which service.  This is
-intended to make it easier to compare the results of multiple services against
-each other.  To skip the creation of the results grid, use the -G option
-(/G on Windows).  The grid image have a name with the following pattern:
+arranged in a grid.  This is intended to make it easier to compare the results
+of multiple services against each other.  To skip the creation of the results
+grid, use the -G option (/G on Windows).  The grid image have a name with
+the following pattern:
 
   somefile.handprint-all.png
 
@@ -213,7 +212,7 @@ output of -e will be multiple files like this:
   somefile.handprint-amazon.txt
   ...
 
-The files will written to the directory indicated by -o, or (if -o is not
+The files will be written to the directory indicated by -o, or (if -o is not
 used) the directory where "somefile" is located.  When -o is not used and
 the input images are given as URLs, then the files are written to the current
 working directory instead.
@@ -231,6 +230,58 @@ possible to connect each "document-N.png" to the URL it came from.
 
 Finally, note that the use of the -G option (/G on Windows) WITHOUT either
 the -e or -c option is an error because it means no output would be produced.
+
+Type of annotations
+~~~~~~~~~~~~~~~~~~~
+
+Handprint produces copies of the input images overlayed with the recognition
+results received from the different services.  By default, it shows only the
+recognized text.  The option -d (/d on Windows) can be used to tell Handprint
+to display other results.  The recognized values are as follows:
+
+  text    -- display the text recognized in the image (default)
+  bb      -- display all bounding boxes returned by the service
+  bb-word -- display only the bounding boxes for words
+  bb-line -- display only the bounding boxes for lines
+  bb-para -- display only the bounding boxes for paragraphs
+
+Separate multiple values with a comma.  The option "bb" is a shorthand for the
+value "bb-word,bb-line,bb-para".  As an example, the following command will
+show both the recognized text and the bounding boxes around words:
+
+  handprint -d text,bb-word  somefile.png
+
+Note that as of June 2021, the main services (Amazon, Google, Microsoft) do not
+all provide the same bounding box information in their results.  The following
+table summarizes what is available:
+
+               Bounding boxes available
+  Service      Word    Line   Paragraph
+  ---------    ----    ----   ---------
+  Amazon         Y       Y        -
+  Google         Y       -        Y
+  Microsoft      Y       Y        -
+
+If a service does not provide a particular kind of bounding box, Handprint will
+not display that kind of bounding box in the annotated output for that service.
+
+Thresholding by confidence
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+All of the services return confidence scores for items recognized in the input.
+By default, Handprint will show all results in the annotated image, no matter
+how low the score.  The option -n (/n on Windows) can be used to threshold the
+results based on the confidence value for each item (text or bounding boxes).
+The value provided as the argument to -n must be a floating point number
+between 0 and 1.0.  For example, the following command will make Handprint only
+show text that is rated with least 99.5% confidence:
+
+  handprint -n 0.995  somefile.png
+
+Note that the confidence values returned by the different services are not
+normalized against each other.  What one service considers to be 80% confidence
+may not be what another service considers 80% confidence.  Handprint performs
+the thresholding against the raw scores returned by each service individually.
 
 Comparing results to expected output
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -292,27 +343,31 @@ appropriately.
 Additional command-line arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+To move the position of the text annotations overlayed over the input image,
+you can use the option -m (or /m on Windows).  This takes two numbers separated
+by a comma in the form x,y.  Positive numbers move the text rightward and
+upward, respectively, relative to the default position.  The default position
+of each text annotation in the annotated output is such that the left edge of
+the word starts at the location of the upper left corner of the bounding box
+returned by the service; this has the effect of putting the annotation near,
+but above, the location of the (actual) word in the input image by default.
+Using the text-move option allows you to move the annotation if desired.
+
 To change the color of the text annotations overlayed over the input image,
-you can use the option -C (or /C on Windows).  You can use hex color codes
+you can use the option -x (or /x on Windows).  You can use hex color codes
 such as "#ff0000" or X11/CSS4 color names with no spaces such as "purple"
 or "darkgreen".  If you use a hex value, make sure to enclose the value with
 quotes, or the shell will interpret the pound sign as a comment character.
 
-To change the position of the text annotations overlayed over the input image,
-you can use the option -S (or /S on Windows).  This takes two numbers separated
-by a comma in the form x,y.  Positive numbers move the text down and to the
-right of the default position.  The default position of each word in the
-annotated output is such that the lower left corner of the annotation is at the
-position of the upper left corner of the bounding box returned by the service;
-this has the effect of putting the annotation near, but above, the location of
-the (actual) word in the input image.  Using the shift option allows you to
-move the annotation if desired.
+To change the size of the text annotations overlayed over the input image,
+you can use the option -z (or /z on Windows).  The value is in units of points.
+The default size is 12 points.
 
 Handprint will send files to the different services in parallel, using a
-number of process threads equal to 1/2 of the number of cores on the computer
-it is running on.  (E.g., if your computer has 4 cores, it will by default use
-at most 2 threads.)  The option -t (/t on Windows) can be used to change this
-number.
+number of process threads at most equal to 1/2 of the number of cores on the
+computer it is running on.  (E.g., if your computer has 4 cores, it will by
+default use at most 2 threads.)  The option -t (/t on Windows) can be used to
+change this number.
 
 If given the -q option (/q on Windows), Handprint will not print its usual
 informational messages while it is working.  It will only print messages
@@ -333,7 +388,6 @@ a debugger because the subthreads will not stop running if the signal is sent.
 
 If given the -V option (/V on Windows), this program will print the version
 and other information, and exit without doing anything else.
-
 
 Return values
 ~~~~~~~~~~~~~
@@ -356,8 +410,8 @@ Command-line arguments summary
 
     # Initial setup -----------------------------------------------------------
 
-    prefix = '/' if sys.platform.startswith('win') else '-'
-    hint = f'(Hint: use {prefix}h for help.)'
+    pref = '/' if sys.platform.startswith('win') else '-'
+    hint = f'(Hint: use {pref}h for help.)'
     ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
             use_color = not no_color, be_quiet = quiet)
     ui.start()
@@ -386,7 +440,7 @@ Command-line arguments summary
             alert(f'Unknown service: "{service}". {hint}')
             exit(int(ExitCode.bad_arg))
         if not files or len(files) > 1:
-            alert(f'Option {prefix}a requires one file. {hint}')
+            alert(f'Option {pref}a requires one file. {hint}')
             exit(int(ExitCode.bad_arg))
         creds_file = files[0]
         if not readable(creds_file):
@@ -402,8 +456,15 @@ Command-line arguments summary
     if services != 'S' and not all(s in services_list() for s in services):
         alert_fatal(f'"{services}" is/are not known services. {hint}')
         exit(int(ExitCode.bad_arg))
+    display_given = display
+    display = ['text'] if display == 'D' else display.lower().split(',')
+    possible_displays = ['text', 'bb', 'bb-word', 'bb-words', 'bb-line',
+                         'bb-lines', 'bb-para', 'bb-paragraph', 'bb-paragraphs']
+    if not all(d in possible_displays for d in display):
+        alert_fatal(f'Unrecognized value for {pref}d: {display_given}. {hint}')
+        exit(int(ExitCode.bad_arg))
     if no_grid and not extended and not compare:
-        alert_fatal(f'{prefix}G without {prefix}e or {prefix}c produces no output. {hint}')
+        alert_fatal(f'{pref}G without {pref}e or {pref}c produces no output. {hint}')
         exit(int(ExitCode.bad_arg))
     if any(item.startswith('-') for item in files):
         bad = next(item for item in files if item.startswith('-'))
@@ -413,7 +474,21 @@ Command-line arguments summary
         alert_fatal(f'Need images or URLs to have something to do. {hint}')
         exit(int(ExitCode.bad_arg))
     if relaxed and not compare:
-        warn(f'Option {prefix}r without {prefix}c has no effect. {hint}')
+        warn(f'Option {pref}r without {pref}c has no effect. {hint}')
+    if text_move != 'M' and ',' not in text_move:
+        alert_fatal(f'Option {pref}m requires an argument of the form x,y. {hint}')
+        exit(int(ExitCode.bad_arg))
+    if text_size != 'Z' and not isint(text_size):
+        alert_fatal(f'Option {pref}z requires an integer as an argument. {hint}')
+        exit(int(ExitCode.bad_arg))
+    if confidence != 'N':
+        if not isreal(confidence):
+            alert_fatal(f'Option {pref}n requires a real number as an argument. {hint}')
+            exit(int(ExitCode.bad_arg))
+        confidence = fast_real(confidence)
+        if not (0 <= confidence <= 1.0):
+            alert_fatal(f'Option {pref}n requires a real number between 0 and 1.0. {hint}')
+            exit(int(ExitCode.bad_arg))
 
     # Do the real work --------------------------------------------------------
 
@@ -425,8 +500,11 @@ Command-line arguments summary
                         output_dir = None if output_dir == 'O' else output_dir,
                         add_creds  = None if add_creds == 'A' else add_creds,
                         base_name  = 'document' if base_name == 'B' else base_name,
-                        text_color = 'red' if color_text == 'C' else color_text.lower(),
-                        text_shift = '0,0' if move_text == 'M' else move_text,
+                        confidence = 0 if confidence == 'N' else confidence,
+                        text_color = 'red' if text_color == 'X' else text_color.lower(),
+                        text_shift = '0,0' if text_move == 'M' else text_move,
+                        text_size  = '12' if text_size == 'Z' else int(text_size),
+                        display    = display,
                         make_grid  = not no_grid,
                         extended   = extended,
                         services   = services,
@@ -450,7 +528,7 @@ Command-line arguments summary
             exit_code = ExitCode.user_interrupt
         else:
             msg = str(exception[1])
-            alert_fatal(f'Encountered error {exception[0].__name__}: {msg}')
+            alert_fatal(f'An error occurred ({exception[0].__name__}): {msg}')
             exit_code = ExitCode.exception
             if __debug__:
                 from traceback import format_exception

@@ -226,7 +226,13 @@ The 2&times;2 image above was produced by running the following command from the
 handprint --text-size 20  "DAG_5_1_6 1952-1957 Notebook VI p2.jpg"
 ```
 
-The individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked (described in more detail below).  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
+To move the position of the text annotations overlaid over the input image, you can use the option `-m` (or `/m` on Windows).  This takes two numbers separated by a comma in the form `x,y`.  Positive numbers move the text rightward and upward, respectively, relative to the default position.  The default position of each text annotation in the annotated output is such that the _left edge of the word_ starts at the location of the _upper left corner of the bounding box_ returned by the service; this has the effect of putting the annotation near, but above, the location of the (actual) word in the input image by default.  For example, if the word in the image is _strawberry_, the bounding box returned by the service will enclose _strawberry_, and the upper left corner of that bounding box will be somewhere above the letter _s_. Then, the default position of the text annotation will put the left edge of the word "strawberry" at that point above the letter _s_. Using the move-text option allows you to move the annotation if desired. A value such as `0,-5` will move it downward five pixels.
+
+To change the color of the text annotations overlaid over the input image, you can use the option `-x` (or `/x` on Windows).  You can use hex color codes such as `"#ff0000"` (make sure to enclose the value with quotes, or the shell will interpret the pound sign as a comment character), or X11/CSS4 color names with no spaces such as `purple` or `darkgreen`.
+
+To change the size of the text annotations overlaid over the input image, you can use the option `-z` (or `/z` on Windows).  The value is in units of points.  The default size is 12.
+
+Finally, the individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked (described in more detail below).  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
 
 
 ### _Annotation types_
@@ -374,12 +380,6 @@ somefile.handprint-microsoft.json
 ```
 
 and use those instead of getting results from the services.  This can be useful to save repeated invocations of the services if all you want is to draw the results differently or perform some testing/debugging on the same inputs.
-
-To move the position of the text annotations overlaid over the input image, you can use the option `-m` (or `/m` on Windows).  This takes two numbers separated by a comma in the form `x,y`.  Positive numbers move the text rightward and upward, respectively, relative to the default position.  The default position of each text annotation in the annotated output is such that the _left edge of the word_ starts at the location of the _upper left corner of the bounding box_ returned by the service; this has the effect of putting the annotation near, but above, the location of the (actual) word in the input image by default.  For example, if the word in the image is _strawberry_, the bounding box returned by the service will enclose _strawberry_, and the upper left corner of that bounding box will be somewhere above the letter _s_. Then, the default position of the text annotation will put the left edge of the word "strawberry" at that point above the letter _s_. Using the move-text option allows you to move the annotation if desired. A value such as `0,-5` will move it downward five pixels.
-
-To change the color of the text annotations overlaid over the input image, you can use the option `-x` (or `/x` on Windows).  You can use hex color codes such as `"#ff0000"` (make sure to enclose the value with quotes, or the shell will interpret the pound sign as a comment character), or X11/CSS4 color names with no spaces such as `purple` or `darkgreen`.
-
-To change the size of the text annotations overlaid over the input image, you can use the option `-z` (or `/z` on Windows).  The value is in units of points.  The default size is 12.
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
 

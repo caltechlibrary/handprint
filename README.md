@@ -365,6 +365,16 @@ The base name `document` can be changed using the `-b` option (`/b` on Windows).
 
 ### _Other options_
 
+The option `-j` (`/j` on Windows) tells Handprint to look for and reuse preexisting results for each input instead of contacting the services.  This makes it look for JSON files produced in a previous run with the `-e` option,
+```
+somefile.handprint-amazon-rekognition.json
+somefile.handprint-amazon-textract.json
+somefile.handprint-google.json
+somefile.handprint-microsoft.json
+```
+
+and use those instead of getting results from the services.  This can be useful to save repeated invocations of the services if all you want is to draw the results differently or perform some testing/debugging on the same inputs.
+
 To move the position of the text annotations overlaid over the input image, you can use the option `-m` (or `/m` on Windows).  This takes two numbers separated by a comma in the form `x,y`.  Positive numbers move the text rightward and upward, respectively, relative to the default position.  The default position of each text annotation in the annotated output is such that the _left edge of the word_ starts at the location of the _upper left corner of the bounding box_ returned by the service; this has the effect of putting the annotation near, but above, the location of the (actual) word in the input image by default.  For example, if the word in the image is _strawberry_, the bounding box returned by the service will enclose _strawberry_, and the upper left corner of that bounding box will be somewhere above the letter _s_. Then, the default position of the text annotation will put the left edge of the word "strawberry" at that point above the letter _s_. Using the move-text option allows you to move the annotation if desired. A value such as `0,-5` will move it downward five pixels.
 
 To change the color of the text annotations overlaid over the input image, you can use the option `-x` (or `/x` on Windows).  You can use hex color codes such as `"#ff0000"` (make sure to enclose the value with quotes, or the shell will interpret the pound sign as a comment character), or X11/CSS4 color names with no spaces such as `purple` or `darkgreen`.
@@ -395,6 +405,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-f`_F_   | `--from-file`_F_    | Read file names or URLs from file _F_ | Use what's given on command line |
 | `-G`      | `--no-grid`         | Don't produce results summary image | Produce an _N_&times;_N_ grid image| |
 | `-h`      | `--help`            | Display help text and exit | | |
+| `-j`      | `--reuse-json`      | Reuse prior JSON results if found | Invoke services | | 
 | `-l`      | `--list`            | Display known services and exit | | | 
 | `-m`_x,y_ | `--text-move`_x,y_  | Move each text annotation by x,y | `0,0` | |
 | `-n`_N_   | `--confidence`_N_   | Use confidence score threshold _N_ | `0` | |

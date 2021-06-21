@@ -33,6 +33,11 @@ requests                 >= 2.25.0
 rich                     >= 10.1.0
 setuptools               >= 57.0.0
 sidetrack                >= 1.4.0
+
+# Handprint doesn't use six, but it's used by dateparser, and apparently
+# installation of dateparser doesn't cause installation of six.
+six                      >= 1.16.0
+
 StringDist               >= 1.0.9
 textdistance             >= 4.2.1
 urllib3                  == 1.26.5

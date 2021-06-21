@@ -82,7 +82,7 @@ class Manager:
 
     def __init__(self, service_names, num_threads, output_dir, make_grid,
                  compare, extended, text_size, text_color, text_shift,
-                 display, confidence):
+                 display, confidence, reuse_json):
         '''Initialize manager for services.  This will also initialize the
         credentials for individual services.
         '''
@@ -96,6 +96,7 @@ class Manager:
         self._text_shift = text_shift
         self._display = display
         self._confidence = confidence
+        self._reuse_json = reuse_json
 
         self._services = []
         for service_name in service_names:
@@ -271,36 +272,42 @@ class Manager:
     _lock = Lock()
 
     def _send(self, image, service):
-        '''Send the "image" to the service named "service" and write output in
-        directory "dest_dir".
-        '''
+        '''Get results from service named "service" for the "image".'''
 
         service_name = f'[{service.name_color()}]{service.name()}[/]'
-        inform(f'Sending to {service_name} and waiting for response ...')
-        last_time = timer()
-        try:
-            output = service.result(image.file)
-        except AuthFailure as ex:
-            raise AuthFailure(f'Unable to use {service}: {str(ex)}')
-        except RateLimitExceeded as ex:
-            time_passed = timer() - last_time
-            if time_passed < 1/service.max_rate():
-                warn(f'Pausing {service_name} due to rate limits')
-                wait(1/service.max_rate() - time_passed)
-                warn(f'Continuing {service_name}')
-                return self._send(image, service)
-        if output.error:
-            # Sanitize the error string in case it contains '{' characters.
-            msg = output.error.replace('{', '{{{{').replace('}', '}}}}')
-            alert(f'{service_name} failed: {msg}')
-            warn(f'No result from {service_name} for {relative(image.file)}')
-            return None
-        inform(f'Got result from {service_name}.')
-        raise_for_interrupts()
+        base_path    = path.join(image.dest_dir, path.basename(image.file))
+        json_file    = self._renamed(base_path, str(service), 'json')
 
+        saved_results = None
+        if self._reuse_json and readable(json_file):
+            inform(f'Reading saved results for {service_name} from {relative(json_file)}')
+            with open(json_file, 'r') as f:
+                saved_results = json.load(f)
+            output = service.result(image.file, saved_results)
+        else:
+            inform(f'Sending to {service_name} and waiting for response ...')
+            last_time = timer()
+            try:
+                output = service.result(image.file, None)
+            except AuthFailure as ex:
+                raise AuthFailure(f'Unable to use {service}: {str(ex)}')
+            except RateLimitExceeded as ex:
+                time_passed = timer() - last_time
+                if time_passed < 1/service.max_rate():
+                    warn(f'Pausing {service_name} due to rate limits')
+                    wait(1/service.max_rate() - time_passed)
+                    warn(f'Continuing {service_name}')
+                    return self._send(image, service)
+            if output.error:
+                # Sanitize the error string in case it contains '{' characters.
+                msg = output.error.replace('{', '{{{{').replace('}', '}}}}')
+                alert(f'{service_name} failed: {msg}')
+                warn(f'No result from {service_name} for {relative(image.file)}')
+                return None
+            inform(f'Got result from {service_name}.')
+
+        raise_for_interrupts()
         inform(f'Creating annotated image for {service_name}.')
-        file_name   = path.basename(image.file)
-        base_path   = path.join(image.dest_dir, file_name)
         annot_path  = self._renamed(base_path, str(service), 'png')
         report_path = None
         with self._lock:
@@ -308,13 +315,13 @@ class Manager:
                                   self._text_size, self._text_color, self._text_shift,
                                   self._display, self._confidence)
             self._save(img, annot_path)
-        if self._extended_results:
-            txt_file  = self._renamed(base_path, str(service), 'txt')
-            json_file = self._renamed(base_path, str(service), 'json')
+
+        if self._extended_results and (saved_results is None):
             inform(f'Saving all data for {service_name}.')
             raw_json = json.dumps(output.data, sort_keys = True, indent = 2)
             self._save(raw_json, json_file)
             inform(f'Saving extracted text for {service_name}.')
+            txt_file  = self._renamed(base_path, str(service), 'txt')
             self._save(output.text, txt_file)
         if self._compare:
             gt_file = alt_extension(image.item_file, 'gt.txt')

@@ -68,34 +68,36 @@ disable_ssl_cert_check()
 # .............................................................................
 
 @plac.annotations(
-    add_creds  = ('add credentials file for service "A"',                 'option', 'a'),
-    base_name  = ('use base name "B" to name downloaded images',          'option', 'b'),
-    no_color   = ('do not colorize output printed to the terminal',       'flag',   'C'),
-    compare    = ('compare text results to ground truth files',           'flag',   'c'),
-    display    = ('annotations to display (default: text)',               'option', 'd'),
-    extended   = ('produce extended results (text file, JSON data)',      'flag',   'e'),
-    from_file  = ('read list of images or URLs from file "F"',            'option', 'f'),
-    no_grid    = ('do not create an all-results grid image',              'flag',   'G'),
-    list       = ('print list of known services',                         'flag',   'l'),
-    text_move  = ('move position of text annotations by x,y (see help)',  'option', 'm'),
-    confidence = ('only keep results with confidence scores >= N',        'option', 'n'),
-    output_dir = ('write output to directory "O"',                        'option', 'o'),
-    quiet      = ('only print important messages while working',          'flag',   'q'),
-    relaxed    = ('make --compare use more relaxed criteria',             'flag',   'r'),
-    services   = ('invoke HTR/OCR service "S" (default: "all")',          'option', 's'),
-    threads    = ('number of threads to use (default: #cores/2)',         'option', 't'),
-    version    = ('print version info and exit',                          'flag',   'V'),
-    text_color = ('use color "X" for text annotations (default: red)',    'option', 'x'),
-    text_size  = ('use font size "Z" for text annotations (default: 10)', 'option', 'z'),
-    debug      = ('write detailed trace to "OUT" ("-" means console)',    'option', '@'),
+    add_creds  = ('add credentials file for service "A"',                  'option', 'a'),
+    base_name  = ('use base name "B" to name downloaded images',           'option', 'b'),
+    no_color   = ('do not colorize output printed to the terminal',        'flag',   'C'),
+    compare    = ('compare text results to ground truth files',            'flag',   'c'),
+    display    = ('annotations to display (default: text)',                'option', 'd'),
+    extended   = ('produce extended results (text file, JSON data)',       'flag',   'e'),
+    from_file  = ('read list of images or URLs from file "F"',             'option', 'f'),
+    no_grid    = ('do not create an all-results grid image',               'flag',   'G'),
+    reuse_json = ('look for prior JSON results for the inputs & use them', 'flag',   'j'),
+    list       = ('print list of known services',                          'flag',   'l'),
+    text_move  = ('move position of text annotations by x,y (see help)',   'option', 'm'),
+    confidence = ('only keep results with confidence scores >= N',         'option', 'n'),
+    output_dir = ('write output to directory "O"',                         'option', 'o'),
+    quiet      = ('only print important messages while working',           'flag',   'q'),
+    relaxed    = ('make --compare use more relaxed criteria',              'flag',   'r'),
+    services   = ('invoke HTR/OCR service "S" (default: "all")',           'option', 's'),
+    threads    = ('number of threads to use (default: #cores/2)',          'option', 't'),
+    version    = ('print version info and exit',                           'flag',   'V'),
+    text_color = ('use color "X" for text annotations (default: red)',     'option', 'x'),
+    text_size  = ('use font size "Z" for text annotations (default: 10)',  'option', 'z'),
+    debug      = ('write detailed trace to "OUT" ("-" means console)',     'option', '@'),
     files      = 'file(s), directory(ies) of files, or URL(s)',
 )
 
 def main(add_creds = 'A', base_name = 'B', no_color = False, compare = False,
          display = 'D', extended = False, from_file = 'F', no_grid = False,
-         list = False, text_move = 'M', confidence = 'N', output_dir = 'O',
-         quiet = False, relaxed = False, services = 'S', threads = 'T',
-         version = False, text_color = 'X', text_size = 'Z', debug = 'OUT', *files):
+         list = False, reuse_json = False, text_move = 'M', confidence = 'N',
+         output_dir = 'O', quiet = False, relaxed = False, services = 'S',
+         threads = 'T', version = False, text_color = 'X', text_size = 'Z',
+         debug = 'OUT', *files):
     '''Handprint (a loose acronym of "HANDwritten Page RecognitIoN Test") runs
 alternative text recognition services on images of handwritten document pages.
 
@@ -201,15 +203,18 @@ output that includes the complete response from the service (converted to a
 JSON file by Handprint) and the text extracted (stored as a .txt file).  The
 output of -e will be multiple files like this:
 
-  somefile.handprint-google.png
+  somefile.handprint-amazon-rekognition.json
+  somefile.handprint-amazon-rekognition.png
+  somefile.handprint-amazon-rekognition.txt
+  somefile.handprint-amazon-textract.json
+  somefile.handprint-amazon-textract.png
+  somefile.handprint-amazon-textract.txt
   somefile.handprint-google.json
+  somefile.handprint-google.png
   somefile.handprint-google.txt
-  somefile.handprint-microsoft.png
   somefile.handprint-microsoft.json
+  somefile.handprint-microsoft.png
   somefile.handprint-microsoft.txt
-  somefile.handprint-amazon.png
-  somefile.handprint-amazon.json
-  somefile.handprint-amazon.txt
   ...
 
 The files will be written to the directory indicated by -o, or (if -o is not
@@ -342,6 +347,19 @@ appropriately.
 
 Additional command-line arguments
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The option -j (/j on Windows) tells Handprint to look for and reuse preexisting
+results for each input instead of contacting the services.  This makes it look
+for JSON files produced in a previous run with the -e option,
+
+  somefile.handprint-amazon-rekognition.json
+  somefile.handprint-amazon-textract.json
+  somefile.handprint-google.json
+  somefile.handprint-microsoft.json
+
+and use those instead of getting results from the services.  This can be useful
+to save repeated invocations of the services if all you want is to draw the
+results differently or perform some testing/debugging on the same inputs.
 
 To move the position of the text annotations overlayed over the input image,
 you can use the option -m (or /m on Windows).  This takes two numbers separated
@@ -507,6 +525,7 @@ Command-line arguments summary
                         display    = display,
                         make_grid  = not no_grid,
                         extended   = extended,
+                        reuse_json = reuse_json,
                         services   = services,
                         threads    = max(1, cpu_count()//2 if threads == 'T' else int(threads)),
                         compare    = 'relaxed' if (compare and relaxed) else compare)
@@ -527,13 +546,18 @@ Command-line arguments summary
             warn('Interrupted.')
             exit_code = ExitCode.user_interrupt
         else:
-            msg = str(exception[1])
-            alert_fatal(f'An error occurred ({exception[0].__name__}): {msg}')
-            exit_code = ExitCode.exception
+            ex_class = exception[0]
+            ex = exception[1]
+            alert_fatal(f'An error occurred ({ex_class.__name__}): {str(ex)}')
+            # Return a better error code for some common cases.
+            if ex_class in [FileNotFoundError, FileExistsError, PermissionError]:
+                exit_code = ExitCode.file_error
+            else:
+                exit_code = ExitCode.exception
             if __debug__:
                 from traceback import format_exception
                 details = ''.join(format_exception(*exception))
-                logr(f'Exception: {msg}\n{details}')
+                logr(f'Exception: {str(ex)}\n{details}')
     else:
         inform('Done.')
 

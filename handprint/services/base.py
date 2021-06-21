@@ -15,7 +15,7 @@ file "LICENSE" for more information.
 '''
 
 from   collections import namedtuple
-from   commonpy.file_utils import readable
+from   commonpy.file_utils import readable, relative
 import imagesize
 
 if __debug__:
@@ -129,9 +129,9 @@ class TextRecognition(object):
         pass
 
 
-    def result(self, path):
+    def result(self, path, saved_result = None):
         '''Returns the text recognition results from the service as an
-        TRResult named tuple.
+        TRResult named tuple.  If a saved result is supplied, use that.
         '''
         pass
 
@@ -147,22 +147,22 @@ class TextRecognition(object):
             return (None, TRResult(path = file_path, data = {}, text = '',
                                    error = error_text, boxes = []))
 
+        rel_path = relative(file_path)
         if not readable(file_path):
-            return error_result('Unable to read file: {}'.format(file_path))
-        if __debug__: log('reading image file {} for {}', file_path, self.name())
+            return error_result(f'Unable to read file: {rel_path}')
+        if __debug__: log(f'reading {rel_path} for {self.name()}')
         with open(file_path, 'rb') as image_file:
             image = image_file.read()
         if len(image) == 0:
-            return error_result('Empty file: {}'.format(file_path))
+            return error_result(f'Empty file: {rel_path}')
         if len(image) > self.max_size():
-            text = 'Exceeds {} byte limit for service: {}'.format(self.max_size(), file_path)
+            text = f'Exceeds {self.max_size()} byte limit for service: {rel_path}'
             return error_result(text)
         width, height = imagesize.get(file_path)
-        if __debug__: log('image size is width = {}, height = {}', width, height)
+        if __debug__: log(f'image size is width = {width}, height = {height}')
         if self.max_dimensions():
             max_width, max_height = self.max_dimensions()
             if width > max_width or height > max_height:
-                text = 'Image dimensions {}x{} exceed {} limits: {}'.format(
-                    width, height, self.name(), file_path)
+                text = f'Dimensions {width}x{height} exceed {self.name()} limits: {rel_path}'
                 return error_result(text)
         return (image, None)

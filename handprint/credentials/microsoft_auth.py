@@ -39,11 +39,11 @@ _DEFAULT_ENDPOINT = 'https://westus.api.cognitive.microsoft.com'
 class MicrosoftCredentials(Credentials):
     def __init__(self):
         cfile = path.join(self.credentials_dir(), credentials_filename('microsoft'))
-        if __debug__: log('credentials file for microsoft is {}', cfile)
+        if __debug__: log(f'credentials file for microsoft is {cfile}')
         if not path.exists(cfile):
             raise AuthFailure('Credentials for Microsoft have not been installed')
         elif not readable(cfile):
-            raise AuthFailure('Microsoft credentials file unreadable: {}'.format(cfile))
+            raise AuthFailure(f'Microsoft credentials file unreadable: {cfile}')
 
         try:
             with open(cfile, 'r') as file:
@@ -58,5 +58,4 @@ class MicrosoftCredentials(Credentials):
                 creds['endpoint'] = endpoint
                 self.credentials = creds
         except Exception as ex:
-            raise AuthFailure(
-                'Unable to parse Microsoft exceptions file: {}'.format(str(ex)))
+            raise AuthFailure(f'Unable to parse Microsoft exceptions file: {str(ex)}')

@@ -96,10 +96,45 @@ class MicrosoftTR(TextRecognition):
     #
     # * Otherwise, returns a TRResult if successful.
 
-    def result(self, path):
-        '''Returns all the results from calling the service on the 'path'. The
-        results are returned as an TRResult named tuple.
+    def result(self, path, result = None):
+        '''Returns the result from calling the service on the 'file_path'.
+        The result is returned as an TRResult named tuple.
         '''
+        if not result:
+            result = self._result_from_api(path)
+            if isinstance(result, tuple):
+                return result
+
+        lines = []
+        full_text = ''
+        if 'analyzeResult' in result:
+            analysis = result['analyzeResult']
+            if 'readResults' in analysis:
+                # We only return the 1st page.  FIXME: should check if > 1.
+                lines = analysis['readResults'][0]['lines']
+                sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1],
+                                                              x['boundingBox'][0]))
+                full_text = '\n'.join(x['text'] for x in sorted_lines)
+
+        # Create our particular box structure for annotations.  The Microsoft
+        # structure is like this: data['recognitionResult']['lines'] contains
+        # a list of dict with keys 'words', 'boundingBox', and 'text'.
+
+        boxes = []
+        for line in lines:
+            # Microsoft doesn't put confidence scores on the lines.
+            boxes.append(Box(kind = 'line', bb = line['boundingBox'], text = '',
+                             score = 1.0))
+            for word in line['words']:
+                boxes.append(Box(kind = 'word', bb = word['boundingBox'],
+                                 text = word['text'], score = word['confidence']))
+
+        # Put it all together.
+        return TRResult(path = path, data = result, text = full_text,
+                        boxes = boxes, error = None)
+
+
+    def _result_from_api(self, path):
         # Read the image and proceed with contacting the service.
         (image, error) = self._image_from_file(path)
         if error:
@@ -164,40 +199,14 @@ class MicrosoftTR(TextRecognition):
                                 boxes = [], error = text)
 
         if __debug__: log(f'results received from Microsoft for {relative(path)}')
-        lines = []
-        full_text = ''
-        if 'analyzeResult' in analysis:
-            results = analysis['analyzeResult']
-            if 'readResults' in results:
-                # We only return the 1st page.  FIXME: should check if > 1.
-                lines = results['readResults'][0]['lines']
-                sorted_lines = sorted(lines, key = lambda x: (x['boundingBox'][1],
-                                                              x['boundingBox'][0]))
-                full_text = '\n'.join(x['text'] for x in sorted_lines)
-
-        # Create our particular box structure for annotations.  The Microsoft
-        # structure is like this: data['recognitionResult']['lines'] contains
-        # a list of dict with keys 'words', 'boundingBox', and 'text'.
-
-        boxes = []
-        for line in lines:
-            # Microsoft doesn't put confidence scores on the lines.
-            boxes.append(Box(kind = 'line', bb = line['boundingBox'], text = '',
-                             score = 1.0))
-            for word in line['words']:
-                boxes.append(Box(kind = 'word', bb = word['boundingBox'],
-                                 text = word['text'], score = word['confidence']))
-
-        # Put it all together.
-        return TRResult(path = path, data = analysis, text = full_text,
-                        boxes = boxes, error = None)
+        return analysis
 
 
     def _net(self, get_or_post, url, headers, data = None, polling = False):
         response, error = net(get_or_post, url, headers = headers,
                               data = data, polling = polling)
         if isinstance(error, NetworkFailure):
-            if __debug__: log('network exception: {}', str(error))
+            if __debug__: log(f'network exception: {str(error)}')
             return TRResult(path = path, data = {}, text = '', error = str(error))
         elif isinstance(error, RateLimitExceeded):
             # https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-manager-request-limits
@@ -206,7 +215,7 @@ class MicrosoftTR(TextRecognition):
             sleep_time = 20
             if 'Retry-After' in response.headers:
                 sleep_time = int(response.headers['Retry-After'])
-            if __debug__: log('sleeping for {} s and retrying', sleep_time)
+            if __debug__: log(f'sleeping for {sleep_time} s and retrying')
             wait(sleep_time)
             return self._net(get_or_post, url, headers, data, polling) # Recurse
         elif error:

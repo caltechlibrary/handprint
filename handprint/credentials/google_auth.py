@@ -33,11 +33,11 @@ from .credentials_files import credentials_filename
 class GoogleCredentials(Credentials):
     def __init__(self):
         cfile = path.join(self.credentials_dir(), credentials_filename('google'))
-        if __debug__: log('credentials file for google is {}', cfile)
+        if __debug__: log(f'credentials file for google is {cfile}')
         if not path.exists(cfile):
             raise AuthFailure('Credentials for Google have not been installed')
         elif not readable(cfile):
-            raise AuthFailure('Google credentials file unreadable: {}'.format(cfile))
+            raise AuthFailure(f'Google credentials file unreadable: {cfile}')
 
         # Haven't been able to make it work; only the environment variable
         # approach has been working for me.

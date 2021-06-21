@@ -15,7 +15,7 @@ file "LICENSE" for more information.
 '''
 
 import boto3
-from   commonpy.file_utils import readable
+from   commonpy.file_utils import readable, relative
 from   commonpy.interrupt import raise_for_interrupts
 import imagesize
 import os
@@ -80,58 +80,59 @@ class AmazonTR(TextRecognition):
     #
     # * Otherwise, returns a TRResult if successful.
 
-    def amazon_result(self, file_path, variant, api_method, image_keyword,
-                      response_key, value_key, block_key):
-        '''Returns the results from calling the service on the 'file_path'.
-        The results are returned as an TRResult named tuple.
+    def amazon_result(self, file_path, variant, method, image_keyword,
+                      result_key, value_key, block_key, result):
+        '''Returns the result from calling the service on the 'file_path'.
+        The result is returned as an TRResult named tuple.
         '''
-        # Read the image and proceed with contacting the service.
-        # If any exceptions occur, let them be passed to caller.
-        (image, error) = self._image_from_file(file_path)
-        if error:
-            return TRResult(path = file_path, data = {}, boxes = [],
-                            text = '', error = error)
 
-        if __debug__: log('setting up Amazon client function "{}"', variant)
-        creds = self._credentials
-        try:
-            session = boto3.session.Session()
-            client = session.client(variant, region_name = creds['region_name'],
-                                    aws_access_key_id = creds['aws_access_key_id'],
-                                    aws_secret_access_key = creds['aws_secret_access_key'])
-            if __debug__: log('calling Amazon API function')
-            response = getattr(client, api_method)( **{ image_keyword : {'Bytes': image} })
-            if __debug__: log('received {} blocks', len(response[response_key]))
-            raise_for_interrupts()
-            full_text = ''
-            boxes = []
-            width, height = imagesize.get(file_path)
-            for block in response[response_key]:
-                if value_key not in block:
-                    continue
-                kind = block[value_key].lower()
-                if kind in ['word', 'line']:
-                    text = block[block_key]
-                    corners = corner_list(block['Geometry']['Polygon'], width, height)
-                    if corners:
-                        boxes.append(Box(kind = kind, bb = corners, text = text,
-                                         score = block['Confidence'] / 100))
-                    else:
-                        # Something's wrong with the vertex list. Skip & continue.
-                        if __debug__: log('bad bb for {}: {}', text, bb)
-                if kind == "line":
-                    if 'Text' in block:
-                        full_text += block['Text'] + '\n'
-                    elif 'DetectedText' in block:
-                        full_text += block['DetectedText'] + '\n'
-            return TRResult(path = file_path, data = response, boxes = boxes,
-                            text = full_text, error = None)
-        except KeyboardInterrupt as ex:
-            raise
-        except Exception as ex:
-            text = 'Error: {} -- {}'.format(str(ex), file_path)
-            return TRResult(path = file_path, data = {}, boxes = [],
-                            text = '', error = text)
+        if not result:
+            # If any exceptions occur, let them be passed to caller.
+            (image, error) = self._image_from_file(file_path)
+            if error:
+                return TRResult(path = file_path, data = {}, boxes = [],
+                                text = '', error = error)
+            try:
+                if __debug__: log(f'setting up Amazon client function "{variant}"')
+                creds = self._credentials
+                session = boto3.session.Session()
+                client = session.client(variant, region_name = creds['region_name'],
+                                        aws_access_key_id = creds['aws_access_key_id'],
+                                        aws_secret_access_key = creds['aws_secret_access_key'])
+                if __debug__: log('calling Amazon API function')
+                result = getattr(client, method)( **{ image_keyword : {'Bytes': image} })
+                if __debug__: log(f'received {len(result[result_key])} blocks')
+            except KeyboardInterrupt as ex:
+                raise
+            except Exception as ex:
+                return TRResult(path = file_path, data = {}, boxes = [], text = '',
+                                error = f'Error: {str(ex)} -- {relative(file_path)}')
+
+        raise_for_interrupts()
+        full_text = ''
+        boxes = []
+        width, height = imagesize.get(file_path)
+        if __debug__: log(f'parsing Amazon result for {relative(file_path)}')
+        for block in result[result_key]:
+            if value_key not in block:
+                continue
+            kind = block[value_key].lower()
+            if kind in ['word', 'line']:
+                text = block[block_key]
+                corners = corner_list(block['Geometry']['Polygon'], width, height)
+                if corners:
+                    boxes.append(Box(kind = kind, bb = corners, text = text,
+                                     score = block['Confidence'] / 100))
+                else:
+                    # Something's wrong with the vertex list. Skip & continue.
+                    if __debug__: log(f'bad bb for {text}: {bb}')
+            if kind == "line":
+                if 'Text' in block:
+                    full_text += block['Text'] + '\n'
+                elif 'DetectedText' in block:
+                    full_text += block['DetectedText'] + '\n'
+        return TRResult(path = file_path, data = result, boxes = boxes,
+                        text = full_text, error = None)
 
 
 class AmazonTextractTR(AmazonTR):
@@ -150,16 +151,17 @@ class AmazonTextractTR(AmazonTR):
         return 'light_goldenrod2'
 
 
-    def result(self, file_path):
-        '''Returns the results from calling the service on the 'file_path'.
-        The results are returned as an TRResult named tuple.
+    def result(self, file_path, saved_result):
+        '''Returns the result from calling the service on the 'file_path'.
+        The result is returned as an TRResult named tuple.
         '''
         return self.amazon_result(file_path, 'textract',
                                   'detect_document_text',
                                   'Document',
-                                  'Blocks',     # response_key
+                                  'Blocks',     # result_key
                                   'BlockType',  # value_key
-                                  'Text')       # block_key
+                                  'Text',       # block_key
+                                  saved_result)
 
 
 class AmazonRekognitionTR(AmazonTR):
@@ -178,17 +180,17 @@ class AmazonRekognitionTR(AmazonTR):
         return 'dark_orange'
 
 
-    def result(self, file_path):
-        '''Returns the results from calling the service on the 'file_path'.
-        The results are returned as an TRResult named tuple.
+    def result(self, file_path, saved_result = None):
+        '''Returns the result from calling the service on the 'file_path'.
+        The result is returned as an TRResult named tuple.
         '''
         return self.amazon_result(file_path, 'rekognition',
                                   'detect_text',
                                   'Image',
-                                  'TextDetections', # response_key
+                                  'TextDetections', # result_key
                                   'Type',           # value_key
-                                  'DetectedText')   # block_key
-
+                                  'DetectedText',   # block_key
+                                  saved_result)
 
 # Miscellaneous utilities.
 # .............................................................................

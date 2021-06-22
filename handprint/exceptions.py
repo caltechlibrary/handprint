@@ -61,5 +61,5 @@ class RateLimitExceeded(HandprintException):
     pass
 
 class InternalError(HandprintException):
-    '''Unrecoverable problem involving eprints2bags itself.'''
+    '''Unrecoverable problem involving Handprint itself.'''
     pass

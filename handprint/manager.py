@@ -445,7 +445,7 @@ class Manager:
 
         if __debug__: log(f'writing output to file {relative(file)}')
         if isinstance(result, str):
-            with open(file, 'w') as f:
+            with open(file, 'w', encoding='utf-8') as f:
                 f.write(result)
         elif isinstance(result, io.BytesIO):
             with open(file, 'wb') as f:

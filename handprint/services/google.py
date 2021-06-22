@@ -131,6 +131,12 @@ class GoogleTR(TextRecognition):
             except google.api_core.exceptions.PermissionDenied as ex:
                 text = 'Authentication failure for Google service -- {}'.format(ex)
                 raise AuthFailure(text)
+            except google.auth.exceptions.DefaultCredentialsError as ex:
+                text = 'Credentials file error for Google service -- {}'.format(ex)
+                raise AuthFailure(text)
+            except google.api_core.exceptions.ServiceUnavailable as ex:
+                text = 'Network, service, or Google configuration error -- {}'.format(ex)
+                raise ServiceFailure(text)
             except KeyboardInterrupt as ex:
                 raise
             except Exception as ex:

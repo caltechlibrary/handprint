@@ -15,6 +15,7 @@ file "LICENSE" for more information.
 '''
 
 import boto3
+import botocore
 from   commonpy.file_utils import readable, relative
 from   commonpy.interrupt import raise_for_interrupts
 import imagesize
@@ -102,11 +103,28 @@ class AmazonTR(TextRecognition):
                 if __debug__: log('calling Amazon API function')
                 result = getattr(client, method)( **{ image_keyword : {'Bytes': image} })
                 if __debug__: log(f'received {len(result[result_key])} blocks')
+            except botocore.exceptions.EndpointConnectionError as ex:
+                raise AuthFailure(f'Problem with credentials file -- {str(ex)}')
             except KeyboardInterrupt as ex:
                 raise
+            except KeyError as ex:
+                msg = f'Amazon credentials file is missing {",".join(ex.args)}'
+                raise AuthFailure(msg)
             except Exception as ex:
-                return TRResult(path = file_path, data = {}, boxes = [], text = '',
-                                error = f'Error: {str(ex)} -- {relative(file_path)}')
+                if getattr(ex, 'response', False) and 'Error' in ex.response:
+                    error = ex.response['Error']
+                    code = error['Code']
+                    text = error['Message']
+                    path = relative(file_path)
+                    if code in ['UnsupportedDocumentException', 'BadDocumentException']:
+                        msg = f'Amazon {variant} reports bad image in {path} -- {str(text)}'
+                        raise CorruptedContent(msg)
+                    elif code in ['InvalidSignatureException', 'UnrecognizedClientException']:
+                        raise AuthFailure(f'Problem with credentials file -- {text}')
+                # Fallback if we can't get details.
+                if __debug__: log(f'Amazon returned exception {str(ex)}')
+                msg = f'Amazon {variant} failure for {path} -- {error["Message"]}'
+                raise ServiceFailure(msg)
 
         raise_for_interrupts()
         full_text = ''

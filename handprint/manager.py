@@ -290,7 +290,7 @@ class Manager:
             try:
                 output = service.result(image.file, None)
             except AuthFailure as ex:
-                raise AuthFailure(f'Unable to use {service}: {str(ex)}')
+                raise AuthFailure(f'Service {service}: {str(ex)}')
             except RateLimitExceeded as ex:
                 time_passed = timer() - last_time
                 if time_passed < 1/service.max_rate():

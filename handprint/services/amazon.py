@@ -117,7 +117,7 @@ class AmazonTR(TextRecognition):
                     text = error['Message']
                     path = relative(file_path)
                     if code in ['UnsupportedDocumentException', 'BadDocumentException']:
-                        msg = f'Amazon {variant} reports bad image in {path} -- {str(text)}'
+                        msg = f'Amazon {variant} reports bad or corrupted image in {path}'
                         raise CorruptedContent(msg)
                     elif code in ['InvalidSignatureException', 'UnrecognizedClientException']:
                         raise AuthFailure(f'Problem with credentials file -- {text}')

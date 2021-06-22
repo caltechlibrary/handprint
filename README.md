@@ -1,6 +1,6 @@
 # Handprint<img width="12%" align="right" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/noun_Hand_733265.png">
 
-The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can generate images showing the results, compare the recognized text to expected text, and save the raw HTR results as JSON and text files.
+The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can produce annotated images showing the results, compare the recognized text to expected text, save the HTR service results as JSON and text files, and more.
 
 [![Latest release](https://img.shields.io/github/v/release/caltechlibrary/handprint.svg?style=flat-square&color=b44e88&label=Latest%20release)](https://github.com/caltechlibrary/handprint/releases)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
@@ -52,8 +52,9 @@ Services supported include Google's [Google Cloud Vision API](https://cloud.goog
 
 ## ✎ Installation and configuration
 
-The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command and inspecting the results:
+The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command in a terminal shell and inspecting the results:
 ```sh
+# Note: on Windows, you may have to use "python" instead of "python3"
 python3 --version
 ```
 
@@ -405,7 +406,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-f`_F_   | `--from-file`_F_    | Read file names or URLs from file _F_ | Use what's given on command line |
 | `-G`      | `--no-grid`         | Don't produce results summary image | Produce an _N_&times;_N_ grid image| |
 | `-h`      | `--help`            | Display help text and exit | | |
-| `-j`      | `--reuse-json`      | Reuse prior JSON results if found | Invoke services | | 
+| `-j`      | `--reuse-json`      | Reuse prior JSON results if found | Ignore any existing results | | 
 | `-l`      | `--list`            | Display known services and exit | | | 
 | `-m`_x,y_ | `--text-move`_x,y_  | Move each text annotation by x,y | `0,0` | |
 | `-n`_N_   | `--confidence`_N_   | Use confidence score threshold _N_ | `0` | |

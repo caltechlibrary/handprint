@@ -34,6 +34,13 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+import sys
+if sys.version_info <= (3, 8):
+    print('Handprint requires Python version 3.8 or higher,')
+    print('but the current version of Python is ' +
+          str(sys.version_info.major) + '.' + str(sys.version_info.minor) + '.')
+    sys.exit(6)
+
 from   boltons.debugutils import pdb_on_signal
 from   commonpy.data_utils import timestamp
 from   commonpy.file_utils import filename_extension, files_in_directory
@@ -44,7 +51,6 @@ import os
 from   os import path, cpu_count
 import plac
 import signal
-import sys
 from   sys import exit as exit
 
 if __debug__:

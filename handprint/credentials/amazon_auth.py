@@ -33,15 +33,14 @@ from .credentials_files import credentials_filename
 class AmazonCredentials(Credentials):
     def __init__(self):
         cfile = path.join(self.credentials_dir(), credentials_filename('amazon'))
-        if __debug__: log('credentials file for amazon is {}', cfile)
+        if __debug__: log(f'credentials file for amazon is {cfile}')
         if not path.exists(cfile):
             raise AuthFailure('Credentials for Amazon have not been installed')
         elif not readable(cfile):
-            raise AuthFailure('Amazon credentials file unreadable: {}'.format(cfile))
+            raise AuthFailure(f'Amazon credentials file unreadable: {cfile}')
 
         try:
             with open(cfile, 'r') as file:
                 self.credentials = json.load(file)
         except Exception as ex:
-            raise AuthFailure(
-                'Unable to parse Amazon exceptions file: {}'.format(str(ex)))
+            raise AuthFailure(f'Unable to parse Amazon exceptions file: {str(ex)}')

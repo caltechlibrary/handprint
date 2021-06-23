@@ -15,6 +15,7 @@ file "LICENSE" for more information.
 '''
 
 from   commonpy.interrupt import raise_for_interrupts
+from   commonpy.data_utils import pluralized
 from   commonpy.file_utils import filename_extension, filename_basename
 from   commonpy.file_utils import files_in_directory, readable, writable
 import os
@@ -60,7 +61,7 @@ class MainBody(object):
         self._manager = Manager(self.services, self.threads, self.output_dir,
                                 self.make_grid, self.compare, self.extended,
                                 self.text_size, self.text_color, self.text_shift,
-                                self.display, self.confidence)
+                                self.display, self.confidence, self.reuse_json)
 
 
     def run(self):
@@ -114,14 +115,15 @@ class MainBody(object):
             raise CannotProceed(ExitCode.bad_arg)
         num_targets = len(targets)
 
-        inform('Will apply {} service{} ({}) to {} image{}.',
-               len(self.services), 's' if len(self.services) > 1 else '',
-               ', '.join(self.services), num_targets, 's' if num_targets > 1 else '')
+        inform(f'Given {pluralized("image", num_targets, True)} to work on.')
+        inform('Will apply results of {}: {}'.format(
+            pluralized('service', len(self.services), True),
+            ', '.join(self.services), num_targets))
+        inform(f'Will use credentials stored in {Credentials.credentials_dir()}/.')
         if self.extended:
             inform('Will save extended results.')
         num_threads = min(self.threads, len(self.services))
         inform(f'Will use up to {num_threads} process threads.')
-        inform(f'Will use credentials stored in {Credentials.credentials_dir()}/.')
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')

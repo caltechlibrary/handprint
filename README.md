@@ -1,12 +1,12 @@
 # Handprint<img width="12%" align="right" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/noun_Hand_733265.png">
 
-The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can generate images showing the results, compare the recognized text to expected text, and save the raw HTR results as JSON and text files.
+The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can produce annotated images showing the results, compare the recognized text to expected text, save the HTR service results as JSON and text files, and more.
 
 [![Latest release](https://img.shields.io/github/v/release/caltechlibrary/handprint.svg?style=flat-square&color=b44e88&label=Latest%20release)](https://github.com/caltechlibrary/handprint/releases)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.8+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
-[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/1669)](https://data.caltech.edu/records/1669)
+[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/2004)](https://data.caltech.edu/records/2004)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
 
 
@@ -52,8 +52,9 @@ Services supported include Google's [Google Cloud Vision API](https://cloud.goog
 
 ## ✎ Installation and configuration
 
-The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command and inspecting the results:
+The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command in a terminal shell and inspecting the results:
 ```sh
+# Note: on Windows, you may have to use "python" instead of "python3"
 python3 --version
 ```
 
@@ -226,7 +227,13 @@ The 2&times;2 image above was produced by running the following command from the
 handprint --text-size 20  "DAG_5_1_6 1952-1957 Notebook VI p2.jpg"
 ```
 
-The individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked (described in more detail below).  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
+To move the position of the text annotations overlaid over the input image, you can use the option `-m` (or `/m` on Windows).  This takes two numbers separated by a comma in the form `x,y`.  Positive numbers move the text rightward and upward, respectively, relative to the default position.  The default position of each text annotation in the annotated output is such that the _left edge of the word_ starts at the location of the _upper left corner of the bounding box_ returned by the service; this has the effect of putting the annotation near, but above, the location of the (actual) word in the input image by default.  For example, if the word in the image is _strawberry_, the bounding box returned by the service will enclose _strawberry_, and the upper left corner of that bounding box will be somewhere above the letter _s_. Then, the default position of the text annotation will put the left edge of the word "strawberry" at that point above the letter _s_. Using the move-text option allows you to move the annotation if desired. A value such as `0,-5` will move it downward five pixels.
+
+To change the color of the text annotations overlaid over the input image, you can use the option `-x` (or `/x` on Windows).  You can use hex color codes such as `"#ff0000"` (make sure to enclose the value with quotes, or the shell will interpret the pound sign as a comment character), or X11/CSS4 color names with no spaces such as `purple` or `darkgreen`.
+
+To change the size of the text annotations overlaid over the input image, you can use the option `-z` (or `/z` on Windows).  The value is in units of points.  The default size is 12.
+
+Finally, the individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the `-e` extended results option (`/e` on Windows) is invoked (described in more detail below).  The production of the overview grid image can be skipped by using the `-G` option (`/G` on Windows).
 
 
 ### _Annotation types_
@@ -365,11 +372,15 @@ The base name `document` can be changed using the `-b` option (`/b` on Windows).
 
 ### _Other options_
 
-To move the position of the text annotations overlaid over the input image, you can use the option `-m` (or `/m` on Windows).  This takes two numbers separated by a comma in the form `x,y`.  Positive numbers move the text rightward and upward, respectively, relative to the default position.  The default position of each text annotation in the annotated output is such that the _left edge of the word_ starts at the location of the _upper left corner of the bounding box_ returned by the service; this has the effect of putting the annotation near, but above, the location of the (actual) word in the input image by default.  For example, if the word in the image is _strawberry_, the bounding box returned by the service will enclose _strawberry_, and the upper left corner of that bounding box will be somewhere above the letter _s_. Then, the default position of the text annotation will put the left edge of the word "strawberry" at that point above the letter _s_. Using the move-text option allows you to move the annotation if desired. A value such as `0,-5` will move it downward five pixels.
+The option `-j` (`/j` on Windows) tells Handprint to look for and reuse preexisting results for each input instead of contacting the services.  This makes it look for JSON files produced in a previous run with the `-e` option,
+```
+somefile.handprint-amazon-rekognition.json
+somefile.handprint-amazon-textract.json
+somefile.handprint-google.json
+somefile.handprint-microsoft.json
+```
 
-To change the color of the text annotations overlaid over the input image, you can use the option `-x` (or `/x` on Windows).  You can use hex color codes such as `"#ff0000"` (make sure to enclose the value with quotes, or the shell will interpret the pound sign as a comment character), or X11/CSS4 color names with no spaces such as `purple` or `darkgreen`.
-
-To change the size of the text annotations overlaid over the input image, you can use the option `-z` (or `/z` on Windows).  The value is in units of points.  The default size is 12.
+and use those instead of getting results from the services.  This can be useful to save repeated invocations of the services if all you want is to draw the results differently or perform some testing/debugging on the same inputs.
 
 Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The `-t` option (`/t` on Windows) can be used to change this number.
 
@@ -395,6 +406,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-f`_F_   | `--from-file`_F_    | Read file names or URLs from file _F_ | Use what's given on command line |
 | `-G`      | `--no-grid`         | Don't produce results summary image | Produce an _N_&times;_N_ grid image| |
 | `-h`      | `--help`            | Display help text and exit | | |
+| `-j`      | `--reuse-json`      | Reuse prior JSON results if found | Ignore any existing results | | 
 | `-l`      | `--list`            | Display known services and exit | | | 
 | `-m`_x,y_ | `--text-move`_x,y_  | Move each text annotation by x,y | `0,0` | |
 | `-n`_N_   | `--confidence`_N_   | Use confidence score threshold _N_ | `0` | |

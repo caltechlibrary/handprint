@@ -14,8 +14,10 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   commonpy.file_utils import relative
 from   commonpy.interrupt import raise_for_interrupts
 import io
+import json
 import math
 import os
 import google
@@ -102,68 +104,78 @@ class GoogleTR(TextRecognition):
     #
     # * Otherwise, returns a TRResult if successful.
 
-    def result(self, path):
-        '''Returns the results from calling the service on the 'path'.  The
-        results are returned as an TRResult named tuple.
+    def result(self, path, result = None):
+        '''Returns the result from calling the service on the 'file_path'.
+        The result is returned as an TRResult named tuple.
         '''
-        # Read the image and proceed with contacting the service.
-        (image, error) = self._image_from_file(path)
-        if error:
-            return error
 
-        try:
-            if __debug__: log(f'building Google vision API object for {path}')
-            client  = gv.ImageAnnotatorClient()
-            params  = gv.TextDetectionParams(
-                mapping = { 'enable_text_detection_confidence_score': True })
-            context = gv.ImageContext(language_hints = ['en-t-i0-handwrit'],
-                                      text_detection_params = params)
-            img     = gv.Image(content = image)
-            if __debug__: log(f'sending image to Google for {path} ...')
-            response = client.document_text_detection(image = img, image_context = context)
-            if __debug__: log(f'received result from Google for {path}')
+        if not result:
+            # Read the image and proceed with contacting the service.
+            (image, error) = self._image_from_file(path)
+            if error:
+                return error
 
-            raise_for_interrupts()
-            boxes = []
-            # See this page for more information about the structure:
-            # https://cloud.google.com/vision/docs/handwriting#python
-            if len(response.full_text_annotation.pages) > 1:
-                warn('More than one page received from Google; using only first.')
-            for block in response.full_text_annotation.pages[0].blocks:
-                for para in block.paragraphs:
-                    corners = corner_list(para.bounding_box.vertices)
-                    boxes.append(Box(bb = corners, kind = 'para', text = '',
-                                     score = para.confidence))
-                    for word in para.words:
-                        text = ''
-                        for symbol in word.symbols:
-                            text += symbol.text
-                        corners = corner_list(word.bounding_box.vertices)
-                        if corners:
-                            boxes.append(Box(bb = corners, kind = 'word',
-                                             text = text, score = para.confidence))
-                        else:
-                            # Something is wrong with the vertex list.
-                            # Skip it and continue.
-                            if __debug__: log('bad bb for {}: {}', text, bb)
-            full_text = response.full_text_annotation.text
-            return TRResult(path = path, data = dict_from_response(response),
-                            boxes = boxes, text = full_text, error = None)
-        except google.api_core.exceptions.PermissionDenied as ex:
-            text = 'Authentication failure for Google service -- {}'.format(ex)
-            raise AuthFailure(text)
-        except KeyboardInterrupt as ex:
-            raise
-        except Exception as ex:
-            if isinstance(ex, KeyError):
-                # Can happen if you control-C in the middle of the Google call.
-                # Result is "Exception ignored in: 'grpc._cython.cygrpc._next'"
-                # printed to the terminal and we end up here.
-                raise KeyboardInterrupt
-            else:
-                text = 'Error: {} -- {}'.format(str(ex), path)
-                return TRResult(path = path, data = {}, boxes = [],
-                                text = '', error = text)
+            if __debug__: log(f'building Google API object for {relative(path)}')
+            try:
+                client  = gv.ImageAnnotatorClient()
+                params  = gv.TextDetectionParams(
+                    mapping = { 'enable_text_detection_confidence_score': True })
+                context = gv.ImageContext(language_hints = ['en-t-i0-handwrit'],
+                                          text_detection_params = params)
+                img     = gv.Image(content = image)
+                if __debug__: log(f'sending image to Google for {relative(path)} ...')
+                response = client.document_text_detection(image = img,
+                                                          image_context = context)
+                if __debug__: log(f'received result from Google for {relative(path)}')
+                result = dict_from_response(response)
+            except google.api_core.exceptions.PermissionDenied as ex:
+                text = 'Authentication failure for Google service -- {}'.format(ex)
+                raise AuthFailure(text)
+            except google.auth.exceptions.DefaultCredentialsError as ex:
+                text = 'Credentials file error for Google service -- {}'.format(ex)
+                raise AuthFailure(text)
+            except google.api_core.exceptions.ServiceUnavailable as ex:
+                text = 'Network, service, or Google configuration error -- {}'.format(ex)
+                raise ServiceFailure(text)
+            except KeyboardInterrupt as ex:
+                raise
+            except Exception as ex:
+                if isinstance(ex, KeyError):
+                    # Can happen if you control-C in the middle of the Google call.
+                    # Result is "Exception ignored in: 'grpc._cython.cygrpc._next'"
+                    # printed to the terminal and we end up here.
+                    raise KeyboardInterrupt
+                else:
+                    text = 'Error: {} -- {}'.format(str(ex), path)
+                    return TRResult(path = path, data = {}, boxes = [],
+                                    text = '', error = text)
+
+        raise_for_interrupts()
+        boxes = []
+        # See this page for more information about the structure:
+        # https://cloud.google.com/vision/docs/handwriting#python
+        if len(result['full_text_annotation']['pages']) > 1:
+            warn('More than one page received from Google; using only first.')
+        for block in result['full_text_annotation']['pages'][0]['blocks']:
+            for para in block['paragraphs']:
+                corners = corner_list(para['bounding_box']['vertices'])
+                boxes.append(Box(bb = corners, kind = 'para', text = '',
+                                 score = para['confidence']))
+                for word in para['words']:
+                    text = ''
+                    for symbol in word['symbols']:
+                        text += symbol['text']
+                    corners = corner_list(word['bounding_box']['vertices'])
+                    if corners:
+                        boxes.append(Box(bb = corners, kind = 'word',
+                                         text = text, score = para['confidence']))
+                    else:
+                        # Something is wrong with the vertex list.
+                        # Skip it and continue.
+                        if __debug__: log(f'bad bb for {text}: {bb}')
+        full_text = result['full_text_annotation']['text']
+        return TRResult(path = path, data = result,
+                        boxes = boxes, text = full_text, error = None)
 
 
 # Miscellaenous utilities
@@ -182,8 +194,8 @@ def corner_list(vertices):
     if len(vertices) < 4:
         return []
     for vertex in vertices:
-        corners.append(vertex.x)
-        corners.append(vertex.y)
+        corners.append(vertex['x'])
+        corners.append(vertex['y'])
     return corners
 
 

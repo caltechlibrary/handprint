@@ -399,18 +399,18 @@ The following table summarizes all the command line options available. (Note: on
 |---------------------------------|----------------|---------|---------|--|
 | `-a`_A_   | `--add-creds`_A_    | Add credentials for service _A_ and exit | | |
 | `-b`_B_   | `--base-name`_B_    | Write outputs to files named _B_-n | Use base names of image files | ⚑ |
-| `-C`      | `--no-color`        | Don't color-code the output | Use colors in the terminal output |
+| `-C`      | `--no-color`        | Don't color-code the output | Color-code the terminal output |
 | `-c`      | `--compare`         | Compare to ground truth; see `-r` too | |
 | `-d`_D_   | `--display`_D_      | Display annotation types _D_ | Display text annotations | ★ |
-| `-e`      | `--extended`        | Produce extended results | Produce only the overview image | |
-| `-f`_F_   | `--from-file`_F_    | Read file names or URLs from file _F_ | Use what's given on command line |
-| `-G`      | `--no-grid`         | Don't produce results summary image | Produce an _N_&times;_N_ grid image| |
+| `-e`      | `--extended`        | Produce extended results | Produce only summary image | |
+| `-f`_F_   | `--from-file`_F_    | Read file names or URLs from file _F_ | Use args on the command line |
+| `-G`      | `--no-grid`         | Don't create summary image | Create an _N_&times;_N_ grid image| |
 | `-h`      | `--help`            | Display help text and exit | | |
 | `-j`      | `--reuse-json`      | Reuse prior JSON results if found | Ignore any existing results | | 
 | `-l`      | `--list`            | Display known services and exit | | | 
 | `-m`_x,y_ | `--text-move`_x,y_  | Move each text annotation by x,y | `0,0` | |
 | `-n`_N_   | `--confidence`_N_   | Use confidence score threshold _N_ | `0` | |
-| `-o`_O_   | `--output`_O_       | Write outputs to directory _O_ | Directories where images are found | |
+| `-o`_O_   | `--output`_O_       | Write all outputs to directory _O_ | Write to images' directories | |
 | `-q`      | `--quiet`           | Don't print messages while working | Be chatty while working |
 | `-r`      | `--relaxed`         | Use looser criteria for `--compare` | |
 | `-s`_S_   | `--service`_S_      | Use recognition service _S_; see `-l` | Use all services | |
@@ -418,7 +418,7 @@ The following table summarizes all the command line options available. (Note: on
 | `-V`      | `--version`         | Display program version info and exit | | |
 | `-x`_X_   | `--text-color`_X_   | Use color _X_ for text annotations | Red | |
 | `-z`_Z_   | `--text-size`_Z_    | Use font size _Z_ for text annotations | Use font size 12 | |
-| `-@`_OUT_ | `--debug`_OUT_      | Debugging mode; write trace to _OUT_ | Normal mode | ⬥ |
+| `-@`_OUT_ | `--debug`_OUT_      | Write detailed execution info to _OUT_ | Normal mode | ⬥ |
 
 ⚑ &nbsp; If URLs are given, then the outputs will be written by default to names of the form `document-n`, where n is an integer.  Examples: `document-1.jpg`, `document-1.handprint-google.txt`, etc.  This is because images located in network content management systems may not have any clear names in their URLs.<br>
 ★ &nbsp; The possible values of _D_ are: `text`, `bb`, `bb-word`, `bb-line`, `bb-para`. Multiple values must be separated with commas. The value `bb` is a shorthand for `bb-word,bb-line,bb-para`. The default is `text`.<br>

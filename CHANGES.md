@@ -1,5 +1,10 @@
 # Change log for Handprint
 
+## Version 1.5.1
+
+* Removed `dateparser` from explicit dependencies because Handprint doesn't depend on that package.  (It's a transitive dependency coming from something else, but doesn't belong in Handprint's requirements.)
+
+
 ## Version 1.5.0
 
 This version contains many additions and some important bugs in the extended output (i.e., using the `-e` flag) for Google and Amazon. If you use Handprint, you should definitely update to this version.

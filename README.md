@@ -488,7 +488,6 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [boltons](https://github.com/mahmoud/boltons/) &ndash; package of miscellaneous Python utilities
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
 * [CommonPy](https://github.com/caltechlibrary/commonpy) &ndash; a collection of commonly-useful Python functions
-* [dateparser](https://pypi.org/project/dateparser/) &ndash; parse dates in almost any string format
 * [fastnumbers](https://github.com/SethMMorton/fastnumbers) &ndash; number testing and conversion functions
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 
 * [grpcio](https://grpc.io) &ndash; open-source RPC framework

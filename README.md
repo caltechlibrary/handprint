@@ -12,6 +12,8 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 
 ## ❡ Log of recent changes
 
+_Version 1.5.1_: Speed up initial application load time and update some dependencies in `requirements.txt`.
+
 _Version 1.5.0_: This is a large update with many new features and bug fixes. Please see the file [`CHANGES.md`](CHANGES.md) for more information. If you use Handprint, **you should update to this version**.
 
 ## § Table of Contents

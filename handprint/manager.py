@@ -21,7 +21,6 @@ from   commonpy.file_utils import files_in_directory, alt_extension
 from   commonpy.file_utils import readable, writable, nonempty
 from   commonpy.file_utils import delete_existing
 from   concurrent.futures import ThreadPoolExecutor
-import humanize
 import io
 from   itertools import repeat
 import json
@@ -35,21 +34,22 @@ import threading
 from   threading import Thread, Lock
 from   timeit import default_timer as timer
 import urllib
-from   validator_collection.checkers import is_url
+
+# Note: additional imports are interspersed in the code below, to delay loading
+# packages until they're needed.  This speeds up initial application startup
+# time, although it goes against PEP 8 conventions.  IMHO it's worth it.
+import handprint
+from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
+from handprint.exceptions import *
+from handprint.network import download_file, disable_ssl_cert_check
+from handprint.services import KNOWN_SERVICES
+from handprint.ui import inform, alert, warn
 
 if __debug__:
     from sidetrack import set_debug, log, logr
 
-import handprint
-from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
-from handprint.comparison import text_comparison
-from handprint.exceptions import *
-from handprint.images import converted_image, annotated_image, create_image_grid
-from handprint.images import image_size, image_dimensions
-from handprint.images import reduced_image_size, reduced_image_dimensions
-from handprint.network import network_available, download_file, disable_ssl_cert_check
-from handprint.services import KNOWN_SERVICES
-from handprint.ui import inform, alert, warn
+# Disable certificate verification.  FIXME: probably shouldn't do this.
+disable_ssl_cert_check()
 
 
 # Helper data types.
@@ -137,7 +137,7 @@ class Manager:
         "index" and "base_name" to construct a download copy of the item if
         it has to be downloaded from a URL first.
         '''
-        # Shortcuts to make the code more readable.
+       # Shortcuts to make the code more readable.
         services = self._services
 
         inform(f'Starting on [white]{item}[/]')
@@ -183,6 +183,7 @@ class Manager:
             inform(f'Creating results grid image: {relative(grid_file)}')
             all_results = [r.annotated for r in results]
             width = math.ceil(math.sqrt(len(all_results)))
+            from handprint.images import create_image_grid
             create_image_grid(all_results, grid_file, max_horizontal = width)
 
         # Clean up after ourselves.
@@ -217,6 +218,7 @@ class Manager:
 
         # For URLs, we download the corresponding files and name them with
         # the base_name.
+        from validator_collection.checkers import is_url
         if is_url(item):
             # First make sure the URL actually points to an image.
             if __debug__: log(f'testing if URL contains an image: {item}')
@@ -310,6 +312,7 @@ class Manager:
         inform(f'Creating annotated image for {service_name}.')
         annot_path  = self._renamed(base_path, str(service), 'png')
         report_path = None
+        from handprint.images import annotated_image
         with self._lock:
             img = annotated_image(image.file, output.boxes, service,
                                   self._text_size, self._text_color, self._text_shift,
@@ -332,6 +335,7 @@ class Manager:
                 if __debug__: log(f'reading ground truth from {gt_file}')
                 gt_text = open(gt_file, 'r').read()
                 inform(f'Saving {service_name} comparison to ground truth')
+                from handprint.comparison import text_comparison
                 self._save(text_comparison(output.text, gt_text, relaxed), report_path)
             elif not nonempty(gt_file):
                 warn(f'Skipping {service_name} comparison because {gt_path} is empty')
@@ -342,16 +346,19 @@ class Manager:
 
     def _normalized(self, orig_item, orig_fmt, item_file, dest_dir):
         '''Normalize images to same format and max size.'''
-        # All services accept PNG, so normalize files to PNG.
         to_delete = set()
+
+        # All services accept PNG, so normalize files to PNG.
         file = item_file
         if orig_fmt != _OUTPUT_FORMAT:
             new_file = self._converted_file(file, _OUTPUT_FORMAT, dest_dir)
             if new_file and path.basename(new_file) != path.basename(file):
                 to_delete.add(new_file)
             file = new_file
+
         # Resize if either size or dimensions are larger than accepted
         if file and self._max_dimensions:
+            from handprint.images import image_dimensions
             (image_width, image_height) = image_dimensions(file)
             (max_width, max_height) = self._max_dimensions
             if max_width < image_width or max_height < image_height:
@@ -359,11 +366,14 @@ class Manager:
                 if new_file and path.basename(new_file) != path.basename(file):
                     to_delete.add(new_file)
                 file = new_file
+
+        from handprint.images import image_size
         if file and self._max_size and self._max_size < image_size(file):
             new_file = self._smaller_file(file)
             if new_file and  path.basename(new_file) != path.basename(file):
                 to_delete.add(new_file)
             file = new_file
+
         return Input(orig_item, orig_fmt, item_file, file, dest_dir, to_delete)
 
 
@@ -375,6 +385,7 @@ class Manager:
             return new_file
         else:
             inform(f'Converting to {to_format} format: {relative(file)}')
+            from handprint.images import converted_image
             (converted, error) = converted_image(file, to_format, new_file)
             if error:
                 alert(f'Failed to convert {relative(file)}: {error}')
@@ -389,6 +400,7 @@ class Manager:
         name_tail = '.handprint' + file_ext
         new_file = file if name_tail in file else filename_basename(file) + name_tail
         if path.exists(new_file):
+            from handprint.images import image_size
             if image_size(new_file) < self._max_size:
                 inform(f'Reusing resized image found in {relative(new_file)}')
                 return new_file
@@ -396,8 +408,9 @@ class Manager:
                 # We found a ".handprint.ext" file, perhaps from a previous run,
                 # but for the current set of services, it's larger than allowed.
                 if __debug__: log('existing resized file larger than {}b: {}',
-                                  humanize.intcomma(self._max_size), new_file)
+                                  self._max_size, new_file)
         inform(f'Size too large; reducing size: {relative(file)}')
+        from handprint.images import reduced_image_size
         (resized, error) = reduced_image_size(file, new_file, self._max_size)
         if error:
             alert(f'Failed to resize {relative(file)}: {error}')
@@ -411,6 +424,7 @@ class Manager:
         name_tail = '.handprint' + file_ext
         new_file = file if name_tail in file else filename_basename(file) + name_tail
         if path.exists(new_file) and readable(new_file):
+            from handprint.images import image_dimensions
             (image_width, image_height) = image_dimensions(new_file)
             if image_width < max_width and image_height < max_height:
                 inform(f'Using reduced image found in {relative(new_file)}')
@@ -421,6 +435,7 @@ class Manager:
                 if __debug__: log('existing resized file larger than {}x{}: {}',
                                   max_width, max_height, new_file)
         inform(f'Dimensions too large; reducing dimensions: {relative(file)}')
+        from handprint.images import reduced_image_dimensions
         (resized, error) = reduced_image_dimensions(file, new_file, max_width, max_height)
         if error:
             alert(f'Failed to re-dimension {relative(file)}: {error}')

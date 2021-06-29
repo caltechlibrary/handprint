@@ -19,10 +19,8 @@ from   commonpy.data_utils import pluralized
 from   commonpy.file_utils import filename_extension, filename_basename
 from   commonpy.file_utils import files_in_directory, readable, writable
 import os
-from   os import path
-import shutil
+from   os.path import isfile, isdir, exists
 import sys
-from   validator_collection.checkers import is_url
 
 if __debug__:
     from sidetrack import set_debug, log, logr
@@ -32,8 +30,6 @@ from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.credentials import Credentials
 from handprint.exceptions import *
 from handprint.exit_codes import ExitCode
-from handprint.manager import Manager
-from handprint.network import network_available, disable_ssl_cert_check
 from handprint.services import ACCEPTED_FORMATS, services_list
 from handprint.ui import inform, alert, alert_fatal, warn
 
@@ -58,6 +54,7 @@ class MainBody(object):
 
         # The manager object manages the process of manipulating images and
         # sending them to the services.
+        from handprint.manager import Manager
         self._manager = Manager(self.services, self.threads, self.output_dir,
                                 self.make_grid, self.compare, self.extended,
                                 self.text_size, self.text_color, self.text_shift,
@@ -85,12 +82,13 @@ class MainBody(object):
     def _do_preflight(self):
         '''Check the option values given by the user, and do other prep.'''
 
+        from handprint.network import network_available
         if not network_available():
             alert_fatal('No network connection.')
             raise CannotProceed(ExitCode.no_network)
 
         if self.from_file:
-            if not path.exists(self.from_file):
+            if not exists(self.from_file):
                 alert_fatal(f'File not found: {self.from_file}')
                 raise CannotProceed(ExitCode.bad_arg)
             if not readable(self.from_file):
@@ -98,7 +96,7 @@ class MainBody(object):
                 raise CannotProceed(ExitCode.file_error)
 
         if self.output_dir:
-            if path.isdir(self.output_dir):
+            if isdir(self.output_dir):
                 if not writable(self.output_dir):
                     alert_fatal(f'Directory not writable: {self.output_dir}')
                     raise CannotProceed(ExitCode.file_error)
@@ -127,6 +125,7 @@ class MainBody(object):
 
         # Get to work.
         if __debug__: log('initializing manager and starting processes')
+        import shutil
         print_separators = num_targets > 1
         rule = '─'*(shutil.get_terminal_size().columns or 80)
         for index, item in enumerate(targets, start = 1):
@@ -141,6 +140,10 @@ class MainBody(object):
 
 
     def targets_from_arguments(self):
+        # Validator_collection takes a long time to load.  Delay loading it
+        # until needed, so that overall application startup time is faster.
+        from validator_collection.checkers import is_url
+
         targets = []
         if self.from_file:
             if __debug__: log(f'reading {self.from_file}')
@@ -149,9 +152,9 @@ class MainBody(object):
             for item in self.files:
                 if is_url(item):
                     targets.append(item)
-                elif path.isfile(item) and filename_extension(item) in ACCEPTED_FORMATS:
+                elif isfile(item) and filename_extension(item) in ACCEPTED_FORMATS:
                     targets.append(item)
-                elif path.isdir(item):
+                elif isdir(item):
                     # It's a directory, so look for files within.
                     targets += files_in_directory(item, extensions = ACCEPTED_FORMATS)
                 else:

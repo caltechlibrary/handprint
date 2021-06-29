@@ -29,7 +29,6 @@ if __debug__:
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials
 from handprint.exceptions import *
-from handprint.network import net
 from handprint.services.base import TextRecognition, TRResult, Box
 
 
@@ -203,6 +202,7 @@ class MicrosoftTR(TextRecognition):
 
 
     def _net(self, get_or_post, url, headers, data = None, polling = False):
+        from handprint.network import net
         response, error = net(get_or_post, url, headers = headers,
                               data = data, polling = polling)
         if isinstance(error, NetworkFailure):

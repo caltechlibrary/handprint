@@ -14,8 +14,6 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-import boto3
-import botocore
 from   commonpy.file_utils import readable, relative
 from   commonpy.interrupt import raise_for_interrupts
 import imagesize
@@ -28,7 +26,6 @@ if __debug__:
 import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials
 from handprint.exceptions import *
-from handprint.network import net
 from handprint.services.base import TextRecognition, TRResult, Box
 
 
@@ -86,6 +83,11 @@ class AmazonTR(TextRecognition):
         '''Returns the result from calling the service on the 'file_path'.
         The result is returned as an TRResult named tuple.
         '''
+
+        # Delay loading the API packages until needed because they take time to
+        # load.  Doing this speeds up overall application start time.
+        import boto3
+        import botocore
 
         if not result:
             # If any exceptions occur, let them be passed to caller.

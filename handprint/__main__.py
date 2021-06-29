@@ -433,7 +433,8 @@ Command-line arguments summary
     pref = '/' if sys.platform.startswith('win') else '-'
     hint = f'(Hint: use {pref}h for help.)'
     ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
-            use_color = not no_color, be_quiet = quiet)
+            use_color = not no_color, be_quiet = quiet,
+            show_banner = not (version or list or add_creds != 'A'))
     ui.start()
 
     if debug != 'OUT':
@@ -450,7 +451,7 @@ Command-line arguments summary
         print_version()
         exit(int(ExitCode.success))
     if list:
-        inform('Known services: {}', ', '.join(services_list()))
+        inform('Known services: [bold]{}[/]', ', '.join(services_list()))
         exit(int(ExitCode.success))
     if add_creds != 'A':
         service = add_creds.lower()

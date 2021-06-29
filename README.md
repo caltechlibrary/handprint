@@ -244,9 +244,9 @@ Handprint produces copies of the input images overlaid with the recognition resu
 
 * `text`: display the text recognized in the image (default)
 * `bb`: display all bounding boxes returned by the service
-* `bb-word`: display the bounding boxes for words
-* `bb-line`: display the bounding boxes for lines
-* `bb-para`: display the bounding boxes for paragraphs
+* `bb-word`: display the bounding boxes for words (in red)
+* `bb-line`: display the bounding boxes for lines (in blue)
+* `bb-para`: display the bounding boxes for paragraphs (in green)
 
 Separate multiple values with a comma.  The option `bb` is a shorthand for the value `bb-word,bb-line,bb-para`.  As an example, the following command will show both the recognized text and the bounding boxes around words:
 ```sh

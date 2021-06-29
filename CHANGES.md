@@ -1,5 +1,17 @@
 # Change log for Handprint
 
+## Version 1.5.1
+
+There are no functional changes in this release; all of the code changes are internal, to speed up Handprint startup times and further clean up some code dependencies.
+
+All changes in this release:
+
+* To speed up initial application startup time, `import` statements have been moved from (usually) the tops of files, to where the packages are actually used in the code. Profiling using the Python `-X importtime` option helped identify expensive packages to make this efficiency gain possible.
+* The user interface code in `ui.py` has been replaced with importing [Bun](https://github.com/caltechlibrary/bun).
+* The version of `commonpy` needed is now 1.3.9.
+* The dependency on [dateparser](https://github.com/scrapinghub/dateparser) has been removed because Handprint doesn't depend on that package.  (It's a transitive dependency coming from something else, but by itself, it doesn't belong in Handprint's requirements.)
+
+
 ## Version 1.5.0
 
 This version contains many additions and some important bugs in the extended output (i.e., using the `-e` flag) for Google and Amazon. If you use Handprint, you should definitely update to this version.

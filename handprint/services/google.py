@@ -20,10 +20,6 @@ import io
 import json
 import math
 import os
-import google
-from google.cloud import vision_v1 as gv
-from google.api_core.exceptions import PermissionDenied
-from google.protobuf.json_format import MessageToDict
 import json
 
 if __debug__:
@@ -108,6 +104,13 @@ class GoogleTR(TextRecognition):
         '''Returns the result from calling the service on the 'file_path'.
         The result is returned as an TRResult named tuple.
         '''
+
+        # Delay loading the API packages until needed because they take time to
+        # load.  Doing this speeds up overall application start time.
+        import google
+        from google.cloud import vision_v1 as gv
+        from google.api_core.exceptions import PermissionDenied
+        from google.protobuf.json_format import MessageToDict
 
         if not result:
             # Read the image and proceed with contacting the service.
@@ -206,6 +209,7 @@ def corner_list(vertices):
 # https://github.com/googleapis/python-memcache/issues/19#issuecomment-709628506
 
 def dict_from_response(response):
+    import google
     if isinstance(response, google.cloud.vision_v1.types.image_annotator.AnnotateImageResponse):
         return response.__class__.to_dict(response)
     else:

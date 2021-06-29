@@ -34,7 +34,16 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+import sys
+from   sys import exit as exit
+if sys.version_info <= (3, 8):
+    print('Handprint requires Python version 3.8 or higher,')
+    print('but the current version of Python is ' +
+          str(sys.version_info.major) + '.' + str(sys.version_info.minor) + '.')
+    sys.exit(6)
+
 from   boltons.debugutils import pdb_on_signal
+from   bun import UI, inform, alert, alert_fatal, warn
 from   commonpy.data_utils import timestamp
 from   commonpy.file_utils import filename_extension, files_in_directory
 from   commonpy.file_utils import readable, writable
@@ -44,8 +53,6 @@ import os
 from   os import path, cpu_count
 import plac
 import signal
-import sys
-from   sys import exit as exit
 
 if __debug__:
     from sidetrack import set_debug, log, logr
@@ -56,12 +63,7 @@ from handprint.credentials import Credentials
 from handprint.exceptions import *
 from handprint.exit_codes import ExitCode
 from handprint.main_body import MainBody
-from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
-from handprint.ui import UI, inform, alert, alert_fatal, warn
-
-# Disable certificate verification.  FIXME: probably shouldn't do this.
-disable_ssl_cert_check()
 
 
 # Main program.
@@ -431,10 +433,9 @@ Command-line arguments summary
     pref = '/' if sys.platform.startswith('win') else '-'
     hint = f'(Hint: use {pref}h for help.)'
     ui = UI('Handprint', 'HANDwritten Page RecognitIoN Test',
-            use_color = not no_color, be_quiet = quiet)
+            use_color = not no_color, be_quiet = quiet,
+            show_banner = not (version or list or add_creds != 'A'))
     ui.start()
-
-    # Preprocess arguments and handle early exits -----------------------------
 
     if debug != 'OUT':
         if __debug__: set_debug(True, debug, extra = '%(threadName)s')
@@ -444,13 +445,13 @@ Command-line arguments summary
             # Even with a different signal, I can't get this to work on Win.
             pdb_on_signal(signal.SIGUSR1)
 
-    # Handle arguments that involve deliberate exits.
+    # Preprocess arguments and handle early exits -----------------------------
 
     if version:
         print_version()
         exit(int(ExitCode.success))
     if list:
-        inform('Known services: {}', ', '.join(services_list()))
+        inform('Known services: [bold]{}[/]', ', '.join(services_list()))
         exit(int(ExitCode.success))
     if add_creds != 'A':
         service = add_creds.lower()
@@ -467,9 +468,6 @@ Command-line arguments summary
         Credentials.save_credentials(service, creds_file)
         inform(f'Saved credentials for service "{service}".')
         exit(int(ExitCode.success))
-
-    # Do sanity checks on some other arguments.
-
     services = services_list() if services == 'S' else services.lower().split(',')
     if services != 'S' and not all(s in services_list() for s in services):
         alert_fatal(f'"{services}" is/are not known services. {hint}')

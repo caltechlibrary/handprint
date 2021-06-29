@@ -66,8 +66,8 @@ __pycache__
 # Project-specific things to ignore:
 # .............................................................................
 
-build
-dist
+./build
+./dist
 *-reduced.jpg
 *-reduced.png
 *.all-results.jpg

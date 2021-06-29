@@ -14,11 +14,7 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
-from collections  import namedtuple
-from stringdist   import levenshtein
-from textdistance import lcsseq
-# Shorten this name for easier reading in the code below.
-lcsseq_score = lcsseq.normalized_similarity
+from collections import namedtuple
 
 import handprint
 from handprint.exceptions import *
@@ -105,6 +101,12 @@ def text_comparison(htr_text, gt_text, relaxed = False):
     # 4) Go through the list of tuples, add up error scores and other things
     #    and produce the final output string.
 
+    # Textdistance takes a long time to load.  Delay loading it until we need
+    # it so that the overall application startup times can be faster.
+    from textdistance import lcsseq
+    # Shorten this name for easier reading in the code below.
+    lcsseq_score = lcsseq.normalized_similarity
+
     gt_lines  = gt_text.strip().splitlines()
     htr_lines = htr_text.strip().splitlines()
     htr_index = 0
@@ -177,6 +179,7 @@ def line_data(gt_line, htr_line, htr_index):
     # The stringdist package definition of levenshtein_norm() divides
     # by the longest of the two strings, but it is more conventional in
     # OCR papers and software to divide by the length of the reference.
+    from stringdist import levenshtein
     distance = levenshtein(expected, obtained)
     if len(expected) > 0:
         cer = '{:.2f}'.format(100 * float(distance)/len(expected))

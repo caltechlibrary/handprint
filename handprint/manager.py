@@ -14,6 +14,7 @@ is open-source software released under a 3-clause BSD license.  Please see the
 file "LICENSE" for more information.
 '''
 
+from   bun import inform, alert, warn
 from   collections import namedtuple
 from   commonpy.interrupt import raise_for_interrupts, wait
 from   commonpy.file_utils import filename_basename, filename_extension, relative
@@ -43,7 +44,6 @@ from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.exceptions import *
 from handprint.network import download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
-from handprint.ui import inform, alert, warn
 
 if __debug__:
     from sidetrack import set_debug, log, logr

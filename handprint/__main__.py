@@ -43,6 +43,7 @@ if sys.version_info <= (3, 8):
     sys.exit(6)
 
 from   boltons.debugutils import pdb_on_signal
+from   bun import UI, inform, alert, alert_fatal, warn
 from   commonpy.data_utils import timestamp
 from   commonpy.file_utils import filename_extension, files_in_directory
 from   commonpy.file_utils import readable, writable
@@ -63,7 +64,6 @@ from handprint.exceptions import *
 from handprint.exit_codes import ExitCode
 from handprint.main_body import MainBody
 from handprint.services import services_list
-from handprint.ui import UI, inform, alert, alert_fatal, warn
 
 
 # Main program.

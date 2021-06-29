@@ -35,6 +35,7 @@ file "LICENSE" for more information.
 '''
 
 import sys
+from   sys import exit as exit
 if sys.version_info <= (3, 8):
     print('Handprint requires Python version 3.8 or higher,')
     print('but the current version of Python is ' +
@@ -51,7 +52,6 @@ import os
 from   os import path, cpu_count
 import plac
 import signal
-from   sys import exit as exit
 
 if __debug__:
     from sidetrack import set_debug, log, logr
@@ -62,12 +62,8 @@ from handprint.credentials import Credentials
 from handprint.exceptions import *
 from handprint.exit_codes import ExitCode
 from handprint.main_body import MainBody
-from handprint.network import disable_ssl_cert_check
 from handprint.services import services_list
 from handprint.ui import UI, inform, alert, alert_fatal, warn
-
-# Disable certificate verification.  FIXME: probably shouldn't do this.
-disable_ssl_cert_check()
 
 
 # Main program.
@@ -440,8 +436,6 @@ Command-line arguments summary
             use_color = not no_color, be_quiet = quiet)
     ui.start()
 
-    # Preprocess arguments and handle early exits -----------------------------
-
     if debug != 'OUT':
         if __debug__: set_debug(True, debug, extra = '%(threadName)s')
         import faulthandler
@@ -450,7 +444,7 @@ Command-line arguments summary
             # Even with a different signal, I can't get this to work on Win.
             pdb_on_signal(signal.SIGUSR1)
 
-    # Handle arguments that involve deliberate exits.
+    # Preprocess arguments and handle early exits -----------------------------
 
     if version:
         print_version()
@@ -473,9 +467,6 @@ Command-line arguments summary
         Credentials.save_credentials(service, creds_file)
         inform(f'Saved credentials for service "{service}".')
         exit(int(ExitCode.success))
-
-    # Do sanity checks on some other arguments.
-
     services = services_list() if services == 'S' else services.lower().split(',')
     if services != 'S' and not all(s in services_list() for s in services):
         alert_fatal(f'"{services}" is/are not known services. {hint}')

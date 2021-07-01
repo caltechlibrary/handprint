@@ -128,7 +128,7 @@ def run(cmd, quiet = False):
 
 
 def quit(msg):
-    print(f'‼️  {msg}', flush = True)
+    Console().print(f'‼️  {msg}', style = "bold red")
     exit(1)
 
 

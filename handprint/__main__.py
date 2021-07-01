@@ -248,9 +248,9 @@ to display other results.  The recognized values are as follows:
 
   text    -- display the text recognized in the image (default)
   bb      -- display all bounding boxes returned by the service
-  bb-word -- display only the bounding boxes for words
-  bb-line -- display only the bounding boxes for lines
-  bb-para -- display only the bounding boxes for paragraphs
+  bb-word -- display only the bounding boxes for words (in red)
+  bb-line -- display only the bounding boxes for lines (in blue)
+  bb-para -- display only the bounding boxes for paragraphs (in green)
 
 Separate multiple values with a comma.  The option "bb" is a shorthand for the
 value "bb-word,bb-line,bb-para".  As an example, the following command will

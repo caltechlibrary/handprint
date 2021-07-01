@@ -116,13 +116,10 @@ pypi: create-dist
 
 # make executables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-os     := $(shell uname -s | tr '[A-Z]' '[a-z]' | sed 's/darwin/macos/')
-outdir := dist/binary
-
-binaries: 
-	mkdir -p $(outdir)
-	dev/scripts/create-pyz $(outdir) 3.8.2
-	dev/scripts/create-pyz $(outdir) 3.9.2
+binaries binary: 
+	mkdir -p dist/binary
+	dev/scripts/create-pyz dist/binary 3.8.2
+	dev/scripts/create-pyz dist/binary 3.9.2
 
 
 # Cleanup and miscellaneous directives ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -131,7 +128,8 @@ clean: clean-dist clean-build clean-release clean-other
 
 clean-dist:;
 	-rm -fr dist/$(name) dist/$(name)-$(version).tar.gz \
-	    dist/$(name)-$(version)-py3-none-any.whl __pycache__ .eggs
+	    dist/$(name)-$(version)-py3-none-any.whl dist/binary \
+            __pycache__ .eggs
 
 clean-build:;
 	-rm -rf build

@@ -145,7 +145,7 @@ if not exists(join(here, 'requirements.txt')):
 
 setup_file = join(here, 'setup.cfg')
 if not exists(setup_file):
-    quit(f'__init__.py does not exist in {setup_file}')
+    quit(f'setup.cfg does not exist in {here}')
 
 if len(sys.argv) < 2:
     quit(f'First argument must be destination where outputs will be written')

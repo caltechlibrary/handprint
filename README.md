@@ -54,18 +54,26 @@ Services supported include Google's [Google Cloud Vision API](https://cloud.goog
 
 ## ✎ Installation and configuration
 
-The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command in a terminal shell and inspecting the results:
+The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command in a terminal and inspecting the results:
 ```sh
 # Note: on Windows, you may have to use "python" instead of "python3"
 python3 --version
 ```
+
+Note for Mac users: if you are using macOS Catalina (10.15) or later and have never run `python3`, then the first time you do, macOS will ask you if you want to install the macOS command-line developer tools.  Go ahead and do so, as this is the easiest way to get a recent-enough Python&nbsp;3 on those systems.
 
 Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but does not include credentials for using the services.  To be able to use Handprint, you must **both** install a copy of Handprint on your computer **and** supply your copy with credentials for accessing the cloud services you want to use.
 
 
 ### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
 
-On **Linux**, **macOS**, and **Windows** operating systems, you should be able to install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have the `pip` package or are uncertain if you do, first run the following command in a terminal command line interpreter: 
+#### MacOS systems
+
+The latest Handprint release provides a standalone runnable application for macOS that _only_ needs a Python&nbsp;3 interpreter on your computer &ndash; you **do not** need to run `pip install` as described below. Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint1.5.1-macos-python3.8.zip`.  Download the one matching your version of Python, unzip the file, and the result will be a folder containing `handprint`, a runnable application.
+
+#### Windows and Linux (and alternative approach for macOS)
+
+On Windows and Linux systems (and if you prefer this installation approach on macOS too), you should be able to install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have the `pip` package or are uncertain if you do, first run the following command in a terminal command line interpreter: 
 ```sh
 sudo python3 -m ensurepip
 ```

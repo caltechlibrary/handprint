@@ -7,6 +7,9 @@
 # @website https://github.com/caltechlibrary/handprint
 # =============================================================================
 
+.ONESHELL: 				# Run all commands in the same shell.
+.SHELLFLAGS += -e			# Exit at the first error.
+
 # Before we go any further, test if certain programs are available.
 # The following is based on the approach posted by Jonathan Ben-Avraham to
 # Stack Overflow in 2014 at https://stackoverflow.com/a/25668869
@@ -111,13 +114,22 @@ pypi: create-dist
 	python3 -m twine upload dist/*
 
 
+# make executables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+binaries binary: 
+	mkdir -p dist/binary
+	dev/scripts/create-pyz dist/binary 3.8.2
+	dev/scripts/create-pyz dist/binary 3.9.2
+
+
 # Cleanup and miscellaneous directives ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 clean: clean-dist clean-build clean-release clean-other
 
 clean-dist:;
 	-rm -fr dist/$(name) dist/$(name)-$(version).tar.gz \
-	    dist/$(name)-$(version)-py3-none-any.whl __pycache__ .eggs
+	    dist/$(name)-$(version)-py3-none-any.whl dist/binary \
+            __pycache__ .eggs
 
 clean-build:;
 	-rm -rf build

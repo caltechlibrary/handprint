@@ -40,7 +40,7 @@ if sys.version_info <= (3, 8):
     print('Handprint requires Python version 3.8 or higher,')
     print('but the current version of Python is ' +
           str(sys.version_info.major) + '.' + str(sys.version_info.minor) + '.')
-    sys.exit(6)
+    exit(6)
 
 from   boltons.debugutils import pdb_on_signal
 from   bun import UI, inform, alert, alert_fatal, warn
@@ -55,7 +55,7 @@ import plac
 import signal
 
 if __debug__:
-    from sidetrack import set_debug, log, logr
+    from sidetrack import set_debug, log
 
 import handprint
 from handprint import print_version
@@ -555,7 +555,7 @@ Command-line arguments summary
             if __debug__:
                 from traceback import format_exception
                 details = ''.join(format_exception(*exception))
-                logr(f'Exception: {str(ex)}\n{details}')
+                log(f'Exception: {str(ex)}\n{details}')
     else:
         inform('Done.')
 

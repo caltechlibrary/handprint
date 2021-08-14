@@ -46,7 +46,7 @@ from handprint.network import download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
 
 if __debug__:
-    from sidetrack import set_debug, log, logr
+    from sidetrack import log
 
 # Disable certificate verification.  FIXME: probably shouldn't do this.
 disable_ssl_cert_check()

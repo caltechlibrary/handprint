@@ -21,7 +21,7 @@ import os
 import sys
 
 if __debug__:
-    from sidetrack import set_debug, log, logr
+    from sidetrack import log
 
 import handprint
 from handprint.credentials.amazon_auth import AmazonCredentials

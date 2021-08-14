@@ -19,7 +19,7 @@ from   commonpy.file_utils import readable, relative
 import imagesize
 
 if __debug__:
-    from sidetrack import set_debug, log, logr
+    from sidetrack import log
 
 
 # Named tuple definitions.

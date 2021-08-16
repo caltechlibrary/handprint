@@ -1,5 +1,10 @@
 # Change log for Handprint
 
+## Version 1.5.2
+
+There are no functional changes in this release. This version updates dependency requirements in `requirements.txt` to pin the versions of libraries used, and updates the calls to [sidetrack](https://github.com/caltechlibrary/sidetrack) to use the latest API.
+
+
 ## Version 1.5.1
 
 There are no functional changes in this release; all of the code changes are internal, to speed up Handprint startup times and further clean up some code dependencies.

@@ -47,7 +47,7 @@ class Credentials(object):
     @classmethod
     def save_credentials(self, service, supplied_file):
         if not path.isdir(Credentials.creds_dir):
-            if __debug__: log('creating credentials dir: {}.', Credentials.creds_dir)
+            if __debug__: log(f'creating credentials dir: {Credentials.creds_dir}.')
             makedirs(Credentials.creds_dir)
         dest_file = path.join(Credentials.creds_dir, credentials_filename(service))
         copy_file(supplied_file, dest_file)

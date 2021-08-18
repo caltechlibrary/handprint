@@ -23,7 +23,7 @@ import os
 import json
 
 if __debug__:
-    from sidetrack import set_debug, log, logr
+    from sidetrack import log
 
 import handprint
 from handprint.credentials.google_auth import GoogleCredentials

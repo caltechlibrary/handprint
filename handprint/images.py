@@ -30,7 +30,7 @@ from   PIL import Image
 import warnings
 
 if __debug__:
-    from sidetrack import set_debug, log, logr
+    from sidetrack import log
 
 # The following is needed for function annotated_image(...) in this file.
 # On macOS 10.13.6 with Python 3.5.7 and matplotlib 3.0.3, when running with

@@ -1,5 +1,15 @@
 # Change log for Handprint
 
+## Version 1.5.2
+
+There are no functional changes in this release; the changes all concern code dependencies and installation instructions.
+
+* The requirements in `requirements.txt` now pin the versions of Python packages needed.
+* `Pipfile` and `Pipefile.lock` files are now provided for use with [pipenv](https://pipenv.pypa.io).
+* Imports of [sidetrack](https://github.com/caltechlibrary/sidetrack) now refer to the latest API.
+* The installation instructions in the [README](README.md) file now include information about using [pipx](https://pypa.github.io/pipx/).
+
+
 ## Version 1.5.1
 
 There are no functional changes in this release; all of the code changes are internal, to speed up Handprint startup times and further clean up some code dependencies.

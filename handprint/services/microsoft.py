@@ -24,7 +24,7 @@ import os
 import sys
 
 if __debug__:
-    from sidetrack import set_debug, log, logr
+    from sidetrack import log
 
 import handprint
 from handprint.credentials.microsoft_auth import MicrosoftCredentials

@@ -10,18 +10,17 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
 
 
-## ❡ Log of recent changes
+## Log of recent changes
 
-_Version 1.5.1_: Speed up initial application load time and update some dependencies in `requirements.txt`.
+_Version 1.5.2_: Update versions of Python dependencies. If you use Handprint, **you should update to this version**. This version also adds `Pipefile` and `Pipfile.lock` files for use with [pipenv](https://pipenv.pypa.io/en/latest/).
 
-_Version 1.5.0_: This is a large update with many new features and bug fixes. Please see the file [`CHANGES.md`](CHANGES.md) for more information. If you use Handprint, **you should update to this version**.
 
-## § Table of Contents
+## Table of Contents
 
-* [Introduction](#-introduction)
-* [Installation](#-installation)
-   * [Install Handprint on your computer](#-install-handprint-on-your-computer)
-   * [Add cloud service credentials](#-add-cloud-service-credentials)
+* [Introduction](#introduction)
+* [Installation and configuration](#installation-and-configuration)
+   * [Install Handprint on your computer](#install-handprint-on-your-computer)
+   * [Add cloud service credentials](#add-cloud-service-credentials)
 * [Usage](#︎-usage)
    * [Supported HTR/OCR services](#supported-htrocr-services)
    * [Input files and URLs](#input-files-and-urls)
@@ -35,15 +34,15 @@ _Version 1.5.0_: This is a large update with many new features and bug fixes. Pl
    * [Command line options summary](#command-line-options-summary)
    * [Return values](#return-values)
 * [Known issues and limitations](#known-issues-and-limitations)
-* [Getting help](#-getting-help)
-* [Contributing](#-contributing)
-* [License](#-license)
-* [Authors and history](#-authors-and-history)
-* [Acknowledgments](#︎-acknowledgments)
+* [Getting help](#getting-help)
+* [Contributing](#contributing)
+* [License](#license)
+* [Authors and history](#authors-and-history)
+* [Acknowledgments](#︎acknowledgments)
 
 <img align="right" width="480px" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/glaser-example-google.jpg">
 
-## ☞ Introduction
+## Introduction
 
 Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a tool for comparing alternative services for offline [handwritten text recognition (HTR)](https://en.wikipedia.org/wiki/Handwriting_recognition).  It was developed for use with documents from the [Caltech Archives](http://archives.caltech.edu), but it is completely independent and can be applied to any images of text documents.
 
@@ -52,7 +51,7 @@ Handprint can generate images with recognized text overlaid over them to visuali
 Services supported include Google's [Google Cloud Vision API](https://cloud.google.com/vision/docs/ocr), Microsoft's Azure [Computer Vision API](https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/), and Amazon's [Textract](https://aws.amazon.com/textract/) and [Rekognition](https://aws.amazon.com/rekognition/).  The framework for connecting to services could be expanded to support others as well (and contributions are welcome!).
 
 
-## ✎ Installation and configuration
+## Installation and configuration
 
 The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command in a terminal and inspecting the results:
 ```sh
@@ -62,34 +61,57 @@ python3 --version
 
 Note for Mac users: if you are using macOS Catalina (10.15) or later and have never run `python3`, then the first time you do, macOS will ask you if you want to install the macOS command-line developer tools.  Go ahead and do so, as this is the easiest way to get a recent-enough Python&nbsp;3 on those systems.
 
-Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but does not include credentials for using the services.  To be able to use Handprint, you must **both** install a copy of Handprint on your computer **and** supply your copy with credentials for accessing the cloud services you want to use.
+Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but does not include credentials for using the services.  To be able to use Handprint, you must **both** install a copy of Handprint on your computer **and** supply your copy with credentials for accessing the cloud services you want to use.  See below for more.
 
 
-### ⓵&nbsp;&nbsp; _Install Handprint on your computer_
+### ⓵&nbsp; _Install Handprint on your computer_
 
-#### MacOS systems
+#### Approach 1: using the standalone Handprint executables
 
-The latest Handprint release provides a standalone runnable application for macOS that _only_ needs a Python&nbsp;3 interpreter on your computer &ndash; you **do not** need to run `pip install` as described below. Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint1.5.1-macos-python3.8.zip`.  Download the one matching your version of Python, unzip the file, and the result will be a folder containing `handprint`, a runnable application.
+Beginning with version 1.5.1, runnable self-contained single-file executables are available for select operating system and Python version combinations &ndash; to use them, you **only** need a Python&nbsp;3 interpreter and a copy of Handprint, but **do not** need to run `pip install` or other steps. Please click on the relevant heading below to learn more.
 
-#### Windows and Linux (and alternative approach for macOS)
+<details><summary><img alt="macOS" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/mac-os-32.png">&nbsp;<strong>macOS</strong></summary>
 
-On Windows and Linux systems (and if you prefer this installation approach on macOS too), you should be able to install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have the `pip` package or are uncertain if you do, first run the following command in a terminal command line interpreter: 
+Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.2-macos-python3.8.zip`. Then:
+1. Download the one matching your version of Python
+2. Unzip the file (if your browser did not automatically unzip it for you)
+3. Open the folder thus created (it will have a name like `handprint-1.5.2-macos-python3.8`)
+4. Look inside for `handprint` and move it to a location where you put other command-line programs (e.g., `/usr/local/bin`)
+
+</details><details><summary><img alt="Linux" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/linux-32.png">&nbsp;<strong>Linux</strong></summary>
+
+Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.2-linux-python3.8.zip`. Then:
+1. Download the one matching your version of Python
+2. Unzip the file (if your browser did not automatically unzip it for you)
+3. Open the folder thus created (it will have a name like `handprint-1.5.2-linux-python3.8`)
+4. Look inside for `handprint` and move it to a location where you put other command-line programs (e.g., `/usr/local/bin`)
+
+</details><details><summary><img alt="Windows" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/os-windows-32.png">&nbsp;<strong>Windows</strong></summary>
+
+Standalone executables for Windows are not available at this time. If you are running Windows, please use one of the other methods described below.
+
+</details>
+
+
+#### Approach 2: using `pipx`
+
+You can use [pipx](https://pypa.github.io/pipx/) to install Handprint. Pipx will install it into a separate Python environment that isolates the dependencies needed by Handprint from other Python programs on your system, and yet the resulting `handprint` command wil be executable from any shell &ndash; like any normal application on your computer. If you do not already have pipx on your system, it can be installed in a variety of easy ways and it is best to consult [Pipx's installation guide](https://pypa.github.io/pipx/installation/) for instructions. Once you have pipx on your system, you can install Handprint with the following command:
 ```sh
-sudo python3 -m ensurepip
+pipx install handprint
 ```
 
-Then, to install or upgrade Handprint from the Python package repository, run the following command:
+Pipx can also let you run Handprint directly using `pipx run handprint`, although in that case, you must always prefix every Handprint command with `pipx run`.  Consult the [documentation for `pipx run`](https://github.com/pypa/pipx#walkthrough-running-an-application-in-a-temporary-virtual-environment) for more information.
+
+
+#### Approach 3: using `pip`
+
+If you prefer, you can install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have `pip` package or are uncertain if you do, please consult the [pip installation instructions](https://pip.pypa.io/en/stable/installation/). Then, to install or upgrade Handprint from the Python package repository, run the following command:
 ```sh
 python3 -m pip install handprint --upgrade
 ```
 
-As an alternative to getting it from PyPI, you can instruct `pip` to install or upgrade Handprint directly from the GitHub repository:
-```sh
-python3 -m pip install git+https://github.com/caltechlibrary/handprint.git --upgrade
-```
 
-
-### ⓶&nbsp;&nbsp; _Add cloud service credentials_
+### ⓶&nbsp; _Add cloud service credentials_
 
 A one-time configuration step is needed for each cloud-based HTR service after you install Handprint on a computer.  This step supplies Handprint with credentials to access the services.  In each case, the same command format is used:
 ```sh
@@ -161,7 +183,7 @@ handprint -a amazon-rekognition myamazoncredentials.json
 ```
 
 
-## ▶︎ Usage
+##  Usage
 
 Handprint comes with a single command-line interface program called `handprint`.  Here is a screen cast to give a sense for what it's like to run Handprint. Click on the following image:
 
@@ -455,7 +477,7 @@ This program exits with a return code of 0 if no problems are encountered.  It r
 The debug logging functionality is implemented using [Sidetrack](https://github.com/caltechlibrary/sidetrack) and all calls to the debug code are conditionalized on the Python symbol `__debug__`.  It is carefully written so that you can cause the calls to be _optimized out completely_ if your run Python with [optimization turned on](https://docs.python.org/3/using/cmdline.html#cmdoption-o) (e.g., using the `-O` command-line option).
 
 
-## ☹︎ Known issues and limitations
+## Known issues and limitations
 
 Here are some known limitations in the current version of Handprint:
 
@@ -465,27 +487,27 @@ Here are some known limitations in the current version of Handprint:
 * Some services have different file size restrictions depending on the format of the file, but Handprint always uses the same limit for all files for a given service.  This is a code simplification.
 
 
-## ⁇ Getting help
+## Getting help
 
 If you find an issue, please submit it in [the GitHub issue tracker](https://github.com/caltechlibrary/handprint/issues) for this repository.
 
 
-## ♬ Contributing
+## Contributing
 
 I would be happy to receive your help and participation with enhancing Handprint!  Please visit the [guidelines for contributing](CONTRIBUTING.md) for some tips on getting started.
 
 
-## ⧴ License
+## License
 
 Software produced by the Caltech Library is Copyright © 2021 California Institute of Technology.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
 
 
-## ☺︎ Authors and history
+## Authors and history
 
 [Mike Hucka](https://github.com/mhucka) designed and implemented Handprint beginning in mid-2018.
 
 
-## ♡ Acknowledgments
+## Acknowledgments
 
 The [vector artwork](https://thenounproject.com/search/?q=hand&i=733265) of a hand used as a logo for Handprint was created by [Kevin](https://thenounproject.com/kevn/) from the Noun Project.  It is licensed under the Creative Commons [CC-BY 3.0](https://creativecommons.org/licenses/by/3.0/) license.
 
@@ -497,6 +519,7 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [appdirs](https://github.com/ActiveState/appdirs) &ndash; module for determining appropriate platform-specific directories
 * [boltons](https://github.com/mahmoud/boltons/) &ndash; package of miscellaneous Python utilities
 * [boto3](https://github.com/boto/boto3) &ndash; Amazon AWS SDK for Python
+* [bun](https://github.com/caltechlibrary/bun) &ndash; a set of basic user interface classes and functions
 * [CommonPy](https://github.com/caltechlibrary/commonpy) &ndash; a collection of commonly-useful Python functions
 * [fastnumbers](https://github.com/SethMMorton/fastnumbers) &ndash; number testing and conversion functions
 * [google-api-core, google-api-python-client, google-auth, google-auth-httplib2, google-cloud, google-cloud-vision, googleapis-common-protos, google_api_python_client](https://github.com/googleapis/google-cloud-python) &ndash; Google API libraries 

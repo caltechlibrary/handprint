@@ -4,6 +4,7 @@ network.py: miscellaneous network utilities for Handprint.
 
 from   bun import inform, alert, warn
 from   commonpy.interrupt import interrupted, wait
+from   commonpy.string_utils import antiformat
 import http.client
 from   http.client import responses as http_responses
 import os
@@ -58,7 +59,7 @@ def network_available(address = "8.8.8.8", port = 53, timeout = 5):
         if __debug__: log('we have a network connection')
         return True
     except socket.error as ex:
-        if __debug__: log(f'could not connect to 8.8.8.8: {str(ex)}')
+        if __debug__: log(f'could not connect to 8.8.8.8: {antiformat(str(ex))}')
     return False
 
 
@@ -88,12 +89,12 @@ def timed_request(get_or_post, url, session = None, timeout = 20, **kwargs):
                 if __debug__: log('response received')
                 return response
         except (KeyboardInterrupt, UserCancelled) as ex:
-            if __debug__: log(f'network {method} interrupted by {str(ex)}')
+            if __debug__: log(f'network {method} interrupted by {antiformat(str(ex))}')
             raise
         except Exception as ex:
             # Problem might be transient.  Don't quit right away.
             failures += 1
-            if __debug__: log(f'exception (failure #{failures}): {str(ex)}')
+            if __debug__: log(f'exception (failure #{failures}): {antiformat(str(ex))}')
             # Record the first error we get, not the subsequent ones, because
             # in the case of network outages, the subsequent ones will be
             # about being unable to reconnect and not the original problem.

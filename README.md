@@ -12,7 +12,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 
 ## Log of recent changes
 
-_Version 1.5.2_: This updates Handprint to account for changes in some Python dependencies. If you use Handprint, **you should update to this version**. This version also adds information for how to use [pipx](https://pypa.github.io/pipx/) to install Handprint, and provides `Pipefile` and `Pipfile.lock` files for use with [pipenv](https://pipenv.pypa.io/en/latest/) for people who prefer that approach.
+_Version 1.5.3_: This updates Handprint to account for changes in some Python dependencies. If you use Handprint, **you should update to this version**. This version also adds information for how to use [pipx](https://pypa.github.io/pipx/) to install Handprint, and provides `Pipefile` and `Pipfile.lock` files for use with [pipenv](https://pipenv.pypa.io/en/latest/) for people who prefer that approach.
 
 
 ## Table of Contents

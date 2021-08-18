@@ -93,24 +93,21 @@ Standalone executables for Windows are not available at this time. If you are ru
 </details>
 
 
-#### Approach 2: using `pipenv`
+#### Approach 2: using `pipx`
 
-If you prefer this installation approach, you should be able to install Handprint with [pipenv](https://pipenv.pypa.io). This will create a virtual Python environment and isolate the dependencies needed by Handprint from other Python programs on your system. If you do not already have `pipenv` on your system, it can  can be installed in a variety of ways and it is best to consult [Pipenv's installation instructions](https://pipenv.pypa.io/en/latest/install/#installing-pipenv). Once you have `pipenv`, you can install Handprint with the following command:
+You can use [pipx](https://pypa.github.io/pipx/) to install Handprint. Pipx will install it into a separate Python environment that isolates the dependencies needed by Handprint from other Python programs on your system, and yet the resulting `handprint` command wil be executable from any shell &ndash; like any normal application on your computer. If you do not already have pipx on your system, it can be installed in a variety of easy ways and it is best to consult [Pipx's installation guide](https://pypa.github.io/pipx/installation/) for instructions. Once you have pipx on your system, you can install Handprint with the following command:
 ```sh
-pipenv install handprint
+pipx install handprint
 ```
+
+Pipx can also let you run Handprint directly using `pipx run handprint`, although in that case, you must always prefix every Handprint command with `pipx run`.  Consult the [documentation for `pipx run`](https://github.com/pypa/pipx#walkthrough-running-an-application-in-a-temporary-virtual-environment) for more information.
 
 
 #### Approach 3: using `pip`
 
-If you prefer this installation approach, you should be able to install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have `pip` package or are uncertain if you do, please consult the [pip installation instructions](https://pip.pypa.io/en/stable/installation/). Then, to install or upgrade Handprint from the Python package repository, run the following command:
+If you prefer, you can install Handprint with [pip](https://pip.pypa.io/en/stable/installing/).  If you don't have `pip` package or are uncertain if you do, please consult the [pip installation instructions](https://pip.pypa.io/en/stable/installation/). Then, to install or upgrade Handprint from the Python package repository, run the following command:
 ```sh
-python3 -m pip install handprint
-```
-
-As an alternative to getting it from PyPI, you can instruct `pip` to install or upgrade Handprint directly from the GitHub repository:
-```sh
-python3 -m pip install git+https://github.com/caltechlibrary/handprint.git
+python3 -m pip install handprint --upgrade
 ```
 
 

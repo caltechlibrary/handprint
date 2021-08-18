@@ -19,8 +19,8 @@ _Version 1.5.3_: This updates Handprint to account for changes in some Python de
 
 * [Introduction](#introduction)
 * [Installation and configuration](#installation-and-configuration)
-   * [Install Handprint on your computer](#install-handprint-on-your-computer)
-   * [Add cloud service credentials](#add-cloud-service-credentials)
+   * [Install Handprint on your computer](#-install-handprint-on-your-computer)
+   * [Add cloud service credentials](#-add-cloud-service-credentials)
 * [Usage](#︎-usage)
    * [Supported HTR/OCR services](#supported-htrocr-services)
    * [Input files and URLs](#input-files-and-urls)

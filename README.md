@@ -12,7 +12,9 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 
 ## Log of recent changes
 
-_Version 1.5.3_: This updates Handprint to account for changes in some Python dependencies. If you use Handprint, **you should update to this version**. This version also adds information for how to use [pipx](https://pypa.github.io/pipx/) to install Handprint, and provides `Pipefile` and `Pipfile.lock` files for use with [pipenv](https://pipenv.pypa.io/en/latest/) for people who prefer that approach.
+_Version 1.5.4_: This version fixes an error missed in the updates of version 1.5.3. The error primarily affects first-time users of Handprint.
+
+_Version 1.5.3_: This updates Handprint to account for changes in some Python dependencies.  This version also adds information for how to use [pipx](https://pypa.github.io/pipx/) to install Handprint, and provides `Pipefile` and `Pipfile.lock` files for use with [pipenv](https://pipenv.pypa.io/en/latest/) for people who prefer that approach.
 
 
 ## Table of Contents
@@ -72,18 +74,18 @@ Beginning with version 1.5.1, runnable self-contained single-file executables ar
 
 <details><summary><img alt="macOS" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/mac-os-32.png">&nbsp;<strong>macOS</strong></summary>
 
-Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.2-macos-python3.8.zip`. Then:
+Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.4-macos-python3.8.zip`. Then:
 1. Download the one matching your version of Python
 2. Unzip the file (if your browser did not automatically unzip it for you)
-3. Open the folder thus created (it will have a name like `handprint-1.5.2-macos-python3.8`)
+3. Open the folder thus created (it will have a name like `handprint-1.5.4-macos-python3.8`)
 4. Look inside for `handprint` and move it to a location where you put other command-line programs (e.g., `/usr/local/bin`)
 
 </details><details><summary><img alt="Linux" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/linux-32.png">&nbsp;<strong>Linux</strong></summary>
 
-Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.2-linux-python3.8.zip`. Then:
+Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.4-linux-python3.8.zip`. Then:
 1. Download the one matching your version of Python
 2. Unzip the file (if your browser did not automatically unzip it for you)
-3. Open the folder thus created (it will have a name like `handprint-1.5.2-linux-python3.8`)
+3. Open the folder thus created (it will have a name like `handprint-1.5.4-linux-python3.8`)
 4. Look inside for `handprint` and move it to a location where you put other command-line programs (e.g., `/usr/local/bin`)
 
 </details><details><summary><img alt="Windows" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/os-windows-32.png">&nbsp;<strong>Windows</strong></summary>

@@ -1,5 +1,10 @@
 # Change log for Handprint
 
+## Version 1.5.4
+
+This release fixes a crash that occurs the first time someone tries to install credentials files.
+
+
 ## Version 1.5.3
 
 There are no functional changes in this release; the changes all concern code dependencies and installation instructions.

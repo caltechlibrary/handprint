@@ -12,9 +12,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 
 ## Log of recent changes
 
-_Version 1.5.4_: This version fixes an error missed in the updates of version 1.5.3. The error primarily affects first-time users of Handprint.
-
-_Version 1.5.3_: This updates Handprint to account for changes in some Python dependencies.  This version also adds information for how to use [pipx](https://pypa.github.io/pipx/) to install Handprint, and provides `Pipefile` and `Pipfile.lock` files for use with [pipenv](https://pipenv.pypa.io/en/latest/) for people who prefer that approach.
+_Version 1.5.5_: This release updates dependency versions in `requirements.txt` and `Pipfile`, to address a security issue in Pillow, update CommonPy, and some other version updates. It also fixes an internal bug in the image resizing code.
 
 
 ## Table of Contents

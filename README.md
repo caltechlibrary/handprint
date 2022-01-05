@@ -6,7 +6,7 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.8+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
-[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/2085)](https://data.caltech.edu/records/2085)
+[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/8960)](https://data.caltech.edu/records/8960)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange&label=PyPI)](https://pypi.org/project/handprint/)
 
 

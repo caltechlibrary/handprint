@@ -407,8 +407,8 @@ class Manager:
             else:
                 # We found a ".handprint.ext" file, perhaps from a previous run,
                 # but for the current set of services, it's larger than allowed.
-                if __debug__: log('existing resized file larger than {}b: {}',
-                                  self._max_size, new_file)
+                if __debug__: log('existing resized file larger than'
+                                  + f' {self._max_size}b: {new_file}')
         inform(f'Size too large; reducing size: {relative(file)}')
         from handprint.images import reduced_image_size
         (resized, error) = reduced_image_size(file, new_file, self._max_size)
@@ -432,8 +432,8 @@ class Manager:
             else:
                 # We found a "-reduced" file, perhaps from a previous run, but
                 # for the current set of services, dimension are too large.
-                if __debug__: log('existing resized file larger than {}x{}: {}',
-                                  max_width, max_height, new_file)
+                if __debug__: log('existing resized file larger than'
+                                  + f' {max_width}x{max_height}: {new_file}')
         inform(f'Dimensions too large; reducing dimensions: {relative(file)}')
         from handprint.images import reduced_image_dimensions
         (resized, error) = reduced_image_dimensions(file, new_file, max_width, max_height)

@@ -1,0 +1,23 @@
+# YAML 1.2
+---
+authors: 
+  -
+    affiliation: "Caltech Library"
+    given-names: Michael
+    family-names: Hucka
+    orcid: "0000-0001-9105-5960"
+cff-version: "1.1.0"
+message: "If you use this software, please cite it using these metadata."
+repository-code: "https://github.com/caltechlibrary/handprint"
+title: "Handprint: Run handwritten text recognition services on images of documents"
+date-released: 2022-01-05
+version: "1.5.5"
+doi: 10.22002/2085
+keywords: 
+  - handwritten text recognition
+  - optical character recognition
+  - machine learning
+  - artificial intelligence
+  - cloud services
+  - document processing
+...

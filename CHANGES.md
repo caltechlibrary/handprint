@@ -1,11 +1,19 @@
 # Change log for Handprint
 
-## Version 1.5.4
+Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can produce annotated images showing the results, compare the recognized text to expected text, save the HTR service results as JSON and text files, and more.
+
+
+## ★ Version 1.5.5 ★
+
+This release updates dependency versions specified by `requirements.txt` and `Pipfile`, to address a security issue in Pillow, update to CommonPy, and some other version updates.  It also adds a `CITATION.cff` file to the repository on GitHub, and updates copyright years in files.
+
+
+## ★ Version 1.5.4 ★
 
 This release fixes a crash that occurs the first time someone tries to install credentials files.
 
 
-## Version 1.5.3
+## ★ Version 1.5.3 ★
 
 There are no functional changes in this release; the changes all concern code dependencies and installation instructions.
 
@@ -15,12 +23,12 @@ There are no functional changes in this release; the changes all concern code de
 * The installation instructions in the [README](README.md) file now include information about using [pipx](https://pypa.github.io/pipx/).
 
 
-## Version 1.5.2
+## ★ Version 1.5.2 ★
 
 (Retracted.)
 
 
-## Version 1.5.1
+## ★ Version 1.5.1 ★
 
 There are no functional changes in this release; all of the code changes are internal, to speed up Handprint startup times and further clean up some code dependencies.
 
@@ -32,7 +40,7 @@ All changes in this release:
 * The dependency on [dateparser](https://github.com/scrapinghub/dateparser) has been removed because Handprint doesn't depend on that package.  (It's a transitive dependency coming from something else, but by itself, it doesn't belong in Handprint's requirements.)
 
 
-## Version 1.5.0
+## ★ Version 1.5.0 ★
 
 This version contains many additions and some important bugs in the extended output (i.e., using the `-e` flag) for Google and Amazon. If you use Handprint, you should definitely update to this version.
 
@@ -61,7 +69,7 @@ All changes in this release:
 * The copyright year has been updated.
 
 
-## Version 1.4.0
+## ★ Version 1.4.0 ★
 
 This release does not change the user interface or functionality, but this is more than a patch release because it changes the minimum required versions of many Python packages and uses newer Google API libraries.
 
@@ -72,7 +80,7 @@ This release does not change the user interface or functionality, but this is mo
 * Update [`README.md`](README.md) to acknowledge the Python dependencies actually being used now.
 
 
-## Version 1.3.0
+## ★ Version 1.3.0 ★
 
 * Handprint now requires Python version 3.6 or later.
 * Fixed issue [#19](https://github.com/caltechlibrary/handprint/issues/19), which caused Handprint to fail to produce any output images if both `-e` and `-G` were given.
@@ -89,17 +97,17 @@ This release does not change the user interface or functionality, but this is mo
 * Various internal code updates and refactoring.
 
 
-## Version 1.2.2
+## ★ Version 1.2.2 ★
 
 * Updated copyright year in various source files.
 
 
-## Version 1.2.1
+## ★ Version 1.2.1 ★
 
 * Fixed Microsoft output in the annotated images to be word-based, rather than line-based, to be the same as for the other services.
 
 
-## Version 1.2.0
+## ★ Version 1.2.0 ★
 
 * Two bugs related to running with multiple threads (the default) are hopefully fixed in this version:
   * Sometimes the annotated image generated from a given service would have the results from another service also written over it.  This was inconsistent and intermittent, and the exact cause is still unclear, but this version of Handprint implements a workaround that hopefully stops this from happening.
@@ -115,7 +123,7 @@ Handprint will only extract the first image in the PDF file.
 * A few more bugs have been fixed.
 
 
-## Version 1.1.0
+## ★ Version 1.1.0 ★
 
 * Improve installation instructions and avoid telling people to use `sudo`.
 * Add facility to compare extracted text to a ground truth file. This is enabled using the command-line option `-c`. See the README file or help text for more details.
@@ -126,23 +134,23 @@ Handprint will only extract the first image in the PDF file.
 * Add some missing package imports.
 
 
-## Version 1.0.3
+## ★ Version 1.0.3 ★
 
 * Fix an internal bug getting the credentials file for Amazon services.
 
 
-## Version 1.0.2
+## ★ Version 1.0.2 ★
 
 * Fix [issue #9](https://github.com/caltechlibrary/handprint/issues/9): credentials files are not saved in expected location.
 * Edit the `README.md` file.
 
 
-## Version 1.0.1
+## ★ Version 1.0.1 ★
 
 This version adds instructions for installing from PyPI and fixes a bug writing files downloaded from URLs.
 
 
-## Version 1.0.0
+## ★ Version 1.0.0 ★
 
 This release provides a great many changes over the previous versions of Handprint.  The behavior and implementation have all changed in various ways, and collectively this marks the first version that can fairly be called version 1.0.0.
 
@@ -164,35 +172,35 @@ The following are some of the notable changes in this release:
 * Added code of conduct and contributor guidelines to the repository.
 
 
-## Version 0.9.0
+## ★ Version 0.9.0 ★
 
 * **Backward-incompatible change**: command-line option `-m` is now `-s` and "methods" are now known as "services", to avoid conflicting interpretations of what a "method" is in the context of software.  Internal object classes have likewise been changed.
 * Refactor some internal network code.
 * Add a number of additional images for testing.
 
 
-## Version 0.8.2
+## ★ Version 0.8.2 ★
 
 * Fix internal bug in file download code.
 * Start separate file [CHANGES](https://github.com/caltechlibrary/handprint/blob/master/CHANGES.md) for the change log.
 
 
-## Version 0.8.1
+## ★ Version 0.8.1 ★
 
 * Detect and handle when the Google API returns a badly-formed bounding box.
 * Skip files previously generated by the annotation feature of Handprint.
 
 
-## Version 0.8.0
+## ★ Version 0.8.0 ★
 
 Handprint now generates annotated images by default; they display the extracted text overlaid on the input images.
 
 
-## Version 0.7.5
+## ★ Version 0.7.5 ★
 
 Separate chunks of text in Microsoft output using newlines, rather than spaces, to make the results more comparable to what Google produces.
 
 
-## Version 0.7.4
+## ★ Version 0.7.4 ★
 
 This version improves efficiency by iterating over files/URLs first and then over methods, so that files do not get repeatedly downloaded each time a different method is used.  It also works around some network compatibility problems in different environments, and finally, adds a number of fixes.

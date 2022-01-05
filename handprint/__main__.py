@@ -48,6 +48,7 @@ from   commonpy.data_utils import timestamp
 from   commonpy.file_utils import filename_extension, files_in_directory
 from   commonpy.file_utils import readable, writable
 from   commonpy.interrupt import config_interrupt, interrupt, interrupted
+from   commonpy.string_utils import antiformat
 from   fastnumbers import fast_real, isreal, isint
 import os
 from   os import path, cpu_count
@@ -546,7 +547,7 @@ Command-line arguments summary
         else:
             ex_class = exception[0]
             ex = exception[1]
-            alert_fatal(f'An error occurred ({ex_class.__name__}): {str(ex)}')
+            alert_fatal(f'An error occurred ({ex_class.__name__}): {antiformat(str(ex))}')
             # Return a better error code for some common cases.
             if ex_class in [FileNotFoundError, FileExistsError, PermissionError]:
                 exit_code = ExitCode.file_error
@@ -554,8 +555,8 @@ Command-line arguments summary
                 exit_code = ExitCode.exception
             if __debug__:
                 from traceback import format_exception
-                details = ''.join(format_exception(*exception))
-                log(f'Exception: {str(ex)}\n{details}')
+                details = antiformat(''.join(format_exception(*exception)))
+                log(f'Exception: {antiformat(str(ex))}\n{details}')
     else:
         inform('Done.')
 

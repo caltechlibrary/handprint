@@ -17,7 +17,7 @@
 from   datetime import date
 from   fastnumbers import isint
 import pkg_resources
-from   os import getcwd, chdir, system
+from   os import getcwd, chdir, system, unlink
 from   os.path import exists, dirname, join, basename
 from   rich.console import Console
 import subprocess
@@ -48,11 +48,6 @@ from   zipfile import ZipFile, ZIP_STORED, ZIP_DEFLATED
 # give the user better information about why it fails on Python versions before
 # 3.6, we have to find another solution.
 #
-# In addition, Handprint needs a minimum of Python 3.8.  Testing that would be
-# easier; it could be done with a preamble script for shiv.  However, since we
-# have to test the Python version right at the beginning anyway, we may as well
-# just test for 3.8 as the minimum.
-#
 # The approach used here is to leverage shiv's option to include a custom
 # hash-bang line, and use that to insert a short polyglot script that tests
 # the version of Python and either exits with an error or execs Python on the
@@ -65,7 +60,7 @@ from   zipfile import ZipFile, ZIP_STORED, ZIP_DEFLATED
 # have wanted to write a better error message but it's not possible.)
 
 _HASHBANG = r"""/bin/bash
-''''test \$(python3 -V 2>&1|cut -c 10) -ge 8 && exec python3 -x \"\$0\" \"\$@\" # '''
+''''test \$(python3 -V 2>&1|cut -c 10) -ge 6 && exec python3 -x \"\$0\" \"\$@\" # '''
 ''''exec echo 'Python too old.' # '''"""
 
 _ZIP_COMMENTS_FMT = '''
@@ -79,8 +74,7 @@ https://github.com/caltechlibrary/handprint/.
 
 '''
 
-_README_FMT = '''
-About the Handprint version {1} distribution for {3}
+_README_FMT = '''About the Handprint version {1} distribution for {3}
 =========================================================
 
 The file named "handprint" inside the ZIP file that you
@@ -112,7 +106,61 @@ Page RecognitIoN Test!
 
 Mike Hucka
 california institute of Technology Library
-{0}
+Date created: {0}
+'''
+
+_PREAMBLE_FMT = '''#!/usr/bin/env python3
+# Preamble script for Handprint PYZ version {1} and Python {2}.{3} on {4}.
+
+# Version test ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# The shiv wrapper tests for a minimum version to run, but our application may
+# be built against a different/higher version of Python.  Test it and don't
+# bother doing going further if the Python version is not right.
+
+import sys
+
+if sys.version_info.major != {2} or sys.version_info.minor != {3}:
+    print('The self-contained executable of Handprint {1} that you attempted')
+    print('to run was built to work specifically with Python version {2}.{3} only,')
+    print('but your current version of Python is ' +
+          str(sys.version_info.major) + '.' + str(sys.version_info.minor) + '.')
+    print('')
+    print('Please ensure that "python3" invokes Python version {2}.{3}, or else')
+    print('please visit the following URL to see if a version of the Handprint')
+    print('distribution is available that matches the version of "python3" on')
+    print('your system: https://github.com/caltechlibrary/handprint/releases/')
+    print('')
+    print('You can visit https://github.com/caltechlibrary/handprint for more')
+    print('information about this and Handprint in general.')
+    exit(6)
+
+# Cache cleanup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Remove past versions of the shiv cache for this program, if any exist.
+
+from pathlib import Path
+
+# The following variables are injected by shiv.bootstrap.
+site_packages: Path
+env: "shiv.bootstrap.environment.Environment"
+
+# Get the current PYZ's site_packages directory.
+current = site_packages.parent
+
+# Get the parent directory of the site_packages directory is our shiv cache.
+cache_path = current.parent
+
+name, build_id = current.name.split('_')
+if __name__ == "__main__":
+    printed_message = False
+    for path in cache_path.iterdir():
+        if path.name.startswith(name + '_') and not path.name.endswith(build_id):
+            if not printed_message:
+                print('Handprint doing one-time cleanup operations ...', end = '')
+                printed_message = True
+            import shutil
+            shutil.rmtree(path)
+    if printed_message:
+        print('Done.')
 '''
 
 
@@ -169,7 +217,8 @@ if py_version not in known_versions:
 # Gather information.
 # .............................................................................
 
-py_short_version = '.'.join(py_version.split('.')[0:2])
+py_major, py_minor, _ = [int(x) for x in py_version.split('.')]
+py_short_version = f'{py_major}.{py_minor}'
 
 with open('setup.cfg', 'r') as config_file:
     for line in config_file.readlines():
@@ -197,16 +246,22 @@ run(f'~/.pyenv/shims/pip install shiv --upgrade')
 
 inform(f'Building output with shiv')
 
+with open('preamble.py', 'w') as file:
+    file.write(_PREAMBLE_FMT.format(today, h_version, py_major, py_minor, os))
+
 run(f'~/.pyenv/shims/shiv -p "{_HASHBANG}" -c handprint -o "{outname}" -E '
-    + f'--prefer-binary handprint=={h_version}')
+    + f'--preamble preamble.py --prefer-binary handprint=={h_version}')
 
 inform(f'Creating zip file')
 zip_file = dirname + '.zip'
-comment  = _ZIP_COMMENTS_FMT.format(today, h_version, py_version, os)
-readme   = _README_FMT.format(today, h_version, py_version, os)
+comment  = _ZIP_COMMENTS_FMT.format(today, h_version, py_short_version, os)
+readme   = _README_FMT.format(today, h_version, py_short_version, os)
 with zipfile.ZipFile(zip_file, 'w', ZIP_STORED) as zf:
     zf.write(outname, join(dirname, outname))
     zf.writestr(join(dirname, 'README-HANDPRINT-INSTRUCTIONS.txt'), readme)
     zf.comment = comment.encode()
+
+inform(f'Cleaning up')
+unlink('preamble.py')
 
 inform(f'Done; output is in {outdir}')

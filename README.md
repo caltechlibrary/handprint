@@ -6,21 +6,23 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.8+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
-[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/2016)](https://data.caltech.edu/records/2016)
-[![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange)](https://pypi.org/project/handprint/)
+[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/2085)](https://data.caltech.edu/records/2085)
+[![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange&label=PyPI)](https://pypi.org/project/handprint/)
 
 
 ## Log of recent changes
 
-_Version 1.5.2_: Update versions of Python dependencies. If you use Handprint, **you should update to this version**. This version also adds `Pipefile` and `Pipfile.lock` files for use with [pipenv](https://pipenv.pypa.io/en/latest/).
+_Version 1.5.4_: This version fixes an error missed in the updates of version 1.5.3. The error primarily affects first-time users of Handprint.
+
+_Version 1.5.3_: This updates Handprint to account for changes in some Python dependencies.  This version also adds information for how to use [pipx](https://pypa.github.io/pipx/) to install Handprint, and provides `Pipefile` and `Pipfile.lock` files for use with [pipenv](https://pipenv.pypa.io/en/latest/) for people who prefer that approach.
 
 
 ## Table of Contents
 
 * [Introduction](#introduction)
 * [Installation and configuration](#installation-and-configuration)
-   * [Install Handprint on your computer](#install-handprint-on-your-computer)
-   * [Add cloud service credentials](#add-cloud-service-credentials)
+   * [Install Handprint on your computer](#-install-handprint-on-your-computer)
+   * [Add cloud service credentials](#-add-cloud-service-credentials)
 * [Usage](#︎-usage)
    * [Supported HTR/OCR services](#supported-htrocr-services)
    * [Input files and URLs](#input-files-and-urls)
@@ -72,18 +74,18 @@ Beginning with version 1.5.1, runnable self-contained single-file executables ar
 
 <details><summary><img alt="macOS" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/mac-os-32.png">&nbsp;<strong>macOS</strong></summary>
 
-Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.2-macos-python3.8.zip`. Then:
+Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.4-macos-python3.8.zip`. Then:
 1. Download the one matching your version of Python
 2. Unzip the file (if your browser did not automatically unzip it for you)
-3. Open the folder thus created (it will have a name like `handprint-1.5.2-macos-python3.8`)
+3. Open the folder thus created (it will have a name like `handprint-1.5.4-macos-python3.8`)
 4. Look inside for `handprint` and move it to a location where you put other command-line programs (e.g., `/usr/local/bin`)
 
 </details><details><summary><img alt="Linux" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/linux-32.png">&nbsp;<strong>Linux</strong></summary>
 
-Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.2-linux-python3.8.zip`. Then:
+Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.4-linux-python3.8.zip`. Then:
 1. Download the one matching your version of Python
 2. Unzip the file (if your browser did not automatically unzip it for you)
-3. Open the folder thus created (it will have a name like `handprint-1.5.2-linux-python3.8`)
+3. Open the folder thus created (it will have a name like `handprint-1.5.4-linux-python3.8`)
 4. Look inside for `handprint` and move it to a location where you put other command-line programs (e.g., `/usr/local/bin`)
 
 </details><details><summary><img alt="Windows" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/os-windows-32.png">&nbsp;<strong>Windows</strong></summary>
@@ -95,7 +97,7 @@ Standalone executables for Windows are not available at this time. If you are ru
 
 #### Approach 2: using `pipx`
 
-You can use [pipx](https://pypa.github.io/pipx/) to install Handprint. Pipx will install it into a separate Python environment that isolates the dependencies needed by Handprint from other Python programs on your system, and yet the resulting `handprint` command wil be executable from any shell &ndash; like any normal application on your computer. If you do not already have pipx on your system, it can be installed in a variety of easy ways and it is best to consult [Pipx's installation guide](https://pypa.github.io/pipx/installation/) for instructions. Once you have pipx on your system, you can install Handprint with the following command:
+You can use [pipx](https://pypa.github.io/pipx/) to install Handprint. Pipx will install it into a separate Python environment that isolates the dependencies needed by Handprint from other Python programs on your system, and yet the resulting `handprint` command wil be executable from any shell &ndash; like any normal application on your computer. If you do not already have `pipx` on your system, it can be installed in a variety of easy ways and it is best to consult [Pipx's installation guide](https://pypa.github.io/pipx/installation/) for instructions. Once you have pipx on your system, you can install Handprint with the following command:
 ```sh
 pipx install handprint
 ```
@@ -536,7 +538,7 @@ Handprint makes use of numerous open-source packages, without which it would hav
 * [requests](http://docs.python-requests.org) &ndash; an HTTP library for Python
 * [Rich](https://rich.readthedocs.io/en/latest/) &ndash; library for writing styled text to the terminal
 * [setuptools](https://github.com/pypa/setuptools) &ndash; library for `setup.py`
-* [sidetrack](https://github.com/caltechlibrary/sidetrack) &ndash; simple debug logging/tracing package
+* [Sidetrack](https://github.com/caltechlibrary/sidetrack) &ndash; simple debug logging/tracing package
 * [StringDist](https://github.com/obulkin/string-dist) &ndash; library for calculating string distances
 * [textdistance](https://github.com/orsinium/textdistance) &ndash; compute distances between text sequences
 * [urllib3](https://github.com/urllib3/urllib3) &ndash; Python HTTP library

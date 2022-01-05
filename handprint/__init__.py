@@ -21,7 +21,7 @@ file "LICENSE" for more information.
 #  |    by the Makefile. Manual changes to these values will be lost.      |
 #  ╰────────────────────── Notice ── Notice ── Notice ─────────────────────╯
 
-__version__     = '1.5.2'
+__version__     = '1.5.4'
 __description__ = 'Apply handwritten text recognition services to document images'
 __url__         = 'https://github.com/caltechlibrary/handprint'
 __author__      = 'Michael Hucka'

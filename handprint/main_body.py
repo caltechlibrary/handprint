@@ -19,6 +19,7 @@ from   commonpy.interrupt import raise_for_interrupts
 from   commonpy.data_utils import pluralized
 from   commonpy.file_utils import filename_extension, filename_basename
 from   commonpy.file_utils import files_in_directory, readable, writable
+from   commonpy.string_utils import antiformat
 import os
 from   os.path import isfile, isdir, exists
 import sys
@@ -69,7 +70,7 @@ class MainBody(object):
             self._do_preflight()
             self._do_main_work()
         except Exception as ex:
-            if __debug__: log(f'exception in main body: {str(ex)}')
+            if __debug__: log(f'exception in main body: {antiformat(str(ex))}')
             self.exception = sys.exc_info()
         if __debug__: log('finished MainBody')
 

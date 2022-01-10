@@ -82,3 +82,4 @@ __pycache__
 *.google.png
 *.bak
 .README.md.tmp
+docs/_build

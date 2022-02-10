@@ -1,3 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+body, input {
+    color: rgba(0,0,0,.87);
+    -webkit-font-feature-settings: "kern","liga";
+    font-feature-settings: "kern","liga";
+    font-family: "Atkinson Hyperlegible", "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.md-typeset {
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+.md-typeset p, .md-typeset ol {
+    margin-top: 0.75em;;
+    margin-bottom: 0.75em;;
+}
+
+.md-typeset ol li,.md-typeset ul li{
+    margin-bottom: .35em;
+}
+
+.md-typeset ol li ol,.md-typeset ol li ul,.md-typeset ul li ol,.md-typeset ul li ul{
+    margin:.35em 0 .35em .625em
+}
+
+.md-typeset ol li blockquote,.md-typeset ol li p,.md-typeset ul li blockquote,.md-typeset ul li p{
+    margin: .35em 0 !important;
+}
+
 .md-sidebar--secondary {
   display: none !important;
 }
@@ -6,8 +37,28 @@
   margin-right: 0;
 }
 
+.md-header-nav__source {
+  width: 8rem !important;
+}
+
+.md-typeset h1{
+    margin: 0 0 1.5rem;
+}
+
+.md-typeset h2 {
+    margin: 1.5rem 0 .8rem;
+}
+
+.md-typeset h3{
+    margin: 1.35rem 0 .8rem;
+}
+
 nav.md-tabs {
-  display: none
+  display: none;
+}
+
+.md-nav__list ul {
+  margin-left: 10px !important;
 }
 
 figure {
@@ -15,8 +66,16 @@ figure {
   text-align: center;
 }
 
+figure img {
+  max-width: 75% !important;
+}
+
 figure figcaption {
   font-style: italic;
+}
+
+dt {
+  font-weight: bold;
 }
 
 .button {
@@ -101,4 +160,8 @@ h3 {
 
 h4 {
   font-style: italic;
+}
+
+img.shadowed {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 22px 50px 4px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 0, 0, 0.0);
 }

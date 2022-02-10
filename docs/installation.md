@@ -5,6 +5,8 @@ This page describes how you can install Handprint on your computer. After instal
 
 ## Preliminary requirements
 
+Handprint is written in [Python 3](https://www.python.org) and makes use of some additional Python software libraries that are installed automatically during the [installation steps](#installation). It also assumes a macOS, Windows or Linux environment, and a working Internet connection.
+
 The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that's not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command in a terminal and inspecting the results:
 ```sh
 # Note: on Windows, you may have to use "python" instead of "python3"
@@ -13,8 +15,6 @@ python3 --version
 
 Note for Mac users: if you are using macOS Catalina (10.15) or later and have never run `python3`, then the first time you do, macOS will ask you if you want to install the macOS command-line developer tools.  Go ahead and do so, as this is the easiest way to get a recent-enough Python&nbsp;3 on those systems.
 
-Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but does not include credentials for using the services.  To be able to use Handprint, you must **both** install a copy of Handprint on your computer **and** supply your copy with credentials for accessing the cloud services you want to use.  See below for more.
-
 
 ## Installation instructions
 
@@ -22,9 +22,9 @@ There are multiple ways of installing Handprint, ranging from downloading a self
 
 ### Approach 1: using the standalone Handprint executables
 
-Beginning with version 1.5.1, runnable self-contained single-file executables are available for select operating system and Python version combinations &ndash; to use them, you **only** need a Python&nbsp;3 interpreter and a copy of Handprint, but **do not** need to run `pip install` or other steps. Please click on the relevant heading below to learn more.
+Beginning with version 1.5.1, runnable self-contained single-file executables are available for select operating system and Python version combinations &ndash; to use them, you **only** need a Python&nbsp;3 interpreter and a copy of Handprint, but **do not** need to run `pip install` or other steps.
 
-<details><summary><img alt="macOS" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/mac-os-32.png">&nbsp;<strong>macOS</strong></summary>
+#### MacOS
 
 Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.4-macos-python3.8.zip`. Then:
 1. Download the one matching your version of Python
@@ -32,7 +32,7 @@ Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/
 3. Open the folder thus created (it will have a name like `handprint-1.5.4-macos-python3.8`)
 4. Look inside for `handprint` and move it to a location where you put other command-line programs (e.g., `/usr/local/bin`)
 
-</details><details><summary><img alt="Linux" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/linux-32.png">&nbsp;<strong>Linux</strong></summary>
+#### Linux
 
 Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/releases) and look for the ZIP files with names such as (e.g.) `handprint-1.5.4-linux-python3.8.zip`. Then:
 1. Download the one matching your version of Python
@@ -40,11 +40,9 @@ Visit the [Handprint releases page](https://github.com/caltechlibrary/handprint/
 3. Open the folder thus created (it will have a name like `handprint-1.5.4-linux-python3.8`)
 4. Look inside for `handprint` and move it to a location where you put other command-line programs (e.g., `/usr/local/bin`)
 
-</details><details><summary><img alt="Windows" align="bottom" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/os-windows-32.png">&nbsp;<strong>Windows</strong></summary>
+#### Windows
 
 Standalone executables for Windows are not available at this time. If you are running Windows, please use one of the other methods described below.
-
-</details>
 
 
 ### Approach 2: using `pipx`

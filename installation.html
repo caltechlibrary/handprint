@@ -57,9 +57,10 @@
     <script src="_static/doctools.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Colophon" href="colophon.html" />
+    <link rel="next" title="Configuration for cloud services" href="configuration.html" />
     <link rel="prev" title="Handprint" href="index.html" />
   
    
@@ -233,6 +234,139 @@
     <li class="md-nav__item">
     
     
+      <a href="configuration.html" class="md-nav__link">Configuration for cloud services</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#microsoft" class="md-nav__link">Microsoft</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#google" class="md-nav__link">Google</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#amazon" class="md-nav__link">Amazon</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html" class="md-nav__link">Basic Handprint usage</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#installing-credentials" class="md-nav__link">Installing credentials</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#input-files-and-urls" class="md-nav__link">Input files and URLs</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#selecting-destination-services" class="md-nav__link">Selecting destination services</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#visual-display-of-recognition-results" class="md-nav__link">Visual display of recognition results</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html" class="md-nav__link">Advanced Handprint usage</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#annotation-types" class="md-nav__link">Annotation types</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#thresholding-by-confidence" class="md-nav__link">Thresholding by confidence</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#comparison-to-ground-truth-text" class="md-nav__link">Comparison to ground truth text</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#extended-results" class="md-nav__link">Extended results</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#other-options" class="md-nav__link">Other options</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html" class="md-nav__link">Handprint command summary</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#command-line-options" class="md-nav__link">Command-line options</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#return-values" class="md-nav__link">Return values</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="known-issues.html" class="md-nav__link">Known issues and limitations</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
       <a href="colophon.html" class="md-nav__link">Colophon</a>
       
     
@@ -261,24 +395,25 @@
             
   <section class="tex2jax_ignore mathjax_ignore" id="installation">
 <h1 id="installation--page-root">Installation<a class="headerlink" href="#installation--page-root" title="Permalink to this headline">¶</a></h1>
-<p>This page describes how you can install Handprint on your computer. After installation, you will also need to perform some <span class="xref myst">configuration steps described elsewhere</span>.</p>
+<p>This page describes how you can install Handprint on your computer. After installation, you will also need to perform some <a class="reference internal" href="configuration.html"><span class="doc std std-doc">configuration steps described elsewhere</span></a>.</p>
 <section id="preliminary-requirements">
 <h2 id="preliminary-requirements">Preliminary requirements<a class="headerlink" href="#preliminary-requirements" title="Permalink to this headline">¶</a></h2>
+<p>Handprint is written in <a class="reference external" href="https://www.python.org">Python 3</a> and makes use of some additional Python software libraries that are installed automatically during the <a class="reference external" href="#installation">installation steps</a>. It also assumes a macOS, Windows or Linux environment, and a working Internet connection.</p>
 <p>The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that’s not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command in a terminal and inspecting the results:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note: on Windows, you may have to use "python" instead of "python3"</span>
 python3 --version
 </pre></div>
 </div>
 <p>Note for Mac users: if you are using macOS Catalina (10.15) or later and have never run <code class="docutils literal notranslate"><span class="pre">python3</span></code>, then the first time you do, macOS will ask you if you want to install the macOS command-line developer tools.  Go ahead and do so, as this is the easiest way to get a recent-enough Python 3 on those systems.</p>
-<p>Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but does not include credentials for using the services.  To be able to use Handprint, you must <strong>both</strong> install a copy of Handprint on your computer <strong>and</strong> supply your copy with credentials for accessing the cloud services you want to use.  See below for more.</p>
 </section>
 <section id="installation-instructions">
 <h2 id="installation-instructions">Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h2>
 <p>There are multiple ways of installing Handprint, ranging from downloading a self-contained, single-file, ready-to-run program, to installing it as a typical Python program using <code class="docutils literal notranslate"><span class="pre">pip</span></code>.  Please choose the alternative that suits you.</p>
 <section id="approach-1-using-the-standalone-handprint-executables">
 <h3 id="approach-1-using-the-standalone-handprint-executables">Approach 1: using the standalone Handprint executables<a class="headerlink" href="#approach-1-using-the-standalone-handprint-executables" title="Permalink to this headline">¶</a></h3>
-<p>Beginning with version 1.5.1, runnable self-contained single-file executables are available for select operating system and Python version combinations – to use them, you <strong>only</strong> need a Python 3 interpreter and a copy of Handprint, but <strong>do not</strong> need to run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> or other steps. Please click on the relevant heading below to learn more.</p>
-<details><summary><img align="bottom" alt="macOS" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/mac-os-32.png"/> <strong>macOS</strong></summary>
+<p>Beginning with version 1.5.1, runnable self-contained single-file executables are available for select operating system and Python version combinations – to use them, you <strong>only</strong> need a Python 3 interpreter and a copy of Handprint, but <strong>do not</strong> need to run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> or other steps.</p>
+<section id="macos">
+<h4 id="macos">MacOS<a class="headerlink" href="#macos" title="Permalink to this headline">¶</a></h4>
 <p>Visit the <a class="reference external" href="https://github.com/caltechlibrary/handprint/releases">Handprint releases page</a> and look for the ZIP files with names such as (e.g.) <code class="docutils literal notranslate"><span class="pre">handprint-1.5.4-macos-python3.8.zip</span></code>. Then:</p>
 <ol class="arabic simple">
 <li><p>Download the one matching your version of Python</p></li>
@@ -286,7 +421,9 @@ python3 --version
 <li><p>Open the folder thus created (it will have a name like <code class="docutils literal notranslate"><span class="pre">handprint-1.5.4-macos-python3.8</span></code>)</p></li>
 <li><p>Look inside for <code class="docutils literal notranslate"><span class="pre">handprint</span></code> and move it to a location where you put other command-line programs (e.g., <code class="docutils literal notranslate"><span class="pre">/usr/local/bin</span></code>)</p></li>
 </ol>
-</details><details><summary><img align="bottom" alt="Linux" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/linux-32.png"/> <strong>Linux</strong></summary>
+</section>
+<section id="linux">
+<h4 id="linux">Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h4>
 <p>Visit the <a class="reference external" href="https://github.com/caltechlibrary/handprint/releases">Handprint releases page</a> and look for the ZIP files with names such as (e.g.) <code class="docutils literal notranslate"><span class="pre">handprint-1.5.4-linux-python3.8.zip</span></code>. Then:</p>
 <ol class="arabic simple">
 <li><p>Download the one matching your version of Python</p></li>
@@ -294,9 +431,11 @@ python3 --version
 <li><p>Open the folder thus created (it will have a name like <code class="docutils literal notranslate"><span class="pre">handprint-1.5.4-linux-python3.8</span></code>)</p></li>
 <li><p>Look inside for <code class="docutils literal notranslate"><span class="pre">handprint</span></code> and move it to a location where you put other command-line programs (e.g., <code class="docutils literal notranslate"><span class="pre">/usr/local/bin</span></code>)</p></li>
 </ol>
-</details><details><summary><img align="bottom" alt="Windows" height="26px" src="https://github.com/caltechlibrary/handprint/raw/main/.graphics/os-windows-32.png"/> <strong>Windows</strong></summary>
+</section>
+<section id="windows">
+<h4 id="windows">Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h4>
 <p>Standalone executables for Windows are not available at this time. If you are running Windows, please use one of the other methods described below.</p>
-</details>
+</section>
 </section>
 <section id="approach-2-using-pipx">
 <h3 id="approach-2-using-pipx">Approach 2: using <code class="docutils literal notranslate"><span class="pre">pipx</span></code><a class="headerlink" href="#approach-2-using-pipx" title="Permalink to this headline">¶</a></h3>
@@ -340,12 +479,12 @@ python3 --version
             </a>
           
           
-            <a href="colophon.html" title="Colophon"
+            <a href="configuration.html" title="Configuration for cloud services"
                class="md-flex md-footer-nav__link md-footer-nav__link--next"
                rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
                 class="md-flex__ellipsis"> <span
-                class="md-footer-nav__direction"> Next </span> Colophon </span>
+                class="md-footer-nav__direction"> Next </span> Configuration for cloud services </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink"><i
                 class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
@@ -363,10 +502,10 @@ python3 --version
               
           </div>
             Last updated on
-              Jan 13, 2022.
+              Feb 10, 2022.
             <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

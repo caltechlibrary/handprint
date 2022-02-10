@@ -1,0 +1,520 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="blue-grey">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Configuration for cloud services &#8212; Handprint</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Basic Handprint usage" href="basic-usage.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=deep-orange data-md-color-accent=teal>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#configuration" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="Handprint"
+           class="md-header-nav__button md-logo">
+          
+              <img src="_static/handprint-icon-white.png" height="26"
+                   alt="Home logo">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">Handprint</span>
+          <span class="md-header-nav__topic"> Configuration for cloud services </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/caltechlibrary/handprint/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    Handprint
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="Handprint" class="md-nav__button md-logo">
+      
+        <img src="_static/handprint-icon-white.png" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="Handprint">Handprint</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/caltechlibrary/handprint/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    Handprint
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html" class="md-nav__link">Installation</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html#preliminary-requirements" class="md-nav__link">Preliminary requirements</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html#installation-instructions" class="md-nav__link">Installation instructions</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Configuration for cloud services </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">Configuration for cloud services</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+  <ul class="md-nav__list" data-md-scrollfix="">
+  </ul>
+</nav>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#microsoft" class="md-nav__link">Microsoft</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#google" class="md-nav__link">Google</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#amazon" class="md-nav__link">Amazon</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html" class="md-nav__link">Basic Handprint usage</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#installing-credentials" class="md-nav__link">Installing credentials</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#input-files-and-urls" class="md-nav__link">Input files and URLs</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#selecting-destination-services" class="md-nav__link">Selecting destination services</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#visual-display-of-recognition-results" class="md-nav__link">Visual display of recognition results</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html" class="md-nav__link">Advanced Handprint usage</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#annotation-types" class="md-nav__link">Annotation types</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#thresholding-by-confidence" class="md-nav__link">Thresholding by confidence</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#comparison-to-ground-truth-text" class="md-nav__link">Comparison to ground truth text</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#extended-results" class="md-nav__link">Extended results</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#other-options" class="md-nav__link">Other options</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html" class="md-nav__link">Handprint command summary</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#command-line-options" class="md-nav__link">Command-line options</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#return-values" class="md-nav__link">Return values</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="known-issues.html" class="md-nav__link">Known issues and limitations</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="colophon.html" class="md-nav__link">Colophon</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+  <ul class="md-nav__list" data-md-scrollfix="">
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="configuration-for-cloud-services">
+<h1 id="configuration--page-root">Configuration for cloud services<a class="headerlink" href="#configuration--page-root" title="Permalink to this headline">¶</a></h1>
+<p>Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but <em>does not include credentials for using the services</em>.  To be able to use Handprint, you must <strong>both</strong> install a copy of Handprint on your computer <strong>and</strong> supply your copy with credentials for accessing the cloud services you want to use.</p>
+<p>Installing credentials involves a one-time configuration step for <strong>each</strong> cloud-based HTR service after you install Handprint on a computer.  In each case, the same command format is used:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -a SERVICENAME CREDENTIALSFILE.json
+</pre></div>
+</div>
+<p><em>SERVICENAME</em> must be one of the service names printed by running <code class="docutils literal notranslate"><span class="pre">handprint</span> <span class="pre">-l</span></code>, and <code class="docutils literal notranslate"><span class="pre">CREDENTIALSFILE.json</span></code> must have one of the formats discussed below.  When you run this command, Handprint copies <code class="docutils literal notranslate"><span class="pre">CREDENTIALSFILE.json</span></code> to a private location, and thereafter uses the credentials to access <em>SERVICENAME</em>.  (The private location is different on different systems; for example, on macOS it is <code class="docutils literal notranslate"><span class="pre">~/Library/Application</span> <span class="pre">Support/Handprint/</span></code>.)  Examples are given below.</p>
+<section id="microsoft">
+<h2 id="microsoft">Microsoft<a class="headerlink" href="#microsoft" title="Permalink to this headline">¶</a></h2>
+<p>Microsoft’s approach to credentials in Azure involves the use of <a class="reference external" href="https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/vision-api-how-to-topics/howtosubscribe">subscription keys</a>.  The format of the credentials file for Handprint needs to contain two fields:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w"> </span><span class="nt">"subscription_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOURKEYHERE"</span><span class="p">,</span><span class="w"></span>
+<span class="w"> </span><span class="nt">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://ENDPOINT"</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>The value <code class="docutils literal notranslate"><span class="pre">"YOURKEYHERE"</span></code> will be a string such as <code class="docutils literal notranslate"><span class="pre">"18de248475134eb49ae4a4e94b93461c"</span></code>, and it will be associated with an endpoint URI such as <code class="docutils literal notranslate"><span class="pre">"https://westus.api.cognitive.microsoft.com"</span></code>.  To obtain a key and the corresponding endpoint URI, visit <a class="reference external" href="https://portal.azure.com">https://portal.azure.com</a> and sign in using your account login.  (Note: you will need to turn off browser security plugins such as Ad Block and uMatrix if you have them, or else the site will not work.)  Once you are authenticated to the Azure portal, you can create credentials for using Azure’s machine-learning services.  Some notes all about this can be found in the <a class="reference external" href="https://github.com/caltechlibrary/handprint/wiki/Getting-Microsoft-Azure-credentials">Handprint project Wiki pages on GitHub</a>.</p>
+<p>Once you have obtained both a key and an endpoint URI, use a text editor to create a JSON file in the simple format shown above, save that file somewhere on your computer (for the sake of this example, assume it is <code class="docutils literal notranslate"><span class="pre">myazurecredentials.json</span></code>), and use the command discussed above to make Handprint copy the credentials file:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -a microsoft myazurecredentials.json
+</pre></div>
+</div>
+</section>
+<section id="google">
+<h2 id="google">Google<a class="headerlink" href="#google" title="Permalink to this headline">¶</a></h2>
+<p>Credentials for using a Google service account need to be stored in a JSON file that contains many fields.  The overall format looks like this:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"service_account"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"project_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"theid"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"private_key_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"thekey"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"private_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"-----BEGIN PRIVATE KEY-----anotherkey-----END PRIVATE KEY-----\n"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"client_email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"emailaddress"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"id"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"auth_uri"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://accounts.google.com/o/oauth2/auth"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"token_uri"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://oauth2.googleapis.com/token"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"auth_provider_x509_cert_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://www.googleapis.com/oauth2/v1/certs"</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="nt">"client_x509_cert_url"</span><span class="p">:</span><span class="w"> </span><span class="s2">"someurl"</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Getting one of these is summarized in the Google Cloud docs for <a class="reference external" href="https://cloud.google.com/docs/authentication/">Creating a service account</a>, but more explicit instructions can be found in the <a class="reference external" href="https://github.com/caltechlibrary/handprint/wiki/Getting-Google-Cloud-credentials">Handprint project Wiki pages on GitHub</a>.  Once you have downloaded a Google credentials file from Google, save the file somewhere on your computer (for the sake of this example, assume it is <code class="docutils literal notranslate"><span class="pre">mygooglecredentials.json</span></code>), and use the command discussed above to make Handprint copy the credentials file:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -a google mygooglecredentials.json
+</pre></div>
+</div>
+</section>
+<section id="amazon">
+<h2 id="amazon">Amazon<a class="headerlink" href="#amazon" title="Permalink to this headline">¶</a></h2>
+<p>Amazon credentials for AWS take the form of two alphanumeric strings: a <em>key id</em> string and a <em>secret access key</em> string.  In addition, the service needs to be invoked with a region identifier.  For the purposes of Handprint, these should be stored in a JSON file with the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"aws_access_key_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_KEY_ID_HERE"</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"aws_secret_access_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_ACCESS_KEY_HERE"</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">"region_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_REGION_NAME_HERE"</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Getting this information is, thankfully, a relatively simple process for Amazon’s services. Instructions can be found in the <a class="reference external" href="https://github.com/caltechlibrary/handprint/wiki/Creating-credentials-for-use-with-Amazon-Rekognition">Handprint project Wiki pages on GitHub</a>.  Once you have obtained the two alphanumeric keys and a region identifier string, use a text editor to create a JSON file in the simple format shown above, save that file somewhere on your computer (for the sake of this example, assume it is <code class="docutils literal notranslate"><span class="pre">myamazoncredentials.json</span></code>), and use <em>two</em> commands to make Handprint copy the credentials file for the two different Amazon services currently supported by Handprint:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -a amazon-textract myamazoncredentials.json
+handprint -a amazon-rekognition myamazoncredentials.json
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="installation.html" title="Installation"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> Installation </span>
+              </div>
+            </a>
+          
+          
+            <a href="basic-usage.html" title="Basic Handprint usage"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> Basic Handprint usage </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2022, Caltech Library.
+              
+          </div>
+            Last updated on
+              Feb 10, 2022.
+            <br/>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

@@ -1,0 +1,522 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="blue-grey">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Basic Handprint usage &#8212; Handprint</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Advanced Handprint usage" href="advanced-usage.html" />
+    <link rel="prev" title="Configuration for cloud services" href="configuration.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=deep-orange data-md-color-accent=teal>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#basic-usage" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="Handprint"
+           class="md-header-nav__button md-logo">
+          
+              <img src="_static/handprint-icon-white.png" height="26"
+                   alt="Home logo">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">Handprint</span>
+          <span class="md-header-nav__topic"> Basic Handprint usage </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/caltechlibrary/handprint/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    Handprint
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="Handprint" class="md-nav__button md-logo">
+      
+        <img src="_static/handprint-icon-white.png" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="Handprint">Handprint</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/caltechlibrary/handprint/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    Handprint
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html" class="md-nav__link">Installation</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html#preliminary-requirements" class="md-nav__link">Preliminary requirements</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html#installation-instructions" class="md-nav__link">Installation instructions</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html" class="md-nav__link">Configuration for cloud services</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#microsoft" class="md-nav__link">Microsoft</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#google" class="md-nav__link">Google</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#amazon" class="md-nav__link">Amazon</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Basic Handprint usage </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">Basic Handprint usage</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+  <ul class="md-nav__list" data-md-scrollfix="">
+  </ul>
+</nav>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#installing-credentials" class="md-nav__link">Installing credentials</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#input-files-and-urls" class="md-nav__link">Input files and URLs</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#selecting-destination-services" class="md-nav__link">Selecting destination services</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#visual-display-of-recognition-results" class="md-nav__link">Visual display of recognition results</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html" class="md-nav__link">Advanced Handprint usage</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#annotation-types" class="md-nav__link">Annotation types</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#thresholding-by-confidence" class="md-nav__link">Thresholding by confidence</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#comparison-to-ground-truth-text" class="md-nav__link">Comparison to ground truth text</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#extended-results" class="md-nav__link">Extended results</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced-usage.html#other-options" class="md-nav__link">Other options</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html" class="md-nav__link">Handprint command summary</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#command-line-options" class="md-nav__link">Command-line options</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#return-values" class="md-nav__link">Return values</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="known-issues.html" class="md-nav__link">Known issues and limitations</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="colophon.html" class="md-nav__link">Colophon</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+  <ul class="md-nav__list" data-md-scrollfix="">
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="basic-handprint-usage">
+<h1 id="basic-usage--page-root">Basic Handprint usage<a class="headerlink" href="#basic-usage--page-root" title="Permalink to this headline">¶</a></h1>
+<p>If the installation steps described in the previous section proceed successfully, a command-line program named <code class="docutils literal notranslate"><span class="pre">handprint</span></code> should end up installed in a location where software is normally installed on your computer.  Running <code class="docutils literal notranslate"><span class="pre">handprint</span></code> from a terminal shell then should be as simple as running any other shell command on your system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>handprint -h
+</pre></div>
+</div>
+<p>If that fails for some reason, you should be able to run <code class="docutils literal notranslate"><span class="pre">handprint</span></code> from anywhere using the normal approach for running Python modules:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3 -m handprint -h
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">-h</span></code> option (<code class="docutils literal notranslate"><span class="pre">/h</span></code> on Windows) will make <code class="docutils literal notranslate"><span class="pre">handprint</span></code> display some help information and exit immediately.  To make Handprint do more, you can supply other arguments that instruct <code class="docutils literal notranslate"><span class="pre">handprint</span></code> to process image files (or alternatively, URLs pointing to image files at a network location) and run text recognition algorithms on them, as explained below.</p>
+<section id="installing-credentials">
+<h2 id="installing-credentials">Installing credentials<a class="headerlink" href="#installing-credentials" title="Permalink to this headline">¶</a></h2>
+<p>Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but <em>does not include credentials for using the services</em>.  Before you can use Handprint, you must supply credentials for accessing the cloud services you want to use. The process for doing this involves using the <code class="docutils literal notranslate"><span class="pre">-a</span></code> option (<code class="docutils literal notranslate"><span class="pre">/a</span></code> on Windows) and is described in detail in the section <a class="reference internal" href="configuration.html"><span class="doc std std-doc">Configuration for cloud services</span></a>.</p>
+</section>
+<section id="input-files-and-urls">
+<h2 id="input-files-and-urls">Input files and URLs<a class="headerlink" href="#input-files-and-urls" title="Permalink to this headline">¶</a></h2>
+<p>After credentials are installed, running Handprint <em>without</em> the <code class="docutils literal notranslate"><span class="pre">-a</span></code> option will invoke one or more services on files, directories of files, or URLs pointing to files. Here is an example of running Handprint on a directory containing images:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint tests/data/caltech-archives/glaser/
+</pre></div>
+</div>
+<p>Image paths or URLs can be supplied to Handprint in any of the following ways:</p>
+<ul class="simple">
+<li><p>One or more directory paths or one or more image file paths on the local disk, which will be interpreted as images (either individually or in directories) to be processed</p></li>
+<li><p>One or more URLs, which will be interpreted as network locations of image files to be processed</p></li>
+<li><p>If given the <code class="docutils literal notranslate"><span class="pre">-f</span></code> option (<code class="docutils literal notranslate"><span class="pre">/f</span></code> on Windows), a file containing either image paths or image URLs to be processed</p></li>
+</ul>
+<p>Handprint assumes a path is a URL if it meets the test of <a class="reference external" href="https://validator-collection.readthedocs.io/en/latest/checkers.html?highlight=is_url#validator_collection.checkers.is_url"><code class="docutils literal notranslate"><span class="pre">is_url(...)</span></code></a> from the Python Validator Collection.  For every input given as a URL, Handprint will first download the image found at the URL to a directory indicated by the option <code class="docutils literal notranslate"><span class="pre">-o</span></code> (<code class="docutils literal notranslate"><span class="pre">/o</span></code> on Windows), or the current directory if option <code class="docutils literal notranslate"><span class="pre">-o</span></code> is not used.</p>
+<p>No matter whether files or URLs, each input item should be a single image of a document page in which text should be recognized.  Handprint reads a number of common formats: JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF.  However, for simplicity and maximum compatibility with all cloud services, Handprint always <strong>converts all input files to PNG</strong> if they are not already in that format, no matter if a given service can accept other formats.  Handprint also <strong>reduces the size</strong> of input images to the smallest size accepted by any of the services invoked if an image exceeds that size.  (For example, when sending a file to services A and B at the same time, if service A accepts files up to 10 MB in size and service B accepts files up to 4 MB, Handprint will resize the file to 4 MB before sending it to <em>both</em> A and B, even if A could accept a higher-resolution image.)  Finally, if the input contains more than one page (e.g., in a PDF file), Handprint will <strong>only use the first page of the input</strong> and ignore the remaining pages.</p>
+<p>Be aware that <strong>downsizing images can change the text recognition results returned by some services</strong> compared to the results obtained using the original full-size input image.  If your images are larger when converted to PNG than the smallest size accepted by one of the destination services (currently 4 MB, for Microsoft), then you may wish to compare the results of using multiple services at once versus one at a time (i.e., one destination at a time in separate invocations of Handprint).</p>
+<p>Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it’s usually better to store the URLs in a file in combination with the <code class="docutils literal notranslate"><span class="pre">-f</span></code> option (<code class="docutils literal notranslate"><span class="pre">/f</span></code> on Windows).</p>
+</section>
+<section id="selecting-destination-services">
+<h2 id="selecting-destination-services">Selecting destination services<a class="headerlink" href="#selecting-destination-services" title="Permalink to this headline">¶</a></h2>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">-l</span></code> option (<code class="docutils literal notranslate"><span class="pre">/l</span></code> on Windows) to make it display a list of the services currently supported by Handprint:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># handprint -l</span>
+Known services: amazon-rekognition, amazon-textract, google, microsoft
+</pre></div>
+</div>
+<p>By default, Handprint will send images to all of the known services, creating annotated images to represent the results of each individual service.  To invoke only specific services, use the <code class="docutils literal notranslate"><span class="pre">-s</span></code> option (<code class="docutils literal notranslate"><span class="pre">/s</span></code> on Windows) followed by a service name or a list of names separated by commas (e.g., <code class="docutils literal notranslate"><span class="pre">google,microsoft</span></code>).  For example, the following command will invoke Microsoft’s text recognition service on a page from <a class="reference external" href="https://picryl.com/media/clara-barton-papers-speeches-and-writings-file-1849-1947-books-the-life-of-71">Clara Barton’s unpublished draft book “The Life of My Childhood”</a>, available in Handprint’s source directory:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -s microsoft tests/data/public-domain/images/clara-barton-life-of-my-childhood-p90.jpg
+</pre></div>
+</div>
+<p>Here is the result of that command:</p>
+<p align="center">
+<img alt="Example of running Microsoft's service on a page from Clara Barton's unpublished draft book, The Life of My Childhood." src="_static/media/clara-barton-page.jpg" width="90%"/>
+</p>
+</section>
+<section id="visual-display-of-recognition-results">
+<h2 id="visual-display-of-recognition-results">Visual display of recognition results<a class="headerlink" href="#visual-display-of-recognition-results" title="Permalink to this headline">¶</a></h2>
+<p>After gathering the results of each service for a given input, Handprint will create a single compound image consisting of the results for each service arranged in a <em>N</em>×<em>N</em> grid.  This overview image is intended to make it easier to compare the results of multiple services against each other.  The grid image will have the suffix <code class="docutils literal notranslate"><span class="pre">.handprint-all.png</span></code>.  Here is a sample output image to illustrate:</p>
+<p align="center">
+<img alt="Example annotated results output image" src="_static/media/all-results-example.png" width="90%"/>
+</p>
+<p>The 2×2 image above was produced by running the following command from the Handprint <code class="docutils literal notranslate"><span class="pre">tests/data/caltech-archives/glaser</span></code> directory:</p>
+<div class="highlight-csh notranslate"><div class="highlight"><pre><span></span>handprint --text-size 20  <span class="s2">"DAG_5_1_6 1952-1957 Notebook VI p2.jpg"</span>
+</pre></div>
+</div>
+<p>To move the position of the text annotations overlaid over the input image, you can use the option <code class="docutils literal notranslate"><span class="pre">-m</span></code> (or <code class="docutils literal notranslate"><span class="pre">/m</span></code> on Windows).  This takes two numbers separated by a comma in the form <code class="docutils literal notranslate"><span class="pre">x,y</span></code>.  Positive numbers move the text rightward and upward, respectively, relative to the default position.  The default position of each text annotation in the annotated output is such that the <em>left edge of the word</em> starts at the location of the <em>upper left corner of the bounding box</em> returned by the service; this has the effect of putting the annotation near, but above, the location of the (actual) word in the input image by default.  For example, if the word in the image is <em>strawberry</em>, the bounding box returned by the service will enclose <em>strawberry</em>, and the upper left corner of that bounding box will be somewhere above the letter <em>s</em>. Then, the default position of the text annotation will put the left edge of the word “strawberry” at that point above the letter <em>s</em>. Using the move-text option allows you to move the annotation if desired. A value such as <code class="docutils literal notranslate"><span class="pre">0,-5</span></code> will move it downward five pixels.</p>
+<p>To change the color of the text annotations overlaid over the input image, you can use the option <code class="docutils literal notranslate"><span class="pre">-x</span></code> (or <code class="docutils literal notranslate"><span class="pre">/x</span></code> on Windows).  You can use hex color codes such as <code class="docutils literal notranslate"><span class="pre">"#ff0000"</span></code> (make sure to enclose the value with quotes, or the shell will interpret the pound sign as a comment character), or X11/CSS4 color names with no spaces such as <code class="docutils literal notranslate"><span class="pre">purple</span></code> or <code class="docutils literal notranslate"><span class="pre">darkgreen</span></code>.</p>
+<p>To change the size of the text annotations overlaid over the input image, you can use the option <code class="docutils literal notranslate"><span class="pre">-z</span></code> (or <code class="docutils literal notranslate"><span class="pre">/z</span></code> on Windows).  The value is in units of points.  The default size is 12.</p>
+<p>Finally, the individual results, as well as individual annotated images corresponding to the results from each service, will not be retained unless the <code class="docutils literal notranslate"><span class="pre">-e</span></code> extended results option (<code class="docutils literal notranslate"><span class="pre">/e</span></code> on Windows) is invoked (described in more detail below).  The production of the overview grid image can be skipped by using the <code class="docutils literal notranslate"><span class="pre">-G</span></code> option (<code class="docutils literal notranslate"><span class="pre">/G</span></code> on Windows).</p>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="configuration.html" title="Configuration for cloud services"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> Configuration for cloud services </span>
+              </div>
+            </a>
+          
+          
+            <a href="advanced-usage.html" title="Advanced Handprint usage"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> Advanced Handprint usage </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2022, Caltech Library.
+              
+          </div>
+            Last updated on
+              Feb 10, 2022.
+            <br/>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

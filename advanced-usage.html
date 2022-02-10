@@ -1,0 +1,609 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="blue-grey">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Advanced Handprint usage &#8212; Handprint</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Handprint command summary" href="command-summary.html" />
+    <link rel="prev" title="Basic Handprint usage" href="basic-usage.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=deep-orange data-md-color-accent=teal>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#advanced-usage" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="Handprint"
+           class="md-header-nav__button md-logo">
+          
+              <img src="_static/handprint-icon-white.png" height="26"
+                   alt="Home logo">
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">Handprint</span>
+          <span class="md-header-nav__topic"> Advanced Handprint usage </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            <a href="https://github.com/caltechlibrary/handprint/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    Handprint
+  </div>
+</a>
+          </div>
+        </div>
+      
+      
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">Home</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="Handprint" class="md-nav__button md-logo">
+      
+        <img src="_static/handprint-icon-white.png" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="Handprint">Handprint</a>
+  </label>
+    <div class="md-nav__source">
+      <a href="https://github.com/caltechlibrary/handprint/" title="Go to repository" class="md-source" data-md-source="github">
+
+    <div class="md-source__icon">
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="28" height="28">
+        <use xlink:href="#__github" width="24" height="24"></use>
+      </svg>
+    </div>
+  
+  <div class="md-source__repository">
+    Handprint
+  </div>
+</a>
+    </div>
+  
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html" class="md-nav__link">Installation</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html#preliminary-requirements" class="md-nav__link">Preliminary requirements</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="installation.html#installation-instructions" class="md-nav__link">Installation instructions</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html" class="md-nav__link">Configuration for cloud services</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#microsoft" class="md-nav__link">Microsoft</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#google" class="md-nav__link">Google</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="configuration.html#amazon" class="md-nav__link">Amazon</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html" class="md-nav__link">Basic Handprint usage</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#installing-credentials" class="md-nav__link">Installing credentials</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#input-files-and-urls" class="md-nav__link">Input files and URLs</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#selecting-destination-services" class="md-nav__link">Selecting destination services</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="basic-usage.html#visual-display-of-recognition-results" class="md-nav__link">Visual display of recognition results</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Advanced Handprint usage </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">Advanced Handprint usage</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+  <ul class="md-nav__list" data-md-scrollfix="">
+  </ul>
+</nav>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="#annotation-types" class="md-nav__link">Annotation types</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#thresholding-by-confidence" class="md-nav__link">Thresholding by confidence</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#comparison-to-ground-truth-text" class="md-nav__link">Comparison to ground truth text</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#extended-results" class="md-nav__link">Extended results</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#other-options" class="md-nav__link">Other options</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html" class="md-nav__link">Handprint command summary</a>
+      <ul class="md-nav__list"> 
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#command-line-options" class="md-nav__link">Command-line options</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#return-values" class="md-nav__link">Return values</a>
+      
+    
+    </li></ul>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="known-issues.html" class="md-nav__link">Known issues and limitations</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="colophon.html" class="md-nav__link">Colophon</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+  <ul class="md-nav__list" data-md-scrollfix="">
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section class="tex2jax_ignore mathjax_ignore" id="advanced-handprint-usage">
+<h1 id="advanced-usage--page-root">Advanced Handprint usage<a class="headerlink" href="#advanced-usage--page-root" title="Permalink to this headline">¶</a></h1>
+<section id="annotation-types">
+<h2 id="annotation-types">Annotation types<a class="headerlink" href="#annotation-types" title="Permalink to this headline">¶</a></h2>
+<p>Handprint produces copies of the input images overlaid with the recognition results received from the different services.  By default, it shows only the recognized text.  The option <code class="docutils literal notranslate"><span class="pre">-d</span></code> (<code class="docutils literal notranslate"><span class="pre">/d</span></code> on Windows) can be used to tell Handprint to display other results.  The recognized values are as follows:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">text</span></code>: display the text recognized in the image (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bb</span></code>: display all bounding boxes returned by the service</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bb-word</span></code>: display the bounding boxes for words (in red)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bb-line</span></code>: display the bounding boxes for lines (in blue)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bb-para</span></code>: display the bounding boxes for paragraphs (in green)</p></li>
+</ul>
+<p>Separate multiple values with a comma.  The option <code class="docutils literal notranslate"><span class="pre">bb</span></code> is a shorthand for the value <code class="docutils literal notranslate"><span class="pre">bb-word,bb-line,bb-para</span></code>.  As an example, the following command will show both the recognized text and the bounding boxes around words:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -d text,bb-word  -s google  tests/data/public-domain/images/H96566k.jpg
+</pre></div>
+</div>
+<p>And here is the output from that command:</p>
+<p align="center">
+<img alt="Example of bounding boxes" src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/google-bounding-box-example.png" width="90%"/>
+</p>
+<p>Note that as of June 2021, the main services (Amazon, Google, Microsoft) do not all provide the same bounding box information in their results.  The following table summarizes what is available:</p>
+<table>
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="text-center head"><p>Word<br/>bounding boxes</p></th>
+<th class="text-center head"><p>Line<br/>bounding boxes</p></th>
+<th class="text-center head"><p>Paragraph<br/>bounding boxes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Amazon</p></td>
+<td class="text-center"><p>Y</p></td>
+<td class="text-center"><p>Y</p></td>
+<td class="text-center"><p>-</p></td>
+</tr>
+<tr class="row-odd"><td><p>Google</p></td>
+<td class="text-center"><p>Y</p></td>
+<td class="text-center"><p>-</p></td>
+<td class="text-center"><p>Y</p></td>
+</tr>
+<tr class="row-even"><td><p>Microsoft</p></td>
+<td class="text-center"><p>Y</p></td>
+<td class="text-center"><p>Y</p></td>
+<td class="text-center"><p>-</p></td>
+</tr>
+</tbody>
+</table>
+<p>If a service does not provide a particular kind of bounding box, Handprint will not display that kind of
+bounding box in the annotated output for that service.</p>
+</section>
+<section id="thresholding-by-confidence">
+<h2 id="thresholding-by-confidence">Thresholding by confidence<a class="headerlink" href="#thresholding-by-confidence" title="Permalink to this headline">¶</a></h2>
+<p>All of the services return confidence scores for items recognized in the input.  By default, Handprint will show all results no matter how low the confidence score.  The option <code class="docutils literal notranslate"><span class="pre">-n</span></code> (<code class="docutils literal notranslate"><span class="pre">/n</span></code> on Windows) can be used to threshold the results based on the confidence value for each item (text or bounding boxes).  The value provided as the argument to the option must be a floating point number between 0 and 1.0.  For example, the following command will make Handprint only show text that is rated with least 99.5% confidence:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -n <span class="m">0</span>.995  somefile.png
+</pre></div>
+</div>
+<p>Note that the <strong>confidence values returned by the different services are not normalized against each other</strong>.  What one service considers to be 80% confidence may not be what another service considers 80% confidence.  Handprint performs the thresholding against the raw scores returned by each service individually.</p>
+</section>
+<section id="comparison-to-ground-truth-text">
+<h2 id="comparison-to-ground-truth-text">Comparison to ground truth text<a class="headerlink" href="#comparison-to-ground-truth-text" title="Permalink to this headline">¶</a></h2>
+<p>Handprint offers the ability to compare the output of HTR services to expected output (i.e., ground truth) using the option <code class="docutils literal notranslate"><span class="pre">-c</span></code> (or <code class="docutils literal notranslate"><span class="pre">/c</span></code> on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:</p>
+<ul class="simple">
+<li><p>The file containing the expected results should be named <code class="docutils literal notranslate"><span class="pre">.gt.txt</span></code>, with a base name identical to the image file.  For example, an image file named <code class="docutils literal notranslate"><span class="pre">somefile.jpg</span></code> should have a corresponding text file <code class="docutils literal notranslate"><span class="pre">somefile.gt.txt</span></code>.  (This is a convention used by some other tools such as <a class="reference external" href="https://github.com/tmbdev/ocropy/wiki/Working-with-Ground-Truth">ocropy</a>.)</p></li>
+<li><p>The ground-truth text file should be located in the same directory as the input image file.</p></li>
+<li><p>The text should be line oriented, with each line representing a line of text in the image.</p></li>
+<li><p>The text should be plain text only.  No Unicode or binary encodings.  (This limitation comes from the HTR services, which – as of this writing – return results in plain text format.)</p></li>
+</ul>
+<p>Handprint will write the comparison results to a tab-delimited file named after the input image and service but with the extension <code class="docutils literal notranslate"><span class="pre">.tsv</span></code>.  For example, for an input image <code class="docutils literal notranslate"><span class="pre">somefile.jpg</span></code> and results received from Google, the comparison results will be written to <code class="docutils literal notranslate"><span class="pre">somefile.handprint-google.tsv</span></code>.  The use of a tab-delimited format rather than comma-delimited format avoids the need to quote commas and other characters in the text.  The output file will have one row for each line of text in the input, plus an additional row at the end for total number of errors found.  Each row will have the following columns:</p>
+<ol class="arabic simple">
+<li><p>number of errors on that line of text (computed as <a class="reference external" href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein distance</a>),</p></li>
+<li><p>the <em>character error rate</em> (CER) for the line (see below)</p></li>
+<li><p>the expected text on that line</p></li>
+<li><p>the text received from the service for that line</p></li>
+</ol>
+<p>The character error rate (CER) is computed as</p>
+<p align="center">
+ 100 × (<i>i</i> + <i>s</i> + <i>d</i>)/<i>n</i>
+</p>
+<p>where <em>i</em> is the number of inserted characters, <em>s</em> the number of substituted characters, and <em>d</em> the number of deleted characters needed to transform the the text received into the expected text, and <em>n</em> is the number of characters in the expected text line.  This approach to normalizing the CER value is conventional but note that it <strong>can lead to values greater than 100%</strong>.</p>
+<p>By default, scoring is done by Handprint on an exact basis; character case is not changed, punctuation is not removed, and stop words are not removed.  However, multiple contiguous spaces are converted to one space, and leading spaces are removed from text lines.</p>
+<p>If given the option <code class="docutils literal notranslate"><span class="pre">-r</span></code> (<code class="docutils literal notranslate"><span class="pre">/r</span></code> on Windows), Handprint will relax the comparison algorithm further, as follows: it will convert all text to lower case, and it will ignore certain sentence punctuation characters, namely <code class="docutils literal notranslate"><span class="pre">,</span></code>, <code class="docutils literal notranslate"><span class="pre">.</span></code>, <code class="docutils literal notranslate"><span class="pre">:</span></code>, and <code class="docutils literal notranslate"><span class="pre">;</span></code>.  The rationale for these particular choices comes from experience with actual texts and HTR services.  For example, a difference sometimes seen between HTR services is how they handle seemingly large spaces between a word and a subsequent comma or period: sometimes the HTR service will add a space before the comma or period, but inspection of the input document will reveal sloppiness in the author’s handwriting and neither the addition nor the omission of a space is provably right or wrong.  To avoid biasing the results one way or another, it is better to omit the punctuation.  On the other hand, this may not always be desirable, and thus needs to be a user-controlled option.</p>
+<p>Handprint attempts to cope with possibly-missing text in the HTR results by matching up likely corresponding lines in the expected and received results.  It does this by comparing each line of ground-truth text to each line of the HTR results using <a class="reference external" href="https://en.wikipedia.org/wiki/Longest_common_subsequence_problem">longest common subsequence similarity</a> as implemented by the LCSSEQ function in the <a class="reference external" href="https://github.com/life4/textdistance">textdistance</a> package.  If the lines do not pass a threshold score, Handprint looks at subsequent lines of the HTR results and tries to reestablish correspondence to ground truth.  If nothing else in the HTR results appear close enough to the expected ground-truth line, the line is assumed to be missing from the HTR results and scored appropriately.</p>
+<p>The following is an example of a tab-separated file produced using <code class="docutils literal notranslate"><span class="pre">-c</span></code>.  This example shows a case where two lines were missing entirely from the HTR results; for those lines, the number of errors equals the length of the ground-truth text lines and the CER is 100%.</p>
+<p align="center">
+<img src="https://raw.githubusercontent.com/caltechlibrary/handprint/develop/.graphics/example-tsv-file.png" width="60%"/>
+</p>
+</section>
+<section id="extended-results">
+<h2 id="extended-results">Extended results<a class="headerlink" href="#extended-results" title="Permalink to this headline">¶</a></h2>
+<p>If the option <code class="docutils literal notranslate"><span class="pre">-e</span></code> (<code class="docutils literal notranslate"><span class="pre">/e</span></code> on Windows) is used, Handprint saves not only the overview image containing all the results, but also, individual annotated images for each service’s results, the raw data (converted to a JSON file by Handprint), and the text extracted by the service.  These additional outputs will be written in files named after the original files with the addition of a string that indicates the service used.  For example, a file named <code class="docutils literal notranslate"><span class="pre">somefile.jpg</span></code> will produce</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">textract</span><span class="o">.</span><span class="n">png</span>
+<span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">textract</span><span class="o">.</span><span class="n">json</span>
+<span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">textract</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">png</span>
+<span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">json</span>
+<span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">txt</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>A complication arises with using URLs in combination with the <code class="docutils literal notranslate"><span class="pre">-e</span></code> option: how should Handprint name the files that it writes?  Some CMS systems store content using opaque schemes that provide no clear names in the URLs, making it impossible for a software tool such as Handprint to guess what file name would make sense to use for local storage.  Worse, some systems create extremely long URLs, making it impractical to use the URL itself as the file name.  For example, the following is a real URL pointing to an image in Caltech Archives:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>https://hale.archives.caltech.edu/adore-djatoka//resolver?rft_id=https%3A%2F%2Fhale.archives.caltech.edu%2Fislandora%2Fobject%2Fhale%253A85240%2Fdatastream%2FJP2%2Fview%3Ftoken%3D7997253eb6195d89b2615e8fa60708a97204a4cdefe527a5ab593395ac7d4327&amp;url_ver=Z39.88-2004&amp;svc_id=info%3Alanl-repo%2Fsvc%2FgetRegion&amp;svc_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Ajpeg2000&amp;svc.format=image%2Fjpeg&amp;svc.level=4&amp;svc.rotate=0
+</pre></div>
+</div>
+<p>To deal with this situation, Handprint manufactures its own file names when a URL is encountered.  The scheme is simple: by default, Handprint will use a base name of <code class="docutils literal notranslate"><span class="pre">document-N</span></code>, where <code class="docutils literal notranslate"><span class="pre">N</span></code> is an integer.  The integers start from <code class="docutils literal notranslate"><span class="pre">1</span></code> for every run of Handprint, and the integers count the URLs found either on the command line or in the file indicated by the <code class="docutils literal notranslate"><span class="pre">-f</span></code> option.  The image found at a given URL is stored in a file named <code class="docutils literal notranslate"><span class="pre">document-N.E</span></code> where <code class="docutils literal notranslate"><span class="pre">E</span></code> is the format extension (e.g., <code class="docutils literal notranslate"><span class="pre">document-1.jpg</span></code>, <code class="docutils literal notranslate"><span class="pre">document-1.png</span></code>, etc.).  The URL itself is stored in another file named <code class="docutils literal notranslate"><span class="pre">document-1.url</span></code>.  Thus, the files produced by Handprint will look like this when the <code class="docutils literal notranslate"><span class="pre">-e</span></code> option is used (assuming, for this example, that the files at the source URLs are in JPEG format):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">document</span><span class="o">-</span><span class="mf">1.</span><span class="n">jpg</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">1.</span><span class="n">url</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">1.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">png</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">1.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">json</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">1.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">1.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">png</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">1.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">json</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">1.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">txt</span>
+<span class="o">...</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">2.</span><span class="n">jpg</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">2.</span><span class="n">url</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">2.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">png</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">2.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">json</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">2.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">2.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">png</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">2.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">json</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">2.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">txt</span>
+<span class="o">...</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">3.</span><span class="n">jpg</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">3.</span><span class="n">url</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">3.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">png</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">3.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">json</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">3.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">txt</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">3.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">png</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">3.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">json</span>
+<span class="n">document</span><span class="o">-</span><span class="mf">3.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">txt</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>The base name <code class="docutils literal notranslate"><span class="pre">document</span></code> can be changed using the <code class="docutils literal notranslate"><span class="pre">-b</span></code> option (<code class="docutils literal notranslate"><span class="pre">/b</span></code> on Windows).  For example, running Handprint with the option <code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">einstein</span></code> will cause the outputs to be named <code class="docutils literal notranslate"><span class="pre">einstein-1.jpg</span></code>, <code class="docutils literal notranslate"><span class="pre">einstein-1.url</span></code>, etc.</p>
+</section>
+<section id="other-options">
+<h2 id="other-options">Other options<a class="headerlink" href="#other-options" title="Permalink to this headline">¶</a></h2>
+<p>The option <code class="docutils literal notranslate"><span class="pre">-j</span></code> (<code class="docutils literal notranslate"><span class="pre">/j</span></code> on Windows) tells Handprint to look for and reuse preexisting results for each input instead of contacting the services.  This makes it look for JSON files produced in a previous run with the <code class="docutils literal notranslate"><span class="pre">-e</span></code> option,</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">rekognition</span><span class="o">.</span><span class="n">json</span>
+<span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">textract</span><span class="o">.</span><span class="n">json</span>
+<span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">google</span><span class="o">.</span><span class="n">json</span>
+<span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">microsoft</span><span class="o">.</span><span class="n">json</span>
+</pre></div>
+</div>
+<p>and use those instead of getting results from the services.  This can be useful to save repeated invocations of the services if all you want is to draw the results differently or perform some testing/debugging on the same inputs.</p>
+<p>Handprint will send files to the different services in parallel, using a number of process threads equal to 1/2 of the number of cores on the computer it is running on.  (E.g., if your computer has 4 cores, it will by default use at most 2 threads.)  The <code class="docutils literal notranslate"><span class="pre">-t</span></code> option (<code class="docutils literal notranslate"><span class="pre">/t</span></code> on Windows) can be used to change this number.</p>
+<p>If given the <code class="docutils literal notranslate"><span class="pre">-q</span></code> option (<code class="docutils literal notranslate"><span class="pre">/q</span></code> on Windows), Handprint will not print its usual informational messages while it is working.  It will only print messages for warnings or errors.  By default messages printed by Handprint are also color-coded.  If given the option <code class="docutils literal notranslate"><span class="pre">-Z</span></code> (<code class="docutils literal notranslate"><span class="pre">/Z</span></code> on Windows), Handprint will not color the text of messages it prints.  (This latter option is useful when running Handprint within subshells inside other environments such as Emacs.)</p>
+<p>If given the <code class="docutils literal notranslate"><span class="pre">-@</span></code> argument (<code class="docutils literal notranslate"><span class="pre">/@</span></code> on Windows), this program will output a detailed trace of what it is doing.  The debug trace will be sent to the given destination, which can be <code class="docutils literal notranslate"><span class="pre">-</span></code> to indicate console output, or a file path to send the output to a file.  On non-Windows platforms, Handprint will also install a signal handler that responds to signal <code class="docutils literal notranslate"><span class="pre">SIGUSR1</span></code>; if the signal is sent to the running process, it will drop Handprint into the <code class="docutils literal notranslate"><span class="pre">pdb</span></code> debugger.  <em>Note</em>: It’s best to use <code class="docutils literal notranslate"><span class="pre">-t</span> <span class="pre">1</span></code> when attempting to use a debugger because otherwise subthreads will continue running even if the main thread is interrupted.</p>
+<p>If given the <code class="docutils literal notranslate"><span class="pre">-V</span></code> option (<code class="docutils literal notranslate"><span class="pre">/V</span></code> on Windows), this program will print the version and other information, and exit without doing anything else.</p>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="basic-usage.html" title="Basic Handprint usage"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> Basic Handprint usage </span>
+              </div>
+            </a>
+          
+          
+            <a href="command-summary.html" title="Handprint command summary"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> Handprint command summary </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2022, Caltech Library.
+              
+          </div>
+            Last updated on
+              Feb 10, 2022.
+            <br/>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.4.0.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>

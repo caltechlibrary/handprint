@@ -1,5 +1,8 @@
 # Advanced Handprint usage
 
+This section describes commands that are somewhat more complex than those described in the [section on basic usage](basic-usage.md).
+
+
 ## Annotation types
 
 Handprint produces copies of the input images overlaid with the recognition results received from the different services.  By default, it shows only the recognized text.  The option `-d` (`/d` on Windows) can be used to tell Handprint to display other results.  The recognized values are as follows:

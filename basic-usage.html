@@ -354,6 +354,13 @@
       <a href="command-summary.html#return-values" class="md-nav__link">Return values</a>
       
     
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#additional-notes" class="md-nav__link">Additional notes</a>
+      
+    
     </li></ul>
     
     </li>
@@ -420,7 +427,7 @@
 <li><p>One or more URLs, which will be interpreted as network locations of image files to be processed</p></li>
 <li><p>If given the <code class="docutils literal notranslate"><span class="pre">-f</span></code> option (<code class="docutils literal notranslate"><span class="pre">/f</span></code> on Windows), a file containing either image paths or image URLs to be processed</p></li>
 </ul>
-<p>Handprint assumes a path is a URL if it meets the test of <a class="reference external" href="https://validator-collection.readthedocs.io/en/latest/checkers.html?highlight=is_url#validator_collection.checkers.is_url"><code class="docutils literal notranslate"><span class="pre">is_url(...)</span></code></a> from the Python Validator Collection.  For every input given as a URL, Handprint will first download the image found at the URL to a directory indicated by the option <code class="docutils literal notranslate"><span class="pre">-o</span></code> (<code class="docutils literal notranslate"><span class="pre">/o</span></code> on Windows), or the current directory if option <code class="docutils literal notranslate"><span class="pre">-o</span></code> is not used.</p>
+<p>For every input given as a URL, Handprint will first download the image found at the URL to a directory indicated by the option <code class="docutils literal notranslate"><span class="pre">-o</span></code> (<code class="docutils literal notranslate"><span class="pre">/o</span></code> on Windows), or the current directory if option <code class="docutils literal notranslate"><span class="pre">-o</span></code> is not used.</p>
 <p>No matter whether files or URLs, each input item should be a single image of a document page in which text should be recognized.  Handprint reads a number of common formats: JP2, JPEG, PDF, PNG, GIF, BMP, and TIFF.  However, for simplicity and maximum compatibility with all cloud services, Handprint always <strong>converts all input files to PNG</strong> if they are not already in that format, no matter if a given service can accept other formats.  Handprint also <strong>reduces the size</strong> of input images to the smallest size accepted by any of the services invoked if an image exceeds that size.  (For example, when sending a file to services A and B at the same time, if service A accepts files up to 10 MB in size and service B accepts files up to 4 MB, Handprint will resize the file to 4 MB before sending it to <em>both</em> A and B, even if A could accept a higher-resolution image.)  Finally, if the input contains more than one page (e.g., in a PDF file), Handprint will <strong>only use the first page of the input</strong> and ignore the remaining pages.</p>
 <p>Be aware that <strong>downsizing images can change the text recognition results returned by some services</strong> compared to the results obtained using the original full-size input image.  If your images are larger when converted to PNG than the smallest size accepted by one of the destination services (currently 4 MB, for Microsoft), then you may wish to compare the results of using multiple services at once versus one at a time (i.e., one destination at a time in separate invocations of Handprint).</p>
 <p>Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it’s usually better to store the URLs in a file in combination with the <code class="docutils literal notranslate"><span class="pre">-f</span></code> option (<code class="docutils literal notranslate"><span class="pre">/f</span></code> on Windows).</p>

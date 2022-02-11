@@ -53,6 +53,14 @@ body, input {
     margin: 1.35rem 0 .8rem;
 }
 
+.md-typeset table:not([class]) {
+  font-size: 0.8rem;
+}
+
+.md-typeset__scrollwrap {
+  text-align: center;
+}
+
 nav.md-tabs {
   display: none;
 }

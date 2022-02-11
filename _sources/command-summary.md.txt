@@ -47,3 +47,8 @@ This program exits with a return code of 0 if no problems are encountered.  It r
 | 4    | file error &ndash; encountered a problem with a file     |
 | 5    | server error &ndash; encountered a problem with a server |
 | 6    | an exception or fatal error occurred                     |
+
+
+## Additional notes
+
+The debug logging functionality is implemented using [Sidetrack](https://github.com/caltechlibrary/sidetrack) and all calls to the debug code are conditionalized on the Python symbol `__debug__`.  It is carefully written so that you can cause the calls to be _optimized out completely_ if your run Python with [optimization turned on](https://docs.python.org/3/using/cmdline.html#cmdoption-o) (e.g., using the `-O` command-line option).

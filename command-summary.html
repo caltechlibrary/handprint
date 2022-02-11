@@ -354,6 +354,13 @@
       <a href="#return-values" class="md-nav__link">Return values</a>
       
     
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="#additional-notes" class="md-nav__link">Additional notes</a>
+      
+    
     </li></ul>
     
     </li>
@@ -579,6 +586,10 @@
 </tr>
 </tbody>
 </table>
+</section>
+<section id="additional-notes">
+<h2 id="additional-notes">Additional notes<a class="headerlink" href="#additional-notes" title="Permalink to this headline">¶</a></h2>
+<p>The debug logging functionality is implemented using <a class="reference external" href="https://github.com/caltechlibrary/sidetrack">Sidetrack</a> and all calls to the debug code are conditionalized on the Python symbol <code class="docutils literal notranslate"><span class="pre">__debug__</span></code>.  It is carefully written so that you can cause the calls to be <em>optimized out completely</em> if your run Python with <a class="reference external" href="https://docs.python.org/3/using/cmdline.html#cmdoption-o">optimization turned on</a> (e.g., using the <code class="docutils literal notranslate"><span class="pre">-O</span></code> command-line option).</p>
 </section>
 </section>
 

@@ -344,6 +344,13 @@
       <a href="command-summary.html#return-values" class="md-nav__link">Return values</a>
       
     
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="command-summary.html#additional-notes" class="md-nav__link">Additional notes</a>
+      
+    
     </li></ul>
     
     </li>
@@ -384,8 +391,10 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="handprint">
-<h1 id="index--page-root">Handprint<a class="reference internal" href="#index--page-root"><img alt="_images/handprint-icon.svg" class="align-right" src="_images/handprint-icon.svg" width="75em"/></a><a class="headerlink" href="#index--page-root" title="Permalink to this headline">¶</a></h1>
-<p>The <em><strong>Hand</strong>written <strong>p</strong>age <strong>r</strong>ecognit<strong>i</strong>o<strong>n</strong> <strong>t</strong>est</em> is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can produce annotated images showing the results, compare the recognized text to expected text, save the HTR service results as JSON and text files, and more. Handprint currently supports Google’s <a class="reference external" href="https://cloud.google.com/vision/docs/ocr">Google Cloud Vision API</a>, Microsoft’s Azure <a class="reference external" href="https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/">Computer Vision API</a>, and Amazon’s <a class="reference external" href="https://aws.amazon.com/textract/">Textract</a> and <a class="reference external" href="https://aws.amazon.com/rekognition/">Rekognition</a>; its framework for connecting to services could be expanded to support others in the future.</p>
+<h1 id="index--page-root">Handprint<a class="reference internal" href="#index--page-root"><img alt="_images/glaser-example-google.jpg" class="align-right" src="_images/glaser-example-google.jpg" style="width: 400px;"/></a><a class="headerlink" href="#index--page-root" title="Permalink to this headline">¶</a></h1>
+<p>The <em><strong>Hand</strong>written <strong>p</strong>age <strong>r</strong>ecognit<strong>i</strong>o<strong>n</strong> <strong>t</strong>est</em> is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can produce annotated images showing the results, compare the recognized text to expected text, save the HTR service results as JSON and text files, and more. It can be applied to any images of text documents. The images can come from your local computer’s disk or from web locations.</p>
+<p>Handprint currently supports Google’s <a class="reference external" href="https://cloud.google.com/vision/docs/ocr">Google Cloud Vision API</a>, Microsoft’s Azure <a class="reference external" href="https://azure.microsoft.com/en-us/services/cognitive-services/computer-vision/">Computer Vision API</a>, and Amazon’s <a class="reference external" href="https://aws.amazon.com/textract/">Textract</a> and <a class="reference external" href="https://aws.amazon.com/rekognition/">Rekognition</a>. (To use the services, you need to provide suitable account credentials.)</p>
+<p>Handprint is written in Python. Ready-to-run executables are available for some operating systems; you can also install Handprint using common Python installation frameworks such as <code class="docutils literal notranslate"><span class="pre">pipx</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p>
 <section id="sections">
 <h2 id="sections">Sections<a class="headerlink" href="#sections" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -419,6 +428,7 @@
 <li class="toctree-l1"><a class="reference internal" href="command-summary.html">Handprint command summary</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="command-summary.html#command-line-options">Command-line options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="command-summary.html#return-values">Return values</a></li>
+<li class="toctree-l2"><a class="reference internal" href="command-summary.html#additional-notes">Additional notes</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="known-issues.html">Known issues and limitations</a></li>

@@ -46,7 +46,7 @@ handprint -n 0.995  somefile.png
 Note that the **confidence values returned by the different services are not normalized against each other**.  What one service considers to be 80% confidence may not be what another service considers 80% confidence.  Handprint performs the thresholding against the raw scores returned by each service individually.
 
 
-## Comparison to ground truth text
+## Comparison to ground truth
 
 Handprint offers the ability to compare the output of HTR services to expected output (i.e., ground truth) using the option `-c` (or `/c` on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:
 

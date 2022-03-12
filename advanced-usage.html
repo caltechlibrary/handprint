@@ -316,7 +316,7 @@
     <li class="md-nav__item">
     
     
-      <a href="#comparison-to-ground-truth-text" class="md-nav__link">Comparison to ground truth text</a>
+      <a href="#comparison-to-ground-truth" class="md-nav__link">Comparison to ground truth</a>
       
     
     </li>
@@ -459,8 +459,8 @@ bounding box in the annotated output for that service.</p>
 </div>
 <p>Note that the <strong>confidence values returned by the different services are not normalized against each other</strong>.  What one service considers to be 80% confidence may not be what another service considers 80% confidence.  Handprint performs the thresholding against the raw scores returned by each service individually.</p>
 </section>
-<section id="comparison-to-ground-truth-text">
-<h2 id="comparison-to-ground-truth-text">Comparison to ground truth text<a class="headerlink" href="#comparison-to-ground-truth-text" title="Permalink to this headline">¶</a></h2>
+<section id="comparison-to-ground-truth">
+<h2 id="comparison-to-ground-truth">Comparison to ground truth<a class="headerlink" href="#comparison-to-ground-truth" title="Permalink to this headline">¶</a></h2>
 <p>Handprint offers the ability to compare the output of HTR services to expected output (i.e., ground truth) using the option <code class="docutils literal notranslate"><span class="pre">-c</span></code> (or <code class="docutils literal notranslate"><span class="pre">/c</span></code> on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:</p>
 <ul class="simple">
 <li><p>The file containing the expected results should be named <code class="docutils literal notranslate"><span class="pre">.gt.txt</span></code>, with a base name identical to the image file.  For example, an image file named <code class="docutils literal notranslate"><span class="pre">somefile.jpg</span></code> should have a corresponding text file <code class="docutils literal notranslate"><span class="pre">somefile.gt.txt</span></code>.  (This is a convention used by some other tools such as <a class="reference external" href="https://github.com/tmbdev/ocropy/wiki/Working-with-Ground-Truth">ocropy</a>.)</p></li>
@@ -600,7 +600,7 @@ bounding box in the annotated output for that service.</p>
               
           </div>
             Last updated on
-              Feb 17, 2022.
+              Mar 12, 2022.
             <br/>
             Created using
             <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.4.0.

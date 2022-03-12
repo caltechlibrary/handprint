@@ -5,7 +5,12 @@ Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a com
 
 ## ★ Version 1.5.5 ★
 
-This release updates dependency versions specified by `requirements.txt` and `Pipfile`, to address a security issue in Pillow, update to CommonPy, and some other version updates.  It also adds a `CITATION.cff` file to the repository on GitHub, and updates copyright years in files.
+Changes in this release:
+
+* Update dependency versions specified by `requirements.txt` and `Pipfile`, to address a security issue in Pillow, update to CommonPy, and some other version updates.
+* Fix to a bug in the image resizing code involving calls to debug log functions.
+* Updates to copyright years in files.
+* Addition of a `CITATION.cff` file to the repository on GitHub
 
 
 ## ★ Version 1.5.4 ★

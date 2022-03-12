@@ -64,6 +64,8 @@ update-codemeta:;
 	@sed -i .bak -e "/version/ s/[0-9].[0-9][0-9]*.[0-9][0-9]*/$(version)/" codemeta.json
 
 update-citation:;
+	$(eval date  := $(shell date "+%F"))
+	@sed -i .bak -e "/^date-released/ s/[0-9][0-9-]*/$(date)/" CITATION.cff
 	@sed -i .bak -e "/^version/ s/[0-9].[0-9][0-9]*.[0-9][0-9]*/$(version)/" CITATION.cff
 
 edited := codemeta.json $(init_file) CITATION.cff

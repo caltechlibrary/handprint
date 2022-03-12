@@ -61,7 +61,7 @@ Here is the result of that command:
 </p>
 
 
-## Visual display of recognition results
+## Visual display of results
 
 After gathering the results of each service for a given input, Handprint will create a single compound image consisting of the results for each service arranged in a _N_&times;_N_ grid.  This overview image is intended to make it easier to compare the results of multiple services against each other.  The grid image will have the suffix `.handprint-all.png`.  Here is a sample output image to illustrate:
 

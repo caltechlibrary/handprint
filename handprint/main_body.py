@@ -83,7 +83,7 @@ class MainBody(object):
     def _do_preflight(self):
         '''Check the option values given by the user, and do other prep.'''
 
-        from handprint.network import network_available
+        from commonpy.network_utils import network_available
         if not network_available():
             alert_fatal('No network connection.')
             raise CannotProceed(ExitCode.no_network)

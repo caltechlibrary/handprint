@@ -1,6 +1,6 @@
 # =============================================================================
 # @file    requirements.txt
-# @brief   Python dependencies for Handprint
+# @brief   Python dependencies for Handprint for normal use
 # @created 2018-10-23
 # @license Please see the file named LICENSE in the project directory
 # @website https://github.com/caltechlibrary/handprint

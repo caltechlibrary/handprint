@@ -1,0 +1,11 @@
+# =============================================================================
+# @file    requirements.txt
+# @brief   Python dependencies for Handprint for development
+# @created 2022-03-14
+# @license Please see the file named LICENSE in the project directory
+# @website https://github.com/caltechlibrary/handprint
+# =============================================================================
+
+-r requirements.txt
+
+pytest-mock == 3.7.0

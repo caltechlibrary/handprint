@@ -3,6 +3,16 @@
 Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can produce annotated images showing the results, compare the recognized text to expected text, save the HTR service results as JSON and text files, and more.
 
 
+## ★ Version 1.5.6 ★
+
+Changes in this release:
+* The internal `network` module is gone; instead, this uses the equivalent functions from [CommonPy](https://github.com/caltechlibrary/commonpy)'s `network_utils` module.
+* `Makefile` has a fix for updating `CITATION.cff`.
+* Some dependency versions have been updated in `requirements.txt`.
+* There is a new `requirements-dev.txt` file for installing dependencies needed to run test cases using `pytest`.
+* There are new test cases.
+
+
 ## ★ Version 1.5.5 ★
 
 Changes in this release:

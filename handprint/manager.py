@@ -21,6 +21,7 @@ from   commonpy.file_utils import filename_basename, filename_extension, relativ
 from   commonpy.file_utils import files_in_directory, alt_extension
 from   commonpy.file_utils import readable, writable, nonempty
 from   commonpy.file_utils import delete_existing
+from   commonpy.network_utils import download_file
 from   concurrent.futures import ThreadPoolExecutor
 import io
 from   itertools import repeat
@@ -42,14 +43,10 @@ import urllib
 import handprint
 from handprint import _OUTPUT_EXT, _OUTPUT_FORMAT
 from handprint.exceptions import *
-from handprint.network import download_file, disable_ssl_cert_check
 from handprint.services import KNOWN_SERVICES
 
 if __debug__:
     from sidetrack import log
-
-# Disable certificate verification.  FIXME: probably shouldn't do this.
-disable_ssl_cert_check()
 
 
 # Helper data types.

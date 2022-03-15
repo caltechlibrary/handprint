@@ -28,7 +28,7 @@ numpy                    == 1.22.2
 Pillow                   == 9.0.0
 plac                     == 1.3.3
 psutil                   == 5.8.0
-PyMuPDF                  == 1.18.14
+PyMuPDF                  == 1.19.6
 requests                 == 2.25.0
 rich                     == 10.1.0
 setuptools               == 57.0.0

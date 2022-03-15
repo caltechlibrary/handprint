@@ -1,11 +1,7 @@
 {
     "_meta": {
         "hash": {
-<<<<<<< HEAD
-            "sha256": "69dd3d5758d96d2ee127fa666f01f31438ceea046d99e1ce3d7434251b626a19"
-=======
             "sha256": "32bc3b617a598774407ed8f8904133d1ffcba2a2a4124aa8674b6d15a4a7797a"
->>>>>>> 0008d88 (Update Pipfile)
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -110,11 +106,7 @@
                 "sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597",
                 "sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df"
             ],
-<<<<<<< HEAD
-            "markers": "python_full_version >= '3.5.0'",
-=======
             "markers": "python_version >= '3.5'",
->>>>>>> 0008d88 (Update Pipfile)
             "version": "==2.0.12"
         },
         "colorama": {
@@ -153,7 +145,7 @@
                 "sha256:159cc4e01a593706a15cd4e269a0b3345edf3aef8bf9278a57dac8adf5bf1e4a",
                 "sha256:17202df32c7a36e773136ff353aa3767e987f8b3e27374c39fd21a30a803d6f8"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==1.0.0"
         },
         "deprecation": {
@@ -337,7 +329,6 @@
                 "sha256:61e0f6601fa709f35cdb730863b4e5ec7ad449792add80d1410d4174ed139af5",
                 "sha256:875f41ebd6f2c44781259005b157faed1a5031df3ae5aa7bcb4628a6c0782f14"
             ],
-            "markers": "python_full_version >= '3.6.1'",
             "version": "==3.2.0"
         },
         "hpack": {
@@ -345,7 +336,6 @@
                 "sha256:0edd79eda27a53ba5be2dfabf3b15780928a0dff6eb0c60a3d6767720e970c89",
                 "sha256:8eec9c1f4bfae3408a3f30500261f7e6a65912dc138526ea054f9ad98892e9d2"
             ],
-            "markers": "python_full_version >= '3.6.1'",
             "version": "==3.0.0"
         },
         "httpcore": {
@@ -385,7 +375,6 @@
                 "sha256:5187962cb16dcc078f23cb5a4b110098d546c3f41ff2d4038a9896893bbd0b40",
                 "sha256:a9f5c17f2cc3c719b917c4f33ed1c61bd1f8dfac4b1bd23b7c80b3400971b41f"
             ],
-            "markers": "python_full_version >= '3.6.1'",
             "version": "==5.2.0"
         },
         "idna": {
@@ -393,7 +382,6 @@
                 "sha256:b307872f855b18632ce0c21c5e45be78c0ea7ae4c15c828c20788b26921eb3f6",
                 "sha256:b97d804b1e9b523befed77c48dacec60e6dcb0b5391d57af6a65a312a90648c0"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.10"
         },
         "imagesize": {
@@ -416,7 +404,7 @@
                 "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9",
                 "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f"
             ],
-            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "markers": "python_version >= '2.6' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==0.10.0"
         },
         "jsonschema": {
@@ -628,11 +616,7 @@
                 "sha256:f358aa33e03b7a84e0d91270a4d4d8f5df6921abe99a377828839e8ed0c04e07",
                 "sha256:f51d5a9f137f7a2cec2d326a74b6e3fc79d635d69ffe1b036d39fc7d75430d37"
             ],
-<<<<<<< HEAD
-            "markers": "python_full_version >= '3.5.0'",
-=======
             "markers": "python_version >= '3.5'",
->>>>>>> 0008d88 (Update Pipfile)
             "version": "==3.19.4"
         },
         "psutil": {
@@ -718,7 +702,7 @@
                 "sha256:44238f1b60a76d78fc8ca0528ee429702aae011c265fe6a8dd8b63049ae41c65",
                 "sha256:4e426f72023d88d03b2fa258de560726ce890ff3b630f88c21cbb8b2503b8c6a"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==2.11.2"
         },
         "pymupdf": {
@@ -753,11 +737,7 @@
                 "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea",
                 "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"
             ],
-<<<<<<< HEAD
-            "markers": "python_version >= '3.6'",
-=======
-            "markers": "python_version >= '3.1'",
->>>>>>> 0008d88 (Update Pipfile)
+            "markers": "python_version > '3.0'",
             "version": "==3.0.7"
         },
         "pyrsistent": {
@@ -789,26 +769,18 @@
         },
         "pytest": {
             "hashes": [
-<<<<<<< HEAD
-                "sha256:9ce3ff477af913ecf6321fe337b93a2c0dcf2a0a1439c43f5452112c1e4280db",
-                "sha256:e30905a0c131d3d94b89624a1cc5afec3e0ba2fbdb151867d8e0ebd49850f171"
-            ],
-            "markers": "python_version >= '3.6'",
-            "version": "==7.0.1"
-=======
                 "sha256:b555252a95bbb2a37a97b5ac2eb050c436f7989993565f5e0c9128fcaacadd0e",
                 "sha256:f1089d218cfcc63a212c42896f1b7fbf096874d045e1988186861a1a87d27b47"
             ],
             "markers": "python_version >= '3.7'",
             "version": "==7.1.0"
->>>>>>> 0008d88 (Update Pipfile)
         },
         "python-dateutil": {
             "hashes": [
                 "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86",
                 "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==2.8.2"
         },
         "pytz": {
@@ -993,17 +965,6 @@
             ],
             "version": "==0.4.2"
         },
-<<<<<<< HEAD
-        "setuptools": {
-            "hashes": [
-                "sha256:2347b2b432c891a863acadca2da9ac101eae6169b1d3dfee2ec605ecd50dbfe5",
-                "sha256:e4f30b9f84e5ab3decf945113119649fec09c1fc3507c6ebffec75646c56e62b"
-            ],
-            "markers": "python_version >= '3.7'",
-            "version": "==60.9.3"
-        },
-=======
->>>>>>> 0008d88 (Update Pipfile)
         "sidetrack": {
             "hashes": [
                 "sha256:169e06b27c6e7fd107fefb5efe52c0ee86d0663a6d33e43f2b14a0355401e28a",
@@ -1017,7 +978,7 @@
                 "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926",
                 "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"
             ],
-            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
             "version": "==1.16.0"
         },
         "sniffio": {
@@ -1025,7 +986,7 @@
                 "sha256:471b71698eac1c2112a40ce2752bb2f4a4814c22a54a3eed3676bc0f5ca9f663",
                 "sha256:c4666eecec1d3f50960c6bdf61ab7bc350648da6c126e3cf6898d8cd4ddcd3de"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==1.2.0"
         },
         "stringdist": {
@@ -1048,7 +1009,7 @@
                 "sha256:d2762b1aa2a36857df8420d63c2c31706e4924da8773439a543365d38459afd8",
                 "sha256:f188eab8c90ff935f3fa49d9228049cd7f37fb47105c3f15f8e6dd6f6e25924a"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==3.0.2"
         },
         "tomli": {
@@ -1161,7 +1122,7 @@
                 "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea",
                 "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"
             ],
-            "markers": "python_version >= '3.1'",
+            "markers": "python_version > '3.0'",
             "version": "==3.0.7"
         },
         "pytest": {

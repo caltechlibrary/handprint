@@ -6,13 +6,13 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg?style=flat-square)](https://choosealicense.com/licenses/bsd-3-clause)
 [![Python](https://img.shields.io/badge/Python-3.8+-brightgreen.svg?style=flat-square)](http://shields.io)
 [![GitHub stars](https://img.shields.io/github/stars/caltechlibrary/handprint.svg?style=flat-square&color=lightgray&label=Stars)](https://github.com/caltechlibrary/handprint/stargazers)
-[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/8960)](https://data.caltech.edu/records/8960)
+[![DOI](https://img.shields.io/badge/dynamic/json.svg?label=DOI&style=flat-square&colorA=gray&colorB=navy&query=$.metadata.doi&uri=https://data.caltech.edu/api/record/20059)](https://data.caltech.edu/records/20059)
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange&label=PyPI)](https://pypi.org/project/handprint/)
 
 
 ## Log of recent changes
 
-_Version 1.5.5_: This release updates dependency versions in `requirements.txt` and `Pipfile`, to address a security issue in Pillow, update CommonPy, and some other version updates. It also fixes an internal bug in the image resizing code.
+_Version 1.5.6_: This release updates dependency versions in `requirements.txt` and `Pipfile`, to address a security issue in Pillow. It also removes the internal copy of network utilities in favor of using the `network_utils` module from [CommonPy](https://github.com/caltechlibrary/commonpy). There are no functional or API changes in this release.
 
 
 ## Table of Contents

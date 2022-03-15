@@ -12,7 +12,7 @@ repository-code: "https://github.com/caltechlibrary/handprint"
 title: "Handprint: Run handwritten text recognition services on images of documents"
 date-released: 2022-03-15
 version: "1.5.6"
-doi: 10.22002/8960
+doi: 10.22002/20059
 keywords: 
   - handwritten text recognition
   - optical character recognition

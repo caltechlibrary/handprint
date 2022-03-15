@@ -195,7 +195,7 @@ def reduced_image_dimensions(orig_file, dest_file, max_width, max_height):
 
 
 def converted_image(orig_file, to_format, dest_file = None):
-    '''Returns a tuple of (success, output file, error message).
+    '''Convert image in "orig_file" to format "to_format".
     Returns a tuple of (new_file, error).  The value of 'error' will be None
     if no error occurred; otherwise, the value will be a string summarizing the
     error that occurred and 'new_file' will be set to None.

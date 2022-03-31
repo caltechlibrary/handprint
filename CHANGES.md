@@ -2,6 +2,8 @@
 
 Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a command-line program that invokes HTR (handwritten text recognition) services on images of document pages.  It can produce annotated images showing the results, compare the recognized text to expected text, save the HTR service results as JSON and text files, and more.
 
+Note: the repository uses a separate branch named `joss-paper` to store the files for the Handprint JOSS paper submission made in March 2022. That branch has a separate change history and different file structure. Changes to the paper are not reflected in _this_ change history.
+
 
 ## ★ Version 1.5.6 ★
 

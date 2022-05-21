@@ -110,17 +110,17 @@ Installing credentials for cloud-based services
 If given the command-line flag -l (or /l on Windows), Handprint will print a
 list of the known services, and exit.
 
-Before a given service can be used, if it is cloud-based commercial OCR/HTR
-service, Handprint needs to be supplied with user credentials for accessing
-that service.  The credentials must be stored in a JSON file with a certain
-format; see the Handprint user documentation for details about the formats
-for each service.  To add a new credentials file, use the -a option (/a on
-Windows) in combination with the name of a service and a single file path on
-the command line.  The name supplied right after the -a option must be the
-name of a recognized service (such as "google", "amazon", "microsoft"), and
-the file argument must be a JSON file containing the credentials data in the
-required format for that service.  Here is an example of adding credentials
-for Google (assuming you created the JSON file as described in the docs):
+Before a given service can be used, Handprint needs to be supplied with user
+credentials for accessing that service.  The credentials must be stored in a
+JSON file with a specific format that varies depending on the service; please
+see the Handprint user documentation for details about the formats for each
+service.  To add a new credentials file, use the -a option (/a on Windows) in
+combination with the name of a service and a single file path on the command
+line.  The name supplied right after the -a option must be the name of a
+recognized service (such as "google", "amazon", "microsoft"), and the file
+argument must be a JSON file containing the credentials data in the required
+format for that service.  Here is an example of adding credentials for Google
+(assuming you created the JSON file as described in the docs):
 
   handprint -a google mygooglecreds.json
 
@@ -227,7 +227,7 @@ working directory instead.
 
 When the inputs are URLs, Handprint must download a copy of the image located
 at the network address (because it is not possible to write the results in
-the network locations represented by the URLs.).  The images and other
+the network locations represented by the URLs).  The images and other
 results will be stored files whose root names have the form "document-N",
 where "N" is an integer.  The root name can be changed using the -b option
 (/b on Windows).  The image at networked locations will be converted to

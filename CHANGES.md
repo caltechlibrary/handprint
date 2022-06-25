@@ -5,6 +5,13 @@ Handprint (_**Hand**written **P**age **R**ecognit**i**o**n** **T**est_) is a com
 Note: the repository uses a separate branch named `joss-paper` to store the files for the Handprint JOSS paper submission made in March 2022. That branch has a separate change history and different file structure. Changes to the paper are not reflected in _this_ change history.
 
 
+## ★ Version 1.6.0 ★
+
+Changes in this release:
+* Beginning with this release, the license for Handprint is now an unmodified [BSD 3-clause](https://opensource.org/licenses/BSD-3-Clause), instead of the previous Caltech-specific modified version of the license.
+* Some versions of dependencies in `requirements.txt` have been updated.
+
+
 ## ★ Version 1.5.6 ★
 
 Changes in this release:

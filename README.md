@@ -193,7 +193,7 @@ python3 -m pip install -r requirements-dev.txt
 
 ## License
 
-Software produced by the Caltech Library is Copyright © 2021&ndash;2022 California Institute of Technology.  This software is freely distributed under a BSD/MIT type license.  Please see the [LICENSE](LICENSE) file for more information.
+Software produced by the Caltech Library is Copyright © 2018&ndash;2022 California Institute of Technology.  This software is freely distributed under the [BSD 3-clause OSI license](https://opensource.org/licenses/BSD-3-Clause).  Please see the [LICENSE](LICENSE) file for more information.
 
 
 ## Authors and history

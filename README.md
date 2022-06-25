@@ -10,11 +10,6 @@ The _**Hand**written **P**age **R**ecognit**i**o**n** **T**est_ is a command-lin
 [![PyPI](https://img.shields.io/pypi/v/handprint.svg?style=flat-square&color=orange&label=PyPI)](https://pypi.org/project/handprint/)
 
 
-## Log of recent changes
-
-_Version 1.5.6_: This release updates dependency versions in `requirements.txt` and `Pipfile`, to address a security issue in Pillow. It also removes the internal copy of network utilities in favor of using the `network_utils` module from [CommonPy](https://github.com/caltechlibrary/commonpy). There are no functional or API changes in this release.
-
-
 ## Table of Contents
 
 * [Introduction](#introduction)

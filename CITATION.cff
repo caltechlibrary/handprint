@@ -10,8 +10,8 @@ cff-version: "1.1.0"
 message: "If you use this software, please cite it using these metadata."
 repository-code: "https://github.com/caltechlibrary/handprint"
 title: "Handprint: Run handwritten text recognition services on images of documents"
-date-released: 2022-03-15
-version: "1.5.6"
+date-released: 2022-06-24
+version: "1.6.0"
 doi: 10.22002/20059
 keywords: 
   - handwritten text recognition

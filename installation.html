@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -54,6 +54,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
@@ -401,10 +402,10 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="installation">
-<h1 id="installation--page-root">Installation<a class="headerlink" href="#installation--page-root" title="Permalink to this headline">¶</a></h1>
+<h1 id="installation--page-root">Installation<a class="headerlink" href="#installation--page-root" title="Permalink to this heading">¶</a></h1>
 <p>This page describes how you can install Handprint on your computer. After installation, you will also need to perform some <a class="reference internal" href="configuration.html"><span class="doc std std-doc">configuration steps described elsewhere</span></a>.</p>
 <section id="preliminary-requirements">
-<h2 id="preliminary-requirements">Preliminary requirements<a class="headerlink" href="#preliminary-requirements" title="Permalink to this headline">¶</a></h2>
+<h2 id="preliminary-requirements">Preliminary requirements<a class="headerlink" href="#preliminary-requirements" title="Permalink to this heading">¶</a></h2>
 <p>Handprint is written in <a class="reference external" href="https://www.python.org">Python 3</a> and makes use of some additional Python software libraries that are installed automatically during the <span class="xref myst">installation steps</span>. It also assumes a macOS, Windows or Linux environment, and a working Internet connection.</p>
 <p>The instructions below assume you have a Python interpreter version 3.8 or higher installed on your computer; if that’s not the case, please first install Python and familiarize yourself with running Python programs on your system. If you are unsure of which version of Python you have, you can find out by running the following command in a terminal and inspecting the results:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note: on Windows, you may have to use "python" instead of "python3"</span>
@@ -414,13 +415,13 @@ python3 --version
 <p>Note for Mac users: if you are using macOS Catalina (10.15) or later and have never run <code class="docutils literal notranslate"><span class="pre">python3</span></code>, then the first time you do, macOS will ask you if you want to install the macOS command-line developer tools.  Go ahead and do so, as this is the easiest way to get a recent-enough Python 3 on those systems.</p>
 </section>
 <section id="installation-instructions">
-<h2 id="installation-instructions">Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this headline">¶</a></h2>
+<h2 id="installation-instructions">Installation instructions<a class="headerlink" href="#installation-instructions" title="Permalink to this heading">¶</a></h2>
 <p>There are multiple ways of installing Handprint, ranging from downloading a self-contained, single-file, ready-to-run program, to installing it as a typical Python program using <code class="docutils literal notranslate"><span class="pre">pip</span></code>.  Please choose the alternative that suits you.</p>
 <section id="approach-1-using-the-standalone-handprint-executables">
-<h3 id="approach-1-using-the-standalone-handprint-executables">Approach 1: using the standalone Handprint executables<a class="headerlink" href="#approach-1-using-the-standalone-handprint-executables" title="Permalink to this headline">¶</a></h3>
+<h3 id="approach-1-using-the-standalone-handprint-executables">Approach 1: using the standalone Handprint executables<a class="headerlink" href="#approach-1-using-the-standalone-handprint-executables" title="Permalink to this heading">¶</a></h3>
 <p>Beginning with version 1.5.1, runnable self-contained single-file executables are available for select operating system and Python version combinations – to use them, you <strong>only</strong> need a Python 3 interpreter and a copy of Handprint, but <strong>do not</strong> need to run <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> or other steps.</p>
 <section id="macos">
-<h4 id="macos">MacOS<a class="headerlink" href="#macos" title="Permalink to this headline">¶</a></h4>
+<h4 id="macos">MacOS<a class="headerlink" href="#macos" title="Permalink to this heading">¶</a></h4>
 <p>Visit the <a class="reference external" href="https://github.com/caltechlibrary/handprint/releases">Handprint releases page</a> and look for the ZIP files with names such as (e.g.) <code class="docutils literal notranslate"><span class="pre">handprint-1.5.4-macos-python3.8.zip</span></code>. Then:</p>
 <ol class="arabic simple">
 <li><p>Download the one matching your version of Python</p></li>
@@ -430,7 +431,7 @@ python3 --version
 </ol>
 </section>
 <section id="linux">
-<h4 id="linux">Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h4>
+<h4 id="linux">Linux<a class="headerlink" href="#linux" title="Permalink to this heading">¶</a></h4>
 <p>Visit the <a class="reference external" href="https://github.com/caltechlibrary/handprint/releases">Handprint releases page</a> and look for the ZIP files with names such as (e.g.) <code class="docutils literal notranslate"><span class="pre">handprint-1.5.4-linux-python3.8.zip</span></code>. Then:</p>
 <ol class="arabic simple">
 <li><p>Download the one matching your version of Python</p></li>
@@ -440,12 +441,12 @@ python3 --version
 </ol>
 </section>
 <section id="windows">
-<h4 id="windows">Windows<a class="headerlink" href="#windows" title="Permalink to this headline">¶</a></h4>
+<h4 id="windows">Windows<a class="headerlink" href="#windows" title="Permalink to this heading">¶</a></h4>
 <p>Standalone executables for Windows are not available at this time. If you are running Windows, please use one of the other methods described below.</p>
 </section>
 </section>
 <section id="approach-2-using-pipx">
-<h3 id="approach-2-using-pipx">Approach 2: using <code class="docutils literal notranslate"><span class="pre">pipx</span></code><a class="headerlink" href="#approach-2-using-pipx" title="Permalink to this headline">¶</a></h3>
+<h3 id="approach-2-using-pipx">Approach 2: using <code class="docutils literal notranslate"><span class="pre">pipx</span></code><a class="headerlink" href="#approach-2-using-pipx" title="Permalink to this heading">¶</a></h3>
 <p>You can use <a class="reference external" href="https://pypa.github.io/pipx/">pipx</a> to install Handprint. Pipx will install it into a separate Python environment that isolates the dependencies needed by Handprint from other Python programs on your system, and yet the resulting <code class="docutils literal notranslate"><span class="pre">handprint</span></code> command wil be executable from any shell – like any normal application on your computer. If you do not already have <code class="docutils literal notranslate"><span class="pre">pipx</span></code> on your system, it can be installed in a variety of easy ways and it is best to consult <a class="reference external" href="https://pypa.github.io/pipx/installation/">Pipx’s installation guide</a> for instructions. Once you have pipx on your system, you can install Handprint with the following command:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>pipx install handprint
 </pre></div>
@@ -453,7 +454,7 @@ python3 --version
 <p>Pipx can also let you run Handprint directly using <code class="docutils literal notranslate"><span class="pre">pipx</span> <span class="pre">run</span> <span class="pre">handprint</span></code>, although in that case, you must always prefix every Handprint command with <code class="docutils literal notranslate"><span class="pre">pipx</span> <span class="pre">run</span></code>.  Consult the <a class="reference external" href="https://github.com/pypa/pipx#walkthrough-running-an-application-in-a-temporary-virtual-environment">documentation for <code class="docutils literal notranslate"><span class="pre">pipx</span> <span class="pre">run</span></code></a> for more information.</p>
 </section>
 <section id="approach-3-using-pip">
-<h3 id="approach-3-using-pip">Approach 3: using <code class="docutils literal notranslate"><span class="pre">pip</span></code><a class="headerlink" href="#approach-3-using-pip" title="Permalink to this headline">¶</a></h3>
+<h3 id="approach-3-using-pip">Approach 3: using <code class="docutils literal notranslate"><span class="pre">pip</span></code><a class="headerlink" href="#approach-3-using-pip" title="Permalink to this heading">¶</a></h3>
 <p>If you prefer, you can install Handprint with <a class="reference external" href="https://pip.pypa.io/en/stable/installing/">pip</a>.  If you don’t have <code class="docutils literal notranslate"><span class="pre">pip</span></code> package or are uncertain if you do, please consult the <a class="reference external" href="https://pip.pypa.io/en/stable/installation/">pip installation instructions</a>. Then, to install or upgrade Handprint from the Python package repository, run the following command:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>python3 -m pip install handprint --upgrade
 </pre></div>
@@ -509,10 +510,10 @@ python3 --version
               
           </div>
             Last updated on
-              May 21, 2022.
+              Jun 25, 2022.
             <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

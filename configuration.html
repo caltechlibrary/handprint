@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -54,6 +54,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
@@ -401,7 +402,7 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="configuration-for-cloud-services">
-<h1 id="configuration--page-root">Configuration for cloud services<a class="headerlink" href="#configuration--page-root" title="Permalink to this headline">¶</a></h1>
+<h1 id="configuration--page-root">Configuration for cloud services<a class="headerlink" href="#configuration--page-root" title="Permalink to this heading">¶</a></h1>
 <p>Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but <em>does not include credentials for using the services</em>.  To be able to use Handprint, you must <strong>both</strong> install a copy of Handprint on your computer <strong>and</strong> supply your copy with credentials for accessing the cloud services you want to use.</p>
 <p>Installing credentials involves a one-time configuration step for <strong>each</strong> cloud-based HTR service after you install Handprint on a computer.  In each case, the same command format is used:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -a SERVICENAME CREDENTIALSFILE.json
@@ -409,7 +410,7 @@
 </div>
 <p><em>SERVICENAME</em> must be one of the service names printed by running <code class="docutils literal notranslate"><span class="pre">handprint</span> <span class="pre">-l</span></code>, and <code class="docutils literal notranslate"><span class="pre">CREDENTIALSFILE.json</span></code> must have one of the formats discussed below.  When you run this command, Handprint copies <code class="docutils literal notranslate"><span class="pre">CREDENTIALSFILE.json</span></code> to a private location, and thereafter uses the credentials to access <em>SERVICENAME</em>.  (The private location is different on different systems; for example, on macOS it is <code class="docutils literal notranslate"><span class="pre">~/Library/Application</span> <span class="pre">Support/Handprint/</span></code>.)  Examples are given below.</p>
 <section id="microsoft">
-<h2 id="microsoft">Microsoft<a class="headerlink" href="#microsoft" title="Permalink to this headline">¶</a></h2>
+<h2 id="microsoft">Microsoft<a class="headerlink" href="#microsoft" title="Permalink to this heading">¶</a></h2>
 <p>Microsoft’s approach to credentials in Azure involves the use of <a class="reference external" href="https://docs.microsoft.com/en-us/azure/cognitive-services/computer-vision/vision-api-how-to-topics/howtosubscribe">subscription keys</a>.  The format of the credentials file for Handprint needs to contain two fields:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
 <span class="w"> </span><span class="nt">"subscription_key"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOURKEYHERE"</span><span class="p">,</span><span class="w"></span>
@@ -424,7 +425,7 @@
 </div>
 </section>
 <section id="google">
-<h2 id="google">Google<a class="headerlink" href="#google" title="Permalink to this headline">¶</a></h2>
+<h2 id="google">Google<a class="headerlink" href="#google" title="Permalink to this heading">¶</a></h2>
 <p>Credentials for using a Google service account need to be stored in a JSON file that contains many fields.  The overall format looks like this:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
 <span class="w">  </span><span class="nt">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"service_account"</span><span class="p">,</span><span class="w"></span>
@@ -446,7 +447,7 @@
 </div>
 </section>
 <section id="amazon">
-<h2 id="amazon">Amazon<a class="headerlink" href="#amazon" title="Permalink to this headline">¶</a></h2>
+<h2 id="amazon">Amazon<a class="headerlink" href="#amazon" title="Permalink to this heading">¶</a></h2>
 <p>Amazon credentials for AWS take the form of two alphanumeric strings: a <em>key id</em> string and a <em>secret access key</em> string.  In addition, the service needs to be invoked with a region identifier.  For the purposes of Handprint, these should be stored in a JSON file with the following format:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="nt">"aws_access_key_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_KEY_ID_HERE"</span><span class="p">,</span><span class="w"></span>
@@ -510,10 +511,10 @@ handprint -a amazon-rekognition myamazoncredentials.json
               
           </div>
             Last updated on
-              May 21, 2022.
+              Jun 25, 2022.
             <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

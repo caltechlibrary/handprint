@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -54,6 +54,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
@@ -401,7 +402,7 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="basic-handprint-usage">
-<h1 id="basic-usage--page-root">Basic Handprint usage<a class="headerlink" href="#basic-usage--page-root" title="Permalink to this headline">¶</a></h1>
+<h1 id="basic-usage--page-root">Basic Handprint usage<a class="headerlink" href="#basic-usage--page-root" title="Permalink to this heading">¶</a></h1>
 <p>If the installation steps described in the previous section proceed successfully, a command-line program named <code class="docutils literal notranslate"><span class="pre">handprint</span></code> should end up installed in a location where software is normally installed on your computer.  Running <code class="docutils literal notranslate"><span class="pre">handprint</span></code> from a terminal shell then should be as simple as running any other shell command on your system:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>handprint -h
 </pre></div>
@@ -412,11 +413,11 @@
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">-h</span></code> option (<code class="docutils literal notranslate"><span class="pre">/h</span></code> on Windows) will make <code class="docutils literal notranslate"><span class="pre">handprint</span></code> display some help information and exit immediately.  To make Handprint do more, you can supply other arguments that instruct <code class="docutils literal notranslate"><span class="pre">handprint</span></code> to process image files (or alternatively, URLs pointing to image files at a network location) and run text recognition algorithms on them, as explained below.</p>
 <section id="installing-credentials">
-<h2 id="installing-credentials">Installing credentials<a class="headerlink" href="#installing-credentials" title="Permalink to this headline">¶</a></h2>
+<h2 id="installing-credentials">Installing credentials<a class="headerlink" href="#installing-credentials" title="Permalink to this heading">¶</a></h2>
 <p>Handprint includes several adapters for working with cloud-based HTR services from Amazon, Google, and Microsoft, but <em>does not include credentials for using the services</em>.  Before you can use Handprint, you must supply credentials for accessing the cloud services you want to use. The process for doing this involves using the <code class="docutils literal notranslate"><span class="pre">-a</span></code> option (<code class="docutils literal notranslate"><span class="pre">/a</span></code> on Windows) and is described in detail in the section <a class="reference internal" href="configuration.html"><span class="doc std std-doc">Configuration for cloud services</span></a>.</p>
 </section>
 <section id="input-files-and-urls">
-<h2 id="input-files-and-urls">Input files and URLs<a class="headerlink" href="#input-files-and-urls" title="Permalink to this headline">¶</a></h2>
+<h2 id="input-files-and-urls">Input files and URLs<a class="headerlink" href="#input-files-and-urls" title="Permalink to this heading">¶</a></h2>
 <p>After credentials are installed, running Handprint <em>without</em> the <code class="docutils literal notranslate"><span class="pre">-a</span></code> option will invoke one or more services on files, directories of files, or URLs pointing to files. Here is an example of running Handprint on a directory containing images:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint tests/data/caltech-archives/glaser/
 </pre></div>
@@ -433,7 +434,7 @@
 <p>Finally, note that providing URLs on the command line can be problematic due to how terminal shells interpret certain characters, and so when supplying URLs, it’s usually better to store the URLs in a file in combination with the <code class="docutils literal notranslate"><span class="pre">-f</span></code> option (<code class="docutils literal notranslate"><span class="pre">/f</span></code> on Windows).</p>
 </section>
 <section id="selecting-destination-services">
-<h2 id="selecting-destination-services">Selecting destination services<a class="headerlink" href="#selecting-destination-services" title="Permalink to this headline">¶</a></h2>
+<h2 id="selecting-destination-services">Selecting destination services<a class="headerlink" href="#selecting-destination-services" title="Permalink to this heading">¶</a></h2>
 <p>You can use the <code class="docutils literal notranslate"><span class="pre">-l</span></code> option (<code class="docutils literal notranslate"><span class="pre">/l</span></code> on Windows) to make it display a list of the services currently supported by Handprint:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span><span class="c1"># handprint -l</span>
 Known services: amazon-rekognition, amazon-textract, google, microsoft
@@ -449,7 +450,7 @@ Known services: amazon-rekognition, amazon-textract, google, microsoft
 </p>
 </section>
 <section id="visual-display-of-results">
-<h2 id="visual-display-of-results">Visual display of results<a class="headerlink" href="#visual-display-of-results" title="Permalink to this headline">¶</a></h2>
+<h2 id="visual-display-of-results">Visual display of results<a class="headerlink" href="#visual-display-of-results" title="Permalink to this heading">¶</a></h2>
 <p>After gathering the results of each service for a given input, Handprint will create a single compound image consisting of the results for each service arranged in a <em>N</em>×<em>N</em> grid.  This overview image is intended to make it easier to compare the results of multiple services against each other.  The grid image will have the suffix <code class="docutils literal notranslate"><span class="pre">.handprint-all.png</span></code>.  Here is a sample output image to illustrate:</p>
 <p align="center">
 <img alt="Example annotated results output image" src="_static/media/all-results-example.png" width="90%"/>
@@ -512,10 +513,10 @@ Known services: amazon-rekognition, amazon-textract, google, microsoft
               
           </div>
             Last updated on
-              May 21, 2022.
+              Jun 25, 2022.
             <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

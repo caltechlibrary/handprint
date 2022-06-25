@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -54,6 +54,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
@@ -401,9 +402,9 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="handprint-command-summary">
-<h1 id="command-summary--page-root">Handprint command summary<a class="headerlink" href="#command-summary--page-root" title="Permalink to this headline">¶</a></h1>
+<h1 id="command-summary--page-root">Handprint command summary<a class="headerlink" href="#command-summary--page-root" title="Permalink to this heading">¶</a></h1>
 <section id="command-line-options">
-<h2 id="command-line-options">Command-line options<a class="headerlink" href="#command-line-options" title="Permalink to this headline">¶</a></h2>
+<h2 id="command-line-options">Command-line options<a class="headerlink" href="#command-line-options" title="Permalink to this heading">¶</a></h2>
 <p>The following table summarizes all the command line options available. (Note: on Windows computers, <code class="docutils literal notranslate"><span class="pre">/</span></code> must be used as the prefix character instead of the <code class="docutils literal notranslate"><span class="pre">-</span></code> dash character):</p>
 <table>
 <thead>
@@ -554,11 +555,11 @@
 ⬥   To write to the console, use the character <code class="docutils literal notranslate"><span class="pre">-</span></code> as the value of <em>OUT</em>; otherwise, <em>OUT</em> must be the name of a file where the output should be written.</p>
 </section>
 <section id="return-values">
-<h2 id="return-values">Return values<a class="headerlink" href="#return-values" title="Permalink to this headline">¶</a></h2>
+<h2 id="return-values">Return values<a class="headerlink" href="#return-values" title="Permalink to this heading">¶</a></h2>
 <p>This program exits with a return code of 0 if no problems are encountered.  It returns a nonzero value otherwise. The following table lists the possible return values:</p>
 <table>
 <thead>
-<tr class="row-odd"><th class="text-center head"><p>Code</p></th>
+<tr class="row-odd"><th class="head text-center"><p>Code</p></th>
 <th class="head"><p>Meaning</p></th>
 </tr>
 </thead>
@@ -588,7 +589,7 @@
 </table>
 </section>
 <section id="additional-notes">
-<h2 id="additional-notes">Additional notes<a class="headerlink" href="#additional-notes" title="Permalink to this headline">¶</a></h2>
+<h2 id="additional-notes">Additional notes<a class="headerlink" href="#additional-notes" title="Permalink to this heading">¶</a></h2>
 <p>The debug logging functionality is implemented using <a class="reference external" href="https://github.com/caltechlibrary/sidetrack">Sidetrack</a> and all calls to the debug code are conditionalized on the Python symbol <code class="docutils literal notranslate"><span class="pre">__debug__</span></code>.  It is carefully written so that you can cause the calls to be <em>optimized out completely</em> if your run Python with <a class="reference external" href="https://docs.python.org/3/using/cmdline.html#cmdoption-o">optimization turned on</a> (e.g., using the <code class="docutils literal notranslate"><span class="pre">-O</span></code> command-line option).</p>
 </section>
 </section>
@@ -640,10 +641,10 @@
               
           </div>
             Last updated on
-              May 21, 2022.
+              Jun 25, 2022.
             <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

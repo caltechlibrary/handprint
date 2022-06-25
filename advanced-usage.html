@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -54,6 +54,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
@@ -401,10 +402,10 @@
           <article class="md-content__inner md-typeset" role="main">
             
   <section id="advanced-handprint-usage">
-<h1 id="advanced-usage--page-root">Advanced Handprint usage<a class="headerlink" href="#advanced-usage--page-root" title="Permalink to this headline">¶</a></h1>
+<h1 id="advanced-usage--page-root">Advanced Handprint usage<a class="headerlink" href="#advanced-usage--page-root" title="Permalink to this heading">¶</a></h1>
 <p>This section describes commands that are somewhat more complex than those described in the <a class="reference internal" href="basic-usage.html"><span class="doc std std-doc">section on basic usage</span></a>.</p>
 <section id="annotation-types">
-<h2 id="annotation-types">Annotation types<a class="headerlink" href="#annotation-types" title="Permalink to this headline">¶</a></h2>
+<h2 id="annotation-types">Annotation types<a class="headerlink" href="#annotation-types" title="Permalink to this heading">¶</a></h2>
 <p>Handprint produces copies of the input images overlaid with the recognition results received from the different services.  By default, it shows only the recognized text.  The option <code class="docutils literal notranslate"><span class="pre">-d</span></code> (<code class="docutils literal notranslate"><span class="pre">/d</span></code> on Windows) can be used to tell Handprint to display other results.  The recognized values are as follows:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">text</span></code>: display the text recognized in the image (default)</p></li>
@@ -425,9 +426,9 @@
 <table>
 <thead>
 <tr class="row-odd"><th class="head"><p>Service</p></th>
-<th class="text-center head"><p>Word<br/>bounding boxes</p></th>
-<th class="text-center head"><p>Line<br/>bounding boxes</p></th>
-<th class="text-center head"><p>Paragraph<br/>bounding boxes</p></th>
+<th class="head text-center"><p>Word<br/>bounding boxes</p></th>
+<th class="head text-center"><p>Line<br/>bounding boxes</p></th>
+<th class="head text-center"><p>Paragraph<br/>bounding boxes</p></th>
 </tr>
 </thead>
 <tbody>
@@ -452,7 +453,7 @@
 bounding box in the annotated output for that service.</p>
 </section>
 <section id="thresholding-by-confidence">
-<h2 id="thresholding-by-confidence">Thresholding by confidence<a class="headerlink" href="#thresholding-by-confidence" title="Permalink to this headline">¶</a></h2>
+<h2 id="thresholding-by-confidence">Thresholding by confidence<a class="headerlink" href="#thresholding-by-confidence" title="Permalink to this heading">¶</a></h2>
 <p>All of the services return confidence scores for items recognized in the input.  By default, Handprint will show all results no matter how low the confidence score.  The option <code class="docutils literal notranslate"><span class="pre">-n</span></code> (<code class="docutils literal notranslate"><span class="pre">/n</span></code> on Windows) can be used to threshold the results based on the confidence value for each item (text or bounding boxes).  The value provided as the argument to the option must be a floating point number between 0 and 1.0.  For example, the following command will make Handprint only show text that is rated with least 99.5% confidence:</p>
 <div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>handprint -n <span class="m">0</span>.995  somefile.png
 </pre></div>
@@ -460,7 +461,7 @@ bounding box in the annotated output for that service.</p>
 <p>Note that the <strong>confidence values returned by the different services are not normalized against each other</strong>.  What one service considers to be 80% confidence may not be what another service considers 80% confidence.  Handprint performs the thresholding against the raw scores returned by each service individually.</p>
 </section>
 <section id="comparison-to-ground-truth">
-<h2 id="comparison-to-ground-truth">Comparison to ground truth<a class="headerlink" href="#comparison-to-ground-truth" title="Permalink to this headline">¶</a></h2>
+<h2 id="comparison-to-ground-truth">Comparison to ground truth<a class="headerlink" href="#comparison-to-ground-truth" title="Permalink to this heading">¶</a></h2>
 <p>Handprint offers the ability to compare the output of HTR services to expected output (i.e., ground truth) using the option <code class="docutils literal notranslate"><span class="pre">-c</span></code> (or <code class="docutils literal notranslate"><span class="pre">/c</span></code> on Windows).  This facility requires that the user provides text files that contain the expected text for each input image.  The ground-truth text files must have the following characteristics:</p>
 <ul class="simple">
 <li><p>The file containing the expected results should be named <code class="docutils literal notranslate"><span class="pre">.gt.txt</span></code>, with a base name identical to the image file.  For example, an image file named <code class="docutils literal notranslate"><span class="pre">somefile.jpg</span></code> should have a corresponding text file <code class="docutils literal notranslate"><span class="pre">somefile.gt.txt</span></code>.  (This is a convention used by some other tools such as <a class="reference external" href="https://github.com/tmbdev/ocropy/wiki/Working-with-Ground-Truth">ocropy</a>.)</p></li>
@@ -489,7 +490,7 @@ bounding box in the annotated output for that service.</p>
 </p>
 </section>
 <section id="extended-results">
-<h2 id="extended-results">Extended results<a class="headerlink" href="#extended-results" title="Permalink to this headline">¶</a></h2>
+<h2 id="extended-results">Extended results<a class="headerlink" href="#extended-results" title="Permalink to this heading">¶</a></h2>
 <p>If the option <code class="docutils literal notranslate"><span class="pre">-e</span></code> (<code class="docutils literal notranslate"><span class="pre">/e</span></code> on Windows) is used, Handprint saves not only the overview image containing all the results, but also, individual annotated images for each service’s results, the raw data (converted to a JSON file by Handprint), and the text extracted by the service.  These additional outputs will be written in files named after the original files with the addition of a string that indicates the service used.  For example, a file named <code class="docutils literal notranslate"><span class="pre">somefile.jpg</span></code> will produce</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">textract</span><span class="o">.</span><span class="n">png</span>
 <span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">textract</span><span class="o">.</span><span class="n">json</span>
@@ -537,7 +538,7 @@ bounding box in the annotated output for that service.</p>
 <p>The base name <code class="docutils literal notranslate"><span class="pre">document</span></code> can be changed using the <code class="docutils literal notranslate"><span class="pre">-b</span></code> option (<code class="docutils literal notranslate"><span class="pre">/b</span></code> on Windows).  For example, running Handprint with the option <code class="docutils literal notranslate"><span class="pre">-b</span> <span class="pre">einstein</span></code> will cause the outputs to be named <code class="docutils literal notranslate"><span class="pre">einstein-1.jpg</span></code>, <code class="docutils literal notranslate"><span class="pre">einstein-1.url</span></code>, etc.</p>
 </section>
 <section id="other-options">
-<h2 id="other-options">Other options<a class="headerlink" href="#other-options" title="Permalink to this headline">¶</a></h2>
+<h2 id="other-options">Other options<a class="headerlink" href="#other-options" title="Permalink to this heading">¶</a></h2>
 <p>The option <code class="docutils literal notranslate"><span class="pre">-j</span></code> (<code class="docutils literal notranslate"><span class="pre">/j</span></code> on Windows) tells Handprint to look for and reuse preexisting results for each input instead of contacting the services.  This makes it look for JSON files produced in a previous run with the <code class="docutils literal notranslate"><span class="pre">-e</span></code> option,</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">rekognition</span><span class="o">.</span><span class="n">json</span>
 <span class="n">somefile</span><span class="o">.</span><span class="n">handprint</span><span class="o">-</span><span class="n">amazon</span><span class="o">-</span><span class="n">textract</span><span class="o">.</span><span class="n">json</span>
@@ -600,10 +601,10 @@ bounding box in the annotated output for that service.</p>
               
           </div>
             Last updated on
-              May 21, 2022.
+              Jun 25, 2022.
             <br/>
             Created using
-            <a href="http://www.sphinx-doc.org/">Sphinx</a> 4.5.0.
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 5.0.2.
              and
             <a href="https://github.com/bashtage/sphinx-material/">Material for
               Sphinx</a>

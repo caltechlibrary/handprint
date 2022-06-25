@@ -134,7 +134,7 @@ class Manager:
         "index" and "base_name" to construct a download copy of the item if
         it has to be downloaded from a URL first.
         '''
-       # Shortcuts to make the code more readable.
+        # Shortcuts to make the code more readable.
         services = self._services
 
         inform(f'Starting on [white]{item}[/]')

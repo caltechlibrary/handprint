@@ -31,7 +31,7 @@ sidetrack = "==2.0.0"
 textdistance = "==4.2.2"
 urllib3 = "==1.26.5"
 validator-collection = "==1.5.0"
-Pillow = "==9.0.1"
+Pillow = "==9.3.0"
 PyMuPDF = "==1.19.6"
 StringDist = "==1.0.9"
 
